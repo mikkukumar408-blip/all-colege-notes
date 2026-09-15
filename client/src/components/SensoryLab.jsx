@@ -125,7 +125,7 @@ function cleanMathTypography(str) {
 
   // Remove stray LaTeX brackets and delimiters
   s = s.replace(/\\\{/g, '{').replace(/\\\}/g, '}');
-  s = s.replace(/\{([a-zA-Z0-9\s,\.\+\-\*\/=]+)\}/g, '($1)');
+  s = s.replace(/(?<!\\(?:begin|end|text|frac|sqrt|mathbf|substack|array|cases|aligned|bmatrix|matrix))\{([0-9\s,\.\+\-\*\/=]+)\}/g, '($1)');
   s = s.replace(/\$\$/g, '').replace(/\$([^$]+?)\$/g, '$1');
 
   return s;
@@ -135,38 +135,76 @@ function renderKaTeXSafe(formula, isDisplay = false) {
   if (!formula) return '';
   let clean = formula.trim();
 
+  // Strip any inner stray dollar signs
+  clean = clean.replace(/(?<!\\)\$/g, '');
+
   // 0. Normalize double-escaped LaTeX keywords (\\begin -> \begin, \\left -> \left, etc.)
   clean = clean.replace(/\\\\([a-zA-Z]+)/g, (m, word) => '\x5C' + word);
 
-  // 0B. Fix formfeed \f from unescaped \frac in JS strings
+  // 0A. Fix JS string literal escape corruption:
+  clean = clean.replace(/[\t\x09]\s*heta/g, '\\theta');
+  clean = clean.replace(/(?<!\\)\btheta\b/g, '\\theta');
+  clean = clean.replace(/[\r\x0d]\s*ho/g, '\\rho');
+  clean = clean.replace(/(?<!\\)\brho\b/g, '\\rho');
+  clean = clean.replace(/[\b\x08]\s*egin/g, '\\begin');
+  clean = clean.replace(/[\f\x0c]\s*rac/g, '\\frac');
   clean = clean.replace(/\x0crac/g, '\\frac');
   clean = clean.replace(/⬆rac/g, '\\frac');
+  clean = clean.replace(/(?<!\\)\bleft\s*([\[\(\{])/g, '\\left$1');
+  clean = clean.replace(/[\r\x0d]\s*ight\s*([\]\)\}])/g, '\\right$1');
+  clean = clean.replace(/(?<!\\)\bright\s*([\]\)\}])/g, '\\right$1');
+  clean = clean.replace(/(?:\\into|int_0|int0)\s*\^/g, '\\int_0^');
+  clean = clean.replace(/(?<!\\)\bint\b(?=\s*[_0\^])/g, '\\int');
+  clean = clean.replace(/(?<![a-zA-Z\\])pi(?![a-zA-Z])/g, '\\pi');
+  clean = clean.replace(/(?<![a-zA-Z\\])sin(?![a-zA-Z])/g, '\\sin');
+  clean = clean.replace(/(?<![a-zA-Z\\])cos(?![a-zA-Z])/g, '\\cos');
+  clean = clean.replace(/(?<![a-zA-Z\\])tan(?![a-zA-Z])/g, '\\tan');
 
-  // 1. Convert any span fractions back to LaTeX \frac{num}{den}
+  // Fix parentheses from cleanMathTypography if any occurred
+  clean = clean.replace(/\\begin\((cases|aligned|bmatrix|matrix|array)\)/g, '\\begin{$1}');
+  clean = clean.replace(/\\end\((cases|aligned|bmatrix|matrix|array)\)/g, '\\end{$1}');
+
+  // Convert any span fractions back to LaTeX \frac{num}{den}
   clean = clean.replace(/<span class=['"]frac['"]><span class=['"]frac-num['"]>([\s\S]*?)<\/span><span class=['"]frac-den['"]>([\s\S]*?)<\/span><\/span>/g, '\\frac{$1}{$2}');
 
-  // 2. Strip any other HTML tags from inside LaTeX
+  // Strip any HTML tags inside LaTeX
   clean = clean.replace(/<[^>]+>/g, '');
 
-  // 3. Fix matrix newlines if needed
+  // Matrix column separator fixes (e.g. {ccc/c} -> {ccc|c})
+  clean = clean.replace(/\{([crl]+)\/([crl]+)\}/g, '{$1|$2}');
+  clean = clean.replace(/\[A\s+mid\s+B\]/g, '[A \\mid B]');
+  clean = clean.replace(/\[A\s+mid\s+I\]/g, '[A \\mid I]');
+
+  // Fix matrix newlines if needed
   clean = clean.replace(/(\\begin\{(?:[a-zA-Z]*matrix|cases|aligned)\}[\s\S]*?\\end\{(?:[a-zA-Z]*matrix|cases|aligned)\})/g, (env) => {
     return env.replace(/\\ (?=[a-zA-Z0-9_\-\+\*\(\)\^²³⁴ⁿ¹ᐟ²³ᐟ²\sλρθμπσωφΔ∇&|⋮⋱\.]|\\end)/g, '\\\\ ');
   });
 
-  // 4. Normalize Unicode sub/superscripts for KaTeX matrices
+  // Normalize Unicode sub/superscripts for KaTeX matrices
   clean = clean
     .replace(/\bI₁\b/g, 'I_1').replace(/\bI₂\b/g, 'I_2').replace(/\bI₃\b/g, 'I_3')
     .replace(/\bIᵣ\b/g, 'I_r').replace(/\bA⁻¹\b/g, 'A^{-1}').replace(/\bA²\b/g, 'A^2').replace(/\bA³\b/g, 'A^3').replace(/\bA⁴\b/g, 'A^4');
 
-  // 5. Normalize common Unicode math symbols and unescaped percent signs for flawless KaTeX parsing
+  // Normalize Unicode & operators for KaTeX
   clean = clean
+    .replace(/\\?·/g, '\\cdot ')
+    .replace(/\\?≈/g, '\\approx ')
+    .replace(/\\?≠/g, '\\neq ')
+    .replace(/\\?→/g, '\\rightarrow ')
+    .replace(/\\?⇒/g, '\\implies ')
+    .replace(/\\?⇔/g, '\\iff ')
+    .replace(/\\?±/g, '\\pm ')
+    .replace(/\\?≤/g, '\\le ')
+    .replace(/\\?≥/g, '\\ge ')
+    .replace(/\\?λ/g, '\\lambda ')
+    .replace(/\\?μ/g, '\\mu ')
+    .replace(/\\?ω/g, '\\omega ')
+    .replace(/\\?Ω/g, '\\Omega ')
+    .replace(/\\?π/g, '\\pi ')
+    .replace(/\\?∞/g, '\\infty ')
+    .replace(/\\?∈/g, '\\in ')
+    .replace(/\\?∂/g, '\\partial ')
     .replace(/(?<!\\)%/g, '\\%')
-    .replace(/→/g, '\\rightarrow ')
-    .replace(/π/g, '\\pi ')
-    .replace(/∞/g, '\\infty ')
-    .replace(/∈/g, '\\in ')
-    .replace(/·/g, '\\cdot ')
-    .replace(/∂/g, '\\partial ')
     .replace(/ⁿ/g, '^n')
     .replace(/²/g, '^2')
     .replace(/³/g, '^3')
@@ -185,6 +223,16 @@ function renderKaTeXSafe(formula, isDisplay = false) {
       strict: false
     });
     if (rendered.includes('katex-error')) {
+      // Retry after cleaning any control characters
+      const stripped = clean.replace(/[\x00-\x1F\x7F]/g, ' ');
+      const retry = katex.renderToString(stripped, {
+        displayMode: isDisplay,
+        throwOnError: false,
+        strict: false
+      });
+      if (!retry.includes('katex-error')) {
+        return retry;
+      }
       return cleanMathTypography(clean);
     }
     return rendered;
@@ -207,9 +255,6 @@ function formatNoteContent(content) {
   html = html.replace(/\x0crac/g, '\\frac');
   html = html.replace(/⬆rac/g, '\\frac');
   html = html.replace(/\x0c/g, '');
-
-  // Pre-clean 0B: Auto-wrap standalone LaTeX matrix blocks (\left[ \begin{array}... or \begin{bmatrix}) in $$...$$
-  html = html.replace(/(?<!\$)\s*(\\+left\[\s*\\+begin\{(?:array|bmatrix|matrix)\}[\s\S]*?\\+end\{(?:array|bmatrix|matrix)\}\s*\\+right\])\s*(?!\$)/g, '\n\n$$$1$$\n\n');
 
   // Pre-clean 0C: Auto-clean stray LaTeX arrows and symbols outside math mode in text
   html = html.replace(/\\leftrightarrow/g, ' ⇄ ');
@@ -257,6 +302,22 @@ function formatNoteContent(content) {
   // Step 1: Extract and pre-render Display Math ($$...$$) into placeholders
   const mathDisplayBlocks = [];
   html = html.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
+    const rendered = renderKaTeXSafe(formula, true);
+    const placeholder = `\x00MATH_DISPLAY_${mathDisplayBlocks.length}\x00`;
+    mathDisplayBlocks.push(`<div class="katex-display-box">${rendered}</div>`);
+    return placeholder;
+  });
+
+  // Step 1.5: Auto-extract any UNWRAPPED LaTeX environments (cases, aligned, bmatrix, matrix, array) into display blocks
+  html = html.replace(/(\\+begin\{(?:cases|aligned|bmatrix|matrix|array)\}[\s\S]*?\\+end\{(?:cases|aligned|bmatrix|matrix|array)\})/g, (match, formula) => {
+    const rendered = renderKaTeXSafe(formula, true);
+    const placeholder = `\x00MATH_DISPLAY_${mathDisplayBlocks.length}\x00`;
+    mathDisplayBlocks.push(`<div class="katex-display-box">${rendered}</div>`);
+    return placeholder;
+  });
+
+  // Step 1.6: Auto-extract any UNWRAPPED augmented matrices (\left[ ... \right])
+  html = html.replace(/(\\+left\[\s*\\+begin\{[^}]+\}[\s\S]*?\\+end\{[^}]+\}\s*\\+right\])/g, (match, formula) => {
     const rendered = renderKaTeXSafe(formula, true);
     const placeholder = `\x00MATH_DISPLAY_${mathDisplayBlocks.length}\x00`;
     mathDisplayBlocks.push(`<div class="katex-display-box">${rendered}</div>`);
