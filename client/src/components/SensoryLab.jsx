@@ -199,6 +199,22 @@ function formatNoteContent(content) {
 
   let html = content;
 
+  // Pre-clean 0A: Auto-fix unescaped \f formfeed from \frac in JS strings and stray arrow symbols
+  html = html.replace(/\x0crac/g, '\\frac');
+  html = html.replace(/⬆rac/g, '\\frac');
+  html = html.replace(/\x0c/g, '');
+
+  // Pre-clean 0B: Auto-wrap standalone LaTeX matrix blocks (\left[ \begin{array}... or \begin{bmatrix}) in $$...$$
+  html = html.replace(/(?<!\$)\s*(\\+left\[\s*\\+begin\{(?:array|bmatrix|matrix)\}[\s\S]*?\\+end\{(?:array|bmatrix|matrix)\}\s*\\+right\])\s*(?!\$)/g, '\n\n$$$1$$\n\n');
+
+  // Pre-clean 0C: Auto-clean stray LaTeX arrows and symbols outside math mode in text
+  html = html.replace(/\\leftrightarrow/g, ' ⇄ ');
+  html = html.replace(/\\rightarrow/g, ' → ');
+  html = html.replace(/\\to\b/g, ' → ');
+  html = html.replace(/\\Omega\b/g, ' Ω');
+  html = html.replace(/\\sin\b/g, 'sin');
+  html = html.replace(/\\cos\b/g, 'cos');
+
   // Step 0 (PRE-PASS): Extract triple-backtick code blocks FIRST before any other processing,
   // clean any embedded math notation inside them, and replace with unique placeholders.
   const codeBlocks = [];
@@ -208,7 +224,15 @@ function formatNoteContent(content) {
     if (isMathDerivation) {
       let cleanCode = cleanMathTypography(code);
       // Clean backticks inside derivations to render math
-      cleanCode = cleanCode.replace(/`([^`\n]+)`/g, (m, math) => {
+      cleanCode = cleanCode.replace(/`([^`\n]+)`/g, (m, rawMath) => {
+        let math = rawMath.trim();
+        // Separate English labels (e.g. "Net Reactance X = ...", "2. Impedance: ...") from math expressions
+        const labelMatch = math.match(/^([0-9]+\.\s*[A-Za-z\s]+:|Power\s*Factor:|Active\s*Power:|Reactive\s*Power:|Net\s*Reactance\s*[A-Za-z]*\s*=)\s*(.*)$/);
+        if (labelMatch) {
+          const label = labelMatch[1];
+          const expr = labelMatch[2];
+          return `<div class="derivation-step-row" style="margin: 6px 0; line-height: 1.8;"><span style="font-weight: 700; color: #1e3a8a; margin-right: 6px;">${label}</span><span class="derivation-math-step">${renderKaTeXSafe(expr, false)}</span></div>`;
+        }
         return `<span class="derivation-math-step">${renderKaTeXSafe(math, false)}</span>`;
       });
       const placeholder = `\x00CODEBLOCK_${codeBlocks.length}\x00`;

@@ -2190,15 +2190,30 @@ h1, h2, h3, .font-heading {
 
 .theme-paper,
 .theme-paper .notes-html-content,
-.theme-paper .notes-html-content * {
+.theme-paper .notes-html-content *:not(.katex):not(.katex *) {
   font-family: 'Caveat', 'Homemade Apple', 'Patrick Hand', cursive !important;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Explicit KaTeX font protection to prevent font-clash and overlapping symbols */
+.katex,
+.katex * {
+  font-family: KaTeX_Main, 'Times New Roman', serif !important;
+  line-height: normal !important;
+}
+.katex-display-box,
+.katex-display {
+  margin: 16px 0 !important;
+  padding: 8px 0 !important;
+  line-height: normal !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
 }
 
 .theme-paper .notes-html-content {
   font-family: 'Caveat', 'Homemade Apple', 'Patrick Hand', cursive !important;
   font-size: 1.55rem !important;
-  line-height: 34px !important;
+  line-height: 42px !important;
   color: #1e3a8a !important; /* Royal blue student ballpoint ink */
   letter-spacing: 0.3px !important;
   font-weight: 600 !important;
@@ -2210,7 +2225,7 @@ h1, h2, h3, .font-heading {
 .theme-paper .notes-html-content div:not(.katex *):not(.worked-example-box):not(.worked-example-box *):not(.academic-derivation-box):not(.academic-derivation-box *):not(.circuit-diagram-card):not(.circuit-diagram-card *):not(.exam-trap-box):not(.green-law-box):not(.topper-mnemonic-box):not(.blue-analogy-box):not(.cyan-keytakeaway-box):not(.orange-warning-box):not(.purple-exam-goal-box):not(.rainbow-concept-box) {
   font-family: 'Caveat', 'Homemade Apple', 'Patrick Hand', cursive !important;
   font-size: 1.55rem !important;
-  line-height: 34px !important;
+  line-height: 42px !important;
   color: #1e3a8a !important;
   letter-spacing: 0.3px !important;
   font-weight: 600 !important;
@@ -2289,7 +2304,7 @@ h1, h2, h3, .font-heading {
   align-items: flex-start !important;
   gap: 10px !important;
   margin: 6px 0 !important;
-  line-height: 34px !important;
+  line-height: 42px !important;
   width: 100% !important;
   max-width: 100% !important;
   min-width: 0 !important;
