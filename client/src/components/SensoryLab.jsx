@@ -590,16 +590,24 @@ export default function SensoryLab({
       const oldFrame = document.getElementById('academic-print-frame');
       if (oldFrame) oldFrame.remove();
 
-      // Clone only the notes panel — not the whole page
+      // Clone only the notes panel
       const contentClone = notesEl.cloneNode(true);
 
-      // Strip UI chrome
+      // Strip UI chrome, watermarks, and the PDF download banner
       contentClone.querySelectorAll(
-        '.forensic-watermark-overlay, .sticky-margin-note, button, ' +
-        '[title*="PDF"], [title*="Subject"], .notes-reader-banner, .pdf-banner, .paper-mode-banner'
+        '.forensic-watermark-overlay, .sticky-margin-note, button, a[href*=".pdf"], ' +
+        '[title*="PDF"], [title*="Subject"], .handwritten-pdf-banner, .notes-reader-banner, ' +
+        '.pdf-banner, .paper-mode-banner'
       ).forEach(el => el.remove());
 
-      // Fix SVG height="auto" — causes a browser error in print mode
+      // Extra safeguard: remove any element containing "Real Classroom Handwritten Notebook Attached"
+      contentClone.querySelectorAll('div').forEach(el => {
+        if (el.textContent && el.textContent.includes('Real Classroom Handwritten Notebook Attached') && el.querySelector('button, a')) {
+          el.remove();
+        }
+      });
+
+      // Fix SVG height="auto"
       contentClone.querySelectorAll('svg').forEach(svg => {
         const h = svg.getAttribute('height');
         if (h === 'auto' || h === '') {
@@ -619,7 +627,6 @@ export default function SensoryLab({
       });
 
       // Collect ALL inline CSS from living stylesheets
-      // (avoids broken cross-origin <link> refs inside an isolated iframe)
       let inlineCSS = '';
       try {
         Array.from(document.styleSheets).forEach(sheet => {
@@ -629,63 +636,219 @@ export default function SensoryLab({
         });
       } catch (_) {}
 
+      const isPaperMode = themeMode === 'paper';
+
       const printHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <title>${activeSubject.code || ''} \u2013 Unit ${selectedUnitNum} Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous"/>
 <style>
 ${inlineCSS}
-@page { size: A4 portrait; margin: 14mm 12mm 14mm 12mm; }
-*,*::before,*::after { box-sizing:border-box!important; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; text-shadow:none!important; }
-html,body { background:#ffffff!important; color:#0f172a!important; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Arial,sans-serif!important; font-size:11pt!important; line-height:1.65!important; margin:0!important; padding:0!important; }
-.notes-reader-panel,.glass-panel { background:#ffffff!important; border:none!important; box-shadow:none!important; overflow:visible!important; padding:0!important; }
-.notes-html-content { color:#0f172a!important; font-size:11pt!important; line-height:1.65!important; white-space:normal!important; }
-h1,h2,h3,h4,h5,.handwritten-heading,.note-h3,.note-h4,.note-h5 { color:#0f172a!important; page-break-after:avoid!important; break-after:avoid!important; }
-.yellow-highlighter { background:transparent!important; color:#92400e!important; font-weight:700!important; }
-.circuit-diagram-card { background:#ffffff!important; border:1px solid #cbd5e1!important; box-shadow:none!important; page-break-inside:avoid!important; break-inside:avoid!important; margin:16px 0!important; padding:12px!important; }
-.circuit-diagram-card svg { max-width:100%!important; width:100%!important; height:auto!important; display:block!important; }
-.circuit-diagram-caption { color:#1e3a8a!important; font-weight:800!important; font-size:9pt!important; margin-top:6px!important; }
-.circuit-diagram-card .schematic-bg { fill:#ffffff!important; stroke:#cbd5e1!important; }
-.circuit-diagram-card .schematic-wire { stroke:#1e3a8a!important; }
-.circuit-diagram-card .schematic-resistor { stroke:#b45309!important; }
-.circuit-diagram-card .schematic-title { fill:#1e40af!important; }
-.circuit-diagram-card text[fill="#e2e8f0"],.circuit-diagram-card text[fill="#94a3b8"],.circuit-diagram-card text[fill="#38bdf8"] { fill:#0f172a!important; }
-.circuit-diagram-card text[fill="#fbbf24"],.circuit-diagram-card text[fill="#fef08a"] { fill:#92400e!important; }
-.circuit-diagram-card text[fill="#10b981"],.circuit-diagram-card text[fill="#34d399"] { fill:#065f46!important; }
-.circuit-diagram-card rect[fill*="rgba(15,23,42"],.circuit-diagram-card rect[fill*="rgba(10,15,29"] { fill:#f8fafc!important; }
-.worked-example-box,.academic-derivation-box,.exam-trap-box,.topper-mnemonic-box,.green-law-box,.blue-analogy-box,.cyan-keytakeaway-box,.orange-warning-box,.purple-exam-goal-box,.custom-table-wrap,.katex-display-box,.analytical-derivation-box,.ascii-diagram-box { page-break-inside:avoid!important; break-inside:avoid!important; box-shadow:none!important; margin:14px 0!important; }
-.exam-trap-box { background:#fff1f2!important; border-left:4px solid #e11d48!important; color:#881337!important; }
-.topper-mnemonic-box { background:#faf5ff!important; border-left:4px solid #9333ea!important; color:#581c87!important; }
-.green-law-box { background:#f0fdf4!important; border-left:4px solid #16a34a!important; color:#14532d!important; }
-.blue-analogy-box { background:#eff6ff!important; border-left:4px solid #2563eb!important; color:#1e3a8a!important; }
-.cyan-keytakeaway-box { background:#ecfeff!important; border-left:4px solid #0891b2!important; color:#164e63!important; }
-.orange-warning-box { background:#fffbeb!important; border-left:4px solid #d97706!important; color:#78350f!important; }
-.purple-exam-goal-box { background:#f5f3ff!important; border-left:4px solid #7c3aed!important; color:#4c1d95!important; }
-.custom-table-wrap table { border-collapse:collapse!important; width:100%!important; }
-.custom-table-wrap th { background:#f1f5f9!important; color:#0f172a!important; border:1px solid #cbd5e1!important; padding:6px 10px!important; }
-.custom-table-wrap td { border:1px solid #e2e8f0!important; color:#1e293b!important; padding:6px 10px!important; }
-.print-academic-banner { border-bottom:2.5px solid #0f172a; padding-bottom:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:flex-start; }
-.print-academic-banner h1 { font-size:18pt!important; font-weight:900!important; color:#0f172a!important; margin:0 0 4px!important; }
-.print-academic-banner h2 { font-size:13pt!important; font-weight:800!important; color:#1e3a8a!important; margin:0 0 6px!important; }
-.print-academic-banner p { font-size:9.5pt!important; color:#475569!important; margin:0!important; }
-.print-doc-footer { margin-top:30px; border-top:1px solid #cbd5e1; padding-top:8px; font-size:8pt; color:#64748b; display:flex; justify-content:space-between; }
+
+@page { 
+  size: A4 portrait; 
+  margin: 14mm 12mm 14mm 12mm; 
+}
+*, *::before, *::after { 
+  box-sizing: border-box !important; 
+  -webkit-print-color-adjust: exact !important; 
+  print-color-adjust: exact !important; 
+  text-shadow: none !important; 
+}
+html, body { 
+  background: #ffffff !important; 
+  margin: 0 !important; 
+  padding: 0 !important; 
+}
+
+/* Base resets */
+.notes-reader-panel, .glass-panel { 
+  background: #ffffff !important; 
+  border: none !important; 
+  box-shadow: none !important; 
+  overflow: visible !important; 
+  padding: 0 !important; 
+}
+.notes-html-content { 
+  line-height: 1.65 !important; 
+  white-space: normal !important; 
+}
+.yellow-highlighter { 
+  background: rgba(254, 240, 138, 0.5) !important; 
+  color: #854d0e !important; 
+  font-weight: 700 !important; 
+  padding: 0 4px !important;
+  border-radius: 3px !important;
+}
+
+/* =========================================================================
+   THEME-AWARE PRINT STYLING
+   ========================================================================= */
+${isPaperMode ? `
+body, body.theme-paper, .theme-paper, .notes-reader-panel.theme-paper {
+  font-family: 'Caveat', 'Patrick Hand', cursive !important;
+  color: #1e3a8a !important; /* Authentic ballpoint royal blue ink */
+  font-size: 13.5pt !important;
+  line-height: 1.55 !important;
+}
+
+#print-root {
+  border-left: 2.5px solid #f87171 !important; /* Classic notebook red margin line */
+  padding-left: 20px !important;
+  margin-left: 6px !important;
+}
+
+.theme-paper h1, .theme-paper h2, .theme-paper h3, .theme-paper h4, .theme-paper h5,
+.theme-paper .handwritten-heading, .theme-paper .note-h3, .theme-paper .note-h4, .theme-paper .note-h5 {
+  font-family: 'Patrick Hand', 'Caveat', cursive !important;
+  color: #0f2b5c !important; /* Rich deep blue heading ink */
+  font-weight: 700 !important;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+}
+
+.theme-paper .notes-html-content,
+.theme-paper .notes-html-content p,
+.theme-paper .notes-html-content li,
+.theme-paper .notes-html-content span:not(.katex *):not(.pill-badge),
+.theme-paper .handwritten-list-item span {
+  font-family: 'Caveat', 'Patrick Hand', cursive !important;
+  color: #1e3a8a !important;
+  font-size: 13.5pt !important;
+}
+
+.theme-paper .handwritten-bullet,
+.theme-paper .handwritten-num {
+  font-family: 'Patrick Hand', cursive !important;
+  color: #dc2626 !important; /* Red pen margin bullets */
+  font-weight: bold !important;
+}
+
+.theme-paper .circuit-diagram-card {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-left: 4px solid #3b82f6 !important;
+}
+.theme-paper .circuit-diagram-card .schematic-wire { stroke: #1e3a8a !important; }
+.theme-paper .circuit-diagram-card .schematic-resistor { stroke: #b45309 !important; }
+.theme-paper .circuit-diagram-card .schematic-title { fill: #1e40af !important; }
+` : `
+body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #0f172a !important;
+  font-size: 11pt !important;
+  line-height: 1.65 !important;
+}
+
+.theme-clean h1, .theme-clean h2, .theme-clean h3, .theme-clean h4, .theme-clean h5,
+.theme-clean .handwritten-heading, .theme-clean .note-h3, .theme-clean .note-h4, .theme-clean .note-h5 {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+}
+
+.theme-clean .notes-html-content,
+.theme-clean .notes-html-content p,
+.theme-clean .notes-html-content li {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #0f172a !important;
+}
+`}
+
+/* Circuit diagrams across all print modes */
+.circuit-diagram-card {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  margin: 16px 0 !important;
+  padding: 12px !important;
+}
+.circuit-diagram-card svg {
+  max-width: 100% !important;
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+}
+.circuit-diagram-caption {
+  color: #1e3a8a !important;
+  font-weight: 800 !important;
+  font-size: 9pt !important;
+  margin-top: 6px !important;
+}
+.circuit-diagram-card .schematic-bg { fill: #ffffff !important; stroke: #cbd5e1 !important; }
+.circuit-diagram-card text[fill="#e2e8f0"], .circuit-diagram-card text[fill="#94a3b8"], .circuit-diagram-card text[fill="#38bdf8"] { fill: #0f172a !important; }
+.circuit-diagram-card text[fill="#fbbf24"], .circuit-diagram-card text[fill="#fef08a"] { fill: #92400e !important; }
+.circuit-diagram-card text[fill="#10b981"], .circuit-diagram-card text[fill="#34d399"] { fill: #065f46 !important; }
+.circuit-diagram-card rect[fill*="rgba(15,23,42"], .circuit-diagram-card rect[fill*="rgba(10,15,29"] { fill: #f8fafc !important; }
+
+/* Callout boxes */
+.worked-example-box, .academic-derivation-box, .exam-trap-box, .topper-mnemonic-box,
+.green-law-box, .blue-analogy-box, .cyan-keytakeaway-box, .orange-warning-box,
+.purple-exam-goal-box, .custom-table-wrap, .katex-display-box, .analytical-derivation-box,
+.ascii-diagram-box {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  box-shadow: none !important;
+  margin: 14px 0 !important;
+}
+.exam-trap-box { background: #fff1f2 !important; border-left: 4px solid #e11d48 !important; color: #881337 !important; }
+.topper-mnemonic-box { background: #faf5ff !important; border-left: 4px solid #9333ea !important; color: #581c87 !important; }
+.green-law-box { background: #f0fdf4 !important; border-left: 4px solid #16a34a !important; color: #14532d !important; }
+.blue-analogy-box { background: #eff6ff !important; border-left: 4px solid #2563eb !important; color: #1e3a8a !important; }
+.cyan-keytakeaway-box { background: #ecfeff !important; border-left: 4px solid #0891b2 !important; color: #164e63 !important; }
+.orange-warning-box { background: #fffbeb !important; border-left: 4px solid #d97706 !important; color: #78350f !important; }
+.purple-exam-goal-box { background: #f5f3ff !important; border-left: 4px solid #7c3aed !important; color: #4c1d95 !important; }
+
+.custom-table-wrap table { border-collapse: collapse !important; width: 100% !important; }
+.custom-table-wrap th { background: #f1f5f9 !important; color: #0f172a !important; border: 1px solid #cbd5e1 !important; padding: 6px 10px !important; }
+.custom-table-wrap td { border: 1px solid #e2e8f0 !important; color: #1e293b !important; padding: 6px 10px !important; }
+
+/* Print academic banner & footer */
+.print-academic-banner {
+  border-bottom: 2.5px solid #0f172a;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.print-academic-banner h1 { font-size: 18pt !important; font-weight: 900 !important; color: #0f172a !important; margin: 0 0 4px !important; }
+.print-academic-banner h2 { font-size: 13pt !important; font-weight: 800 !important; color: #1e3a8a !important; margin: 0 0 6px !important; }
+.print-academic-banner p  { font-size: 9.5pt !important; color: #475569 !important; margin: 0 !important; }
+.print-doc-footer {
+  margin-top: 30px;
+  border-top: 1px solid #cbd5e1;
+  padding-top: 8px;
+  font-size: 8pt;
+  color: #64748b;
+  display: flex;
+  justify-content: space-between;
+}
 </style>
 </head>
-<body>
+<body class="theme-${themeMode}">
 <div class="print-academic-banner">
   <div>
     <h1>${activeSubject.name || ''} (${activeSubject.code || ''})</h1>
     <h2>Unit ${selectedUnitNum}: ${beeeUnit.title || ''}</h2>
-    <p>Semester ${activeSubject.semester || '1'} &bull; Official University Exam Study Notes &bull; Verified Syllabus Material</p>
+    <p>Semester ${activeSubject.semester || '1'} &bull; ${isPaperMode ? 'Handwritten Classroom Notebook Study Material' : 'Official University Exam Study Notes'} &bull; Verified Syllabus</p>
   </div>
   <div style="text-align:right;font-size:9pt;color:#64748b">
+    <strong>Theme:</strong> ${isPaperMode ? 'Handwritten Notebook' : 'Clean Digital'}<br/>
     <strong>Print Date:</strong> ${new Date().toLocaleDateString('en-GB')}<br/>
     <strong>Status:</strong> Exam Verified &#10003;
   </div>
 </div>
-<div id="print-root">${contentClone.innerHTML}</div>
+<div id="print-root" class="notes-reader-panel theme-${themeMode}">${contentClone.innerHTML}</div>
 <div class="print-doc-footer">
   <span>Academic Study Portal &bull; Authorized Single-Student Study License</span>
   <span>Student: ${currentUser?.username || 'Verified Student'}</span>
@@ -693,7 +856,7 @@ h1,h2,h3,h4,h5,.handwritten-heading,.note-h3,.note-h4,.note-h5 { color:#0f172a!i
 </body>
 </html>`;
 
-      // Create hidden iframe and print on load — never fall back to window.print()
+      // Create iframe, print on load
       const iframe = document.createElement('iframe');
       iframe.id = 'academic-print-frame';
       iframe.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:0;pointer-events:none;';
@@ -1130,7 +1293,7 @@ h1,h2,h3,h4,h5,.handwritten-heading,.note-h3,.note-h4,.note-h5 { color:#0f172a!i
 
           {/* Real Notebook Mode Dedicated Handwritten PDF Banner */}
           {themeMode === 'paper' && (
-            <div style={{
+            <div className="handwritten-pdf-banner" style={{
               background: '#ffffff',
               border: '1.5px solid #e2e8f0',
               borderLeft: '5px solid #2563eb',
