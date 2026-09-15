@@ -70,7 +70,7 @@ function cleanMathTypography(str) {
   s = s.replace(/\\lambda/g, 'λ').replace(/\\rho/g, 'ρ').replace(/\\theta/g, 'θ');
   s = s.replace(/\\mu/g, 'μ').replace(/\\pi/g, 'π').replace(/\\sigma/g, 'σ');
   s = s.replace(/\\omega/g, 'ω').replace(/\\phi/g, 'φ').replace(/\\Delta/g, 'Δ');
-  s = s.replace(/\\nabla/g, '∇').replace(/\\ne/g, '≠').replace(/\\le/g, '≤').replace(/\\ge/g, '≥');
+  s = s.replace(/\\nabla\b/g, '∇').replace(/\\ne\b/g, '≠').replace(/\\le\b/g, '≤').replace(/\\ge\b/g, '≥');
   s = s.replace(/\\implies/g, '⇒').replace(/\\iff/g, '⇔').replace(/\\approx/g, '≈');
   s = s.replace(/\\times/g, '×').replace(/\\cdot/g, '·').replace(/\\pm/g, '±');
   s = s.replace(/\\mathbf\{([^}]+)\}/g, '$1').replace(/\\text\{([^}]+)\}/g, '$1');
@@ -135,8 +135,12 @@ function renderKaTeXSafe(formula, isDisplay = false) {
   if (!formula) return '';
   let clean = formula.trim();
 
-  // 0. Fix formfeed \f from unescaped \frac in JS strings
+  // 0. Normalize double-escaped LaTeX keywords (\\begin -> \begin, \\left -> \left, etc.)
+  clean = clean.replace(/\\\\([a-zA-Z]+)/g, (m, word) => '\x5C' + word);
+
+  // 0B. Fix formfeed \f from unescaped \frac in JS strings
   clean = clean.replace(/\x0crac/g, '\\frac');
+  clean = clean.replace(/⬆rac/g, '\\frac');
 
   // 1. Convert any span fractions back to LaTeX \frac{num}{den}
   clean = clean.replace(/<span class=['"]frac['"]><span class=['"]frac-num['"]>([\s\S]*?)<\/span><span class=['"]frac-den['"]>([\s\S]*?)<\/span><\/span>/g, '\\frac{$1}{$2}');
