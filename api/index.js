@@ -8,7 +8,7 @@ const app = express();
 // ---------------------------------------------------------------------------
 app.use(cors({
   origin: '*', // Allows Vercel preview & production domains
-  methods: ['GET', 'POST', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
@@ -176,6 +176,127 @@ router.post('/doubts', postRateLimiter, (req, res) => {
   };
   doubts.unshift(newDoubt);
   res.status(201).json(newDoubt);
+});
+
+// ---------------------------------------------------------------------------
+// 4. CLOUD USER ACCOUNT MANAGEMENT & CROSS-DEVICE AUTH SYNCHRONIZER
+// ---------------------------------------------------------------------------
+let registeredUsers = [
+  {
+    username: 'Bhavya Mishra',
+    role: 'superadmin',
+    isSuperAdmin: true,
+    passwordHash: '1e0489c5be19d207c5af83e422088a8ce588b04ee9096f78e4efd2478254448b',
+    createdAt: '2026-01-01T00:00:00.000Z'
+  },
+  {
+    username: 'student123',
+    role: 'student',
+    salt: '492dc069b4896dc685b4ac3915d4b304',
+    passwordHash: 'a1bfb0afa2fe31d4120ac198fdc803225eeadcdea7630e3582a41359d4eb84bf',
+    createdAt: '2026-09-12T08:00:00.000Z'
+  },
+  { username: 'student', password: 'password123', role: 'student', createdAt: '2026-01-01T00:00:00.000Z' },
+  { username: 'mikumandal', password: 'password123', role: 'student', createdAt: '2026-02-15T00:00:00.000Z' },
+  { username: 'engineer', password: 'password123', role: 'student', createdAt: '2026-02-20T00:00:00.000Z' }
+];
+
+router.get('/users', (req, res) => {
+  res.json({
+    success: true,
+    count: registeredUsers.length,
+    users: registeredUsers,
+    timestamp: new Date().toISOString()
+  });
+});
+
+router.post('/users', (req, res) => {
+  const user = req.body;
+  if (!user || !user.username) {
+    return res.status(400).json({ error: 'Username is required' });
+  }
+
+  const clean = user.username.trim();
+  const idx = registeredUsers.findIndex(u => u.username.toLowerCase() === clean.toLowerCase());
+  const now = new Date().toISOString();
+
+  if (idx >= 0) {
+    registeredUsers[idx] = { ...registeredUsers[idx], ...user, updatedAt: now };
+  } else {
+    registeredUsers.push({
+      ...user,
+      username: clean,
+      createdAt: user.createdAt || now,
+      updatedAt: now
+    });
+  }
+
+  res.json({ success: true, user: registeredUsers.find(u => u.username.toLowerCase() === clean.toLowerCase()), users: registeredUsers });
+});
+
+router.post('/users/sync', (req, res) => {
+  const incoming = req.body.users;
+  if (Array.isArray(incoming)) {
+    for (const inc of incoming) {
+      if (!inc || !inc.username) continue;
+      const clean = inc.username.trim();
+      const idx = registeredUsers.findIndex(u => u.username.toLowerCase() === clean.toLowerCase());
+      if (idx >= 0) {
+        const existing = registeredUsers[idx];
+        const existingTime = existing.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
+        const incTime = inc.updatedAt ? new Date(inc.updatedAt).getTime() : 0;
+        if (incTime >= existingTime) {
+          registeredUsers[idx] = { ...existing, ...inc };
+        }
+      } else {
+        registeredUsers.push(inc);
+      }
+    }
+  }
+  res.json({ success: true, count: registeredUsers.length, users: registeredUsers });
+});
+
+router.post('/users/change-password', (req, res) => {
+  const { username, newPassword, newHash, newSalt } = req.body;
+  if (!username) {
+    return res.status(400).json({ error: 'Username is required' });
+  }
+
+  const clean = username.trim();
+  const idx = registeredUsers.findIndex(u => u.username.toLowerCase() === clean.toLowerCase());
+  const now = new Date().toISOString();
+
+  if (idx >= 0) {
+    if (newPassword) registeredUsers[idx].password = newPassword;
+    if (newHash) registeredUsers[idx].passwordHash = newHash;
+    if (newSalt) registeredUsers[idx].salt = newSalt;
+    registeredUsers[idx].updatedAt = now;
+    return res.json({ success: true, message: `Password for @${clean} updated successfully!`, user: registeredUsers[idx] });
+  } else {
+    const newUser = {
+      username: clean,
+      password: newPassword,
+      passwordHash: newHash,
+      salt: newSalt,
+      role: clean.toLowerCase() === 'bhavya mishra' ? 'superadmin' : 'student',
+      createdAt: now,
+      updatedAt: now
+    };
+    registeredUsers.push(newUser);
+    return res.json({ success: true, message: `Password for @${clean} updated successfully!`, user: newUser });
+  }
+});
+
+router.delete('/users/:username', (req, res) => {
+  const username = req.params.username;
+  if (!username) return res.status(400).json({ error: 'Username is required' });
+
+  if (username.toLowerCase() === 'bhavya mishra') {
+    return res.status(403).json({ error: 'Cannot delete Super Admin account' });
+  }
+
+  registeredUsers = registeredUsers.filter(u => u.username.toLowerCase() !== username.toLowerCase());
+  res.json({ success: true, message: `User @${username} deleted successfully`, count: registeredUsers.length });
 });
 
 app.use('/api', router);

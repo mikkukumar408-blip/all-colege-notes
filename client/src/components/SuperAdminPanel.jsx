@@ -40,6 +40,7 @@ import {
   adminDeleteUser,
   resetActivityLogs 
 } from '../utils/activityTracker';
+import { pullCloudUsers, authBroadcastChannel } from '../utils/cloudSync';
 
 export default function SuperAdminPanel() {
   const [accounts, setAccounts] = useState([]);
@@ -58,20 +59,60 @@ export default function SuperAdminPanel() {
   const [deleteModalUser, setDeleteModalUser] = useState(null);
   const [isDeletingUser, setIsDeletingUser] = useState(false);
 
-  // Load telemetry data
-  const loadTelemetry = () => {
+  // Load telemetry data with live cloud syncing
+  const loadTelemetry = async (showToast = false) => {
     setIsRefreshing(true);
-    const accs = getAllAccountsWithStats();
-    const acts = getUserActivities();
-    setAccounts(accs);
-    setActivities(acts);
-    setTimeout(() => setIsRefreshing(false), 300);
+    try {
+      // 1. Pull fresh registered accounts from serverless cloud across all devices
+      const freshCloudUsers = await pullCloudUsers().catch(() => null);
+
+      // 2. Aggregate telemetry & accounts
+      const accs = getAllAccountsWithStats(freshCloudUsers);
+      const acts = getUserActivities();
+      setAccounts(accs);
+      setActivities(acts);
+
+      if (showToast) {
+        setFeedbackMsg({
+          type: 'success',
+          text: `⚡ Live Cloud Refreshed! Synced ${accs.length} accounts across all devices & sessions.`
+        });
+        setTimeout(() => setFeedbackMsg({ type: '', text: '' }), 4000);
+      }
+    } catch (e) {
+      console.warn('Telemetry sync error:', e);
+      const accs = getAllAccountsWithStats();
+      const acts = getUserActivities();
+      setAccounts(accs);
+      setActivities(acts);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   useEffect(() => {
-    loadTelemetry();
-    const interval = setInterval(loadTelemetry, 8000);
-    return () => clearInterval(interval);
+    loadTelemetry(false);
+
+    // Instant cross-tab real-time sync when a user is created or password is changed in any tab
+    const handleBroadcast = (e) => {
+      if (e?.data?.type === 'USERS_UPDATED' || e?.data?.type === 'USER_CREATED') {
+        const freshUsers = e.data.users || null;
+        const accs = getAllAccountsWithStats(freshUsers);
+        setAccounts(accs);
+      }
+    };
+
+    authBroadcastChannel.addEventListener('message', handleBroadcast);
+
+    // Multi-device cloud polling every 5 seconds
+    const interval = setInterval(() => {
+      loadTelemetry(false);
+    }, 5000);
+
+    return () => {
+      authBroadcastChannel.removeEventListener('message', handleBroadcast);
+      clearInterval(interval);
+    };
   }, []);
 
   // Filter activities based on tab and search query
@@ -100,7 +141,7 @@ export default function SuperAdminPanel() {
       setFeedbackMsg({ type: 'success', text: res.message });
       setPasswordModalUser(null);
       setNewPassword('');
-      loadTelemetry();
+      await loadTelemetry(false);
     } else {
       setFeedbackMsg({ type: 'error', text: res.message });
     }
@@ -119,17 +160,17 @@ export default function SuperAdminPanel() {
   };
 
   // Handle Deleting User Account
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!deleteModalUser) return;
     setIsDeletingUser(true);
 
-    const res = adminDeleteUser(deleteModalUser.username);
+    const res = await adminDeleteUser(deleteModalUser.username);
     setIsDeletingUser(false);
 
     if (res.success) {
       setFeedbackMsg({ type: 'success', text: res.message });
       setDeleteModalUser(null);
-      loadTelemetry();
+      await loadTelemetry(false);
     } else {
       setFeedbackMsg({ type: 'error', text: res.message });
     }
@@ -249,17 +290,18 @@ export default function SuperAdminPanel() {
         {/* Action buttons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <button
-            onClick={loadTelemetry}
+            onClick={() => loadTelemetry(true)}
             className="btn-outline"
-            style={{ padding: '7px 14px', fontSize: '0.8rem', gap: '6px', borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fef08a' }}
-            title="Refresh live user metrics"
+            style={{ padding: '7px 14px', fontSize: '0.8rem', gap: '6px', borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fef08a', cursor: 'pointer' }}
+            title="Refresh live user metrics from cloud across all devices"
+            disabled={isRefreshing}
           >
-            <RefreshCw size={13} className={isRefreshing ? 'animate-spin' : ''} /> Refresh
+            <RefreshCw size={13} className={isRefreshing ? 'animate-spin' : ''} /> {isRefreshing ? 'Syncing...' : 'Refresh'}
           </button>
           <button
             onClick={handleExportJSON}
             className="btn-outline"
-            style={{ padding: '7px 14px', fontSize: '0.8rem', gap: '6px', borderColor: '#22c55e', color: '#86efac' }}
+            style={{ padding: '7px 14px', fontSize: '0.8rem', gap: '6px', borderColor: '#22c55e', color: '#86efac', cursor: 'pointer' }}
             title="Export full audit trail as JSON"
           >
             <Download size={13} /> Export Report
@@ -360,7 +402,8 @@ export default function SuperAdminPanel() {
           background: 'rgba(7, 10, 20, 0.85)',
           borderRadius: '12px',
           border: '1px solid rgba(255, 255, 255, 0.1)',
-          width: '100%'
+          width: '100%',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.4)'
         }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.86rem' }}>
             <thead>
@@ -370,7 +413,19 @@ export default function SuperAdminPanel() {
                 <th style={{ padding: '14px 18px', color: '#fef08a', textAlign: 'center', whiteSpace: 'nowrap' }}>Downloads</th>
                 <th style={{ padding: '14px 18px', color: '#fef08a', textAlign: 'center', whiteSpace: 'nowrap' }}>Views</th>
                 <th style={{ padding: '14px 18px', color: '#fef08a', whiteSpace: 'nowrap' }}>Date & Time of Login / Activity</th>
-                <th style={{ padding: '14px 18px', color: '#fef08a', textAlign: 'center', whiteSpace: 'nowrap' }}>Super Admin Actions</th>
+                <th style={{ 
+                  padding: '14px 18px', 
+                  color: '#fef08a', 
+                  textAlign: 'center', 
+                  whiteSpace: 'nowrap',
+                  position: 'sticky',
+                  right: 0,
+                  background: '#131b2e',
+                  zIndex: 3,
+                  boxShadow: '-4px 0 8px rgba(0, 0, 0, 0.5)'
+                }}>
+                  Super Admin Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -382,12 +437,27 @@ export default function SuperAdminPanel() {
                     background: isRootAdmin ? 'rgba(245, 158, 11, 0.08)' : 'transparent' 
                   }}>
                     <td style={{ padding: '14px 18px', fontWeight: 700, color: isRootAdmin ? '#f59e0b' : '#fff', whiteSpace: 'nowrap' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                         {isRootAdmin && <Crown size={16} color="#f59e0b" />}
-                        @{acc.username}
+                        <span>@{acc.username}</span>
                         {isRootAdmin && (
                           <span style={{ fontSize: '0.68rem', background: '#f59e0b', color: '#000', padding: '2px 7px', borderRadius: '4px', fontWeight: 900 }}>
                             ROOT MASTER
+                          </span>
+                        )}
+                        {acc.updatedAt && (
+                          <span style={{ 
+                            fontSize: '0.66rem', 
+                            background: 'rgba(34, 197, 94, 0.15)', 
+                            color: '#86efac', 
+                            border: '1px solid rgba(34, 197, 94, 0.35)', 
+                            padding: '2px 6px', 
+                            borderRadius: '4px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '3px'
+                          }}>
+                            <Key size={10} /> Pass Updated
                           </span>
                         )}
                       </div>
@@ -411,7 +481,16 @@ export default function SuperAdminPanel() {
                         <span style={{ fontWeight: 600 }}>{formatTime(acc.lastActive)}</span>
                       </div>
                     </td>
-                    <td style={{ padding: '14px 18px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    <td style={{ 
+                      padding: '14px 18px', 
+                      textAlign: 'center', 
+                      whiteSpace: 'nowrap',
+                      position: 'sticky',
+                      right: 0,
+                      background: isRootAdmin ? '#1b1b1c' : '#0b1120',
+                      zIndex: 2,
+                      boxShadow: '-4px 0 8px rgba(0, 0, 0, 0.5)'
+                    }}>
                       <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
                         {/* Change Password Button */}
                         <button

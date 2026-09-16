@@ -10,7 +10,7 @@
    ========================================================================= */
 
 import { hashPasswordPBKDF2 } from './security';
-import { pushCloudUsers, pullCloudUsers, getLocalUsers, saveLocalUsers } from './cloudSync';
+import { pushCloudUsers, pullCloudUsers, getLocalUsers, saveLocalUsers, broadcastUsers, getApiBase } from './cloudSync';
 
 const STORAGE_KEY_ACTIVITIES = 'college_notes_user_activities';
 const STORAGE_KEY_USERS = 'college_notes_registered_users';
@@ -163,23 +163,25 @@ function getDeletedUsers() {
 }
 
 // Helper to retrieve all registered accounts + aggregate stats
-export function getAllAccountsWithStats() {
+export function getAllAccountsWithStats(customUsers = null) {
   let storedUsers = [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY_USERS);
-    if (raw) storedUsers = JSON.parse(raw);
-  } catch (e) {}
+  if (Array.isArray(customUsers) && customUsers.length > 0) {
+    storedUsers = customUsers;
+  } else {
+    storedUsers = getLocalUsers();
+  }
 
   const deletedList = getDeletedUsers().map(u => u.toLowerCase());
 
   const map = new Map();
   PRESEEDED_ACCOUNTS.forEach((acc) => {
     if (!deletedList.includes(acc.username.toLowerCase())) {
-      map.set(acc.username.toLowerCase(), acc);
+      map.set(acc.username.toLowerCase(), { ...acc });
     }
   });
 
   storedUsers.forEach((u) => {
+    if (!u || !u.username) return;
     const key = u.username.toLowerCase();
     if (!deletedList.includes(key)) {
       if (map.has(key)) {
@@ -187,10 +189,11 @@ export function getAllAccountsWithStats() {
       } else {
         map.set(key, {
           username: u.username,
-          role: key === 'bhavya mishra' ? 'superadmin' : 'student',
-          isSuperAdmin: key === 'bhavya mishra',
+          role: (key === 'bhavya mishra' || u.role === 'superadmin') ? 'superadmin' : 'student',
+          isSuperAdmin: key === 'bhavya mishra' || !!u.isSuperAdmin,
           createdAt: u.createdAt || new Date().toISOString(),
-          bio: 'Student Account'
+          updatedAt: u.updatedAt,
+          bio: u.bio || 'Student Account'
         });
       }
     }
@@ -205,7 +208,7 @@ export function getAllAccountsWithStats() {
     );
     const downloads = userActs.filter((a) => a.action === 'DOWNLOAD').length;
     const views = userActs.filter((a) => a.action === 'VIEW').length;
-    const lastActive = userActs.length > 0 ? userActs[0].timestamp : acc.createdAt;
+    const lastActive = userActs.length > 0 ? userActs[0].timestamp : (acc.updatedAt || acc.createdAt);
 
     return {
       ...acc,
@@ -234,8 +237,14 @@ export async function adminChangeUserPassword(username, newPassword) {
   }
 
   try {
-    // 1. Get full current users list (guaranteeing preseeded + local are all loaded)
+    // 1. First fetch latest cloud accounts to prevent overwriting other sessions
     let users = getLocalUsers();
+    try {
+      const cloud = await pullCloudUsers();
+      if (Array.isArray(cloud) && cloud.length > 0) {
+        users = cloud;
+      }
+    } catch (e) {}
 
     // 2. Hash with PBKDF2-100k + Salt
     const { salt, hash } = await hashPasswordPBKDF2(cleanPass);
@@ -269,10 +278,26 @@ export async function adminChangeUserPassword(username, newPassword) {
       });
     }
 
-    // 3. Save locally
+    // 3. Save locally and broadcast across tabs
     saveLocalUsers(users);
+    broadcastUsers(users);
 
-    // 4. Await push to cloud so cloud database is immediately synchronized
+    // 4. Send directly to Vercel Serverless API
+    try {
+      const apiBase = getApiBase();
+      await fetch(`${apiBase}/api/users/change-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: username.trim(),
+          newPassword: cleanPass,
+          salt,
+          hash
+        })
+      });
+    } catch (e) {}
+
+    // 5. Await push to cloud so cloud database is immediately synchronized
     try { 
       await pushCloudUsers(users); 
     } catch (e) {}
@@ -312,10 +337,18 @@ export async function adminDeleteUser(username) {
   try {
     // 1. Remove from registered users
     let users = getLocalUsers();
+    try {
+      const cloud = await pullCloudUsers();
+      if (Array.isArray(cloud) && cloud.length > 0) {
+        users = cloud;
+      }
+    } catch (e) {}
+
     const updatedUsers = users.filter(
       (u) => u.username.toLowerCase() !== username.trim().toLowerCase()
     );
     saveLocalUsers(updatedUsers);
+    broadcastUsers(updatedUsers);
 
     // 2. Add to deleted blacklist (so preseeded accounts like 'student' don't reappear)
     const deleted = getDeletedUsers();
@@ -324,11 +357,19 @@ export async function adminDeleteUser(username) {
       localStorage.setItem(STORAGE_KEY_DELETED, JSON.stringify(deleted));
     }
 
+    // 3. Delete from Vercel API
+    try {
+      const apiBase = getApiBase();
+      await fetch(`${apiBase}/api/users/${encodeURIComponent(username.trim())}`, {
+        method: 'DELETE'
+      });
+    } catch (e) {}
+
     try { 
       await pushCloudUsers(updatedUsers); 
     } catch (e) {}
 
-    // 3. Log the deletion audit event
+    // 4. Log the deletion audit event
     logUserActivity(
       'Bhavya Mishra',
       'ADMIN_ACTION',

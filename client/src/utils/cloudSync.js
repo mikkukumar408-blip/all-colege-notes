@@ -5,10 +5,32 @@
    Syncs accounts, password updates, and user deletions in real-time.
    ========================================================================= */
 
-const PRIMARY_URL = 'https://api.restful-api.dev/objects/ff808181a067127101a094bcbe660013';
-const BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a067127101a094bd364e0014';
+export const getApiBase = () => {
+  if (typeof window !== 'undefined') {
+    return '/api/users';
+  }
+  return 'https://all-college-notes.vercel.app/api/users';
+};
+
+// Backup external KV object (Freshly verified)
+const BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0ab794bbc1fc0';
 const STORAGE_KEY_USERS = 'college_notes_registered_users';
 const STORAGE_KEY_DELETED = 'college_notes_deleted_users';
+
+// Real-time Cross-Tab BroadcastChannel
+export const authBroadcastChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window
+  ? new BroadcastChannel('college_notes_auth_sync')
+  : null;
+
+export function broadcastUsers(usersList) {
+  try {
+    authBroadcastChannel?.postMessage({
+      type: 'ACCOUNTS_CHANGED',
+      users: usersList,
+      timestamp: Date.now()
+    });
+  } catch (e) {}
+}
 
 export const SUPER_ADMIN_ACCOUNT = {
   username: 'Bhavya Mishra',
@@ -144,23 +166,23 @@ export function mergeUsers(localList, cloudList) {
 export async function pullCloudUsers() {
   let cloudUsers = null;
 
-  // Try Primary
+  // 1. Primary: First-Party Vercel Serverless Endpoint (/api/users)
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3500);
-    const res = await fetch(PRIMARY_URL, { signal: controller.signal });
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(getApiBase(), { signal: controller.signal });
     clearTimeout(timeout);
     if (res.ok) {
       const json = await res.json();
-      if (json && json.data && Array.isArray(json.data.users)) {
-        cloudUsers = json.data.users;
+      if (json && Array.isArray(json.users)) {
+        cloudUsers = json.users;
       }
     }
   } catch (err) {
-    // silently fallback
+    // fallback
   }
 
-  // Try Backup if needed
+  // 2. Secondary: Backup external KV store
   if (!cloudUsers) {
     try {
       const controller = new AbortController();
@@ -186,7 +208,18 @@ export async function pullCloudUsers() {
 
 export async function pushCloudUsers(usersList) {
   saveLocalUsers(usersList);
+  broadcastUsers(usersList);
 
+  // 1. Sync to First-Party /api/users/sync
+  try {
+    fetch(getApiBase() + '/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ users: usersList })
+    }).catch(() => {});
+  } catch (e) {}
+
+  // 2. Sync to Secondary Backup
   const payload = {
     name: 'all_college_notes_cloud_db_v1',
     data: {
@@ -203,14 +236,20 @@ export async function pushCloudUsers(usersList) {
   };
 
   try {
-    await Promise.allSettled([
-      fetch(PRIMARY_URL, putOptions),
-      fetch(BACKUP_URL, putOptions)
-    ]);
+    fetch(BACKUP_URL, putOptions).catch(() => {});
   } catch (e) {}
 }
 
 export async function syncNewUserToCloud(newUser) {
+  // Push directly to /api/users for immediate registration
+  try {
+    await fetch(getApiBase(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newUser)
+    });
+  } catch (e) {}
+
   const current = await pullCloudUsers();
   const index = current.findIndex(u => u.username.toLowerCase() === newUser.username.toLowerCase());
   if (index >= 0) {
