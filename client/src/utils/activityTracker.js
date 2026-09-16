@@ -285,7 +285,7 @@ export async function adminChangeUserPassword(username, newPassword) {
     // 4. Send directly to Vercel Serverless API
     try {
       const apiBase = getApiBase();
-      await fetch(`${apiBase}/api/users/change-password`, {
+      await fetch(`${apiBase}/change-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -360,7 +360,7 @@ export async function adminDeleteUser(username) {
     // 3. Delete from Vercel API
     try {
       const apiBase = getApiBase();
-      await fetch(`${apiBase}/api/users/${encodeURIComponent(username.trim())}`, {
+      await fetch(`${apiBase}/${encodeURIComponent(username.trim())}`, {
         method: 'DELETE'
       });
     } catch (e) {}
