@@ -95,30 +95,27 @@ export const initialSubjects = [
     ]
   },
   {
-    id: 'sub-p1',
+    id: 'sub-c1',
     semester: 1,
     year: '1st Year',
-    name: 'Applied Physics',
-    code: 'PHYS102',
+    name: 'Computational and Problem Solving using C',
+    code: 'BCSE-008',
     credits: 4,
-    instructor: 'Prof. Ananya Sen',
-    notesCount: '5 Units Complete',
-    rating: 4.8,
-    description: 'Wave optics, lasers, fiber optics, quantum mechanics, and solid-state crystal physics with diagrams.',
-    banner: 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=800&q=80',
+    instructor: 'Department of Computer Science & Engineering (MMDU)',
+    notesCount: '4 Units Comprehensive Long Notes & Solved Questions',
+    rating: 5.0,
+    description: 'Official MMDU syllabus (BCSE-008): Computational problem classifications, Deductive/Inductive logic, 4-stage compilation pipeline, memory segmentation, 9-tier operator precedence, typecasting, 2D array row-major addressing, 12-point storage classes matrix, Near/Far/Huge pointers, DMA, and file streams with solved examination questions.',
+    banner: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=800&q=80',
     units: [
-      { num: 1, title: 'Wave Optics & Interference', pages: 26, status: 'Verified' },
-      { num: 2, title: 'Lasers & Holography', pages: 22, status: 'Verified' },
-      { num: 3, title: 'Fiber Optics Communication', pages: 24, status: 'Verified' },
-      { num: 4, title: 'Quantum Mechanics Basics', pages: 34, status: 'Verified' },
-      { num: 5, title: 'Solid State & Band Theory', pages: 30, status: 'Verified' }
+      { num: 1, title: 'Programming Fundamentals, Compilation Pipeline & Problem Solving', pages: 36, status: 'Verified' },
+      { num: 2, title: 'Core Programming Concepts, Operators & Control Structures', pages: 34, status: 'Verified' },
+      { num: 3, title: 'Arrays, Strings, Functions & Modular Programming', pages: 42, status: 'Verified' },
+      { num: 4, title: 'Advanced Data Handling, Pointers, Structures, DMA & File I/O', pages: 48, status: 'Verified' }
     ]
   },
-
-  // ==================== SEMESTER 2 ====================
   {
     id: 'sub-aiml',
-    semester: 2,
+    semester: 1,
     year: '1st Year',
     name: 'Fundamentals of AI & ML',
     code: 'BCSE-011',
@@ -137,7 +134,7 @@ export const initialSubjects = [
   },
   {
     id: 'sub-webtech',
-    semester: 2,
+    semester: 1,
     year: '1st Year',
     name: 'Fundamentals of Web Technologies',
     code: 'BCSE-012',
@@ -154,23 +151,26 @@ export const initialSubjects = [
       { num: 4, title: 'Cascading Style Sheets (CSS) Architecture', pages: 44, status: 'Verified' }
     ]
   },
+
+  // ==================== SEMESTER 2 ====================
   {
-    id: 'sub-c1',
+    id: 'sub-p1',
     semester: 2,
     year: '1st Year',
-    name: 'Computational and Problem Solving using C',
-    code: 'BCSE-008',
+    name: 'Applied Physics',
+    code: 'PHYS102',
     credits: 4,
-    instructor: 'Department of Computer Science & Engineering (MMDU)',
-    notesCount: '4 Units Comprehensive Long Notes & Solved Questions',
-    rating: 5.0,
-    description: 'Official MMDU syllabus (BCSE-008): Computational problem classifications, Deductive/Inductive logic, 4-stage compilation pipeline, memory segmentation, 9-tier operator precedence, typecasting, 2D array row-major addressing, 12-point storage classes matrix, Near/Far/Huge pointers, DMA, and file streams with solved examination questions.',
-    banner: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=800&q=80',
+    instructor: 'Prof. Ananya Sen',
+    notesCount: '5 Units Complete',
+    rating: 4.8,
+    description: 'Wave optics, lasers, fiber optics, quantum mechanics, and solid-state crystal physics with diagrams.',
+    banner: 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=800&q=80',
     units: [
-      { num: 1, title: 'Programming Fundamentals, Compilation Pipeline & Problem Solving', pages: 36, status: 'Verified' },
-      { num: 2, title: 'Core Programming Concepts, Operators & Control Structures', pages: 34, status: 'Verified' },
-      { num: 3, title: 'Arrays, Strings, Functions & Modular Programming', pages: 42, status: 'Verified' },
-      { num: 4, title: 'Advanced Data Handling, Pointers, Structures, DMA & File I/O', pages: 48, status: 'Verified' }
+      { num: 1, title: 'Wave Optics & Interference', pages: 26, status: 'Verified' },
+      { num: 2, title: 'Lasers & Holography', pages: 22, status: 'Verified' },
+      { num: 3, title: 'Fiber Optics Communication', pages: 24, status: 'Verified' },
+      { num: 4, title: 'Quantum Mechanics Basics', pages: 34, status: 'Verified' },
+      { num: 5, title: 'Solid State & Band Theory', pages: 30, status: 'Verified' }
     ]
   },
 

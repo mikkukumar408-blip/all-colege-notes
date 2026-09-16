@@ -10,7 +10,7 @@
 
 export const cSubjectDetails = {
   id: "sub-c1",
-  semester: 2,
+  semester: 1,
   year: "1st Year",
   name: "Computational and Problem Solving using C",
   code: "BCSE-008",

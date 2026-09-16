@@ -10,7 +10,7 @@
 
 export const webTechSubjectDetails = {
   id: "sub-webtech",
-  semester: 2,
+  semester: 1,
   year: "1st Year",
   name: "Fundamentals of Web Technologies",
   code: "BCSE-012",

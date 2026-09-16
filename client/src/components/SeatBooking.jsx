@@ -275,7 +275,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <span className="badge-neon" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', border: '1px solid #a855f7' }}>
-                      BCSE-011 • 1st Year (Sem 2)
+                      BCSE-011 • 1st Year (Sem 1)
                     </span>
                     <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 700 }}>
                       7 Pages • 2.1 MB High-Res

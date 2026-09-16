@@ -1,13 +1,13 @@
 /* =========================================================================
    Fundamentals of AI & ML (BCSE-011) STUDY NOTES & MMDU SOLVED EXAM PAPERS
    =========================================================================
-   Full Syllabus Coverage for Semester 2 (Units 1, 2, 3, and 4)
+   Full Syllabus Coverage for Semester 1 (Units 1, 2, 3, and 4)
    Includes MMDU End-Semester Solved Examination Papers (Sections A, B, C, D)
    ========================================================================= */
 
 export const aimlSubjectDetails = {
   "id": "sub-aiml",
-  "semester": 2,
+  "semester": 1,
   "year": "1st Year",
   "name": "Fundamentals of AI & ML",
   "code": "BCSE-011",
