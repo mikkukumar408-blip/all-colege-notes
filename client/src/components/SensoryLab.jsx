@@ -82,12 +82,16 @@ function cleanMathTypography(str) {
   s = s.replace(/∂\^2u\/∂y\^2/g, '∂²u/∂y²');
   s = s.replace(/∂\^2u\/∂x∂y/g, '∂²u/∂x∂y');
 
-  // Stacked Fractions: render \frac{num}{den} with real horizontal fraction bar
+  // Stacked Fractions: render \frac{num}{den} with real horizontal fraction bar via KaTeX
   s = s.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, (m, num, den) => {
-    return `<span class="frac"><span class="frac-num">${num.trim()}</span><span class="frac-den">${den.trim()}</span></span>`;
+    try {
+      return katex.renderToString(`\\frac{${num.trim()}}{${den.trim()}}`, { displayMode: false, throwOnError: false });
+    } catch(e) {
+      return `<span class="frac"><span class="frac-num">${num.trim()}</span><span class="frac-den">${den.trim()}</span></span>`;
+    }
   });
 
-  // Convert inline slash fractions (num / den) into stacked fractions with horizontal bar
+  // Convert inline slash fractions (num / den) into stacked fractions with horizontal bar via KaTeX
   s = s.replace(/\(([a-zA-Z0-9_\-\+\*\(\)\^²³⁴ⁿ¹ᐟ²³ᐟ²\sλρθμπσωφΔ∇]+?)\s*\/\s*([a-zA-Z0-9_\-\+\*\(\)\^²³⁴ⁿ¹ᐟ²³ᐟ²\sλρθμπσωφΔ∇]+?)\)/g, (m, num, den) => {
     const trimmedNum = num.trim();
     const trimmedDen = den.trim();
@@ -96,7 +100,11 @@ function cleanMathTypography(str) {
       return m;
     }
     if (/[0-9a-zA-ZλρθμπσωφΔ∇]/.test(trimmedNum) && /[0-9a-zA-ZλρθμπσωφΔ∇]/.test(trimmedDen)) {
-      return `<span class="frac"><span class="frac-num">${trimmedNum}</span><span class="frac-den">${trimmedDen}</span></span>`;
+      try {
+        return katex.renderToString(`\\frac{${trimmedNum}}{${trimmedDen}}`, { displayMode: false, throwOnError: false });
+      } catch(e) {
+        return `<span class="frac"><span class="frac-num">${trimmedNum}</span><span class="frac-den">${trimmedDen}</span></span>`;
+      }
     }
     return m;
   });
@@ -328,6 +336,51 @@ function formatNoteContent(content) {
   const mathInlineBlocks = [];
   html = html.replace(/\$([^\$\n]+?)\$/g, (match, formula) => {
     const rendered = renderKaTeXSafe(formula, false);
+    const placeholder = `\x00MATH_INLINE_${mathInlineBlocks.length}\x00`;
+    mathInlineBlocks.push(rendered);
+    return placeholder;
+  });
+
+  // Step 2.5: Auto-detect and render broken fraction markup like {fracx}/{frac4} or {frac x}/{frac 4}
+  html = html.replace(/\{frac\s*([^{}]+)\}\s*\/\s*\{frac\s*([^{}]+)\}/gi, (m, num, den) => {
+    const rendered = renderKaTeXSafe(`\\frac{${num.trim()}}{${den.trim()}}`, false);
+    const placeholder = `\x00MATH_INLINE_${mathInlineBlocks.length}\x00`;
+    mathInlineBlocks.push(rendered);
+    return placeholder;
+  });
+
+  // Step 2.6: Auto-detect single-char unwrapped \frac e.g. \frac x 4 or \frac 1 2
+  html = html.replace(/\\+frac\s+([0-9a-zA-Z])\s+([0-9a-zA-Z])/g, '\\frac{$1}{$2}');
+
+  // Step 2.7: Auto-render any remaining UNWRAPPED LaTeX fractions \frac{...}{...} into KaTeX
+  let fracSafety = 0;
+  while (/\\+frac\{([^{}]+)\}\{([^{}]+)\}/.test(html) && fracSafety < 30) {
+    fracSafety++;
+    html = html.replace(/\\+frac\{([^{}]+)\}\{([^{}]+)\}/g, (m, num, den) => {
+      const rendered = renderKaTeXSafe(`\\frac{${num}}{${den}}`, false);
+      const placeholder = `\x00MATH_INLINE_${mathInlineBlocks.length}\x00`;
+      mathInlineBlocks.push(rendered);
+      return placeholder;
+    });
+  }
+
+  // Step 2.8: Auto-render unwrapped bar notation \bar{...} or \bar(...)
+  html = html.replace(/\\+bar\{([^{}]+)\}/g, (m, sym) => {
+    const rendered = renderKaTeXSafe(`\\bar{${sym}}`, false);
+    const placeholder = `\x00MATH_INLINE_${mathInlineBlocks.length}\x00`;
+    mathInlineBlocks.push(rendered);
+    return placeholder;
+  });
+  html = html.replace(/\\+bar\(([a-zA-Z0-9])\)/g, (m, sym) => {
+    const rendered = renderKaTeXSafe(`\\bar{${sym}}`, false);
+    const placeholder = `\x00MATH_INLINE_${mathInlineBlocks.length}\x00`;
+    mathInlineBlocks.push(rendered);
+    return placeholder;
+  });
+
+  // Step 2.9: Auto-render unwrapped limits \lim_{...}
+  html = html.replace(/\\+lim_\{([^{}]+)\}/g, (m, sub) => {
+    const rendered = renderKaTeXSafe(`\\lim_{${sub}}`, false);
     const placeholder = `\x00MATH_INLINE_${mathInlineBlocks.length}\x00`;
     mathInlineBlocks.push(rendered);
     return placeholder;
