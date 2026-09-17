@@ -171,7 +171,7 @@ router.post('/doubts', postRateLimiter, (req, res) => {
 // ---------------------------------------------------------------------------
 // 3B. CAMPUSNOTES ELITE AI ACADEMIC TUTOR (Automated Doubt Solver)
 // ---------------------------------------------------------------------------
-const GROQ_API_KEY = process.env.GROQ_API_KEY || "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";
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 const ACADEMIC_TUTOR_SYSTEM_PROMPT = `You are the "CampusNotes Elite AI Academic Tutor", an expert university professor and engineering topper assistant embedded inside the Student Doubt Clearing Forum.
 
