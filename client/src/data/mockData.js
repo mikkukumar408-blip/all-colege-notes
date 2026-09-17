@@ -9,6 +9,8 @@
    5. initialForumDoubts-> Community Q&A questions and verified peer answers
    ========================================================================= */
 
+import { comprehensiveLabManuals } from './labManualsData';
+
 /* -------------------------------------------------------------------------
    1. ACADEMIC YEARS & SEMESTERS HIERARCHY
    Edit this list to add more years or rename semesters.
@@ -577,53 +579,7 @@ export const initialPYQs = initialShortNotes; // Alias for backwards compatibili
    4. PRACTICAL LABORATORY MANUALS & CODE SOLUTIONS
    Add new lab experiments, programs, or viva question banks here.
    ------------------------------------------------------------------------- */
-export const initialLabManuals = [
-  {
-    id: 'lab-beee',
-    title: 'Basic Electrical & Electronics Lab Manual & Circuit Theorems',
-    subject: 'BEEE Laboratory (EE102)',
-    semester: 'Semester 1',
-    experimentsCount: '16 Experiments',
-    includesViva: true,
-    fileSize: '6.4 MB'
-  },
-  {
-    id: 'lab-1',
-    title: 'Data Structures Lab Manual & Verified Code Solutions',
-    subject: 'Data Structures (CS301)',
-    semester: 'Semester 3',
-    experimentsCount: '14 Programs',
-    includesViva: true,
-    fileSize: '5.6 MB'
-  },
-  {
-    id: 'lab-2',
-    title: 'Operating Systems System Calls & Shell Scripting Manual',
-    subject: 'Operating Systems (CS401)',
-    semester: 'Semester 4',
-    experimentsCount: '12 Experiments',
-    includesViva: true,
-    fileSize: '4.8 MB'
-  },
-  {
-    id: 'lab-3',
-    title: 'DBMS SQL & PL/SQL Trigger Execution Record',
-    subject: 'Database Management (CS402)',
-    semester: 'Semester 4',
-    experimentsCount: '15 Practicals',
-    includesViva: true,
-    fileSize: '6.2 MB'
-  },
-  {
-    id: 'lab-4',
-    title: 'Computer Networks Packet Tracer Simulation Manual',
-    subject: 'Computer Networks (CS501)',
-    semester: 'Semester 5',
-    experimentsCount: '10 Topologies',
-    includesViva: true,
-    fileSize: '7.1 MB'
-  }
-];
+export const initialLabManuals = comprehensiveLabManuals;
 
 /* -------------------------------------------------------------------------
    5. STUDENT PEER FORUM DOUBTS & Q&A THREADS

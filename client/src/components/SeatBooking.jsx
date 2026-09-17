@@ -22,7 +22,14 @@ import {
   ExternalLink,
   BookOpen,
   Search,
-  Filter
+  Filter,
+  Copy,
+  CheckCheck,
+  Terminal,
+  Trophy,
+  X,
+  ChevronRight,
+  Play
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { initialSubjects, initialLabManuals } from '../data/mockData';
@@ -277,6 +284,42 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [notebookSemFilter, setNotebookSemFilter] = useState('All');
   const [notebookSearchQuery, setNotebookSearchQuery] = useState('');
+
+  // Interactive Practical Lab Studio Modal States
+  const [selectedLab, setSelectedLab] = useState(null);
+  const [labActiveTab, setLabActiveTab] = useState('experiments'); // 'experiments' | 'viva' | 'capstone'
+  const [selectedExpIndex, setSelectedExpIndex] = useState(0);
+  const [vivaSearch, setVivaSearch] = useState('');
+  const [copiedCode, setCopiedCode] = useState(false);
+
+  const handleCopyCode = (codeText) => {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(codeText);
+    }
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
+  };
+
+  const handleDownloadLab = (lab) => {
+    try {
+      logUserActivity(
+        currentUser?.username || 'student',
+        'DOWNLOAD',
+        `${lab.code || lab.subject}: ${lab.title}`,
+        `Downloaded Practical Lab Manual (${lab.fileSize || 'PDF'})`
+      );
+    } catch (err) {}
+    if (lab.pdfUrl) {
+      const link = document.createElement('a');
+      link.href = lab.pdfUrl;
+      link.download = `${lab.code || 'Lab'}_Manual.pdf`;
+      link.target = '_blank';
+      link.click();
+    } else {
+      alert(`Downloading official PDF manual for ${lab.title}...`);
+    }
+  };
+
 
   const activeSubject = subjects.find(s => s.id === selectedSubjectId) || subjects[0];
 
@@ -590,41 +633,102 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
           
           {/* Column 1: Verified Practical Lab Manuals */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>
-              Practical Lab Manuals with Working Codes & Viva
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+                  Practical Lab Manuals with Working Codes & Viva
+                </h3>
+                <p style={{ margin: '3px 0 0 0', fontSize: '0.8rem', color: 'var(--text-dim)' }}>
+                  100% MMEC Syllabus-compliant working programs, step-by-step algorithms, terminal outputs & viva banks
+                </p>
+              </div>
+              <span className="badge-neon" style={{ background: 'rgba(0, 240, 255, 0.1)', borderColor: 'rgba(0, 240, 255, 0.4)' }}>
+                Session 2025-26
+              </span>
+            </div>
 
             {labManuals.map(lab => (
-              <div key={lab.id} className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div 
+                key={lab.id} 
+                className="glass-panel" 
+                style={{ 
+                  padding: '22px', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: '14px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  transition: 'all 0.25s ease',
+                  position: 'relative'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
                   <div>
-                    <span className="badge-neon" style={{ marginBottom: '6px' }}>{lab.semester}</span>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', marginTop: '4px' }}>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '6px' }}>
+                      {lab.code && (
+                        <span style={{ 
+                          fontSize: '0.72rem', 
+                          fontWeight: 800, 
+                          padding: '2px 8px', 
+                          borderRadius: '4px', 
+                          background: 'rgba(0, 240, 255, 0.15)', 
+                          color: 'var(--neon-cyan)',
+                          border: '1px solid rgba(0, 240, 255, 0.3)'
+                        }}>
+                          {lab.code}
+                        </span>
+                      )}
+                      <span className="badge-neon" style={{ fontSize: '0.72rem' }}>{lab.semester}</span>
+                      {lab.year && (
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>• {lab.year}</span>
+                      )}
+                    </div>
+                    <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff', margin: '2px 0 4px 0' }}>
                       {lab.title}
                     </h4>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginTop: '2px' }}>
-                      Subject: {lab.subject}
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>
+                      Subject: <strong style={{ color: '#e2e8f0' }}>{lab.subject}</strong>
                     </div>
                   </div>
-                  <span className="badge-amber">{lab.fileSize}</span>
+                  <span className="badge-amber" style={{ fontSize: '0.75rem' }}>{lab.fileSize || 'Official PDF'}</span>
                 </div>
 
-                <div style={{ display: 'flex', gap: '16px', fontSize: '0.82rem', color: '#c0c8db' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Code2 size={15} color="var(--neon-green)" /> {lab.experimentsCount}
+                {/* Practical Highlights Pill Row */}
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', fontSize: '0.8rem', color: '#c0c8db' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(16, 185, 129, 0.1)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.25)', color: '#34d399' }}>
+                    <Code2 size={15} /> <strong>{lab.experiments?.length || lab.totalExperiments || '10+'} Tested Working Codes</strong>
                   </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <HelpCircle size={15} color="var(--neon-cyan)" /> 50+ Viva Questions Included
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(56, 189, 248, 0.1)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(56, 189, 248, 0.25)', color: '#38bdf8' }}>
+                    <HelpCircle size={15} /> <strong>{lab.vivaQuestions?.length || 15}+ Viva-Voce Q&A</strong>
                   </span>
+                  {lab.capstoneProject && (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(245, 158, 11, 0.1)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(245, 158, 11, 0.25)', color: '#fbbf24' }}>
+                      <Trophy size={14} /> <strong>Capstone: {lab.capstoneProject.title}</strong>
+                    </span>
+                  )}
                 </div>
 
-                <button 
-                  className="btn-outline" 
-                  style={{ alignSelf: 'flex-start', padding: '8px 16px', fontSize: '0.82rem' }}
-                  onClick={() => alert(`Downloading ${lab.title}...`)}
-                >
-                  <DownloadCloud size={15} /> Download PDF Manual ({lab.fileSize})
-                </button>
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '4px' }}>
+                  <button 
+                    className="btn-primary"
+                    style={{ padding: '8px 16px', fontSize: '0.82rem', gap: '6px' }}
+                    onClick={() => {
+                      setSelectedLab(lab);
+                      setLabActiveTab('experiments');
+                      setSelectedExpIndex(0);
+                    }}
+                  >
+                    <Code2 size={15} /> 🚀 Explore Experiments & Working Codes
+                  </button>
+
+                  <button 
+                    className="btn-outline" 
+                    style={{ padding: '8px 14px', fontSize: '0.82rem', gap: '6px' }}
+                    onClick={() => handleDownloadLab(lab)}
+                  >
+                    <DownloadCloud size={15} /> Download PDF Manual
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -707,6 +811,696 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
         </div>
       </div>
       )}
+
+      {/* -------------------------------------------------------------------
+         PART C: INTERACTIVE GOD-LEVEL PRACTICAL LAB & CODE STUDIO MODAL
+         ------------------------------------------------------------------- */}
+      {selectedLab && (
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            background: 'rgba(4, 7, 13, 0.88)',
+            backdropFilter: 'blur(16px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            animation: 'fadeIn 0.2s ease-out'
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedLab(null);
+          }}
+        >
+          <div 
+            style={{
+              background: '#0a0d16',
+              border: '1px solid rgba(0, 240, 255, 0.35)',
+              borderRadius: '16px',
+              width: '100%',
+              maxWidth: '1180px',
+              height: '92vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.95), 0 0 30px rgba(0, 240, 255, 0.15)',
+              overflow: 'hidden',
+              position: 'relative'
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: '18px 24px',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'linear-gradient(180deg, rgba(16, 24, 40, 0.95) 0%, rgba(10, 15, 26, 0.95) 100%)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '12px'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                  <span style={{ 
+                    fontSize: '0.75rem', 
+                    fontWeight: 800, 
+                    padding: '2px 8px', 
+                    borderRadius: '4px', 
+                    background: 'rgba(0, 240, 255, 0.18)', 
+                    color: 'var(--neon-cyan)',
+                    border: '1px solid rgba(0, 240, 255, 0.4)'
+                  }}>
+                    {selectedLab.code}
+                  </span>
+                  <span className="badge-neon" style={{ fontSize: '0.72rem' }}>{selectedLab.semester}</span>
+                  <span style={{ 
+                    fontSize: '0.72rem', 
+                    fontWeight: 700, 
+                    padding: '2px 8px', 
+                    borderRadius: '4px', 
+                    background: 'rgba(16, 185, 129, 0.15)', 
+                    color: '#34d399',
+                    border: '1px solid rgba(16, 185, 129, 0.3)'
+                  }}>
+                    ✓ 100% MMEC Syllabus 2025-26 Aligned
+                  </span>
+                </div>
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff', margin: '2px 0 2px 0' }}>
+                  {selectedLab.title}
+                </h2>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>
+                  Subject: <strong style={{ color: '#e2e8f0' }}>{selectedLab.subject}</strong> • Maharishi Markandeshwar (Deemed to be University)
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button 
+                  className="btn-primary" 
+                  style={{ padding: '8px 16px', fontSize: '0.82rem', gap: '6px' }}
+                  onClick={() => handleDownloadLab(selectedLab)}
+                >
+                  <DownloadCloud size={15} /> Download PDF Manual
+                </button>
+                <button 
+                  onClick={() => setSelectedLab(null)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    color: '#fff',
+                    borderRadius: '8px',
+                    width: '36px',
+                    height: '36px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Close Studio"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Navigation Tabs Bar */}
+            <div style={{
+              display: 'flex',
+              gap: '4px',
+              padding: '8px 20px',
+              background: 'rgba(7, 10, 18, 0.95)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+              overflowX: 'auto'
+            }}>
+              <button
+                onClick={() => setLabActiveTab('experiments')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: labActiveTab === 'experiments' ? 'rgba(0, 240, 255, 0.18)' : 'transparent',
+                  color: labActiveTab === 'experiments' ? 'var(--neon-cyan)' : 'var(--text-dim)',
+                  boxShadow: labActiveTab === 'experiments' ? 'inset 0 0 0 1px rgba(0, 240, 255, 0.4)' : 'none'
+                }}
+              >
+                <Code2 size={16} /> All Experiments & Working Codes ({selectedLab.experiments?.length || 0})
+              </button>
+
+              <button
+                onClick={() => setLabActiveTab('viva')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: labActiveTab === 'viva' ? 'rgba(0, 240, 255, 0.18)' : 'transparent',
+                  color: labActiveTab === 'viva' ? 'var(--neon-cyan)' : 'var(--text-dim)',
+                  boxShadow: labActiveTab === 'viva' ? 'inset 0 0 0 1px rgba(0, 240, 255, 0.4)' : 'none'
+                }}
+              >
+                <HelpCircle size={16} /> University Viva-Voce Bank ({selectedLab.vivaQuestions?.length || 0})
+              </button>
+
+              {selectedLab.capstoneProject && (
+                <button
+                  onClick={() => setLabActiveTab('capstone')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: labActiveTab === 'capstone' ? 'rgba(245, 158, 11, 0.18)' : 'transparent',
+                    color: labActiveTab === 'capstone' ? '#fbbf24' : 'var(--text-dim)',
+                    boxShadow: labActiveTab === 'capstone' ? 'inset 0 0 0 1px rgba(245, 158, 11, 0.4)' : 'none'
+                  }}
+                >
+                  <Trophy size={16} /> Capstone Course Project ({selectedLab.capstoneProject.title})
+                </button>
+              )}
+            </div>
+
+            {/* Modal Body Container */}
+            <div style={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
+              {/* TAB 1: EXPERIMENTS & WORKING CODES */}
+              {labActiveTab === 'experiments' && (
+                <div style={{ display: 'flex', width: '100%', height: '100%' }}>
+                  {/* Left Sidebar: Experiments List */}
+                  <div style={{
+                    width: '320px',
+                    minWidth: '280px',
+                    borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+                    background: 'rgba(8, 11, 19, 0.7)',
+                    overflowY: 'auto',
+                    padding: '12px'
+                  }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', padding: '0 8px' }}>
+                      List of Practical Experiments ({selectedLab.experiments?.length || 0})
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      {selectedLab.experiments?.map((exp, idx) => {
+                        const isSelected = selectedExpIndex === idx;
+                        return (
+                          <button
+                            key={exp.expNo || idx}
+                            onClick={() => setSelectedExpIndex(idx)}
+                            style={{
+                              textAlign: 'left',
+                              padding: '10px 12px',
+                              borderRadius: '8px',
+                              border: isSelected ? '1px solid rgba(0, 240, 255, 0.4)' : '1px solid transparent',
+                              background: isSelected ? 'rgba(0, 240, 255, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+                              color: isSelected ? '#fff' : '#94a3b8',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: '8px',
+                              transition: 'all 0.15s'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{
+                                width: '24px',
+                                height: '24px',
+                                borderRadius: '50%',
+                                background: isSelected ? 'var(--neon-cyan)' : 'rgba(255, 255, 255, 0.08)',
+                                color: isSelected ? '#000' : '#cbd5e1',
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                              }}>
+                                {exp.expNo}
+                              </span>
+                              <span style={{ fontSize: '0.82rem', fontWeight: isSelected ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '210px' }}>
+                                {exp.title}
+                              </span>
+                            </div>
+                            {isSelected && <ChevronRight size={14} color="var(--neon-cyan)" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Right Content: Active Experiment Details & Verified Code */}
+                  {selectedLab.experiments?.[selectedExpIndex] && (() => {
+                    const exp = selectedLab.experiments[selectedExpIndex];
+                    return (
+                      <div style={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        padding: '24px 30px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '20px',
+                        background: '#070a12'
+                      }}>
+                        {/* Title & Badge */}
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                            <span style={{ 
+                              background: 'rgba(0, 240, 255, 0.15)', 
+                              color: 'var(--neon-cyan)', 
+                              fontWeight: 800, 
+                              fontSize: '0.75rem', 
+                              padding: '2px 10px', 
+                              borderRadius: '4px',
+                              border: '1px solid rgba(0, 240, 255, 0.3)'
+                            }}>
+                              EXPERIMENT {exp.expNo} OF {selectedLab.experiments.length}
+                            </span>
+                            <span style={{ fontSize: '0.75rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
+                              <CheckCircle2 size={13} /> Verified & Output Checked
+                            </span>
+                          </div>
+                          <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+                            {exp.title}
+                          </h3>
+                        </div>
+
+                        {/* Objective Card */}
+                        <div style={{
+                          background: 'rgba(0, 240, 255, 0.04)',
+                          border: '1px solid rgba(0, 240, 255, 0.25)',
+                          borderRadius: '10px',
+                          padding: '16px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px'
+                        }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--neon-cyan)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            🎯 Practical Objective & Problem Statement
+                          </span>
+                          <p style={{ margin: 0, fontSize: '0.92rem', color: '#e2e8f0', lineHeight: 1.6 }}>
+                            {exp.objective}
+                          </p>
+                        </div>
+
+                        {/* Step-by-Step Algorithm */}
+                        {exp.algorithm && exp.algorithm.length > 0 && (
+                          <div style={{
+                            background: 'rgba(255, 255, 255, 0.02)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: '10px',
+                            padding: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px'
+                          }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                              ⚡ Step-by-Step Implementation Algorithm
+                            </span>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              {exp.algorithm.map((step, sIdx) => (
+                                <div key={sIdx} style={{ fontSize: '0.88rem', color: '#cbd5e1', lineHeight: 1.5, display: 'flex', gap: '8px' }}>
+                                  <span style={{ color: '#f59e0b', fontWeight: 700 }}>{sIdx + 1}.</span>
+                                  <span>{step.replace(/^Step \d+:\s*/i, '')}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Tested Working Source Code Box */}
+                        <div style={{
+                          background: '#040711',
+                          border: '1px solid rgba(0, 240, 255, 0.3)',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          boxShadow: '0 8px 24px rgba(0,0,0,0.5)'
+                        }}>
+                          {/* Code Header Bar */}
+                          <div style={{
+                            background: 'rgba(15, 23, 42, 0.9)',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                            padding: '10px 16px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
+                              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
+                              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }} />
+                              <span style={{ marginLeft: '8px', fontSize: '0.78rem', color: '#94a3b8', fontFamily: 'monospace', fontWeight: 700 }}>
+                                {selectedLab.code.includes('BCSE-001') ? `experiment_${exp.expNo}.c` : selectedLab.code.includes('BCSE-013') ? `practical_${exp.expNo}.html` : `experiment_${exp.expNo}.py`}
+                              </span>
+                            </div>
+
+                            <button
+                              onClick={() => handleCopyCode(exp.code)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                background: copiedCode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                                border: copiedCode ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.15)',
+                                color: copiedCode ? '#34d399' : '#fff',
+                                padding: '5px 12px',
+                                borderRadius: '6px',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              {copiedCode ? <CheckCheck size={14} /> : <Copy size={14} />}
+                              {copiedCode ? 'Copied Code! ✨' : 'Copy Working Code'}
+                            </button>
+                          </div>
+
+                          {/* Preformatted Code */}
+                          <pre style={{
+                            margin: 0,
+                            padding: '18px 20px',
+                            overflowX: 'auto',
+                            fontFamily: 'Consolas, "Fira Code", monospace',
+                            fontSize: '0.85rem',
+                            color: '#38bdf8',
+                            lineHeight: 1.6,
+                            background: '#040711'
+                          }}>
+                            <code>{exp.code}</code>
+                          </pre>
+                        </div>
+
+                        {/* Sample Input & Terminal Output Box */}
+                        <div style={{
+                          background: '#03050c',
+                          border: '1px solid rgba(16, 185, 129, 0.3)',
+                          borderRadius: '10px',
+                          overflow: 'hidden'
+                        }}>
+                          <div style={{
+                            background: 'rgba(16, 185, 129, 0.1)',
+                            borderBottom: '1px solid rgba(16, 185, 129, 0.2)',
+                            padding: '8px 16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            <Terminal size={14} color="#34d399" />
+                            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                              Verified Console / Terminal Execution Output
+                            </span>
+                          </div>
+
+                          <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'Consolas, monospace', fontSize: '0.82rem' }}>
+                            {exp.sampleInput && (
+                              <div>
+                                <span style={{ color: '#94a3b8' }}>Sample Test Input: </span>
+                                <span style={{ color: '#f59e0b' }}>{exp.sampleInput}</span>
+                              </div>
+                            )}
+                            {exp.sampleOutput && (
+                              <div>
+                                <span style={{ color: '#94a3b8' }}>Console Output: </span>
+                                <span style={{ color: '#4ade80', fontWeight: 600 }}>{exp.sampleOutput}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* TAB 2: UNIVERSITY VIVA-VOCE Q&A BANK */}
+              {labActiveTab === 'viva' && (
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  overflowY: 'auto',
+                  padding: '24px 32px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '20px',
+                  background: '#070a12'
+                }}>
+                  {/* Viva Header & Search */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                    <div>
+                      <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+                        Official University Viva-Voce Questions & Model Answers
+                      </h3>
+                      <p style={{ margin: '4px 0 0 0', fontSize: '0.82rem', color: 'var(--text-dim)' }}>
+                        Exhaustive theoretical and practical exam questions frequently asked by university examiners.
+                      </p>
+                    </div>
+
+                    <div style={{ position: 'relative', width: '300px' }}>
+                      <Search size={16} color="var(--text-dim)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                      <input
+                        type="text"
+                        placeholder="Search viva questions (e.g. pointer, stack)..."
+                        value={vivaSearch}
+                        onChange={(e) => setVivaSearch(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '9px 12px 9px 36px',
+                          borderRadius: '8px',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          border: '1px solid rgba(255, 255, 255, 0.15)',
+                          color: '#fff',
+                          fontSize: '0.85rem'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Viva Questions List */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    {selectedLab.vivaQuestions
+                      ?.filter(v => 
+                        !vivaSearch || 
+                        v.q.toLowerCase().includes(vivaSearch.toLowerCase()) || 
+                        v.a.toLowerCase().includes(vivaSearch.toLowerCase())
+                      )
+                      .map((vivaItem, vIdx) => (
+                        <div 
+                          key={vIdx}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.02)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: '12px',
+                            padding: '18px 20px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px',
+                            transition: 'border-color 0.2s'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                            <span style={{
+                              background: 'rgba(0, 240, 255, 0.15)',
+                              color: 'var(--neon-cyan)',
+                              fontSize: '0.75rem',
+                              fontWeight: 800,
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              marginTop: '2px',
+                              flexShrink: 0
+                            }}>
+                              Q{vIdx + 1}
+                            </span>
+                            <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#fff', lineHeight: 1.5 }}>
+                              {vivaItem.q}
+                            </h4>
+                          </div>
+
+                          <div style={{
+                            background: 'rgba(0, 240, 255, 0.03)',
+                            borderLeft: '3px solid var(--neon-cyan)',
+                            padding: '10px 14px',
+                            borderRadius: '0 8px 8px 0',
+                            fontSize: '0.9rem',
+                            color: '#cbd5e1',
+                            lineHeight: 1.6
+                          }}>
+                            <strong style={{ color: 'var(--neon-cyan)' }}>Examiner Model Answer: </strong>
+                            {vivaItem.a}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: CAPSTONE COURSE PROJECT */}
+              {labActiveTab === 'capstone' && selectedLab.capstoneProject && (
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  overflowY: 'auto',
+                  padding: '24px 32px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '20px',
+                  background: '#070a12'
+                }}>
+                  {/* Capstone Header */}
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <span style={{
+                        background: 'rgba(245, 158, 11, 0.15)',
+                        color: '#fbbf24',
+                        fontWeight: 800,
+                        fontSize: '0.75rem',
+                        padding: '3px 10px',
+                        borderRadius: '4px',
+                        border: '1px solid rgba(245, 158, 11, 0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        <Trophy size={14} /> OFFICIAL SYLLABUS COURSE CAPSTONE PROJECT
+                      </span>
+                    </div>
+                    <h3 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+                      {selectedLab.capstoneProject.title}
+                    </h3>
+                    <p style={{ margin: '8px 0 0 0', fontSize: '0.92rem', color: '#cbd5e1', lineHeight: 1.6 }}>
+                      {selectedLab.capstoneProject.description}
+                    </p>
+                  </div>
+
+                  {/* Features List */}
+                  {selectedLab.capstoneProject.features && (
+                    <div style={{
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '12px',
+                      padding: '18px 20px'
+                    }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
+                        Architectural Deliverables & Key Technical Highlights
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
+                        {selectedLab.capstoneProject.features.map((feat, fIdx) => (
+                          <div key={fIdx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.86rem', color: '#e2e8f0' }}>
+                            <CheckCircle2 size={16} color="#fbbf24" style={{ flexShrink: 0 }} />
+                            <span>{feat}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Project Code Box */}
+                  <div style={{
+                    background: '#040711',
+                    border: '1px solid rgba(245, 158, 11, 0.35)',
+                    borderRadius: '12px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      background: 'rgba(15, 23, 42, 0.9)',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                      padding: '10px 16px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <span style={{ fontSize: '0.8rem', color: '#fbbf24', fontFamily: 'monospace', fontWeight: 700 }}>
+                        {selectedLab.code.includes('BCSE-001') ? 'pacman_game_in_c.c' : 'university_portal.html'}
+                      </span>
+
+                      <button
+                        onClick={() => handleCopyCode(selectedLab.capstoneProject.codeSnippet)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          background: copiedCode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                          border: copiedCode ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.15)',
+                          color: copiedCode ? '#34d399' : '#fff',
+                          padding: '5px 12px',
+                          borderRadius: '6px',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {copiedCode ? <CheckCheck size={14} /> : <Copy size={14} />}
+                        {copiedCode ? 'Copied Project Code! ✨' : 'Copy Full Project Code'}
+                      </button>
+                    </div>
+
+                    <pre style={{
+                      margin: 0,
+                      padding: '18px 20px',
+                      overflowX: 'auto',
+                      fontFamily: 'Consolas, "Fira Code", monospace',
+                      fontSize: '0.85rem',
+                      color: '#fbbf24',
+                      lineHeight: 1.6,
+                      background: '#040711',
+                      maxHeight: '400px'
+                    }}>
+                      <code>{selectedLab.capstoneProject.codeSnippet}</code>
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer Bar */}
+            <div style={{
+              padding: '14px 24px',
+              background: 'rgba(8, 12, 22, 0.95)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '12px'
+            }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>
+                Certified Curriculum • <strong>Maharishi Markandeshwar Engineering College</strong> • 2025-2026
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button 
+                  className="btn-outline" 
+                  style={{ padding: '7px 16px', fontSize: '0.8rem' }}
+                  onClick={() => setSelectedLab(null)}
+                >
+                  Close Studio
+                </button>
+                <button 
+                  className="btn-primary" 
+                  style={{ padding: '7px 16px', fontSize: '0.8rem', gap: '6px' }}
+                  onClick={() => handleDownloadLab(selectedLab)}
+                >
+                  <DownloadCloud size={14} /> Download PDF Manual
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
