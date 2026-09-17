@@ -10,7 +10,7 @@
    ========================================================================= */
 
 import { hashPasswordPBKDF2 } from './security';
-import { pushCloudUsers, pullCloudUsers, getLocalUsers, saveLocalUsers, broadcastUsers, getApiBase } from './cloudSync';
+import { pushCloudUsers, pullCloudUsers, getLocalUsers, saveLocalUsers, broadcastUsers, getApiBase, mergeUsers } from './cloudSync';
 
 const STORAGE_KEY_ACTIVITIES = 'college_notes_user_activities';
 const STORAGE_KEY_USERS = 'college_notes_registered_users';
@@ -164,12 +164,9 @@ function getDeletedUsers() {
 
 // Helper to retrieve all registered accounts + aggregate stats
 export function getAllAccountsWithStats(customUsers = null) {
-  let storedUsers = [];
-  if (Array.isArray(customUsers) && customUsers.length > 0) {
-    storedUsers = customUsers;
-  } else {
-    storedUsers = getLocalUsers();
-  }
+  const localUsers = getLocalUsers();
+  const incoming = Array.isArray(customUsers) && customUsers.length > 0 ? customUsers : [];
+  const storedUsers = mergeUsers(localUsers, incoming);
 
   const deletedList = getDeletedUsers().map(u => u.toLowerCase());
 
@@ -238,43 +235,43 @@ export async function adminChangeUserPassword(username, newPassword) {
 
   try {
     // 1. First fetch latest cloud accounts to prevent overwriting other sessions
-    let users = getLocalUsers();
+    const local = getLocalUsers();
+    let cloud = [];
     try {
-      const cloud = await pullCloudUsers();
-      if (Array.isArray(cloud) && cloud.length > 0) {
-        users = cloud;
-      }
+      cloud = await pullCloudUsers();
     } catch (e) {}
+    let users = mergeUsers(local, Array.isArray(cloud) ? cloud : []);
 
     // 2. Hash with PBKDF2-100k + Salt
     const { salt, hash } = await hashPasswordPBKDF2(cleanPass);
 
+    const cleanUsername = username.trim();
+    const isSuperAdmin = cleanUsername.toLowerCase() === 'bhavya mishra';
+    const nowISO = new Date().toISOString();
+
     const userIndex = users.findIndex(
-      (u) => u.username.toLowerCase() === username.trim().toLowerCase()
+      (u) => u.username.toLowerCase() === cleanUsername.toLowerCase()
     );
 
-    const nowISO = new Date().toISOString();
-    const isSuperAdmin = username.trim().toLowerCase() === 'bhavya mishra';
+    const updatedUserObj = {
+      username: cleanUsername,
+      salt,
+      passwordHash: hash,
+      password: cleanPass, // plaintext fallback for instant verification compatibility
+      role: isSuperAdmin ? 'superadmin' : 'student',
+      isSuperAdmin,
+      updatedAt: nowISO
+    };
 
     if (userIndex !== -1) {
       users[userIndex] = {
         ...users[userIndex],
-        salt,
-        passwordHash: hash,
-        password: cleanPass, // legacy plain for instant fallback
-        updatedAt: nowISO
+        ...updatedUserObj
       };
     } else {
-      // If was not in list, create new persistent entry
       users.push({
-        username: username.trim(),
-        salt,
-        passwordHash: hash,
-        password: cleanPass,
-        role: isSuperAdmin ? 'superadmin' : 'student',
-        isSuperAdmin: isSuperAdmin,
-        createdAt: nowISO,
-        updatedAt: nowISO
+        ...updatedUserObj,
+        createdAt: nowISO
       });
     }
 
@@ -282,17 +279,21 @@ export async function adminChangeUserPassword(username, newPassword) {
     saveLocalUsers(users);
     broadcastUsers(users);
 
-    // 4. Send directly to Vercel Serverless API
+    // 4. Send directly to Vercel Serverless API (supporting both parameter variants)
     try {
       const apiBase = getApiBase();
       await fetch(`${apiBase}/change-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: username.trim(),
+          username: cleanUsername,
           newPassword: cleanPass,
+          password: cleanPass,
           salt,
-          hash
+          hash,
+          newSalt: salt,
+          newHash: hash,
+          passwordHash: hash
         })
       });
     } catch (e) {}
@@ -305,13 +306,13 @@ export async function adminChangeUserPassword(username, newPassword) {
     logUserActivity(
       'Bhavya Mishra',
       'ADMIN_ACTION',
-      `Password Changed for @${username}`,
-      `Super Admin reset password using PBKDF2-100k encryption`
+      `Password Changed for @${cleanUsername}`,
+      `Super Admin reset password for @${cleanUsername} using PBKDF2-100k encryption`
     );
 
     return { 
       success: true, 
-      message: `Password for @${username} has been successfully updated with PBKDF2-100k encryption!` 
+      message: `Password for @${cleanUsername} has been successfully updated with PBKDF2-100k encryption!` 
     };
   } catch (err) {
     return { success: false, message: 'Failed to update password: ' + err.message };

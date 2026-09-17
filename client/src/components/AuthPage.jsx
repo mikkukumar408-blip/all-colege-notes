@@ -478,12 +478,15 @@ export default function AuthPage({ onLogin }) {
 
       const { salt, hash } = await hashPasswordPBKDF2(password);
 
+      const nowISO = new Date().toISOString();
       const newUser = {
         username: cleanUsername,
         role: 'student',
         salt,
         passwordHash: hash,
-        createdAt: new Date().toISOString()
+        password, // immediate fallback for seamless cross-device auth
+        createdAt: nowISO,
+        updatedAt: nowISO
       };
 
       // Instantly save to local store and sync across all devices via Cloud DB

@@ -181,6 +181,8 @@ router.post('/doubts', postRateLimiter, (req, res) => {
 // ---------------------------------------------------------------------------
 // 4. CLOUD USER ACCOUNT MANAGEMENT & CROSS-DEVICE AUTH SYNCHRONIZER
 // ---------------------------------------------------------------------------
+const BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0ae98a56225a3';
+
 let registeredUsers = [
   {
     username: 'Bhavya Mishra',
@@ -201,7 +203,70 @@ let registeredUsers = [
   { username: 'engineer', password: 'password123', role: 'student', createdAt: '2026-02-20T00:00:00.000Z' }
 ];
 
-router.get('/users', (req, res) => {
+// Helper to load persistent users from backup KV
+async function fetchBackupUsers() {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 2500);
+    const res = await fetch(BACKUP_URL, { signal: controller.signal });
+    clearTimeout(timer);
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.data && Array.isArray(json.data.users) && json.data.users.length > 0) {
+        return json.data.users;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+// Helper to save persistent users to backup KV
+async function pushBackupUsers(users) {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 2500);
+    await fetch(BACKUP_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'college_notes_cloud_users_v2',
+        data: {
+          system: 'All College Notes Cloud Account Synchronizer',
+          updatedAt: new Date().toISOString(),
+          users
+        }
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timer);
+  } catch (e) {}
+}
+
+function mergeIncomingUsers(targetList, incomingList) {
+  for (const inc of incomingList) {
+    if (!inc || !inc.username) continue;
+    const clean = inc.username.trim();
+    const idx = targetList.findIndex(u => u.username.toLowerCase() === clean.toLowerCase());
+    if (idx >= 0) {
+      const existing = targetList[idx];
+      const existingTime = existing.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
+      const incTime = inc.updatedAt ? new Date(inc.updatedAt).getTime() : 0;
+      if (incTime >= existingTime) {
+        targetList[idx] = { ...existing, ...inc };
+      } else {
+        targetList[idx] = { ...inc, ...existing };
+      }
+    } else {
+      targetList.push(inc);
+    }
+  }
+}
+
+router.get('/users', async (req, res) => {
+  const backup = await fetchBackupUsers();
+  if (backup) {
+    mergeIncomingUsers(registeredUsers, backup);
+  }
   res.json({
     success: true,
     count: registeredUsers.length,
@@ -210,7 +275,7 @@ router.get('/users', (req, res) => {
   });
 });
 
-router.post('/users', (req, res) => {
+router.post('/users', async (req, res) => {
   const user = req.body;
   if (!user || !user.username) {
     return res.status(400).json({ error: 'Username is required' });
@@ -231,33 +296,26 @@ router.post('/users', (req, res) => {
     });
   }
 
+  pushBackupUsers(registeredUsers).catch(() => {});
+
   res.json({ success: true, user: registeredUsers.find(u => u.username.toLowerCase() === clean.toLowerCase()), users: registeredUsers });
 });
 
-router.post('/users/sync', (req, res) => {
+router.post('/users/sync', async (req, res) => {
   const incoming = req.body.users;
   if (Array.isArray(incoming)) {
-    for (const inc of incoming) {
-      if (!inc || !inc.username) continue;
-      const clean = inc.username.trim();
-      const idx = registeredUsers.findIndex(u => u.username.toLowerCase() === clean.toLowerCase());
-      if (idx >= 0) {
-        const existing = registeredUsers[idx];
-        const existingTime = existing.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
-        const incTime = inc.updatedAt ? new Date(inc.updatedAt).getTime() : 0;
-        if (incTime >= existingTime) {
-          registeredUsers[idx] = { ...existing, ...inc };
-        }
-      } else {
-        registeredUsers.push(inc);
-      }
-    }
+    mergeIncomingUsers(registeredUsers, incoming);
+    pushBackupUsers(registeredUsers).catch(() => {});
   }
   res.json({ success: true, count: registeredUsers.length, users: registeredUsers });
 });
 
-router.post('/users/change-password', (req, res) => {
-  const { username, newPassword, newHash, newSalt } = req.body;
+const handleChangePassword = async (req, res) => {
+  const username = req.body.username;
+  const newPassword = req.body.newPassword || req.body.password;
+  const newHash = req.body.newHash || req.body.hash || req.body.passwordHash;
+  const newSalt = req.body.newSalt || req.body.salt;
+
   if (!username) {
     return res.status(400).json({ error: 'Username is required' });
   }
@@ -271,7 +329,6 @@ router.post('/users/change-password', (req, res) => {
     if (newHash) registeredUsers[idx].passwordHash = newHash;
     if (newSalt) registeredUsers[idx].salt = newSalt;
     registeredUsers[idx].updatedAt = now;
-    return res.json({ success: true, message: `Password for @${clean} updated successfully!`, user: registeredUsers[idx] });
   } else {
     const newUser = {
       username: clean,
@@ -283,11 +340,18 @@ router.post('/users/change-password', (req, res) => {
       updatedAt: now
     };
     registeredUsers.push(newUser);
-    return res.json({ success: true, message: `Password for @${clean} updated successfully!`, user: newUser });
   }
-});
 
-router.delete('/users/:username', (req, res) => {
+  pushBackupUsers(registeredUsers).catch(() => {});
+
+  const updatedUser = registeredUsers.find(u => u.username.toLowerCase() === clean.toLowerCase());
+  return res.json({ success: true, message: `Password for @${clean} updated successfully!`, user: updatedUser });
+};
+
+router.post('/users/change-password', handleChangePassword);
+router.post('/change-password', handleChangePassword);
+
+router.delete(['/users/:username', '/:username'], async (req, res) => {
   const username = req.params.username;
   if (!username) return res.status(400).json({ error: 'Username is required' });
 
@@ -296,6 +360,7 @@ router.delete('/users/:username', (req, res) => {
   }
 
   registeredUsers = registeredUsers.filter(u => u.username.toLowerCase() !== username.toLowerCase());
+  pushBackupUsers(registeredUsers).catch(() => {});
   res.json({ success: true, message: `User @${username} deleted successfully`, count: registeredUsers.length });
 });
 

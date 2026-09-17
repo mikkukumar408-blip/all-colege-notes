@@ -12,8 +12,8 @@ export const getApiBase = () => {
   return 'https://all-college-notes.vercel.app/api/users';
 };
 
-// Backup external KV object (Freshly verified)
-const BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0ab794bbc1fc0';
+// Primary KV backup object ID (Active & verified)
+const BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0ae98a56225a3';
 const STORAGE_KEY_USERS = 'college_notes_registered_users';
 const STORAGE_KEY_DELETED = 'college_notes_deleted_users';
 
@@ -25,7 +25,7 @@ export const authBroadcastChannel = typeof window !== 'undefined' && 'BroadcastC
 export function broadcastUsers(usersList) {
   try {
     authBroadcastChannel?.postMessage({
-      type: 'ACCOUNTS_CHANGED',
+      type: 'USERS_UPDATED',
       users: usersList,
       timestamp: Date.now()
     });
@@ -104,7 +104,7 @@ export function mergeUsers(localList, cloudList) {
   const deleted = getDeletedList().map(u => u.toLowerCase());
   const map = new Map();
 
-  // Baseline seed accounts
+  // 1. Initialize with baseline seed accounts
   for (const s of SEED_ACCOUNTS) {
     const key = s.username.toLowerCase();
     if (!deleted.includes(key)) {
@@ -112,7 +112,7 @@ export function mergeUsers(localList, cloudList) {
     }
   }
 
-  // Helper to merge candidate respecting timestamps & upgraded hashes
+  // 2. Helper to merge any candidate user
   const mergeCandidate = (candidate) => {
     if (!candidate || !candidate.username) return;
     const key = candidate.username.toLowerCase();
@@ -128,32 +128,35 @@ export function mergeUsers(localList, cloudList) {
     const candidateTime = candidate.updatedAt ? new Date(candidate.updatedAt).getTime() : 0;
 
     if (candidateTime > existingTime) {
-      // Candidate is newer - overwrite with candidate
+      // Candidate is strictly newer - overwrite with candidate
       map.set(key, { ...existing, ...candidate });
     } else if (candidateTime < existingTime) {
-      // Existing is newer - keep existing credentials, preserve new secondary fields
+      // Existing is strictly newer - keep existing credentials
       map.set(key, { ...candidate, ...existing });
     } else {
-      // Same or missing timestamp: prefer the one with salt & passwordHash (PBKDF2)
-      const candidateHasSalt = Boolean(candidate.salt && candidate.passwordHash);
-      const existingHasSalt = Boolean(existing.salt && existing.passwordHash);
+      // Same or zero timestamp:
+      // If candidate has a custom password or passwordHash and existing does not, take candidate
+      const candidateHasCustom = Boolean(candidate.salt || (candidate.passwordHash && candidate.passwordHash !== '1e0489c5be19d207c5af83e422088a8ce588b04ee9096f78e4efd2478254448b') || (candidate.password && candidate.password !== 'password123'));
+      const existingHasCustom = Boolean(existing.salt || (existing.passwordHash && existing.passwordHash !== '1e0489c5be19d207c5af83e422088a8ce588b04ee9096f78e4efd2478254448b') || (existing.password && existing.password !== 'password123'));
 
-      if (candidateHasSalt && !existingHasSalt) {
+      if (candidateHasCustom && !existingHasCustom) {
         map.set(key, { ...existing, ...candidate });
+      } else if (!candidateHasCustom && existingHasCustom) {
+        map.set(key, { ...candidate, ...existing });
       } else {
         map.set(key, { ...existing, ...candidate });
       }
     }
   };
 
-  // Merge cloud accounts
+  // Merge cloud accounts first
   if (Array.isArray(cloudList)) {
     for (const c of cloudList) {
       mergeCandidate(c);
     }
   }
 
-  // Merge local accounts (local fresh edits take precedence if timestamp matches)
+  // Merge local accounts (local fresh edits take precedence if timestamp matches or is higher)
   if (Array.isArray(localList)) {
     for (const l of localList) {
       mergeCandidate(l);
@@ -164,44 +167,62 @@ export function mergeUsers(localList, cloudList) {
 }
 
 export async function pullCloudUsers() {
-  let cloudUsers = null;
+  let serverUsers = null;
+  let backupUsers = null;
 
-  // 1. Primary: First-Party Vercel Serverless Endpoint (/api/users)
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000);
-    const res = await fetch(getApiBase(), { signal: controller.signal });
-    clearTimeout(timeout);
-    if (res.ok) {
-      const json = await res.json();
-      if (json && Array.isArray(json.users)) {
-        cloudUsers = json.users;
-      }
+    const results = await Promise.allSettled([
+      // 1. First-Party Vercel Serverless Endpoint (/api/users)
+      (async () => {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch(getApiBase(), { signal: controller.signal });
+        clearTimeout(timeout);
+        if (res.ok) {
+          const json = await res.json();
+          if (json && Array.isArray(json.users) && json.users.length > 0) {
+            return json.users;
+          }
+        }
+        return null;
+      })(),
+      // 2. Secondary: Backup external KV store
+      (async () => {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch(BACKUP_URL, { signal: controller.signal });
+        clearTimeout(timeout);
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.data && Array.isArray(json.data.users) && json.data.users.length > 0) {
+            return json.data.users;
+          }
+        }
+        return null;
+      })()
+    ]);
+
+    if (results[0].status === 'fulfilled' && results[0].value) {
+      serverUsers = results[0].value;
+    }
+    if (results[1].status === 'fulfilled' && results[1].value) {
+      backupUsers = results[1].value;
     }
   } catch (err) {
     // fallback
   }
 
-  // 2. Secondary: Backup external KV store
-  if (!cloudUsers) {
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3500);
-      const res = await fetch(BACKUP_URL, { signal: controller.signal });
-      clearTimeout(timeout);
-      if (res.ok) {
-        const json = await res.json();
-        if (json && json.data && Array.isArray(json.data.users)) {
-          cloudUsers = json.data.users;
-        }
-      }
-    } catch (err) {
-      // fallback
-    }
+  let combinedCloud = [];
+  if (serverUsers && backupUsers) {
+    combinedCloud = mergeUsers(serverUsers, backupUsers);
+  } else if (serverUsers) {
+    combinedCloud = serverUsers;
+  } else if (backupUsers) {
+    combinedCloud = backupUsers;
   }
 
   const local = getLocalUsers();
-  const merged = mergeUsers(local, cloudUsers || []);
+  const merged = mergeUsers(local, combinedCloud);
   saveLocalUsers(merged);
   return merged;
 }
@@ -210,18 +231,8 @@ export async function pushCloudUsers(usersList) {
   saveLocalUsers(usersList);
   broadcastUsers(usersList);
 
-  // 1. Sync to First-Party /api/users/sync
-  try {
-    fetch(getApiBase() + '/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ users: usersList })
-    }).catch(() => {});
-  } catch (e) {}
-
-  // 2. Sync to Secondary Backup
   const payload = {
-    name: 'all_college_notes_cloud_db_v1',
+    name: 'college_notes_cloud_users_v2',
     data: {
       system: 'All College Notes Cloud Account Synchronizer',
       updatedAt: new Date().toISOString(),
@@ -229,33 +240,57 @@ export async function pushCloudUsers(usersList) {
     }
   };
 
-  const putOptions = {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  };
-
   try {
-    fetch(BACKUP_URL, putOptions).catch(() => {});
+    await Promise.allSettled([
+      fetch(getApiBase() + '/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ users: usersList })
+      }),
+      fetch(BACKUP_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+    ]);
   } catch (e) {}
 }
 
 export async function syncNewUserToCloud(newUser) {
-  // Push directly to /api/users for immediate registration
+  const now = new Date().toISOString();
+  const cleanUser = {
+    ...newUser,
+    createdAt: newUser.createdAt || now,
+    updatedAt: newUser.updatedAt || now
+  };
+
+  // 1. Immediately save to local storage & broadcast to open tabs
+  const local = getLocalUsers();
+  const idx = local.findIndex(u => u.username.toLowerCase() === cleanUser.username.toLowerCase());
+  if (idx >= 0) {
+    local[idx] = { ...local[idx], ...cleanUser };
+  } else {
+    local.push(cleanUser);
+  }
+  saveLocalUsers(local);
+  broadcastUsers(local);
+
+  // 2. Push directly to /api/users for immediate registration
   try {
     await fetch(getApiBase(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newUser)
+      body: JSON.stringify(cleanUser)
     });
   } catch (e) {}
 
+  // 3. Pull latest cloud users, merge, and push back to KV backup
   const current = await pullCloudUsers();
-  const index = current.findIndex(u => u.username.toLowerCase() === newUser.username.toLowerCase());
-  if (index >= 0) {
-    current[index] = { ...current[index], ...newUser };
+  const currentIdx = current.findIndex(u => u.username.toLowerCase() === cleanUser.username.toLowerCase());
+  if (currentIdx >= 0) {
+    current[currentIdx] = { ...current[currentIdx], ...cleanUser };
   } else {
-    current.push(newUser);
+    current.push(cleanUser);
   }
   await pushCloudUsers(current);
   return current;
