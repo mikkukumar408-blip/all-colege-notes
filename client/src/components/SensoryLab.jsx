@@ -150,23 +150,46 @@ function renderKaTeXSafe(formula, isDisplay = false) {
   clean = clean.replace(/\\\\([a-zA-Z]+)/g, (m, word) => '\x5C' + word);
 
   // 0A. Fix JS string literal escape corruption:
-  clean = clean.replace(/[\t\x09]\s*heta/g, '\\theta');
-  clean = clean.replace(/(?<!\\)\btheta\b/g, '\\theta');
-  clean = clean.replace(/[\r\x0d]\s*ho/g, '\\rho');
-  clean = clean.replace(/(?<!\\)\brho\b/g, '\\rho');
-  clean = clean.replace(/[\b\x08]\s*egin/g, '\\begin');
-  clean = clean.replace(/[\f\x0c]\s*rac/g, '\\frac');
   clean = clean.replace(/\x0crac/g, '\\frac');
+  clean = clean.replace(/\x0cf/g, '\\f');
+  clean = clean.replace(/\x0c/g, '');
+  clean = clean.replace(/\x0dight/g, '\\right');
+  clean = clean.replace(/\x0dho/g, '\\rho');
+  clean = clean.replace(/\x0d/g, '');
+  clean = clean.replace(/\x08egin/g, '\\begin');
+  clean = clean.replace(/\x08ar/g, '\\bar');
+  clean = clean.replace(/\x08/g, '');
+  clean = clean.replace(/\x09ext/g, '\\text');
+  clean = clean.replace(/\x09/g, ' ');
+  clean = clean.replace(/\x0bec/g, '\\vec');
+  clean = clean.replace(/\x0b/g, ' ');
+  clean = clean.replace(/\\'/g, "'");
   clean = clean.replace(/⬆rac/g, '\\frac');
-  clean = clean.replace(/(?<!\\)\bleft\s*([\[\(\{])/g, '\\left$1');
-  clean = clean.replace(/[\r\x0d]\s*ight\s*([\]\)\}])/g, '\\right$1');
-  clean = clean.replace(/(?<!\\)\bright\s*([\]\)\}])/g, '\\right$1');
-  clean = clean.replace(/(?:\\into|int_0|int0)\s*\^/g, '\\int_0^');
-  clean = clean.replace(/(?<!\\)\bint\b(?=\s*[_0\^])/g, '\\int');
-  clean = clean.replace(/(?<![a-zA-Z\\])pi(?![a-zA-Z])/g, '\\pi');
-  clean = clean.replace(/(?<![a-zA-Z\\])sin(?![a-zA-Z])/g, '\\sin');
-  clean = clean.replace(/(?<![a-zA-Z\\])cos(?![a-zA-Z])/g, '\\cos');
-  clean = clean.replace(/(?<![a-zA-Z\\])tan(?![a-zA-Z])/g, '\\tan');
+
+  // 0B. Fix missing backslashes on delimiters and math tokens:
+  clean = clean.replace(/(?<!\\)left\s*([\[\(\{])/g, '\\left$1');
+  clean = clean.replace(/(?<!\\)right\s*([\]\)\}])/g, '\\right$1');
+  clean = clean.replace(/(?<!\\)\b(cos|sin|tan|sec|csc|cot|sinh|cosh|tanh|ln|log|lim|rho|theta|lambda|mu|pi|sigma|omega|phi|psi|Delta|nabla|partial|implies|iff|pm|le|ge|ne|neq|times|cdot|approx|kappa|Gamma|alpha|beta|eta)\b/g, '\\$1');
+  clean = clean.replace(/(?<!\\)\b(dots|ldots|cdots|ddots|vdots)\b/g, '\\$1');
+  clean = clean.replace(/(?<!\\)\b(begin|end)\b/g, '\\$1');
+  clean = clean.replace(/(?<!\\)\b(bar)\s*\{/g, '\\bar{');
+  clean = clean.replace(/(?<!\\)\b(bar)\s*([A-Za-z0-9])/g, '\\bar{$2}');
+  clean = clean.replace(/(?<!\\)\b(frac)\s*\{/g, '\\frac{');
+  clean = clean.replace(/(?<!\\)\b(vec)\s*\{/g, '\\vec{');
+
+  // 0C. Normalize prime exponents: x'^2 -> {x'}^2
+  clean = clean.replace(/([a-zA-Z])\'\^([0-9]+)/g, '{$1\'}^{$2}');
+
+  // 0D. Normalize Unicode exponents to LaTeX:
+  clean = clean
+    .replace(/³ᐟ²/g, '^{3/2}')
+    .replace(/¹ᐟ²/g, '^{1/2}')
+    .replace(/²/g, '^2')
+    .replace(/³/g, '^3')
+    .replace(/⁴/g, '^4')
+    .replace(/ⁿ/g, '^n')
+    .replace(/⁻¹/g, '^{-1}')
+    .replace(/⁻²/g, '^{-2}');
 
   // Fix parentheses from cleanMathTypography if any occurred
   clean = clean.replace(/\\begin\((cases|aligned|bmatrix|matrix|array)\)/g, '\\begin{$1}');
@@ -213,9 +236,6 @@ function renderKaTeXSafe(formula, isDisplay = false) {
     .replace(/\\?∈/g, '\\in ')
     .replace(/\\?∂/g, '\\partial ')
     .replace(/(?<!\\)%/g, '\\%')
-    .replace(/ⁿ/g, '^n')
-    .replace(/²/g, '^2')
-    .replace(/³/g, '^3')
     .replace(/₁/g, '_1')
     .replace(/₂/g, '_2')
     .replace(/₃/g, '_3')
@@ -230,22 +250,29 @@ function renderKaTeXSafe(formula, isDisplay = false) {
       throwOnError: false,
       strict: false
     });
-    if (rendered.includes('katex-error')) {
-      // Retry after cleaning any control characters
-      const stripped = clean.replace(/[\x00-\x1F\x7F]/g, ' ');
-      const retry = katex.renderToString(stripped, {
-        displayMode: isDisplay,
-        throwOnError: false,
-        strict: false
-      });
-      if (!retry.includes('katex-error')) {
-        return retry;
-      }
-      return cleanMathTypography(clean);
+    if (!rendered.includes('katex-error')) {
+      return rendered;
     }
-    return rendered;
+    // Retry after cleaning any control characters
+    const stripped = clean.replace(/[\x00-\x1F\x7F]/g, ' ');
+    const retry = katex.renderToString(stripped, {
+      displayMode: isDisplay,
+      throwOnError: false,
+      strict: false
+    });
+    if (!retry.includes('katex-error')) {
+      return retry;
+    }
+  } catch (e) {}
+
+  // Safe fallback: Render sanitized formula inside KaTeX \text block so typography is always styled math
+  try {
+    return katex.renderToString(`\\text{${clean.replace(/[{}\\]/g, ' ')}}`, {
+      displayMode: isDisplay,
+      throwOnError: false
+    });
   } catch (e) {
-    return cleanMathTypography(clean);
+    return clean;
   }
 }
 
@@ -279,9 +306,7 @@ function formatNoteContent(content) {
     // If the block contains math derivations or LaTeX:
     const isMathDerivation = /`[^`]+`|\\frac|frac-num|\b(?:Solution|Derivation|Slope|LMVT|Rolle|Rank|Eigen|Cauchy|Trace)\b|[=≠≤≥⇒⇔]/.test(code);
     if (isMathDerivation) {
-      let cleanCode = cleanMathTypography(code);
-      // Clean backticks inside derivations to render math
-      cleanCode = cleanCode.replace(/`([^`\n]+)`/g, (m, rawMath) => {
+      let cleanCode = code.replace(/`([^`\n]+)`/g, (m, rawMath) => {
         let math = rawMath.trim();
         // Separate English labels (e.g. "Net Reactance X = ...", "2. Impedance: ...") from math expressions
         const labelMatch = math.match(/^([0-9]+\.\s*[A-Za-z\s]+:|Power\s*Factor:|Active\s*Power:|Reactive\s*Power:|Net\s*Reactance\s*[A-Za-z]*\s*=)\s*(.*)$/);
@@ -292,6 +317,7 @@ function formatNoteContent(content) {
         }
         return `<span class="derivation-math-step">${renderKaTeXSafe(math, false)}</span>`;
       });
+      cleanCode = cleanMathTypography(cleanCode);
       const placeholder = `\x00CODEBLOCK_${codeBlocks.length}\x00`;
       codeBlocks.push(`<div class="analytical-derivation-box"><div class="derivation-body-content">${cleanCode}</div></div>`);
       return placeholder;
