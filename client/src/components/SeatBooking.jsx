@@ -1101,374 +1101,393 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                         className="custom-scroll lab-studio-content"
                         style={{
                           flex: '1 1 0%',
+                          width: '100%',
                           height: '100%',
                           minHeight: 0,
-                          overflowY: 'auto',
+                          overflowY: 'scroll',
+                          overflowX: 'hidden',
                           WebkitOverflowScrolling: 'touch',
-                          padding: '18px 24px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '14px',
+                          padding: '20px 24px',
                           background: '#070a12'
                         }}
                       >
-                        {/* Title & Badge Header */}
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <span style={{ 
-                                background: 'rgba(0, 240, 255, 0.15)', 
-                                color: 'var(--neon-cyan)', 
-                                fontWeight: 800, 
-                                fontSize: '0.75rem', 
-                                padding: '3px 10px', 
-                                borderRadius: '4px',
-                                border: '1px solid rgba(0, 240, 255, 0.3)'
-                              }}>
-                                EXPERIMENT {exp.expNo} OF {selectedLab.experiments.length}
-                              </span>
-                              <span style={{ fontSize: '0.75rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
-                                <CheckCircle2 size={13} /> Tested & Output Verified
-                              </span>
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '16px',
+                          width: '100%',
+                          minHeight: 'min-content'
+                        }}>
+                          {/* Title & Badge Header */}
+                          <div style={{ flexShrink: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ 
+                                  background: 'rgba(0, 240, 255, 0.15)', 
+                                  color: 'var(--neon-cyan)', 
+                                  fontWeight: 800, 
+                                  fontSize: '0.75rem', 
+                                  padding: '3px 10px', 
+                                  borderRadius: '4px', 
+                                  border: '1px solid rgba(0, 240, 255, 0.3)'
+                                }}>
+                                  EXPERIMENT {exp.expNo} OF {selectedLab.experiments.length}
+                                </span>
+                                <span style={{ fontSize: '0.75rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
+                                  <CheckCircle2 size={13} /> Tested & Output Verified
+                                </span>
+                              </div>
+
+                              {/* Prominent Quick Copy Button */}
+                              <button
+                                onClick={() => handleCopyCode(exp.code)}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  background: copiedCode ? 'rgba(16, 185, 129, 0.25)' : 'linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(16, 185, 129, 0.2))',
+                                  border: copiedCode ? '1px solid #10b981' : '1px solid rgba(0, 240, 255, 0.4)',
+                                  color: copiedCode ? '#34d399' : '#fff',
+                                  padding: '6px 14px',
+                                  borderRadius: '6px',
+                                  fontSize: '0.8rem',
+                                  fontWeight: 800,
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s',
+                                  boxShadow: '0 2px 8px rgba(0,0,0,0.4)'
+                                }}
+                              >
+                                {copiedCode ? <CheckCheck size={15} /> : <Copy size={15} />}
+                                {copiedCode ? 'Copied Code! ✨' : '📋 Copy Working Code'}
+                              </button>
                             </div>
 
-                            {/* Prominent Quick Copy Button */}
+                            <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+                              {exp.title}
+                            </h3>
+                          </div>
+
+                          {/* View Switcher Bar: Code (Default) vs Algorithm & Logic vs Full Manual */}
+                          <div style={{
+                            flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            background: 'rgba(255, 255, 255, 0.03)',
+                            padding: '6px',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            flexWrap: 'wrap'
+                          }}>
                             <button
-                              onClick={() => handleCopyCode(exp.code)}
+                              onClick={() => setExpSubView('code')}
                               style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                background: copiedCode ? 'rgba(16, 185, 129, 0.25)' : 'linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(16, 185, 129, 0.2))',
-                                border: copiedCode ? '1px solid #10b981' : '1px solid rgba(0, 240, 255, 0.4)',
-                                color: copiedCode ? '#34d399' : '#fff',
-                                padding: '6px 14px',
+                                flex: 1,
+                                minWidth: '180px',
+                                padding: '8px 14px',
                                 borderRadius: '6px',
-                                fontSize: '0.8rem',
+                                fontSize: '0.82rem',
                                 fontWeight: 800,
                                 cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.4)'
+                                border: expSubView === 'code' ? '1px solid var(--neon-cyan)' : '1px solid transparent',
+                                background: expSubView === 'code' ? 'rgba(0, 240, 255, 0.18)' : 'transparent',
+                                color: expSubView === 'code' ? 'var(--neon-cyan)' : '#94a3b8',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                                transition: 'all 0.2s'
                               }}
                             >
-                              {copiedCode ? <CheckCheck size={15} /> : <Copy size={15} />}
-                              {copiedCode ? 'Copied Code! ✨' : '📋 Copy Working Code'}
+                              <Code2 size={15} /> 💻 Verified Working Code (Default)
+                            </button>
+
+                            <button
+                              onClick={() => setExpSubView('algorithm')}
+                              style={{
+                                flex: 1,
+                                minWidth: '180px',
+                                padding: '8px 14px',
+                                borderRadius: '6px',
+                                fontSize: '0.82rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                border: expSubView === 'algorithm' ? '1px solid #f59e0b' : '1px solid transparent',
+                                background: expSubView === 'algorithm' ? 'rgba(245, 158, 11, 0.18)' : 'transparent',
+                                color: expSubView === 'algorithm' ? '#f59e0b' : '#94a3b8',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              <FileText size={15} /> ⚡ Algorithm & Logic Flow
+                            </button>
+
+                            <button
+                              onClick={() => setExpSubView('both')}
+                              style={{
+                                flex: 1,
+                                minWidth: '180px',
+                                padding: '8px 14px',
+                                borderRadius: '6px',
+                                fontSize: '0.82rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                border: expSubView === 'both' ? '1px solid #10b981' : '1px solid transparent',
+                                background: expSubView === 'both' ? 'rgba(16, 185, 129, 0.18)' : 'transparent',
+                                color: expSubView === 'both' ? '#34d399' : '#94a3b8',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              <BookOpen size={15} /> 📄 Full Document (Both)
                             </button>
                           </div>
 
-                          <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff', margin: 0 }}>
-                            {exp.title}
-                          </h3>
-                        </div>
-
-                        {/* View Switcher Bar: Code (Default) vs Algorithm & Logic vs Full Manual */}
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          background: 'rgba(255, 255, 255, 0.03)',
-                          padding: '6px',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(255, 255, 255, 0.08)',
-                          flexWrap: 'wrap'
-                        }}>
-                          <button
-                            onClick={() => setExpSubView('code')}
-                            style={{
-                              flex: 1,
-                              minWidth: '180px',
-                              padding: '8px 14px',
-                              borderRadius: '6px',
-                              fontSize: '0.82rem',
-                              fontWeight: 800,
-                              cursor: 'pointer',
-                              border: expSubView === 'code' ? '1px solid var(--neon-cyan)' : '1px solid transparent',
-                              background: expSubView === 'code' ? 'rgba(0, 240, 255, 0.18)' : 'transparent',
-                              color: expSubView === 'code' ? 'var(--neon-cyan)' : '#94a3b8',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '6px',
-                              transition: 'all 0.2s'
-                            }}
-                          >
-                            <Code2 size={15} /> 💻 Verified Working Code (Default)
-                          </button>
-
-                          <button
-                            onClick={() => setExpSubView('algorithm')}
-                            style={{
-                              flex: 1,
-                              minWidth: '180px',
-                              padding: '8px 14px',
-                              borderRadius: '6px',
-                              fontSize: '0.82rem',
-                              fontWeight: 800,
-                              cursor: 'pointer',
-                              border: expSubView === 'algorithm' ? '1px solid #f59e0b' : '1px solid transparent',
-                              background: expSubView === 'algorithm' ? 'rgba(245, 158, 11, 0.18)' : 'transparent',
-                              color: expSubView === 'algorithm' ? '#fbbf24' : '#94a3b8',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '6px',
-                              transition: 'all 0.2s'
-                            }}
-                          >
-                            <FileText size={15} /> ⚡ Algorithm & Logic Flow
-                          </button>
-
-                          <button
-                            onClick={() => setExpSubView('both')}
-                            style={{
-                              flex: 1,
-                              minWidth: '180px',
-                              padding: '8px 14px',
-                              borderRadius: '6px',
-                              fontSize: '0.82rem',
-                              fontWeight: 800,
-                              cursor: 'pointer',
-                              border: expSubView === 'both' ? '1px solid #a855f7' : '1px solid transparent',
-                              background: expSubView === 'both' ? 'rgba(168, 85, 247, 0.18)' : 'transparent',
-                              color: expSubView === 'both' ? '#c084fc' : '#94a3b8',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '6px',
-                              transition: 'all 0.2s'
-                            }}
-                          >
-                            <BookOpen size={15} /> 📄 Full Document (Both)
-                          </button>
-                        </div>
-
-                        {/* ================= VIEW 1: CODE FRONT-AND-CENTER (DEFAULT) ================= */}
-                        {(expSubView === 'code' || expSubView === 'both') && (
-                          <>
-                            {/* Compact Objective Banner when in code-first mode */}
-                            <div style={{
-                              background: 'rgba(0, 240, 255, 0.04)',
-                              border: '1px solid rgba(0, 240, 255, 0.2)',
-                              borderRadius: '8px',
-                              padding: '10px 14px',
-                              display: 'flex',
-                              alignItems: 'flex-start',
-                              gap: '10px',
-                              fontSize: '0.88rem',
-                              color: '#cbd5e1'
-                            }}>
-                              <span style={{ fontWeight: 800, color: 'var(--neon-cyan)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                🎯 Objective:
-                              </span>
-                              <span style={{ lineHeight: 1.5 }}>{exp.objective}</span>
-                            </div>
-
-                            {/* Working Source Code Box */}
-                            <div style={{
-                              background: '#040711',
-                              border: '1px solid rgba(0, 240, 255, 0.35)',
-                              borderRadius: '12px',
-                              overflow: 'hidden',
-                              boxShadow: '0 8px 24px rgba(0,0,0,0.6)'
-                            }}>
-                              {/* Window titlebar with filename & copy */}
+                          {/* ================= VIEW 1: CODE FRONT-AND-CENTER (DEFAULT) ================= */}
+                          {(expSubView === 'code' || expSubView === 'both') && (
+                            <>
+                              {/* Compact Objective Banner when in code-first mode */}
                               <div style={{
-                                background: 'rgba(15, 23, 42, 0.95)',
-                                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                                padding: '10px 16px',
+                                flexShrink: 0,
+                                background: 'rgba(0, 240, 255, 0.04)',
+                                border: '1px solid rgba(0, 240, 255, 0.2)',
+                                borderRadius: '8px',
+                                padding: '12px 16px',
                                 display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
+                                alignItems: 'flex-start',
+                                gap: '10px',
+                                fontSize: '0.88rem',
+                                color: '#cbd5e1'
                               }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
-                                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
-                                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }} />
-                                  <span style={{ marginLeft: '8px', fontSize: '0.8rem', color: 'var(--neon-cyan)', fontFamily: 'monospace', fontWeight: 700 }}>
-                                    {codeFileName}
+                                <span style={{ fontWeight: 800, color: 'var(--neon-cyan)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  🎯 Objective:
+                                </span>
+                                <span style={{ lineHeight: 1.5 }}>{exp.objective}</span>
+                              </div>
+
+                              {/* Working Source Code Box */}
+                              <div style={{
+                                flexShrink: 0,
+                                background: '#040711',
+                                border: '1px solid rgba(0, 240, 255, 0.35)',
+                                borderRadius: '12px',
+                                overflow: 'hidden',
+                                boxShadow: '0 8px 24px rgba(0,0,0,0.6)'
+                              }}>
+                                {/* Window titlebar with filename & copy */}
+                                <div style={{
+                                  background: 'rgba(15, 23, 42, 0.95)',
+                                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                                  padding: '10px 16px',
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center'
+                                }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
+                                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
+                                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }} />
+                                    <span style={{ marginLeft: '8px', fontSize: '0.8rem', color: 'var(--neon-cyan)', fontFamily: 'monospace', fontWeight: 700 }}>
+                                      {codeFileName}
+                                    </span>
+                                  </div>
+
+                                  <button
+                                    onClick={() => handleCopyCode(exp.code)}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '6px',
+                                      background: copiedCode ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+                                      border: copiedCode ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.15)',
+                                      color: copiedCode ? '#34d399' : '#fff',
+                                      padding: '5px 12px',
+                                      borderRadius: '6px',
+                                      fontSize: '0.78rem',
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    {copiedCode ? <CheckCheck size={14} /> : <Copy size={14} />}
+                                    {copiedCode ? 'Copied Code! ✨' : 'Copy Complete Code'}
+                                  </button>
+                                </div>
+
+                                {/* Preformatted Code Box with comfortable scroll */}
+                                <pre 
+                                  className="custom-scroll"
+                                  style={{
+                                    margin: 0,
+                                    padding: '18px 22px',
+                                    overflowX: 'auto',
+                                    overflowY: 'visible',
+                                    fontFamily: 'Consolas, "Fira Code", monospace',
+                                    fontSize: '0.86rem',
+                                    color: '#38bdf8',
+                                    lineHeight: 1.65,
+                                    background: '#040711',
+                                    whiteSpace: 'pre-wrap',
+                                    wordBreak: 'break-word'
+                                  }}
+                                >
+                                  <code>{exp.code}</code>
+                                </pre>
+                              </div>
+
+                              {/* Verified Console / Terminal Output Box */}
+                              <div style={{
+                                flexShrink: 0,
+                                background: '#03050c',
+                                border: '1px solid rgba(16, 185, 129, 0.35)',
+                                borderRadius: '10px',
+                                overflow: 'hidden',
+                                boxShadow: '0 4px 16px rgba(0,0,0,0.4)'
+                              }}>
+                                <div style={{
+                                  background: 'rgba(16, 185, 129, 0.12)',
+                                  borderBottom: '1px solid rgba(16, 185, 129, 0.25)',
+                                  padding: '8px 16px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px'
+                                }}>
+                                  <Terminal size={15} color="#34d399" />
+                                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                    Verified Console / Terminal Execution Output
                                   </span>
                                 </div>
 
-                                <button
-                                  onClick={() => handleCopyCode(exp.code)}
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    background: copiedCode ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255, 255, 255, 0.08)',
-                                    border: copiedCode ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.15)',
-                                    color: copiedCode ? '#34d399' : '#fff',
-                                    padding: '5px 12px',
-                                    borderRadius: '6px',
-                                    fontSize: '0.78rem',
-                                    fontWeight: 700,
-                                    cursor: 'pointer'
-                                  }}
-                                >
-                                  {copiedCode ? <CheckCheck size={14} /> : <Copy size={14} />}
-                                  {copiedCode ? 'Copied Code! ✨' : 'Copy Complete Code'}
-                                </button>
-                              </div>
-
-                              {/* Preformatted Code Box with comfortable scroll */}
-                              <pre 
-                                className="custom-scroll"
-                                style={{
-                                  margin: 0,
-                                  padding: '16px 20px',
-                                  overflowX: 'auto',
-                                  overflowY: 'visible',
-                                  fontFamily: 'Consolas, "Fira Code", monospace',
-                                  fontSize: '0.86rem',
-                                  color: '#38bdf8',
-                                  lineHeight: 1.65,
-                                  background: '#040711'
-                                }}
-                              >
-                                <code>{exp.code}</code>
-                              </pre>
-                            </div>
-
-                            {/* Verified Console / Terminal Output Box */}
-                            <div style={{
-                              background: '#03050c',
-                              border: '1px solid rgba(16, 185, 129, 0.35)',
-                              borderRadius: '10px',
-                              overflow: 'hidden',
-                              boxShadow: '0 4px 16px rgba(0,0,0,0.4)'
-                            }}>
-                              <div style={{
-                                background: 'rgba(16, 185, 129, 0.12)',
-                                borderBottom: '1px solid rgba(16, 185, 129, 0.25)',
-                                padding: '8px 16px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px'
-                              }}>
-                                <Terminal size={15} color="#34d399" />
-                                <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                  Verified Console / Terminal Execution Output
-                                </span>
-                              </div>
-
-                              <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'Consolas, monospace', fontSize: '0.84rem' }}>
-                                {exp.sampleInput && (
-                                  <div>
-                                    <span style={{ color: '#94a3b8' }}>Sample Test Input: </span>
-                                    <span style={{ color: '#f59e0b', fontWeight: 600 }}>{exp.sampleInput}</span>
-                                  </div>
-                                )}
-                                {exp.sampleOutput && (
-                                  <div>
-                                    <span style={{ color: '#94a3b8' }}>Console Output: </span>
-                                    <span style={{ color: '#4ade80', fontWeight: 600 }}>{exp.sampleOutput}</span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Quick Link to Algorithm if in code-only mode */}
-                            {expSubView === 'code' && (
-                              <div style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                marginTop: '4px'
-                              }}>
-                                <button
-                                  onClick={() => setExpSubView('algorithm')}
-                                  style={{
-                                    background: 'transparent',
-                                    border: 'none',
-                                    color: '#f59e0b',
-                                    fontSize: '0.82rem',
-                                    fontWeight: 700,
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    textDecoration: 'underline'
-                                  }}
-                                >
-                                  ⚡ Need the step-by-step implementation algorithm & flowchart steps? Click here to view Algorithm
-                                </button>
-                              </div>
-                            )}
-                          </>
-                        )}
-
-                        {/* ================= VIEW 2: ALGORITHM & OBJECTIVE ================= */}
-                        {(expSubView === 'algorithm' || expSubView === 'both') && (
-                          <>
-                            {/* Detailed Objective Card (Only shown here if in algorithm mode) */}
-                            {expSubView === 'algorithm' && (
-                              <div style={{
-                                background: 'rgba(0, 240, 255, 0.04)',
-                                border: '1px solid rgba(0, 240, 255, 0.25)',
-                                borderRadius: '10px',
-                                padding: '18px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '8px'
-                              }}>
-                                <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--neon-cyan)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                  🎯 Practical Objective & Problem Statement
-                                </span>
-                                <p style={{ margin: 0, fontSize: '0.94rem', color: '#e2e8f0', lineHeight: 1.6 }}>
-                                  {exp.objective}
-                                </p>
-                              </div>
-                            )}
-
-                            {/* Step-by-Step Algorithm Card */}
-                            {exp.algorithm && exp.algorithm.length > 0 && (
-                              <div style={{
-                                background: 'rgba(255, 255, 255, 0.02)',
-                                border: '1px solid rgba(255, 255, 255, 0.08)',
-                                borderRadius: '10px',
-                                padding: '18px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '12px'
-                              }}>
-                                <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                  ⚡ Step-by-Step Implementation Algorithm
-                                </span>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                  {exp.algorithm.map((step, sIdx) => (
-                                    <div key={sIdx} style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: 1.5, display: 'flex', gap: '10px' }}>
-                                      <span style={{ color: '#f59e0b', fontWeight: 700, minWidth: '22px' }}>{sIdx + 1}.</span>
-                                      <span>{step.replace(/^Step \d+:\s*/i, '')}</span>
+                                <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'Consolas, monospace', fontSize: '0.84rem' }}>
+                                  {exp.sampleInput && (
+                                    <div>
+                                      <span style={{ color: '#94a3b8' }}>Sample Test Input: </span>
+                                      <span style={{ color: '#f59e0b', fontWeight: 600 }}>{exp.sampleInput}</span>
                                     </div>
-                                  ))}
+                                  )}
+                                  {exp.sampleOutput && (
+                                    <div>
+                                      <span style={{ color: '#94a3b8' }}>Console Output: </span>
+                                      <span style={{ color: '#4ade80', fontWeight: 600 }}>{exp.sampleOutput}</span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                            )}
 
-                            {/* Switch back to Code quick button if in algorithm view */}
-                            {expSubView === 'algorithm' && (
-                              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '6px' }}>
-                                <button
-                                  onClick={() => setExpSubView('code')}
-                                  style={{
-                                    background: 'rgba(0, 240, 255, 0.15)',
-                                    border: '1px solid var(--neon-cyan)',
-                                    color: 'var(--neon-cyan)',
-                                    padding: '10px 20px',
-                                    borderRadius: '8px',
-                                    fontSize: '0.85rem',
-                                    fontWeight: 800,
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px'
-                                  }}
-                                >
-                                  <Code2 size={16} /> 🚀 View & Copy Verified Working Code
-                                </button>
-                              </div>
-                            )}
-                          </>
-                        )}
+                              {/* Quick Link to Algorithm if in code-only mode */}
+                              {expSubView === 'code' && (
+                                <div style={{
+                                  flexShrink: 0,
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  marginTop: '4px'
+                                }}>
+                                  <button
+                                    onClick={() => setExpSubView('algorithm')}
+                                    style={{
+                                      background: 'transparent',
+                                      border: 'none',
+                                      color: '#f59e0b',
+                                      fontSize: '0.82rem',
+                                      fontWeight: 700,
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '6px',
+                                      textDecoration: 'underline'
+                                    }}
+                                  >
+                                    ⚡ Need the step-by-step implementation algorithm & flowchart steps? Click here to view Algorithm
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+
+                          {/* ================= VIEW 2: ALGORITHM & OBJECTIVE ================= */}
+                          {(expSubView === 'algorithm' || expSubView === 'both') && (
+                            <>
+                              {/* Detailed Objective Card (Only shown here if in algorithm mode) */}
+                              {expSubView === 'algorithm' && (
+                                <div style={{
+                                  flexShrink: 0,
+                                  background: 'rgba(0, 240, 255, 0.04)',
+                                  border: '1px solid rgba(0, 240, 255, 0.25)',
+                                  borderRadius: '10px',
+                                  padding: '18px',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '8px'
+                                }}>
+                                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--neon-cyan)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                    🎯 Practical Objective & Problem Statement
+                                  </span>
+                                  <p style={{ margin: 0, fontSize: '0.94rem', color: '#e2e8f0', lineHeight: 1.6 }}>
+                                    {exp.objective}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Step-by-Step Algorithm Card */}
+                              {exp.algorithm && exp.algorithm.length > 0 && (
+                                <div style={{
+                                  flexShrink: 0,
+                                  background: 'rgba(255, 255, 255, 0.02)',
+                                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                                  borderRadius: '10px',
+                                  padding: '18px',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '12px'
+                                }}>
+                                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                    ⚡ Step-by-Step Implementation Algorithm
+                                  </span>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {exp.algorithm.map((step, sIdx) => (
+                                      <div key={sIdx} style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: 1.5, display: 'flex', gap: '10px' }}>
+                                        <span style={{ color: '#f59e0b', fontWeight: 700, minWidth: '22px' }}>{sIdx + 1}.</span>
+                                        <span>{step.replace(/^Step \d+:\s*/i, '')}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Switch back to Code quick button if in algorithm view */}
+                              {expSubView === 'algorithm' && (
+                                <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'center', marginTop: '6px' }}>
+                                  <button
+                                    onClick={() => setExpSubView('code')}
+                                    style={{
+                                      background: 'rgba(0, 240, 255, 0.15)',
+                                      border: '1px solid var(--neon-cyan)',
+                                      color: 'var(--neon-cyan)',
+                                      padding: '10px 20px',
+                                      borderRadius: '8px',
+                                      fontSize: '0.85rem',
+                                      fontWeight: 800,
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px'
+                                    }}
+                                  >
+                                    <Code2 size={16} /> 🚀 View & Copy Verified Working Code
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+
+                          {/* Bottom Breathing Space */}
+                          <div style={{ height: '50px', flexShrink: 0 }} />
+                        </div>
                       </div>
                     );
                   })()}
@@ -1479,105 +1498,115 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
               {labActiveTab === 'viva' && (
                 <div 
                   key={`${selectedLab.id}-viva`}
-                  className="custom-scroll"
+                  className="custom-scroll lab-studio-content"
                   style={{
                     width: '100%',
                     height: '100%',
                     minHeight: 0,
                     flex: '1 1 0%',
-                    overflowY: 'auto',
+                    overflowY: 'scroll',
+                    overflowX: 'hidden',
                     WebkitOverflowScrolling: 'touch',
                     padding: '20px 28px',
+                    background: '#070a12'
+                  }}>
+                  <div style={{
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '18px',
-                    background: '#070a12'
+                    width: '100%',
+                    minHeight: 'min-content'
                   }}>
-                  {/* Viva Header & Search */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-                    <div>
-                      <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff', margin: 0 }}>
-                        Official University Viva-Voce Questions & Model Answers
-                      </h3>
-                      <p style={{ margin: '4px 0 0 0', fontSize: '0.82rem', color: 'var(--text-dim)' }}>
-                        Exhaustive theoretical and practical exam questions frequently asked by university examiners.
-                      </p>
-                    </div>
+                    {/* Viva Header & Search */}
+                    <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                      <div>
+                        <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+                          Official University Viva-Voce Questions & Model Answers
+                        </h3>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '0.82rem', color: 'var(--text-dim)' }}>
+                          Exhaustive theoretical and practical exam questions frequently asked by university examiners.
+                        </p>
+                      </div>
 
-                    <div style={{ position: 'relative', width: '300px' }}>
-                      <Search size={16} color="var(--text-dim)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-                      <input
-                        type="text"
-                        placeholder="Search viva questions (e.g. pointer, stack)..."
-                        value={vivaSearch}
-                        onChange={(e) => setVivaSearch(e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '9px 12px 9px 36px',
-                          borderRadius: '8px',
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(255, 255, 255, 0.15)',
-                          color: '#fff',
-                          fontSize: '0.85rem'
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Viva Questions List */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                    {selectedLab.vivaQuestions
-                      ?.filter(v => 
-                        !vivaSearch || 
-                        v.q.toLowerCase().includes(vivaSearch.toLowerCase()) || 
-                        v.a.toLowerCase().includes(vivaSearch.toLowerCase())
-                      )
-                      .map((vivaItem, vIdx) => (
-                        <div 
-                          key={vIdx}
+                      <div style={{ position: 'relative', width: '300px' }}>
+                        <Search size={16} color="var(--text-dim)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                        <input
+                          type="text"
+                          placeholder="Search viva questions (e.g. pointer, stack)..."
+                          value={vivaSearch}
+                          onChange={(e) => setVivaSearch(e.target.value)}
                           style={{
-                            background: 'rgba(255, 255, 255, 0.02)',
-                            border: '1px solid rgba(255, 255, 255, 0.08)',
-                            borderRadius: '12px',
-                            padding: '18px 20px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '10px',
-                            transition: 'border-color 0.2s'
+                            width: '100%',
+                            padding: '9px 12px 9px 36px',
+                            borderRadius: '8px',
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            border: '1px solid rgba(255, 255, 255, 0.15)',
+                            color: '#fff',
+                            fontSize: '0.85rem'
                           }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                            <span style={{
-                              background: 'rgba(0, 240, 255, 0.15)',
-                              color: 'var(--neon-cyan)',
-                              fontSize: '0.75rem',
-                              fontWeight: 800,
-                              padding: '2px 8px',
-                              borderRadius: '4px',
-                              marginTop: '2px',
-                              flexShrink: 0
-                            }}>
-                              Q{vIdx + 1}
-                            </span>
-                            <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#fff', lineHeight: 1.5 }}>
-                              {vivaItem.q}
-                            </h4>
-                          </div>
+                        />
+                      </div>
+                    </div>
 
-                          <div style={{
-                            background: 'rgba(0, 240, 255, 0.03)',
-                            borderLeft: '3px solid var(--neon-cyan)',
-                            padding: '10px 14px',
-                            borderRadius: '0 8px 8px 0',
-                            fontSize: '0.9rem',
-                            color: '#cbd5e1',
-                            lineHeight: 1.6
-                          }}>
-                            <strong style={{ color: 'var(--neon-cyan)' }}>Examiner Model Answer: </strong>
-                            {vivaItem.a}
+                    {/* Viva Questions List */}
+                    <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      {selectedLab.vivaQuestions
+                        ?.filter(v => 
+                          !vivaSearch || 
+                          v.q.toLowerCase().includes(vivaSearch.toLowerCase()) || 
+                          v.a.toLowerCase().includes(vivaSearch.toLowerCase())
+                        )
+                        .map((vivaItem, vIdx) => (
+                          <div 
+                            key={vIdx}
+                            style={{
+                              flexShrink: 0,
+                              background: 'rgba(255, 255, 255, 0.02)',
+                              border: '1px solid rgba(255, 255, 255, 0.08)',
+                              borderRadius: '12px',
+                              padding: '18px 20px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '10px',
+                              transition: 'border-color 0.2s'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                              <span style={{
+                                background: 'rgba(0, 240, 255, 0.15)',
+                                color: 'var(--neon-cyan)',
+                                fontSize: '0.75rem',
+                                fontWeight: 800,
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                marginTop: '2px',
+                                flexShrink: 0
+                              }}>
+                                Q{vIdx + 1}
+                              </span>
+                              <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#fff', lineHeight: 1.5 }}>
+                                {vivaItem.q}
+                              </h4>
+                            </div>
+
+                            <div style={{
+                              background: 'rgba(0, 240, 255, 0.03)',
+                              borderLeft: '3px solid var(--neon-cyan)',
+                              padding: '10px 14px',
+                              borderRadius: '0 8px 8px 0',
+                              fontSize: '0.9rem',
+                              color: '#cbd5e1',
+                              lineHeight: 1.6
+                            }}>
+                              <strong style={{ color: 'var(--neon-cyan)' }}>Examiner Model Answer: </strong>
+                              {vivaItem.a}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                    </div>
+
+                    {/* Bottom breathing space */}
+                    <div style={{ height: '50px', flexShrink: 0 }} />
                   </div>
                 </div>
               )}
@@ -1586,293 +1615,309 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
               {labActiveTab === 'capstone' && selectedLab.capstoneProject && (
                 <div 
                   key={`${selectedLab.id}-capstone`}
-                  className="custom-scroll"
+                  className="custom-scroll lab-studio-content"
                   style={{
                     width: '100%',
                     height: '100%',
                     minHeight: 0,
                     flex: '1 1 0%',
-                    overflowY: 'auto',
+                    overflowY: 'scroll',
+                    overflowX: 'hidden',
                     WebkitOverflowScrolling: 'touch',
                     padding: '20px 28px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '14px',
                     background: '#070a12'
                   }}>
-                  {/* Capstone Header */}
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
-                      <span style={{
-                        background: 'rgba(245, 158, 11, 0.15)',
-                        color: '#fbbf24',
-                        fontWeight: 800,
-                        fontSize: '0.75rem',
-                        padding: '3px 10px',
-                        borderRadius: '4px',
-                        border: '1px solid rgba(245, 158, 11, 0.3)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}>
-                        <Trophy size={14} /> OFFICIAL SYLLABUS COURSE CAPSTONE PROJECT
-                      </span>
-
-                      {/* Prominent Quick Copy Button */}
-                      <button
-                        onClick={() => handleCopyCode(selectedLab.capstoneProject.codeSnippet)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          background: copiedCode ? 'rgba(16, 185, 129, 0.25)' : 'linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(234, 88, 12, 0.25))',
-                          border: copiedCode ? '1px solid #10b981' : '1px solid rgba(245, 158, 11, 0.45)',
-                          color: copiedCode ? '#34d399' : '#fbbf24',
-                          padding: '6px 14px',
-                          borderRadius: '6px',
-                          fontSize: '0.8rem',
-                          fontWeight: 800,
-                          cursor: 'pointer',
-                          transition: 'all 0.2s',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.4)'
-                        }}
-                      >
-                        {copiedCode ? <CheckCheck size={15} /> : <Copy size={15} />}
-                        {copiedCode ? 'Copied Project Code! ✨' : '📋 Copy Full Project Code'}
-                      </button>
-                    </div>
-
-                    <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', margin: 0 }}>
-                      {selectedLab.capstoneProject.title}
-                    </h3>
-                  </div>
-
-                  {/* Sub-view Switcher: Code (Default) vs Architecture Overview */}
                   <div style={{
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    padding: '6px',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    flexWrap: 'wrap'
+                    flexDirection: 'column',
+                    gap: '16px',
+                    width: '100%',
+                    minHeight: 'min-content'
                   }}>
-                    <button
-                      onClick={() => setCapstoneSubView('code')}
-                      style={{
-                        flex: 1,
-                        minWidth: '180px',
-                        padding: '8px 14px',
-                        borderRadius: '6px',
-                        fontSize: '0.82rem',
-                        fontWeight: 800,
-                        cursor: 'pointer',
-                        border: capstoneSubView === 'code' ? '1px solid #fbbf24' : '1px solid transparent',
-                        background: capstoneSubView === 'code' ? 'rgba(245, 158, 11, 0.18)' : 'transparent',
-                        color: capstoneSubView === 'code' ? '#fbbf24' : '#94a3b8',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      <Code2 size={15} /> 💻 Complete Working Project Code (Default)
-                    </button>
-
-                    <button
-                      onClick={() => setCapstoneSubView('overview')}
-                      style={{
-                        flex: 1,
-                        minWidth: '180px',
-                        padding: '8px 14px',
-                        borderRadius: '6px',
-                        fontSize: '0.82rem',
-                        fontWeight: 800,
-                        cursor: 'pointer',
-                        border: capstoneSubView === 'overview' ? '1px solid var(--neon-cyan)' : '1px solid transparent',
-                        background: capstoneSubView === 'overview' ? 'rgba(0, 240, 255, 0.18)' : 'transparent',
-                        color: capstoneSubView === 'overview' ? 'var(--neon-cyan)' : '#94a3b8',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      <FileText size={15} /> 📋 Architecture & Deliverables
-                    </button>
-                  </div>
-
-                  {/* CAPSTONE VIEW 1: CODE FRONT-AND-CENTER (DEFAULT) */}
-                  {capstoneSubView === 'code' && (
-                    <>
-                      {/* Compact Summary Banner */}
-                      <div style={{
-                        background: 'rgba(245, 158, 11, 0.05)',
-                        border: '1px solid rgba(245, 158, 11, 0.25)',
-                        borderRadius: '8px',
-                        padding: '10px 14px',
-                        fontSize: '0.86rem',
-                        color: '#cbd5e1',
-                        lineHeight: 1.5
-                      }}>
-                        <strong style={{ color: '#fbbf24' }}>Project Architecture: </strong>
-                        {selectedLab.capstoneProject.description}
-                      </div>
-
-                      {/* Project Code Box */}
-                      <div style={{
-                        background: '#040711',
-                        border: '1px solid rgba(245, 158, 11, 0.4)',
-                        borderRadius: '12px',
-                        overflow: 'hidden',
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.6)'
-                      }}>
-                        <div style={{
-                          background: 'rgba(15, 23, 42, 0.95)',
-                          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                          padding: '10px 16px',
+                    {/* Capstone Header */}
+                    <div style={{ flexShrink: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
+                        <span style={{
+                          background: 'rgba(245, 158, 11, 0.15)',
+                          color: '#fbbf24',
+                          fontWeight: 800,
+                          fontSize: '0.75rem',
+                          padding: '3px 10px',
+                          borderRadius: '4px',
+                          border: '1px solid rgba(245, 158, 11, 0.3)',
                           display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center'
+                          alignItems: 'center',
+                          gap: '4px'
                         }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
-                            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
-                            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }} />
-                            <span style={{ marginLeft: '8px', fontSize: '0.82rem', color: '#fbbf24', fontFamily: 'monospace', fontWeight: 700 }}>
-                              {selectedLab.code.includes('BCSE-001') ? 'pacman_game_in_c.c' : selectedLab.code.includes('BCSE-013') ? 'university_portal.html' : selectedLab.code.includes('BELE') ? 'regulated_dc_power_supply.c' : selectedLab.code.includes('BCSE-007') ? 'metro_route_planner.c' : 'digit_recognition_cnn.py'}
-                            </span>
-                          </div>
+                          <Trophy size={14} /> OFFICIAL SYLLABUS COURSE CAPSTONE PROJECT
+                        </span>
 
-                          <button
-                            onClick={() => handleCopyCode(selectedLab.capstoneProject.codeSnippet)}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              background: copiedCode ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255, 255, 255, 0.08)',
-                              border: copiedCode ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.15)',
-                              color: copiedCode ? '#34d399' : '#fff',
-                              padding: '5px 12px',
-                              borderRadius: '6px',
-                              fontSize: '0.78rem',
-                              fontWeight: 700,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            {copiedCode ? <CheckCheck size={14} /> : <Copy size={14} />}
-                            {copiedCode ? 'Copied Project Code! ✨' : 'Copy Full Project Code'}
-                          </button>
-                        </div>
-
-                        <pre 
-                          className="custom-scroll"
-                          style={{
-                            margin: 0,
-                            padding: '16px 20px',
-                            overflowX: 'auto',
-                            overflowY: 'visible',
-                            fontFamily: 'Consolas, "Fira Code", monospace',
-                            fontSize: '0.86rem',
-                            color: '#fbbf24',
-                            lineHeight: 1.65,
-                            background: '#040711'
-                          }}
-                        >
-                          <code>{selectedLab.capstoneProject.codeSnippet}</code>
-                        </pre>
-                      </div>
-
-                      {/* Quick link to architecture */}
-                      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '4px' }}>
+                        {/* Prominent Quick Copy Button */}
                         <button
-                          onClick={() => setCapstoneSubView('overview')}
+                          onClick={() => handleCopyCode(selectedLab.capstoneProject.codeSnippet)}
                           style={{
-                            background: 'transparent',
-                            border: 'none',
-                            color: 'var(--neon-cyan)',
-                            fontSize: '0.82rem',
-                            fontWeight: 700,
-                            cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '6px',
-                            textDecoration: 'underline'
+                            background: copiedCode ? 'rgba(16, 185, 129, 0.25)' : 'linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(234, 88, 12, 0.25))',
+                            border: copiedCode ? '1px solid #10b981' : '1px solid rgba(245, 158, 11, 0.45)',
+                            color: copiedCode ? '#34d399' : '#fbbf24',
+                            padding: '6px 14px',
+                            borderRadius: '6px',
+                            fontSize: '0.8rem',
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.4)'
                           }}
                         >
-                          📋 Need architectural deliverables & key technical highlights? Click here to view Architecture
+                          {copiedCode ? <CheckCheck size={15} /> : <Copy size={15} />}
+                          {copiedCode ? 'Copied Project Code! ✨' : '📋 Copy Full Project Code'}
                         </button>
                       </div>
-                    </>
-                  )}
 
-                  {/* CAPSTONE VIEW 2: ARCHITECTURE & DELIVERABLES */}
-                  {capstoneSubView === 'overview' && (
-                    <>
-                      <div style={{
-                        background: 'rgba(255, 255, 255, 0.02)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        borderRadius: '12px',
-                        padding: '18px 20px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px'
-                      }}>
-                        <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--neon-cyan)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                          Course Capstone Project Overview
-                        </div>
-                        <p style={{ margin: 0, fontSize: '0.92rem', color: '#cbd5e1', lineHeight: 1.6 }}>
-                          {selectedLab.capstoneProject.description}
-                        </p>
-                      </div>
+                      <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+                        {selectedLab.capstoneProject.title}
+                      </h3>
+                    </div>
 
-                      {/* Features List */}
-                      {selectedLab.capstoneProject.features && (
+                    {/* Sub-view Switcher: Code (Default) vs Architecture Overview */}
+                    <div style={{
+                      flexShrink: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      padding: '6px',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      flexWrap: 'wrap'
+                    }}>
+                      <button
+                        onClick={() => setCapstoneSubView('code')}
+                        style={{
+                          flex: 1,
+                          minWidth: '180px',
+                          padding: '8px 14px',
+                          borderRadius: '6px',
+                          fontSize: '0.82rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          border: capstoneSubView === 'code' ? '1px solid #fbbf24' : '1px solid transparent',
+                          background: capstoneSubView === 'code' ? 'rgba(245, 158, 11, 0.18)' : 'transparent',
+                          color: capstoneSubView === 'code' ? '#fbbf24' : '#94a3b8',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <Code2 size={15} /> 💻 Complete Working Project Code (Default)
+                      </button>
+
+                      <button
+                        onClick={() => setCapstoneSubView('overview')}
+                        style={{
+                          flex: 1,
+                          minWidth: '180px',
+                          padding: '8px 14px',
+                          borderRadius: '6px',
+                          fontSize: '0.82rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          border: capstoneSubView === 'overview' ? '1px solid var(--neon-cyan)' : '1px solid transparent',
+                          background: capstoneSubView === 'overview' ? 'rgba(0, 240, 255, 0.18)' : 'transparent',
+                          color: capstoneSubView === 'overview' ? 'var(--neon-cyan)' : '#94a3b8',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <FileText size={15} /> 📋 Architecture & Deliverables
+                      </button>
+                    </div>
+
+                    {/* CAPSTONE VIEW 1: CODE FRONT-AND-CENTER (DEFAULT) */}
+                    {capstoneSubView === 'code' && (
+                      <>
+                        {/* Compact Summary Banner */}
                         <div style={{
+                          flexShrink: 0,
+                          background: 'rgba(245, 158, 11, 0.05)',
+                          border: '1px solid rgba(245, 158, 11, 0.25)',
+                          borderRadius: '8px',
+                          padding: '10px 14px',
+                          fontSize: '0.86rem',
+                          color: '#cbd5e1',
+                          lineHeight: 1.5
+                        }}>
+                          <strong style={{ color: '#fbbf24' }}>Project Architecture: </strong>
+                          {selectedLab.capstoneProject.description}
+                        </div>
+
+                        {/* Project Code Box */}
+                        <div style={{
+                          flexShrink: 0,
+                          background: '#040711',
+                          border: '1px solid rgba(245, 158, 11, 0.4)',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          boxShadow: '0 8px 24px rgba(0,0,0,0.6)'
+                        }}>
+                          <div style={{
+                            background: 'rgba(15, 23, 42, 0.95)',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                            padding: '10px 16px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
+                              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
+                              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }} />
+                              <span style={{ marginLeft: '8px', fontSize: '0.82rem', color: '#fbbf24', fontFamily: 'monospace', fontWeight: 700 }}>
+                                {selectedLab.code.includes('BCSE-001') ? 'pacman_game_in_c.c' : selectedLab.code.includes('BCSE-013') ? 'university_portal.html' : selectedLab.code.includes('BELE') ? 'regulated_dc_power_supply.c' : selectedLab.code.includes('BCSE-007') ? 'metro_route_planner.c' : 'digit_recognition_cnn.py'}
+                              </span>
+                            </div>
+
+                            <button
+                              onClick={() => handleCopyCode(selectedLab.capstoneProject.codeSnippet)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                background: copiedCode ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+                                border: copiedCode ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.15)',
+                                color: copiedCode ? '#34d399' : '#fff',
+                                padding: '5px 12px',
+                                borderRadius: '6px',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {copiedCode ? <CheckCheck size={14} /> : <Copy size={14} />}
+                              {copiedCode ? 'Copied Project Code! ✨' : 'Copy Full Project Code'}
+                            </button>
+                          </div>
+
+                          <pre 
+                            className="custom-scroll"
+                            style={{
+                              margin: 0,
+                              padding: '16px 20px',
+                              overflowX: 'auto',
+                              overflowY: 'visible',
+                              fontFamily: 'Consolas, "Fira Code", monospace',
+                              fontSize: '0.86rem',
+                              color: '#fbbf24',
+                              lineHeight: 1.65,
+                              background: '#040711',
+                              whiteSpace: 'pre-wrap',
+                              wordBreak: 'break-word'
+                            }}
+                          >
+                            <code>{selectedLab.capstoneProject.codeSnippet}</code>
+                          </pre>
+                        </div>
+
+                        {/* Quick link to architecture */}
+                        <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'center', marginTop: '4px' }}>
+                          <button
+                            onClick={() => setCapstoneSubView('overview')}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: 'var(--neon-cyan)',
+                              fontSize: '0.82rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              textDecoration: 'underline'
+                            }}
+                          >
+                            📋 Need architectural deliverables & key technical highlights? Click here to view Architecture
+                          </button>
+                        </div>
+                      </>
+                    )}
+
+                    {/* CAPSTONE VIEW 2: ARCHITECTURE & DELIVERABLES */}
+                    {capstoneSubView === 'overview' && (
+                      <>
+                        <div style={{
+                          flexShrink: 0,
                           background: 'rgba(255, 255, 255, 0.02)',
                           border: '1px solid rgba(255, 255, 255, 0.08)',
                           borderRadius: '12px',
-                          padding: '18px 20px'
+                          padding: '18px 20px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '8px'
                         }}>
-                          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
-                            Architectural Deliverables & Key Technical Highlights
+                          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--neon-cyan)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            Course Capstone Project Overview
                           </div>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
-                            {selectedLab.capstoneProject.features.map((feat, fIdx) => (
-                              <div key={fIdx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.86rem', color: '#e2e8f0' }}>
-                                <CheckCircle2 size={16} color="#fbbf24" style={{ flexShrink: 0 }} />
-                                <span>{feat}</span>
-                              </div>
-                            ))}
-                          </div>
+                          <p style={{ margin: 0, fontSize: '0.92rem', color: '#cbd5e1', lineHeight: 1.6 }}>
+                            {selectedLab.capstoneProject.description}
+                          </p>
                         </div>
-                      )}
 
-                      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '6px' }}>
-                        <button
-                          onClick={() => setCapstoneSubView('code')}
-                          style={{
-                            background: 'rgba(245, 158, 11, 0.15)',
-                            border: '1px solid #fbbf24',
-                            color: '#fbbf24',
-                            padding: '10px 20px',
-                            borderRadius: '8px',
-                            fontSize: '0.85rem',
-                            fontWeight: 800,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px'
-                          }}
-                        >
-                          <Code2 size={16} /> 🚀 View & Copy Full Project Code
-                        </button>
-                      </div>
-                    </>
-                  )}
+                        {/* Features List */}
+                        {selectedLab.capstoneProject.features && (
+                          <div style={{
+                            flexShrink: 0,
+                            background: 'rgba(255, 255, 255, 0.02)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: '12px',
+                            padding: '18px 20px'
+                          }}>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
+                              Architectural Deliverables & Key Technical Highlights
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
+                              {selectedLab.capstoneProject.features.map((feat, fIdx) => (
+                                <div key={fIdx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.86rem', color: '#e2e8f0' }}>
+                                  <CheckCircle2 size={16} color="#fbbf24" style={{ flexShrink: 0 }} />
+                                  <span>{feat}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'center', marginTop: '6px' }}>
+                          <button
+                            onClick={() => setCapstoneSubView('code')}
+                            style={{
+                              background: 'rgba(245, 158, 11, 0.15)',
+                              border: '1px solid #fbbf24',
+                              color: '#fbbf24',
+                              padding: '10px 20px',
+                              borderRadius: '8px',
+                              fontSize: '0.85rem',
+                              fontWeight: 800,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px'
+                            }}
+                          >
+                            <Code2 size={16} /> 🚀 View & Copy Full Project Code
+                          </button>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Bottom breathing space */}
+                    <div style={{ height: '50px', flexShrink: 0 }} />
+                  </div>
                 </div>
               )}
             </div>

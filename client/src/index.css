@@ -60,7 +60,6 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--neon-cyan) rgba(10, 15, 26, 0.85);
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
 }
 
 .custom-scroll::-webkit-scrollbar {
@@ -90,19 +89,22 @@ body {
   .lab-studio-body {
     flex-direction: column !important;
     overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
   }
   .lab-studio-sidebar {
     width: 100% !important;
     min-width: 100% !important;
-    max-height: 220px !important;
+    max-height: 200px !important;
     border-right: none !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
     flex-shrink: 0 !important;
   }
   .lab-studio-content {
-    flex: 1 1 auto !important;
+    flex: none !important;
     width: 100% !important;
-    min-height: 420px !important;
+    height: auto !important;
+    min-height: min-content !important;
+    overflow-y: visible !important;
     padding: 14px 16px !important;
   }
 }
