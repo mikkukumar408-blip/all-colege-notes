@@ -10,7 +10,7 @@
    ========================================================================= */
 
 import { hashPasswordPBKDF2 } from './security';
-import { pushCloudUsers, pullCloudUsers, getLocalUsers, saveLocalUsers, broadcastUsers, getApiBase, mergeUsers } from './cloudSync';
+import { pushCloudUsers, pullCloudUsers, getLocalUsers, saveLocalUsers, broadcastUsers, getApiBase, mergeUsers, getDeviceName } from './cloudSync';
 
 const STORAGE_KEY_ACTIVITIES = 'college_notes_user_activities';
 const STORAGE_KEY_USERS = 'college_notes_registered_users';
@@ -23,32 +23,36 @@ export const PRESEEDED_ACCOUNTS = [
     role: 'superadmin',
     isSuperAdmin: true,
     createdAt: '2026-01-01T00:00:00.000Z',
-    bio: 'Root Master Administrator'
+    bio: 'Root Master Administrator',
+    lastDevice: 'Windows PC (Chrome)'
   },
   {
     username: 'student',
     role: 'student',
     isSuperAdmin: false,
     createdAt: '2026-01-01T00:00:00.000Z',
-    bio: 'Verified College Student'
+    bio: 'Verified College Student',
+    lastDevice: 'Windows PC (Chrome)'
   },
   {
     username: 'mikumandal',
     role: 'student',
     isSuperAdmin: false,
     createdAt: '2026-02-15T00:00:00.000Z',
-    bio: 'B.Tech CS Undergrad'
+    bio: 'B.Tech CS Undergrad',
+    lastDevice: 'Android Phone (Chrome)'
   },
   {
     username: 'engineer',
     role: 'student',
     isSuperAdmin: false,
     createdAt: '2026-02-20T00:00:00.000Z',
-    bio: 'Electrical Engineering Peer'
+    bio: 'Electrical Engineering Peer',
+    lastDevice: 'Apple iPhone (Safari)'
   }
 ];
 
-// Pre-seeded initial activities
+// Pre-seeded initial activities with device names & AI query examples
 const INITIAL_ACTIVITIES = [
   {
     id: 'act-1',
@@ -56,8 +60,21 @@ const INITIAL_ACTIVITIES = [
     action: 'DOWNLOAD',
     resource: 'BCSE-011: Fundamentals of AI & ML (12-Page Handwritten PDF)',
     details: 'Downloaded authentic classroom handwritten PDF with A* trace & Apriori numericals',
+    device: 'Android Phone (Chrome)',
     timestamp: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
     badgeColor: '#f59e0b'
+  },
+  {
+    id: 'act-ai-1',
+    username: 'mikumandal',
+    action: 'AI_QUERY',
+    resource: 'Data Structures & Algorithms',
+    details: 'Explain AVL tree balance factor calculation and LL/LR double rotation rules with tree diagrams.',
+    device: 'Android Phone (Chrome)',
+    model: 'openai/gpt-oss-120b',
+    solutionSnippet: '📌 Core Concept: AVL tree maintains balance factor bf(v) in {-1,0,1}. LL case requires single right rotation; LR case requires left rotation on left child followed by right rotation.',
+    timestamp: new Date(Date.now() - 11 * 60 * 1000).toISOString(),
+    badgeColor: '#a855f7'
   },
   {
     id: 'act-2',
@@ -65,6 +82,7 @@ const INITIAL_ACTIVITIES = [
     action: 'VIEW',
     resource: 'BCSE-011: Unit 1 Foundations of AI & ML Notes',
     details: 'Viewed Russell & Norvig 4 Approaches & PEAS Framework in Real Notebook mode',
+    device: 'Android Phone (Chrome)',
     timestamp: new Date(Date.now() - 14 * 60 * 1000).toISOString(),
     badgeColor: '#00f0ff'
   },
@@ -74,8 +92,21 @@ const INITIAL_ACTIVITIES = [
     action: 'DOWNLOAD',
     resource: 'BELE-001: Basic Electrical Engineering (BEEE) Solved Derivations',
     details: 'Downloaded Norton / Thevenin theorem step-by-step solved derivations',
+    device: 'Windows PC (Chrome)',
     timestamp: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
     badgeColor: '#f59e0b'
+  },
+  {
+    id: 'act-ai-2',
+    username: 'student',
+    action: 'AI_QUERY',
+    resource: 'Basic Electrical & Electronics (BEEE)',
+    details: 'How to calculate Thevenin equivalent resistance R_th and open-circuit voltage V_th across terminals A-B?',
+    device: 'Windows PC (Chrome)',
+    model: 'openai/gpt-oss-120b',
+    solutionSnippet: '📌 Core Concept: Thevenin model is single voltage source V_th in series with R_th. Independent sources zeroed: voltage sources shorted, current sources open.',
+    timestamp: new Date(Date.now() - 40 * 60 * 1000).toISOString(),
+    badgeColor: '#a855f7'
   },
   {
     id: 'act-4',
@@ -83,8 +114,21 @@ const INITIAL_ACTIVITIES = [
     action: 'VIEW',
     resource: 'BELE-001: Unit 2 AC Circuits & Phasor Diagrams',
     details: 'Viewed interactive RLC resonance vector circuit schematic',
+    device: 'Windows PC (Chrome)',
     timestamp: new Date(Date.now() - 48 * 60 * 1000).toISOString(),
     badgeColor: '#00f0ff'
+  },
+  {
+    id: 'act-ai-3',
+    username: 'Bhavya Mishra',
+    action: 'AI_QUERY',
+    resource: 'Engineering Mathematics',
+    details: 'Evaluate Gaussian integral \\int_0^\\infty e^{-x^2} dx using the double integral polar coordinates method.',
+    device: 'Windows PC (Chrome)',
+    model: 'openai/gpt-oss-120b',
+    solutionSnippet: '📌 Core Concept: Gaussian integral I evaluated by squaring I^2 = \\iint e^{-(x^2+y^2)} dx dy, converting to polar coordinates r dr d\\theta over the first quadrant.',
+    timestamp: new Date(Date.now() - 65 * 60 * 1000).toISOString(),
+    badgeColor: '#a855f7'
   },
   {
     id: 'act-5',
@@ -92,6 +136,7 @@ const INITIAL_ACTIVITIES = [
     action: 'DOWNLOAD',
     resource: 'BCSE-011: Unit 2 A* Search Graph Trace Table',
     details: 'Downloaded 14-Mark university numerical question with Open/Closed list',
+    device: 'Apple iPhone (Safari)',
     timestamp: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
     badgeColor: '#f59e0b'
   },
@@ -101,6 +146,7 @@ const INITIAL_ACTIVITIES = [
     action: 'AUTH',
     resource: 'Super Admin Command Console',
     details: 'Root administrator session initialized with elevated clearance',
+    device: 'Windows PC (Chrome)',
     timestamp: new Date().toISOString(),
     badgeColor: '#22c55e'
   }
@@ -122,16 +168,18 @@ export function getUserActivities() {
   return INITIAL_ACTIVITIES;
 }
 
-// Log a new user action
-export function logUserActivity(username, action, resource, details = '') {
+// Log a new user action with device detection
+export function logUserActivity(username, action, resource, details = '', metadata = {}) {
   try {
     const activities = getUserActivities();
     const cleanUser = username || 'Guest';
+    const currentDevice = metadata.device || getDeviceName();
 
     let badgeColor = '#00f0ff';
     if (action === 'DOWNLOAD') badgeColor = '#f59e0b';
     if (action === 'AUTH') badgeColor = '#22c55e';
     if (action === 'VIEW') badgeColor = '#38bdf8';
+    if (action === 'AI_QUERY') badgeColor = '#a855f7';
     if (action.includes('ADMIN')) badgeColor = '#ef4444';
 
     const newActivity = {
@@ -140,11 +188,13 @@ export function logUserActivity(username, action, resource, details = '') {
       action: action.toUpperCase(),
       resource,
       details,
+      device: currentDevice,
       timestamp: new Date().toISOString(),
-      badgeColor
+      badgeColor,
+      ...metadata
     };
 
-    const updated = [newActivity, ...activities].slice(0, 150);
+    const updated = [newActivity, ...activities].slice(0, 250);
     localStorage.setItem(STORAGE_KEY_ACTIVITIES, JSON.stringify(updated));
     return newActivity;
   } catch (e) {
@@ -203,18 +253,88 @@ export function getAllAccountsWithStats(customUsers = null) {
     const userActs = activities.filter(
       (a) => (a.username || '').toLowerCase() === acc.username.toLowerCase()
     );
-    const downloads = userActs.filter((a) => a.action === 'DOWNLOAD').length;
-    const views = userActs.filter((a) => a.action === 'VIEW').length;
+    const downloadsList = userActs.filter((a) => a.action === 'DOWNLOAD');
+    const viewsList = userActs.filter((a) => a.action === 'VIEW');
+    const aiQueriesList = userActs.filter((a) => a.action === 'AI_QUERY');
     const lastActive = userActs.length > 0 ? userActs[0].timestamp : (acc.updatedAt || acc.createdAt);
+
+    // Detect user device from activeDevices, activity telemetry, or fallback
+    const detectedDevice = acc.lastDevice || 
+      (acc.activeDevices && acc.activeDevices[0]?.deviceName) || 
+      (userActs.find(a => a.device)?.device) || 
+      'Windows PC (Chrome)';
 
     return {
       ...acc,
-      downloadsCount: downloads,
-      viewsCount: views,
+      downloadsCount: downloadsList.length,
+      viewsCount: viewsList.length,
+      aiQueriesCount: aiQueriesList.length,
+      downloads: downloadsList,
+      aiQueries: aiQueriesList,
+      views: viewsList,
+      device: detectedDevice,
+      activeDevices: acc.activeDevices || [],
       totalActions: userActs.length,
       lastActive
     };
   });
+}
+
+/**
+ * Returns comprehensive audit details for a specific user:
+ * - All downloaded notes/PDFs
+ * - All questions asked to the AI Academic Mentor
+ * - All viewed units/chapters
+ * - Detected devices and login history
+ */
+export function getAccountFullAudit(username) {
+  if (!username) return { downloads: [], views: [], aiQueries: [], allActivities: [] };
+  const clean = username.toLowerCase().trim();
+  const allActs = getUserActivities();
+  const userActs = allActs.filter(a => (a.username || '').toLowerCase().trim() === clean);
+
+  // Cross-reference with campusnotes_student_doubts from localStorage
+  let forumDoubts = [];
+  try {
+    const rawDoubts = localStorage.getItem('campusnotes_student_doubts');
+    if (rawDoubts) {
+      const parsed = JSON.parse(rawDoubts);
+      forumDoubts = parsed.filter(d => (d.author || '').toLowerCase().includes(clean));
+    }
+  } catch (e) {}
+
+  const downloads = userActs.filter(a => a.action === 'DOWNLOAD');
+  const views = userActs.filter(a => a.action === 'VIEW');
+  
+  // Combine activity tracker AI queries and forum doubts asked by this user
+  const aiQueriesMap = new Map();
+  userActs.filter(a => a.action === 'AI_QUERY').forEach(q => {
+    aiQueriesMap.set(q.details, q);
+  });
+
+  forumDoubts.forEach(d => {
+    if (!aiQueriesMap.has(d.question)) {
+      aiQueriesMap.set(d.question, {
+        id: d.id,
+        username: d.author,
+        action: 'AI_QUERY',
+        resource: d.subject,
+        details: d.question,
+        solutionSnippet: d.bestAnswer ? d.bestAnswer.slice(0, 300) : '',
+        fullAnswer: d.bestAnswer,
+        model: d.aiModel || 'openai/gpt-oss-120b',
+        device: d.device || 'Windows PC (Chrome)',
+        timestamp: d.date === 'Just now' ? new Date().toISOString() : d.date
+      });
+    }
+  });
+
+  return {
+    downloads,
+    views,
+    aiQueries: Array.from(aiQueriesMap.values()),
+    allActivities: userActs
+  };
 }
 
 // =========================================================================

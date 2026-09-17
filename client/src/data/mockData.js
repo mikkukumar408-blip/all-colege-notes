@@ -629,35 +629,4 @@ export const initialLabManuals = [
    5. STUDENT PEER FORUM DOUBTS & Q&A THREADS
    Add initial community questions or sample doubts here.
    ------------------------------------------------------------------------- */
-export const initialForumDoubts = [
-  {
-    id: 'f1',
-    author: 'Aakash Verma (3rd Year)',
-    subject: 'Operating Systems',
-    question: 'How to clearly differentiate between Banker\'s Algorithm for Deadlock Avoidance vs Deadlock Detection in university exams?',
-    answersCount: 4,
-    upvotes: 18,
-    date: '2 hours ago',
-    bestAnswer: 'Avoidance requires the system to know maximum resource demand a priori and ensures state remains Safe before allocation. Detection runs periodically to identify deadlocks after they occur.'
-  },
-  {
-    id: 'f2',
-    author: 'Sneha Roy (2nd Year)',
-    subject: 'Data Structures',
-    question: 'What is the most repeated AVL Tree rotation problem in Semester 3 papers?',
-    answersCount: 6,
-    upvotes: 24,
-    date: 'Yesterday',
-    bestAnswer: 'Double rotations (LR and RL rotations) are asked in almost every 10-mark question. Focus on inserting sequential numbers into an initially empty AVL tree.'
-  },
-  {
-    id: 'f3',
-    author: 'Rohan Patil (1st Year)',
-    subject: 'Engineering Math I',
-    question: 'Are Cayley-Hamilton theorem inverse matrix proofs frequently tested?',
-    answersCount: 3,
-    upvotes: 15,
-    date: '3 days ago',
-    bestAnswer: 'Yes! Proving $A^{-1}$ using $A^3 - 4A^2 + 5A - I = 0$ is a guaranteed 7-mark question in Unit 1.'
-  }
-];
+export const initialForumDoubts = [];

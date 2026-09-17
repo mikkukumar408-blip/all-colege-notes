@@ -194,6 +194,10 @@ export default function App() {
           setCurrentUser(user);
           try {
             sessionStorage.setItem('college_notes_auth_user', JSON.stringify(user));
+            localStorage.setItem('college_notes_has_account', 'true');
+            if (user?.username) {
+              localStorage.setItem('college_notes_last_username', user.username);
+            }
           } catch (e) {}
         }} 
       />

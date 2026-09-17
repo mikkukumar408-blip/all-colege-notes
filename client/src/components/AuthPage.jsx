@@ -42,8 +42,28 @@ import {
 } from '../utils/cloudSync';
 
 export default function AuthPage({ onLogin }) {
-  const [activeTab, setActiveTab] = useState('signin'); // 'signin' | 'signup'
-  const [username, setUsername] = useState('');
+  // First-time visit on any new device defaults to 'signup' (Create Account).
+  // Once an account is created or logged into on this device, it defaults to 'signin' (Sign In).
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const hasAccount = localStorage.getItem('college_notes_has_account');
+      return hasAccount === 'true' ? 'signin' : 'signup';
+    } catch (e) {
+      return 'signup';
+    }
+  });
+
+  const [username, setUsername] = useState(() => {
+    try {
+      const hasAccount = localStorage.getItem('college_notes_has_account') === 'true';
+      if (hasAccount) {
+        return localStorage.getItem('college_notes_last_username') || '';
+      }
+      return '';
+    } catch (e) {
+      return '';
+    }
+  });
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -321,6 +341,8 @@ export default function AuthPage({ onLogin }) {
           try {
             sessionStorage.setItem('college_notes_failed_attempts', '0');
             sessionStorage.removeItem('college_notes_lockout_until');
+            localStorage.setItem('college_notes_has_account', 'true');
+            localStorage.setItem('college_notes_last_username', 'Bhavya Mishra');
           } catch (err) {}
 
           logSecurityEvent('SUPER_ADMIN_AUTH', 'Super Admin authenticated with root credentials', 'INFO');
@@ -411,6 +433,8 @@ export default function AuthPage({ onLogin }) {
         try {
           sessionStorage.setItem('college_notes_failed_attempts', '0');
           sessionStorage.removeItem('college_notes_lockout_until');
+          localStorage.setItem('college_notes_has_account', 'true');
+          localStorage.setItem('college_notes_last_username', user.username || cleanUsername);
         } catch (err) {}
 
         logSecurityEvent('AUTH_LOGIN_SUCCESS', `Student @${user.username} authenticated`, 'INFO');
@@ -495,6 +519,11 @@ export default function AuthPage({ onLogin }) {
 
       logSecurityEvent('ACCOUNT_CREATED', `New student identity @${cleanUsername} generated with PBKDF2-100k encryption & Multi-Device Cloud Sync`, 'INFO');
       logUserActivity(cleanUsername, 'AUTH', 'Account Registration', 'Created new student account (Cloud Synced across all devices)');
+
+      try {
+        localStorage.setItem('college_notes_has_account', 'true');
+        localStorage.setItem('college_notes_last_username', cleanUsername);
+      } catch (err) {}
 
       playCinematicBoom();
       trigger4DXEffect();
