@@ -21,6 +21,7 @@ import {
   Menu,
   ChevronLeft,
   ChevronRight,
+  Sparkles,
   X 
 } from 'lucide-react';
 
