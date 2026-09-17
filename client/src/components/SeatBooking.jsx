@@ -4,7 +4,7 @@ import { logUserActivity } from '../utils/activityTracker';
    =========================================================================
    EDIT THIS FILE to:
    1. Modify the verified Practical Laboratory Manuals list
-   2. Edit options in the Custom Study Bundle Generator (Viva, PYQs, Formula sheets)
+   2. Edit options in the Custom Study Bundle Generator (Viva, Short Notes, Formula sheets)
    3. Update download confirmation card and confetti trigger
    ========================================================================= */
 
@@ -30,7 +30,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
      STATE MANAGEMENT
      - selectedSubjectId: Chosen subject for bundle compilation
      - includeViva: Checkbox for viva-voce answers
-     - includePYQs: Checkbox for solved past exam questions
+     - includeShortNotes: Checkbox for high-yield short notes & exam sheets
      - includeFormulaSheets: Checkbox for formula cheat sheet
      - downloadSuccess: Triggers confirmation view with confetti
      ----------------------------------------------------------------------- */
@@ -38,7 +38,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
   const [labManuals] = useState(initialLabManuals);
   const [selectedSubjectId, setSelectedSubjectId] = useState(preselectedMovie?.id || initialSubjects[3].id);
   const [includeViva, setIncludeViva] = useState(true);
-  const [includePYQs, setIncludePYQs] = useState(true);
+  const [includeShortNotes, setIncludeShortNotes] = useState(true);
   const [includeFormulaSheets, setIncludeFormulaSheets] = useState(true);
   const [studentRollNo, setStudentRollNo] = useState('');
   const [downloadSuccess, setDownloadSuccess] = useState(false);
@@ -117,7 +117,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
               <span style={{ color: 'var(--text-dim)', fontSize: '0.85rem' }}>Included Supplements:</span>
               <strong style={{ color: 'var(--neon-green)' }}>
-                {includeViva ? 'Viva Q&A • ' : ''}{includePYQs ? 'Solved PYQs • ' : ''}{includeFormulaSheets ? 'Formula Cheatsheet' : ''}
+                {includeViva ? 'Viva Q&A • ' : ''}{includeShortNotes ? 'High-Yield Short Notes • ' : ''}{includeFormulaSheets ? 'Formula Cheatsheet' : ''}
               </strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -394,11 +394,11 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
               <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#fff', cursor: 'pointer' }}>
                 <input 
                   type="checkbox" 
-                  checked={includePYQs} 
-                  onChange={(e) => setIncludePYQs(e.target.checked)} 
+                  checked={includeShortNotes} 
+                  onChange={(e) => setIncludeShortNotes(e.target.checked)} 
                   style={{ accentColor: 'var(--neon-cyan)', width: 16, height: 16 }}
                 />
-                <span>Past 3 Years Solved Exam Questions</span>
+                <span>High-Yield Short Notes & Exam Revision Summary</span>
               </label>
 
               <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#fff', cursor: 'pointer' }}>

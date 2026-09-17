@@ -42,7 +42,7 @@ export default function Sidebar({
     { id: 'subjects-notes', label: 'Semester Notes & Subjects', icon: BookOpen, badge: 'All Years' },
     { id: 'notes-reader', label: 'Interactive Notes Reader', icon: FileText, badge: 'Quick Read' },
     { id: 'syllabus', label: 'Syllabus & Curriculum', icon: GraduationCap },
-    { id: 'pyq-bank', label: 'PYQs & Exam Papers', icon: CheckSquare, badge: 'Solved' },
+    { id: 'short-notes', label: 'Short Notes & Exam Notes', icon: Sparkles, badge: 'High Yield' },
     { id: 'downloads-lab', label: 'Lab Manuals & Downloads', icon: DownloadCloud },
     { id: 'doubt-forum', label: 'Student Doubt Forum', icon: MessageSquare },
     ...(isSuperAdmin ? [

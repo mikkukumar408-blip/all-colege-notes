@@ -4,7 +4,7 @@
    EDIT THIS FILE to customize:
    1. academicYears     -> Define Years & Semesters (1st to 4th Year, Sem 1 to 8)
    2. initialSubjects   -> Add, edit, or remove subjects, unit titles & notes
-   3. initialPYQs       -> Past year university question papers & download links
+   3. initialShortNotes -> High-yield short notes, formula sheets & exam revision summaries
    4. initialLabManuals -> Practical laboratory records, codes, and viva questions
    5. initialForumDoubts-> Community Q&A questions and verified peer answers
    ========================================================================= */
@@ -347,88 +347,108 @@ export const initialSubjects = [
 ];
 
 /* -------------------------------------------------------------------------
-   3. PREVIOUS YEAR QUESTION PAPERS (PYQs)
-   Add new past exam papers here.
+   3. HIGH-YIELD SHORT NOTES & EXAM REVISION SHEETS
+   Fast-track revision guides, formula sheets & exam summaries.
    ------------------------------------------------------------------------- */
-export const initialPYQs = [
+export const initialShortNotes = [
   {
-    id: 'pyq-beee-2024',
+    id: 'sn-math1',
+    subject: 'Engineering Mathematics I (BMAT-001)',
+    code: 'BMAT-001',
+    semester: 'Semester 1',
+    category: 'Mathematics',
+    type: 'High-Yield Exam Formulae & Quick Proofs',
+    pdfUrl: '/Mathematics_1_Short_Notes_Exam_Ready.pdf',
+    downloadName: 'Mathematics_1_Short_Notes_Exam_Ready.pdf',
+    fileSize: '246 KB',
+    pages: '4 Pages Quick Revision',
+    downloads: 3820,
+    highlights: [
+      'Cayley-Hamilton Theorem & Inverse Shortcut',
+      'Rolle\'s, LMVT & Cauchy Mean Value Proofs',
+      'Euler\'s Homogeneous Functions & Beta-Gamma Formulas',
+      'Fourier Series Euler Coefficients (a₀, aₙ, bₙ)'
+    ]
+  },
+  {
+    id: 'sn-beee',
     subject: 'Basic Electrical & Electronics (BEEE)',
     code: 'BELE-001',
     semester: 'Semester 1',
-    year: '2024',
-    type: 'End-Semester University Exam (Solved)',
-    downloads: 2480,
-    hasSolutions: true,
-    fileSize: '3.8 MB'
+    category: 'Core Engineering',
+    type: 'Circuit Theorems & Rapid Derivations',
+    pdfUrl: '/BEEE_Short_Notes_Exam_Ready.pdf',
+    downloadName: 'BEEE_Short_Notes_Exam_Ready.pdf',
+    fileSize: '260 KB',
+    pages: '4 Pages Quick Revision',
+    downloads: 4150,
+    highlights: [
+      'Thevenin & Norton Equivalent Circuits & Derivations',
+      'Maximum Power Transfer Theorem Proof',
+      'Transformer EMF Equation & OC/SC Tests',
+      'P-N Diode Rectifier Ripple Factors & Efficiency'
+    ]
   },
   {
-    id: 'pyq-beee-2023',
-    subject: 'Basic Electrical & Electronics (BEEE)',
-    code: 'BELE-001',
+    id: 'sn-c',
+    subject: 'Computational Problem Solving using C',
+    code: 'BCSE-008',
     semester: 'Semester 1',
-    year: '2023',
-    type: 'Mid-Semester Exam + Model Keys',
-    downloads: 1940,
-    hasSolutions: true,
-    fileSize: '2.7 MB'
+    category: 'Computer Science',
+    type: 'Syntax, Memory Layout & Pointers Cheat Sheet',
+    pdfUrl: '/C Programming Exam Revision Sheet.pdf',
+    downloadName: 'C_Programming_Exam_Revision_Sheet.pdf',
+    fileSize: '456 KB',
+    pages: '4 Pages Quick Revision',
+    downloads: 3490,
+    highlights: [
+      '4-Stage Compilation Pipeline & Preprocessor Directives',
+      'Memory Segmentation (Code, Data, BSS, Heap, Stack)',
+      'Pointer Arithmetic, Dynamic Allocation (malloc/calloc)',
+      'Struct Memory Alignment & File Operations'
+    ]
   },
   {
-    id: 'pyq-1',
-    subject: 'Data Structures & Algorithms',
-    code: 'CS301',
-    semester: 'Semester 3',
-    year: '2024',
-    type: 'End-Semester University Exam',
-    downloads: 1420,
-    hasSolutions: true,
-    fileSize: '2.4 MB'
-  },
-  {
-    id: 'pyq-2',
-    subject: 'Operating Systems',
-    code: 'CS401',
-    semester: 'Semester 4',
-    year: '2024',
-    type: 'End-Semester University Exam',
-    downloads: 1180,
-    hasSolutions: true,
-    fileSize: '3.1 MB'
-  },
-  {
-    id: 'pyq-3',
-    subject: 'Database Management Systems',
-    code: 'CS402',
-    semester: 'Semester 4',
-    year: '2023',
-    type: 'Mid-Semester Examination',
-    downloads: 980,
-    hasSolutions: true,
-    fileSize: '1.8 MB'
-  },
-  {
-    id: 'pyq-4',
-    subject: 'Engineering Mathematics I',
-    code: 'MATH101',
+    id: 'sn-webtech',
+    subject: 'Fundamentals of Web Technologies',
+    code: 'BCSE-012',
     semester: 'Semester 1',
-    year: '2024',
-    type: 'End-Semester University Exam',
-    downloads: 1850,
-    hasSolutions: true,
-    fileSize: '4.2 MB'
+    category: 'Computer Science',
+    type: 'Protocols, HTML5/CSS3 & DOM Quick Sheet',
+    pdfUrl: '/Web Technologies Exam Revision Sheet.pdf',
+    downloadName: 'Web_Technologies_Exam_Revision_Sheet.pdf',
+    fileSize: '328 KB',
+    pages: '4 Pages Quick Revision',
+    downloads: 2980,
+    highlights: [
+      'HTTP Request-Response Lifecycle & DNS Resolution',
+      'Semantic HTML5 Architecture & Canvas API',
+      'CSS Flexbox, Grid & Box Model Calculations',
+      'JavaScript DOM Manipulation & Event Bubbling'
+    ]
   },
   {
-    id: 'pyq-5',
-    subject: 'Artificial Intelligence & ML',
-    code: 'CS601',
-    semester: 'Semester 6',
-    year: '2023',
-    type: 'Model Test Paper with Solved Keys',
-    downloads: 1650,
-    hasSolutions: true,
-    fileSize: '2.9 MB'
+    id: 'sn-aiml',
+    subject: 'Fundamentals of Artificial Intelligence & ML',
+    code: 'BCSE-011',
+    semester: 'Semester 1',
+    category: 'Artificial Intelligence',
+    type: 'Search Algorithms, Logic & ML Architecture',
+    pdfUrl: '/AIML_Short_Notes_Exam_Ready.pdf',
+    downloadName: 'AIML_Short_Notes_Exam_Ready.pdf',
+    fileSize: '285 KB',
+    pages: '4 Pages Quick Revision',
+    downloads: 3640,
+    highlights: [
+      'PEAS Agent Architecture & State Space Formulation',
+      'A* Search Heuristic Admissibility & Monotonicity',
+      'Propositional Logic & Resolution Refutation',
+      'Supervised vs Unsupervised ML & Evaluation Metrics'
+    ]
   }
 ];
+
+export const initialPYQs = initialShortNotes; // Alias for backwards compatibility
 
 /* -------------------------------------------------------------------------
    4. PRACTICAL LABORATORY MANUALS & CODE SOLUTIONS

@@ -92,7 +92,7 @@ export default function App() {
      - 'subjects-notes' : Semester Notes & Subject Catalog (Section 1)
      - 'notes-reader'   : In-Browser Notes Reader (Section 2)
      - 'syllabus'       : Official Syllabus & Curriculum (Section 3)
-     - 'pyq-bank'       : Previous Year Question Papers (Section 4)
+     - 'short-notes'    : Short Notes & Exam Revision Sheets (Section 4)
      - 'downloads-lab'  : Lab Manuals & Download Hub (Section 5)
      - 'doubt-forum'    : Student Q&A Community Forum (Section 6)
      ----------------------------------------------------------------------- */
@@ -150,8 +150,8 @@ export default function App() {
         );
       case 'syllabus':
         return <TechGuide />;
-      case 'pyq-bank':
-        return <Theaters />;
+      case 'short-notes':
+        return <Theaters currentUser={currentUser} />;
       case 'downloads-lab':
         return <SeatBooking currentUser={currentUser} preselectedMovie={selectedSubject} />;
       case 'doubt-forum':
@@ -176,7 +176,7 @@ export default function App() {
       case 'subjects-notes': return 'Semester Notes & Subjects';
       case 'notes-reader': return 'Interactive Notes Reader';
       case 'syllabus': return 'Syllabus & Curriculum';
-      case 'pyq-bank': return 'Previous Year Exam Papers (PYQs)';
+      case 'short-notes': return 'Short Notes & Exam Revision Sheets';
       case 'downloads-lab': return 'Lab Manuals & Downloads';
       case 'doubt-forum': return 'Student Doubt Forum';
       case 'admin-panel': return 'Super Admin Control Center';
