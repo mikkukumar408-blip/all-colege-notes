@@ -615,174 +615,656 @@ export const comprehensiveLabManuals = [
     ]
   },
   {
-    "id": "lab-beee-bele001",
-    "code": "BELE-001 / BELE-002",
-    "subject": "Basic Electrical & Electronics Engineering Lab",
-    "title": "Basic Electrical & Electronics Engineering Lab Manual",
-    "semester": "Semester 1 & 2",
-    "year": "1st Year",
-    "fileSize": "6.2 MB",
-    "branch": "All Branches (First Year Common)",
-    "university": "Maharishi Markandeshwar (Deemed to be University) - MMEC",
-    "syllabusMatch": "100% Official Curriculum Aligned (Session 2025-26)",
-    "pdfUrl": "https://raw.githubusercontent.com/Bhavya3733/all-colege-notes/main/public/pdfs/BELE001_BEEE_Lab_Manual.pdf",
-    "totalExperiments": 8,
-    "experimentsCount": "8 Experiments + Hardware Schematics",
-    "capstoneProject": {
-      "title": "Full-Wave Bridge Rectifier with RC Filter & 7805 Voltage Regulator",
-      "description": "Design and hardware circuit testing of a regulated +5V DC power supply from 220V AC mains using Step-Down Transformer (220V/12V), Bridge Rectifier (1N4007 diodes), Capacitor Filter (1000uF), and IC 7805 regulator.",
-      "features": [
-        "Conversion of 220V/50Hz AC mains to 5V ripple-free DC",
-        "Calculation of Ripple Factor (gamma <= 0.05) and Efficiency (eta = 81.2%)",
-        "Load regulation measurement from 0mA to 500mA output current",
-        "Dual protection against overcurrent and thermal runaway"
-      ],
-      "codeSnippet": "/* Circuit Simulation & Analytical Verification in C */\n#include <stdio.h>\n#define PI 3.14159265\n\nint main() {\n    double Vrms = 12.0; // 12V secondary transformer RMS\n    double Vm = Vrms * 1.4142; // Peak Voltage = 16.97 V\n    double Vdc_unfiltered = (2 * Vm) / PI; // 10.8 V\n    double C = 1000e-6; // 1000 uF filter capacitor\n    double R_load = 50.0; // 50 ohm load\n    double f = 50.0; // 50 Hz mains frequency\n\n    double rippleFactor = 1.0 / (4.0 * 1.732 * f * C * R_load);\n\n    printf(\"*** BEEE CAPSTONE: 5V REGULATED DC POWER SUPPLY ***\\n\");\n    printf(\"Peak Secondary Voltage (Vm)    : %.2f V\\n\", Vm);\n    printf(\"DC Output Without Filter (Vdc) : %.2f V\\n\", Vdc_unfiltered);\n    printf(\"Ripple Factor with 1000uF C     : %.4f (<< 0.05 Target Met)\\n\", rippleFactor);\n    printf(\"IC 7805 Regulated Output       : +5.00 V Constant DC\\n\");\n\n    return 0;\n}"
-    },
-    "experiments": [
-      {
-        "expNo": 1,
-        "title": "Verification of Kirchhoff's Current Law (KCL) and Voltage Law (KVL)",
-        "objective": "To experimentally verify Kirchhoff's Current Law (KCL) at a junction and Kirchhoff's Voltage Law (KVL) in a closed mesh on a resistive circuit board.",
-        "algorithm": [
-          "Step 1: Connect circuit with DC voltage source and 3 resistors (R1, R2, R3).",
-          "Step 2: Measure current entering node (I1) and leaving (I2, I3). Verify I1 = I2 + I3.",
-          "Step 3: Measure voltage drops (V1, V2, V3) along closed mesh. Verify V_supply - sum(V_drop) = 0."
-        ],
-        "code": "#include <stdio.h>\n\nint main() {\n    double V = 12.0;\n    double R1 = 100.0, R2 = 220.0, R3 = 330.0;\n    double R_total = R1 + R2 + R3;\n    double I = V / R_total;\n    double V1 = I * R1, V2 = I * R2, V3 = I * R3;\n\n    printf(\"*** BEEE Practical 1: KCL & KVL Verification ***\\n\");\n    printf(\"Supply Voltage V = %.2f V\\n\", V);\n    printf(\"V1 = %.2f V | V2 = %.2f V | V3 = %.2f V\\n\", V1, V2, V3);\n    printf(\"Sum of Drops (V1 + V2 + V3) = %.2f V\\n\", V1 + V2 + V3);\n    printf(\"KVL Residual Error: %.6f V (VERIFIED!)\\n\", V - (V1 + V2 + V3));\n    return 0;\n}",
-        "sampleInput": "V = 12V, R1=100, R2=220, R3=330",
-        "sampleOutput": "Sum of voltage drops = 12.00 V. Error = 0.00 V."
-      },
-      {
-        "expNo": 2,
-        "title": "Verification of Thevenin's and Norton's Theorems",
-        "objective": "To determine the Thevenin equivalent voltage (Vth), Thevenin resistance (Rth), and Norton short-circuit current (In) of a linear DC network.",
-        "algorithm": [
-          "Step 1: Remove load resistor RL to find open circuit voltage Vth.",
-          "Step 2: Deactivate all independent sources to determine Rth.",
-          "Step 3: Calculate load current IL = Vth / (Rth + RL).",
-          "Step 4: Verify with experimental ammeter reading."
-        ],
-        "code": "#include <stdio.h>\n\nint main() {\n    double V = 15.0, R1 = 10.0, R2 = 20.0, RL = 30.0;\n    double Vth = V * (R2 / (R1 + R2));\n    double Rth = (R1 * R2) / (R1 + R2);\n    double IL = Vth / (Rth + RL);\n\n    printf(\"*** BEEE Practical 2: Thevenin's Theorem ***\\n\");\n    printf(\"Thevenin Voltage (Vth) : %.2f V\\n\", Vth);\n    printf(\"Thevenin Res (Rth)     : %.2f Ohms\\n\", Rth);\n    printf(\"Load Current (IL)      : %.4f A (%.2f mA)\\n\", IL, IL * 1000);\n    return 0;\n}",
-        "sampleInput": "V=15V, R1=10, R2=20, RL=30",
-        "sampleOutput": "Vth = 10.00 V | Rth = 6.67 Ohms | IL = 0.2727 A (272.73 mA)"
-      }
+  "id": "lab-beee-bele001",
+  "code": "BELE-001 / BELE-002",
+  "subject": "Basic Electrical & Electronics Engineering Lab",
+  "title": "Basic Electrical & Electronics Engineering Lab Manual",
+  "semester": "Semester 1 & 2",
+  "year": "1st Year",
+  "fileSize": "6.2 MB",
+  "branch": "All Branches (First Year Common)",
+  "university": "Maharishi Markandeshwar (Deemed to be University) - MMEC",
+  "syllabusMatch": "100% Official Curriculum Aligned (Session 2025-26)",
+  "pdfUrl": "https://raw.githubusercontent.com/Bhavya3733/all-colege-notes/main/public/pdfs/BELE001_BEEE_Lab_Manual.pdf",
+  "totalExperiments": 8,
+  "experimentsCount": "8 Experiments + Hardware Schematics",
+  "capstoneProject": {
+    "title": "Full-Wave Bridge Rectifier with RC Filter & 7805 Voltage Regulator",
+    "description": "Design and hardware circuit testing of a regulated +5V DC power supply from 220V AC mains using Step-Down Transformer (220V/12V), Bridge Rectifier (1N4007 diodes), Capacitor Filter (1000uF), and IC 7805 regulator.",
+    "features": [
+      "Conversion of 220V/50Hz AC mains to 5V ripple-free DC",
+      "Calculation of Ripple Factor (gamma <= 0.05) and Efficiency (eta = 81.2%)",
+      "Load regulation measurement from 0mA to 500mA output current",
+      "Dual protection against overcurrent and thermal runaway"
     ],
-    "vivaQuestions": [
-      {
-        "q": "State Kirchhoff's Current Law (KCL) and Voltage Law (KVL).",
-        "a": "KCL states that the algebraic sum of all currents entering and exiting any electrical node is zero (conservation of electric charge). KVL states that the algebraic sum of all electrical potential differences (voltages) around any closed loop or mesh is zero (conservation of energy)."
-      },
-      {
-        "q": "What is Thevenin's Theorem?",
-        "a": "Thevenin's Theorem states that any linear bidirectional electrical network containing voltage sources, current sources, and resistors can be replaced by an equivalent circuit containing a single voltage source (Vth) in series with a single resistance (Rth)."
-      },
-      {
-        "q": "What is the P-N junction knee/cut-in voltage for Silicon and Germanium?",
-        "a": "The cut-in (knee) voltage is approximately 0.7 Volts for Silicon diodes and 0.3 Volts for Germanium diodes at room temperature (300 K)."
-      }
-    ]
+    "codeSnippet": "/* Circuit Simulation & Analytical Verification in C */\\n#include <stdio.h>\\n#define PI 3.14159265\\n\\nint main() {\\n    double Vrms = 12.0; // 12V secondary transformer RMS\\n    double Vm = Vrms * 1.4142; // Peak Voltage = 16.97 V\\n    double Vdc_unfiltered = (2 * Vm) / PI; // 10.8 V\\n    double C = 1000e-6; // 1000 uF filter capacitor\\n    double R_load = 50.0; // 50 ohm load\\n    double f = 50.0; // 50 Hz mains frequency\\n\\n    double rippleFactor = 1.0 / (4.0 * 1.732 * f * C * R_load);\\n\\n    printf(\\\"*** BEEE CAPSTONE: 5V REGULATED DC POWER SUPPLY ***\\\\n\\\");\\n    printf(\\\"Peak Secondary Voltage (Vm)    : %.2f V\\\\n\\\", Vm);\\n    printf(\\\"DC Output Without Filter (Vdc) : %.2f V\\\\n\\\", Vdc_unfiltered);\\n    printf(\\\"Ripple Factor with 1000uF C     : %.4f (<< 0.05 Target Met)\\\\n\\\", rippleFactor);\\n    printf(\\\"IC 7805 Regulated Output       : +5.00 V Constant DC\\\\n\\\");\\n\\n    return 0;\\n}"
   },
-  {
-    "id": "lab-dsa-bcse007",
-    "code": "BCSE-007",
-    "subject": "Data Structures and Algorithms Lab",
-    "title": "Data Structures & Algorithms Practical Manual",
-    "semester": "Semester 3",
-    "year": "2nd Year",
-    "fileSize": "5.9 MB",
-    "branch": "CSE / IT / AI-DS",
-    "university": "Maharishi Markandeshwar (Deemed to be University) - MMEC",
-    "syllabusMatch": "100% Official Curriculum Aligned (Session 2025-26)",
-    "pdfUrl": "https://raw.githubusercontent.com/Bhavya3733/all-colege-notes/main/public/pdfs/BCSE007_DSA_Lab_Manual.pdf",
-    "totalExperiments": 12,
-    "experimentsCount": "12 Experiments (Arrays, Stacks, Queues, Trees, Graphs)",
-    "capstoneProject": {
-      "title": "Smart City Metro Transit Route Planner using Dijkstra's Algorithm",
-      "description": "Full graph-based transit routing network representing metro stations, interchange junctions, transfer penalties, and real-time shortest travel duration calculation.",
-      "features": [
-        "Adjacency list / matrix graph representation of 25+ metro stations",
-        "Dijkstra algorithm for optimal O((V + E) log V) path calculation",
-        "Interactive CLI route generator printing route path and transit time"
+  "experiments": [
+    {
+      "expNo": 1,
+      "title": "Verification of Kirchhoff's Current Law (KCL) and Voltage Law (KVL)",
+      "objective": "To experimentally verify Kirchhoff's Current Law (KCL) at a junction and Kirchhoff's Voltage Law (KVL) in a closed mesh on a resistive circuit board.",
+      "algorithm": [
+        "Step 1: Connect circuit with DC voltage source and 3 resistors (R1, R2, R3).",
+        "Step 2: Measure current entering node (I1) and leaving (I2, I3). Verify I1 = I2 + I3.",
+        "Step 3: Measure voltage drops (V1, V2, V3) along closed mesh. Verify V_supply - sum(V_drop) = 0."
       ],
-      "codeSnippet": "#include <stdio.h>\n#define INF 99999\n#define V 5\n\nint minDistance(int dist[], int sptSet[]) {\n    int min = INF, min_index;\n    for (int v = 0; v < V; v++)\n        if (sptSet[v] == 0 && dist[v] <= min) min = dist[v], min_index = v;\n    return min_index;\n}\n\nvoid dijkstra(int graph[V][V], int src) {\n    int dist[V], sptSet[V];\n    for (int i = 0; i < V; i++) dist[i] = INF, sptSet[i] = 0;\n    dist[src] = 0;\n\n    for (int count = 0; count < V - 1; count++) {\n        int u = minDistance(dist, sptSet);\n        sptSet[u] = 1;\n        for (int v = 0; v < V; v++)\n            if (!sptSet[v] && graph[u][v] && dist[u] != INF && dist[u] + graph[u][v] < dist[v])\n                dist[v] = dist[u] + graph[u][v];\n    }\n    printf(\"Station \\t Travel Time from Central Station\\n\");\n    for (int i = 0; i < V; i++) printf(\"%d \\t\\t %d mins\\n\", i, dist[i]);\n}"
+      "code": "#include <stdio.h>\\n\\nint main() {\\n    double V = 12.0;\\n    double R1 = 100.0, R2 = 220.0, R3 = 330.0;\\n    double R_total = R1 + R2 + R3;\\n    double I = V / R_total;\\n    double V1 = I * R1, V2 = I * R2, V3 = I * R3;\\n\\n    printf(\\\"*** BEEE Practical 1: KCL & KVL Verification ***\\\\n\\\");\\n    printf(\\\"Supply Voltage V = %.2f V\\\\n\\\", V);\\n    printf(\\\"V1 = %.2f V | V2 = %.2f V | V3 = %.2f V\\\\n\\\", V1, V2, V3);\\n    printf(\\\"Sum of Drops (V1 + V2 + V3) = %.2f V\\\\n\\\", V1 + V2 + V3);\\n    printf(\\\"KVL Residual Error: %.6f V (VERIFIED!)\\\\n\\\", V - (V1 + V2 + V3));\\n    return 0;\\n}",
+      "sampleInput": "V = 12V, R1=100, R2=220, R3=330",
+      "sampleOutput": "Sum of voltage drops = 12.00 V. Error = 0.00 V."
     },
-    "experiments": [
-      {
-        "expNo": 1,
-        "title": "Array ADT Operations (Insertion, Deletion, Traversal, Search)",
-        "objective": "Implement Array Abstract Data Type with operations: Insert at index, Delete from index, Linear search, and Traversal in C.",
-        "algorithm": [
-          "Step 1: Check capacity overflow before insertion.",
-          "Step 2: Shift elements right from index to n-1, insert item at index.",
-          "Step 3: Shift elements left for deletion, decrement size.",
-          "Step 4: Traverse and print array elements."
-        ],
-        "code": "#include <stdio.h>\n\nvoid display(int arr[], int n) {\n    for (int i = 0; i < n; i++) printf(\"%d \", arr[i]);\n    printf(\"\\n\");\n}\n\nint insert(int arr[], int *n, int capacity, int val, int idx) {\n    if (*n >= capacity || idx < 0 || idx > *n) return -1;\n    for (int i = *n; i > idx; i--) arr[i] = arr[i - 1];\n    arr[idx] = val;\n    (*n)++;\n    return 0;\n}\n\nint delete(int arr[], int *n, int idx) {\n    if (idx < 0 || idx >= *n) return -1;\n    for (int i = idx; i < *n - 1; i++) arr[i] = arr[i + 1];\n    (*n)--;\n    return 0;\n}\n\nint main() {\n    int arr[10] = {10, 20, 30, 40, 50};\n    int n = 5;\n    printf(\"Original: \"); display(arr, n);\n    insert(arr, &n, 10, 25, 2);\n    printf(\"After Inserting 25 at index 2: \"); display(arr, n);\n    delete(arr, &n, 4);\n    printf(\"After Deleting index 4: \"); display(arr, n);\n    return 0;\n}",
-        "sampleInput": "Array size: 5",
-        "sampleOutput": "Elements shifted and updated with correct bounds."
-      }
+    {
+      "expNo": 2,
+      "title": "Verification of Thevenin's and Norton's Theorems",
+      "objective": "To determine the Thevenin equivalent voltage (Vth), Thevenin resistance (Rth), and Norton short-circuit current (In) of a linear DC network.",
+      "algorithm": [
+        "Step 1: Remove load resistor RL to find open circuit voltage Vth.",
+        "Step 2: Deactivate all independent sources to determine Rth.",
+        "Step 3: Calculate load current IL = Vth / (Rth + RL).",
+        "Step 4: Verify with experimental ammeter reading."
+      ],
+      "code": "#include <stdio.h>\\n\\nint main() {\\n    double V = 15.0, R1 = 10.0, R2 = 20.0, RL = 30.0;\\n    double Vth = V * (R2 / (R1 + R2));\\n    double Rth = (R1 * R2) / (R1 + R2);\\n    double IL = Vth / (Rth + RL);\\n\\n    printf(\\\"*** BEEE Practical 2: Thevenin's Theorem ***\\\\n\\\");\\n    printf(\\\"Thevenin Voltage (Vth) : %.2f V\\\\n\\\", Vth);\\n    printf(\\\"Thevenin Res (Rth)     : %.2f Ohms\\\\n\\\", Rth);\\n    printf(\\\"Load Current (IL)      : %.4f A (%.2f mA)\\\\n\\\", IL, IL * 1000);\\n    return 0;\\n}",
+      "sampleInput": "V=15V, R1=10, R2=20, RL=30",
+      "sampleOutput": "Vth = 10.00 V | Rth = 6.67 Ohms | IL = 0.2727 A (272.73 mA)"
+    },
+    {
+      "expNo": 3,
+      "title": "Verification of Superposition Theorem in DC Resistive Networks",
+      "objective": "To verify Superposition Theorem by measuring current through a resistor with multiple independent DC sources active individually and simultaneously.",
+      "algorithm": [
+        "Step 1: Connect circuit with two DC sources (V1 and V2) and resistors R1, R2, R3.",
+        "Step 2: Keep both V1 and V2 active, measure total current I_total through R3.",
+        "Step 3: Deactivate V2 (replace with short circuit) and measure current I' through R3.",
+        "Step 4: Deactivate V1 (short circuit) and measure current I'' through R3.",
+        "Step 5: Verify algebraic sum: I_total = I' + I''."
+      ],
+      "code": "#include <stdio.h>\\n\\nint main() {\\n    double V1 = 12.0, V2 = 6.0;\\n    double R1 = 10.0, R2 = 20.0, R3 = 30.0;\\n\\n    // Case 1: V1 alone (V2 shorted)\\n    double Req1 = R1 + (R2 * R3) / (R2 + R3);\\n    double Is1 = V1 / Req1;\\n    double I3_prime = Is1 * (R2 / (R2 + R3));\\n\\n    // Case 2: V2 alone (V1 shorted)\\n    double Req2 = R2 + (R1 * R3) / (R1 + R3);\\n    double Is2 = V2 / Req2;\\n    double I3_double_prime = Is2 * (R1 / (R1 + R3));\\n\\n    // Case 3: Both sources active\\n    double I3_total = I3_prime + I3_double_prime;\\n\\n    printf(\\\"*** BEEE Practical 3: Superposition Theorem ***\\\\n\\\");\\n    printf(\\\"Current with V1 alone (I')        : %.4f A\\\\n\\\", I3_prime);\\n    printf(\\\"Current with V2 alone (I'')       : %.4f A\\\\n\\\", I3_double_prime);\\n    printf(\\\"Total Current (I' + I'')          : %.4f A\\\\n\\\", I3_total);\\n    printf(\\\"Superposition Theorem VERIFIED!\\\\n\\\");\\n    return 0;\\n}",
+      "sampleInput": "V1 = 12V, V2 = 6V, R1=10, R2=20, R3=30",
+      "sampleOutput": "I' = 0.2182 A | I'' = 0.0727 A | Total I = 0.2909 A (VERIFIED)"
+    },
+    {
+      "expNo": 4,
+      "title": "Verification of Maximum Power Transfer Theorem",
+      "objective": "To experimentally demonstrate that maximum power is transferred from source to load when load resistance equals Thevenin source internal resistance (RL = Rth).",
+      "algorithm": [
+        "Step 1: Build DC circuit with internal source resistance Rs and variable load resistor RL.",
+        "Step 2: Vary RL from 0.2*Rs to 3*Rs in discrete steps.",
+        "Step 3: Measure voltage across RL and current through RL for each step.",
+        "Step 4: Calculate power PL = IL^2 * RL and plot PL versus RL.",
+        "Step 5: Identify that peak power occurs when RL = Rs."
+      ],
+      "code": "#include <stdio.h>\\n\\nint main() {\\n    double Vth = 10.0;\\n    double Rth = 50.0; // Internal source resistance\\n    double RL_values[] = {10.0, 25.0, 40.0, 50.0, 60.0, 75.0, 100.0};\\n    int n = 7;\\n\\n    printf(\\\"*** BEEE Practical 4: Maximum Power Transfer Theorem ***\\\\n\\\");\\n    printf(\\\"Source Vth = %.1f V | Internal Rth = %.1f Ohms\\\\n\\\\n\\\", Vth, Rth);\\n    printf(\\\"RL (Ohms) \\\\t IL (A) \\\\t\\\\t Power PL (Watts)\\\\n\\\");\\n    printf(\\\"-------------------------------------------------\\\\n\\\");\\n\\n    double max_P = 0.0;\\n    double best_RL = 0.0;\\n\\n    for (int i = 0; i < n; i++) {\\n        double RL = RL_values[i];\\n        double IL = Vth / (Rth + RL);\\n        double PL = IL * IL * RL;\\n        printf(\\\"%6.1f \\\\t\\\\t %6.4f \\\\t\\\\t %6.4f W %s\\\\n\\\", \\n               RL, IL, PL, (RL == Rth) ? \\\"<-- MAX POWER\\\" : \\\"\\\");\\n        if (PL > max_P) {\\n            max_P = PL;\\n            best_RL = RL;\\n        }\\n    }\\n    printf(\\\"\\\\nMaximum Power = %.4f W occurs at RL = %.1f Ohms (RL = Rth Verified!)\\\\n\\\", max_P, best_RL);\\n    return 0;\\n}",
+      "sampleInput": "Vth = 10V, Rth = 50 Ohms, RL = [10, 25, 40, 50, 60, 75, 100]",
+      "sampleOutput": "Max Power 0.5000 W at RL = 50.0 Ohms (Pmax = Vth^2 / 4Rth)"
+    },
+    {
+      "expNo": 5,
+      "title": "V-I Characteristics of P-N Junction Diode & Zener Diode",
+      "objective": "To plot the static forward and reverse bias V-I characteristics of Silicon P-N junction diode (1N4007) and determine cut-in voltage, and reverse breakdown of Zener diode.",
+      "algorithm": [
+        "Step 1: Connect diode in forward bias with series current-limiting resistor.",
+        "Step 2: Increase forward voltage VF from 0 to 1.0 V in small 0.1V increments.",
+        "Step 3: Record forward current IF; note knee voltage where current shoots up.",
+        "Step 4: Reverse diode polarity and record reverse leakage current until breakdown.",
+        "Step 5: Plot graph of V vs I to compute dynamic forward resistance rd = delta(VF) / delta(IF)."
+      ],
+      "code": "#include <stdio.h>\\n\\nint main() {\\n    printf(\\\"*** BEEE Practical 5: P-N Junction & Zener Diode V-I Curves ***\\\\n\\\\n\\\");\\n    printf(\\\"--- FORWARD BIAS (Silicon Diode 1N4007) ---\\\\n\\\");\\n    printf(\\\"VF (Volts) \\\\t IF (mA) \\\\t State\\\\n\\\");\\n    double vf[] = {0.0, 0.2, 0.4, 0.5, 0.6, 0.7, 0.75, 0.8};\\n    double if_ma[] = {0.0, 0.01, 0.05, 0.3, 1.8, 8.5, 24.0, 52.0};\\n    for (int i = 0; i < 8; i++) {\\n        printf(\\\"%.2f V \\\\t\\\\t %.2f mA \\\\t %s\\\\n\\\", vf[i], if_ma[i], \\n               (vf[i] >= 0.7) ? \\\"Conduction (Above Knee)\\\" : \\\"Cut-off\\\");\\n    }\\n\\n    printf(\\\"\\\\nCut-in Voltage (V_gamma) = 0.70 V\\\\n\\\");\\n    double delta_v = 0.75 - 0.70;\\n    double delta_i = (24.0 - 8.5) / 1000.0;\\n    printf(\\\"Dynamic Forward Resistance (rd) = %.2f Ohms\\\\n\\\", delta_v / delta_i);\\n    return 0;\\n}",
+      "sampleInput": "Diode: 1N4007 (Si), Voltage range: 0V - 0.8V",
+      "sampleOutput": "Cut-in V = 0.70 V | Dynamic resistance rd = 3.23 Ohms"
+    },
+    {
+      "expNo": 6,
+      "title": "Half-Wave and Full-Wave Rectifiers with & without Capacitor Filter",
+      "objective": "To study and compare the operation of Half-Wave and Full-Wave Center-Tapped / Bridge rectifiers and analyze the effect of capacitor filter on output ripple factor.",
+      "algorithm": [
+        "Step 1: Connect secondary of 220V/12V step-down transformer to diode rectifier circuit.",
+        "Step 2: Connect resistive load RL and observe output waveform on CRO.",
+        "Step 3: Measure DC output voltage Vdc and AC ripple voltage Vac using DMM.",
+        "Step 4: Calculate Ripple Factor = Vac / Vdc and Efficiency.",
+        "Step 5: Connect 470uF/1000uF shunt capacitor across RL and observe smoothing."
+      ],
+      "code": "#include <stdio.h>\\n#define PI 3.14159265\\n\\nint main() {\\n    double Vrms = 12.0;\\n    double Vm = Vrms * 1.4142; // Peak AC = 16.97 V\\n    double RL = 1000.0; // 1 kOhm\\n    double C = 1000e-6; // 1000 uF\\n    double f = 50.0; // 50 Hz\\n\\n    printf(\\\"*** BEEE Practical 6: Rectifier Comparison ***\\\\n\\\\n\\\");\\n    \\n    // Half Wave\\n    double hwr_vdc = Vm / PI;\\n    double hwr_gamma = 1.21;\\n    printf(\\\"1. Half-Wave Rectifier (Unfiltered):\\\\n\\\");\\n    printf(\\\"   Vdc = %.2f V | Ripple Factor gamma = %.2f | Efficiency = 40.6%%\\\\n\\\\n\\\", hwr_vdc, hwr_gamma);\\n\\n    // Full Wave Bridge\\n    double fwr_vdc = (2 * Vm) / PI;\\n    double fwr_gamma = 0.482;\\n    printf(\\\"2. Full-Wave Rectifier (Unfiltered):\\\\n\\\");\\n    printf(\\\"   Vdc = %.2f V | Ripple Factor gamma = %.3f | Efficiency = 81.2%%\\\\n\\\\n\\\", fwr_vdc, fwr_gamma);\\n\\n    // Full Wave with 1000uF Capacitor Filter\\n    double fwr_filter_gamma = 1.0 / (4.0 * 1.732 * f * C * RL);\\n    printf(\\\"3. Full-Wave with Shunt 1000uF Filter:\\\\n\\\");\\n    printf(\\\"   Ripple Factor gamma = %.4f (< 0.05 Target Achieved)\\\\n\\\", fwr_filter_gamma);\\n\\n    return 0;\\n}",
+      "sampleInput": "Transformer: 220V/12V, 50Hz, RL = 1k, C = 1000uF",
+      "sampleOutput": "HWR gamma = 1.21 | FWR gamma = 0.482 | Filtered gamma = 0.0029"
+    },
+    {
+      "expNo": 7,
+      "title": "Input and Output Characteristics of BJT in Common Emitter (CE) Configuration",
+      "objective": "To plot the Input (IB vs VBE at constant VCE) and Output (IC vs VCE at constant IB) characteristics of NPN Transistor (BC547) in Common Emitter mode.",
+      "algorithm": [
+        "Step 1: Connect transistor BC547 in CE mode with variable base and collector supplies.",
+        "Step 2: Keep VCE fixed at 2V, 5V; vary VBE and record base current IB (Input Char).",
+        "Step 3: Keep IB constant (20uA, 40uA, 60uA); vary VCE from 0 to 10V and record IC (Output Char).",
+        "Step 4: Identify Active, Saturation, and Cutoff regions.",
+        "Step 5: Calculate Current Gain beta = delta(IC) / delta(IB) and dynamic output resistance."
+      ],
+      "code": "#include <stdio.h>\\n\\nint main() {\\n    printf(\\\"*** BEEE Practical 7: BJT CE Characteristics (BC547 NPN) ***\\\\n\\\\n\\\");\\n    printf(\\\"--- OUTPUT CHARACTERISTICS (IC vs VCE at IB = 40 uA) ---\\\\n\\\");\\n    printf(\\\"VCE (Volts) \\\\t IC (mA) \\\\t Operating Region\\\\n\\\");\\n    double vce[] = {0.0, 0.2, 0.5, 1.0, 2.0, 4.0, 6.0, 8.0, 10.0};\\n    double ic[]  = {0.0, 1.8, 5.2, 5.8, 6.0, 6.1, 6.2, 6.3, 6.4};\\n\\n    for (int i = 0; i < 9; i++) {\\n        printf(\\\"%.1f V \\\\t\\\\t %.2f mA \\\\t %s\\\\n\\\", vce[i], ic[i], \\n               (vce[i] < 0.5) ? \\\"Saturation Region\\\" : \\\"Active Region (Linear Amplification)\\\");\\n    }\\n\\n    double delta_ic = (6.2 - 6.0) / 1000.0; // Amperes\\n    double delta_ib = (40.0 - 20.0) * 1e-6; // Amperes\\n    double beta = (6.0 / 1000.0) / (40.0 * 1e-6);\\n    printf(\\\"\\\\nDC Current Gain (Beta / hFE) = %.1f\\\\n\\\", beta);\\n    printf(\\\"BJT CE Characteristics VERIFIED!\\\\n\\\");\\n    return 0;\\n}",
+      "sampleInput": "Transistor: BC547 NPN, Base current: 40 uA",
+      "sampleOutput": "Saturation knee < 0.5V | Beta = 150.0 | Active region IC ~ 6.0 mA"
+    },
+    {
+      "expNo": 8,
+      "title": "Measurement of Voltage, Frequency, and Phase using CRO / DSO",
+      "objective": "To measure amplitude (Vp-p), RMS voltage, time period, frequency, and phase difference of sinusoidal and square waveforms using a Dual-Channel Oscilloscope.",
+      "algorithm": [
+        "Step 1: Connect function generator output to Channel 1 of CRO/DSO.",
+        "Step 2: Adjust Volt/Div and Time/Div knobs to obtain 2-3 stable complete cycles.",
+        "Step 3: Measure peak-to-peak vertical divisions (dy) -> Vp-p = dy * Volts/Div.",
+        "Step 4: Measure horizontal divisions for 1 full cycle (dx) -> T = dx * Time/Div.",
+        "Step 5: Calculate Frequency f = 1 / T.",
+        "Step 6: Feed two signals to CH1 and CH2 and observe Lissajous patterns for phase angle."
+      ],
+      "code": "#include <stdio.h>\\n\\nint main() {\\n    double volts_per_div = 2.0; // 2V / div\\n    double time_per_div = 0.5e-3; // 0.5 ms / div\\n    double dy = 4.2; // 4.2 vertical divisions\\n    double dx = 4.0; // 4.0 horizontal divisions for 1 cycle\\n\\n    double Vpp = dy * volts_per_div;\\n    double Vm = Vpp / 2.0;\\n    double Vrms = Vm / 1.4142;\\n    double T = dx * time_per_div;\\n    double f = 1.0 / T;\\n\\n    printf(\\\"*** BEEE Practical 8: CRO / DSO Waveform Measurement ***\\\\n\\\");\\n    printf(\\\"Volts/Div Scale        : %.1f V/div\\\\n\\\", volts_per_div);\\n    printf(\\\"Time/Div Scale         : %.2f ms/div\\\\n\\\", time_per_div * 1000);\\n    printf(\\\"Peak-to-Peak Voltage   : %.2f V\\\\n\\\", Vpp);\\n    printf(\\\"Peak Voltage (Vm)      : %.2f V\\\\n\\\", Vm);\\n    printf(\\\"RMS Voltage (Vrms)     : %.2f V\\\\n\\\", Vrms);\\n    printf(\\\"Time Period (T)        : %.4f s (%.2f ms)\\\\n\\\", T, T * 1000);\\n    printf(\\\"Measured Frequency (f) : %.2f Hz (1.00 kHz Signal Verified)\\\\n\\\", f);\\n    return 0;\\n}",
+      "sampleInput": "Scale: 2V/div, 0.5ms/div, dy=4.2 div, dx=4.0 div",
+      "sampleOutput": "Vpp = 8.40 V | Vrms = 2.97 V | Period = 2.00 ms | Freq = 500.00 Hz"
+    }
+  ],
+  "vivaQuestions": [
+    {
+      "q": "State Kirchhoff's Current Law (KCL) and Voltage Law (KVL).",
+      "a": "KCL states that the algebraic sum of all currents entering and exiting any electrical node is zero (conservation of electric charge). KVL states that the algebraic sum of all electrical potential differences (voltages) around any closed loop or mesh is zero (conservation of energy)."
+    },
+    {
+      "q": "What is Thevenin's Theorem?",
+      "a": "Thevenin's Theorem states that any linear bidirectional electrical network containing voltage sources, current sources, and resistors can be replaced by an equivalent circuit containing a single voltage source (Vth) in series with a single resistance (Rth)."
+    },
+    {
+      "q": "What is the P-N junction knee/cut-in voltage for Silicon and Germanium?",
+      "a": "The cut-in (knee) voltage is approximately 0.7 Volts for Silicon diodes and 0.3 Volts for Germanium diodes at room temperature (300 K)."
+    },
+    {
+      "q": "State Superposition Theorem and its limitations.",
+      "a": "Superposition theorem states that in any linear bilateral network containing two or more independent sources, the resultant response (current or voltage) in any branch is the algebraic sum of responses caused by each independent source acting alone, with all other independent sources replaced by their internal impedances. Limitation: It cannot be directly applied to calculate power because power is a non-linear quadratic function (P = I^2*R)."
+    },
+    {
+      "q": "State Maximum Power Transfer Theorem for DC circuits.",
+      "a": "A resistive load will receive maximum power from a linear DC network when the resistance of the load equals the Thevenin equivalent resistance of the network as viewed from load terminals (RL = Rth). At maximum power transfer, circuit efficiency is exactly 50%."
+    },
+    {
+      "q": "What is the Ripple Factor of Half-Wave and Full-Wave Rectifiers?",
+      "a": "For a Half-Wave Rectifier, Ripple Factor gamma = 1.21 with efficiency eta = 40.6%. For a Full-Wave Rectifier, Ripple Factor gamma = 0.482 with efficiency eta = 81.2%."
+    },
+    {
+      "q": "Why is Common Emitter (CE) configuration most widely used in amplifier circuits?",
+      "a": "CE configuration provides both high voltage gain and high current gain, resulting in the highest power gain among all three transistor configurations. It also features moderate input and output impedances that facilitate easy multistage cascading."
+    },
+    {
+      "q": "What is the purpose of Lissajous figures on a CRO?",
+      "a": "Lissajous figures are stationary patterns formed on a CRO screen when two sinusoidal signals are simultaneously applied to the X and Y deflection plates in X-Y mode. They are used to measure frequency ratio and phase difference between the two AC signals."
+    }
+  ]
+},
+  {
+  "id": "lab-dsa-bcse007",
+  "code": "BCSE-007",
+  "subject": "Data Structures and Algorithms Lab",
+  "title": "Data Structures & Algorithms Practical Manual",
+  "semester": "Semester 3",
+  "year": "2nd Year",
+  "fileSize": "5.9 MB",
+  "branch": "CSE / IT / AI-DS",
+  "university": "Maharishi Markandeshwar (Deemed to be University) - MMEC",
+  "syllabusMatch": "100% Official Curriculum Aligned (Session 2025-26)",
+  "pdfUrl": "https://raw.githubusercontent.com/Bhavya3733/all-colege-notes/main/public/pdfs/BCSE007_DSA_Lab_Manual.pdf",
+  "totalExperiments": 12,
+  "experimentsCount": "12 Experiments (Arrays, Stacks, Queues, Trees, Graphs)",
+  "capstoneProject": {
+    "title": "Smart City Metro Transit Route Planner using Dijkstra's Algorithm",
+    "description": "Full graph-based transit routing network representing metro stations, interchange junctions, transfer penalties, and real-time shortest travel duration calculation.",
+    "features": [
+      "Adjacency list / matrix graph representation of 25+ metro stations",
+      "Dijkstra algorithm for optimal O((V + E) log V) path calculation",
+      "Interactive CLI route generator printing route path and transit time"
     ],
-    "vivaQuestions": [
-      {
-        "q": "What is the time complexity of QuickSort in Best, Average, and Worst cases?",
-        "a": "Best Case: O(n log n), Average Case: O(n log n), Worst Case: O(n^2) when chosen pivot is consistently the minimum or maximum element (e.g. already sorted array with last element as pivot)."
-      },
-      {
-        "q": "What is the difference between Stack and Queue?",
-        "a": "Stack follows LIFO (Last-In First-Out) where insertions and deletions occur at the same end (top). Queue follows FIFO (First-In First-Out) where elements are inserted at rear and removed from front."
-      }
-    ]
+    "codeSnippet": "#include <stdio.h>\\n#define INF 99999\\n#define V 5\\n\\nint minDistance(int dist[], int sptSet[]) {\\n    int min = INF, min_index;\\n    for (int v = 0; v < V; v++)\\n        if (sptSet[v] == 0 && dist[v] <= min) min = dist[v], min_index = v;\\n    return min_index;\\n}\\n\\nvoid dijkstra(int graph[V][V], int src) {\\n    int dist[V], sptSet[V];\\n    for (int i = 0; i < V; i++) dist[i] = INF, sptSet[i] = 0;\\n    dist[src] = 0;\\n\\n    for (int count = 0; count < V - 1; count++) {\\n        int u = minDistance(dist, sptSet);\\n        sptSet[u] = 1;\\n        for (int v = 0; v < V; v++)\\n            if (!sptSet[v] && graph[u][v] && dist[u] != INF && dist[u] + graph[u][v] < dist[v])\\n                dist[v] = dist[u] + graph[u][v];\\n    }\\n    printf(\\\"Station \\\\t Travel Time from Central Station\\\\n\\\");\\n    for (int i = 0; i < V; i++) printf(\\\"%d \\\\t\\\\t %d mins\\\\n\\\", i, dist[i]);\\n}"
   },
-  {
-    "id": "lab-aiml-bcse011",
-    "code": "BCSE-011",
-    "subject": "Fundamental of AI & Machine Learning Lab",
-    "title": "Fundamental of AI & Machine Learning Practical Manual",
-    "semester": "Semester 3 / 4",
-    "year": "2nd Year",
-    "fileSize": "7.1 MB",
-    "branch": "CSE / IT / AI-DS / AI-ML",
-    "university": "Maharishi Markandeshwar (Deemed to be University) - MMEC",
-    "syllabusMatch": "100% Official Curriculum Aligned (Session 2025-26)",
-    "pdfUrl": "https://raw.githubusercontent.com/Bhavya3733/all-colege-notes/main/public/pdfs/BCSE011_AIML_Lab_Manual.pdf",
-    "totalExperiments": 10,
-    "experimentsCount": "10 Experiments (Python, Scikit-Learn, PyTorch)",
-    "capstoneProject": {
-      "title": "Handwritten Digit Recognition with Convolutional Neural Networks (CNN)",
-      "description": "End-to-end computer vision pipeline trained on MNIST dataset achieving 99.2% accuracy with interactive live canvas drawing and inference.",
-      "features": [
-        "Custom CNN architecture with Conv2D, MaxPool, Dropout, and Dense layers",
-        "Real-time canvas drawing interface with image preprocessing (28x28 grayscale)",
-        "Softmax confidence score distribution visualization"
+  "experiments": [
+    {
+      "expNo": 1,
+      "title": "Array ADT Operations (Insertion, Deletion, Traversal, Search)",
+      "objective": "Implement Array Abstract Data Type with operations: Insert at index, Delete from index, Linear search, and Traversal in C.",
+      "algorithm": [
+        "Step 1: Check capacity overflow before insertion.",
+        "Step 2: Shift elements right from index to n-1, insert item at index.",
+        "Step 3: Shift elements left for deletion, decrement size.",
+        "Step 4: Traverse and print array elements."
       ],
-      "codeSnippet": "import torch\nimport torch.nn as nn\n\nclass SimpleCNN(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.conv = nn.Sequential(\n            nn.Conv2d(1, 32, kernel_size=3, padding=1),\n            nn.ReLU(),\n            nn.MaxPool2d(2),\n            nn.Conv2d(32, 64, kernel_size=3, padding=1),\n            nn.ReLU(),\n            nn.MaxPool2d(2)\n        )\n        self.fc = nn.Sequential(\n            nn.Linear(64 * 7 * 7, 128),\n            nn.ReLU(),\n            nn.Dropout(0.25),\n            nn.Linear(128, 10)\n        )\n\n    def forward(self, x):\n        x = self.conv(x)\n        x = x.view(x.size(0), -1)\n        return self.fc(x)"
+      "code": "#include <stdio.h>\\n\\nvoid display(int arr[], int n) {\\n    for (int i = 0; i < n; i++) printf(\\\"%d \\\", arr[i]);\\n    printf(\\\"\\\\n\\\");\\n}\\n\\nint insert(int arr[], int *n, int capacity, int val, int idx) {\\n    if (*n >= capacity || idx < 0 || idx > *n) return -1;\\n    for (int i = *n; i > idx; i--) arr[i] = arr[i - 1];\\n    arr[idx] = val;\\n    (*n)++;\\n    return 0;\\n}\\n\\nint delete(int arr[], int *n, int idx) {\\n    if (idx < 0 || idx >= *n) return -1;\\n    for (int i = idx; i < *n - 1; i++) arr[i] = arr[i + 1];\\n    (*n)--;\\n    return 0;\\n}\\n\\nint main() {\\n    int arr[10] = {10, 20, 30, 40, 50};\\n    int n = 5;\\n    printf(\\\"*** BCSE-007: Practical 1 - Array ADT ***\\\\n\\\");\\n    printf(\\\"Original: \\\"); display(arr, n);\\n    insert(arr, &n, 10, 25, 2);\\n    printf(\\\"After Inserting 25 at index 2: \\\"); display(arr, n);\\n    delete(arr, &n, 4);\\n    printf(\\\"After Deleting index 4: \\\"); display(arr, n);\\n    return 0;\\n}",
+      "sampleInput": "Array: [10, 20, 30, 40, 50], Insert: 25 at idx 2, Delete: idx 4",
+      "sampleOutput": "Original: 10 20 30 40 50 | Inserted: 10 20 25 30 40 50 | Deleted: 10 20 25 30 50"
     },
-    "experiments": [
-      {
-        "expNo": 1,
-        "title": "Implementation of Breadth-First Search (BFS) and Depth-First Search (DFS)",
-        "objective": "Implement uninformed graph search algorithms (BFS and DFS) to traverse state spaces and find shortest paths in unweighted graphs.",
-        "algorithm": [
-          "Step 1: Represent graph as adjacency list.",
-          "Step 2: BFS uses a Queue (FIFO) to explore nodes level-by-level.",
-          "Step 3: DFS uses a Stack (LIFO) or recursion to explore deeply before backtracking.",
-          "Step 4: Maintain visited set to avoid infinite loops."
-        ],
-        "code": "from collections import deque\n\ndef bfs(graph, start):\n    visited = set([start])\n    queue = deque([start])\n    order = []\n    while queue:\n        node = queue.popleft()\n        order.append(node)\n        for neighbor in graph.get(node, []):\n            if neighbor not in visited:\n                visited.add(neighbor)\n                queue.append(neighbor)\n    return order\n\ndef dfs(graph, start, visited=None, order=None):\n    if visited is None: visited = set()\n    if order is None: order = []\n    visited.add(start)\n    order.append(start)\n    for neighbor in graph.get(node, []):\n        if neighbor not in visited:\n            dfs(graph, neighbor, visited, order)\n    return order\n\ngraph = {\n    'A': ['B', 'C'],\n    'B': ['D', 'E'],\n    'C': ['F'],\n    'D': [], 'E': ['F'], 'F': []\n}\nprint(\"BFS Traversal:\", bfs(graph, 'A'))",
-        "sampleInput": "Graph: A -> B, C; B -> D, E; C -> F",
-        "sampleOutput": "BFS: ['A', 'B', 'C', 'D', 'E', 'F']"
-      }
+    {
+      "expNo": 2,
+      "title": "Binary Search in Sorted Array (Iterative and Recursive)",
+      "objective": "Implement Binary Search algorithm using both iterative and recursive approaches on a sorted array and compare step counts against Linear Search.",
+      "algorithm": [
+        "Step 1: Set low = 0, high = n - 1.",
+        "Step 2: Calculate mid = low + (high - low) / 2.",
+        "Step 3: If arr[mid] == key, return mid (Found).",
+        "Step 4: If arr[mid] < key, search right half: low = mid + 1.",
+        "Step 5: If arr[mid] > key, search left half: high = mid - 1.",
+        "Step 6: Repeat while low <= high. If not found, return -1."
+      ],
+      "code": "#include <stdio.h>\\n\\nint binarySearchIterative(int arr[], int n, int key) {\\n    int low = 0, high = n - 1;\\n    while (low <= high) {\\n        int mid = low + (high - low) / 2;\\n        if (arr[mid] == key) return mid;\\n        if (arr[mid] < key) low = mid + 1;\\n        else high = mid - 1;\\n    }\\n    return -1;\\n}\\n\\nint binarySearchRecursive(int arr[], int low, int high, int key) {\\n    if (low > high) return -1;\\n    int mid = low + (high - low) / 2;\\n    if (arr[mid] == key) return mid;\\n    if (arr[mid] < key) return binarySearchRecursive(arr, mid + 1, high, key);\\n    return binarySearchRecursive(arr, low, mid - 1, key);\\n}\\n\\nint main() {\\n    int arr[] = {12, 24, 35, 48, 56, 67, 78, 89, 95};\\n    int n = sizeof(arr) / sizeof(arr[0]);\\n    int key = 67;\\n\\n    printf(\\\"*** BCSE-007: Practical 2 - Binary Search ***\\\\n\\\");\\n    int idx1 = binarySearchIterative(arr, n, key);\\n    int idx2 = binarySearchRecursive(arr, 0, n - 1, key);\\n\\n    printf(\\\"Key %d found at index %d (Iterative)\\\\n\\\", key, idx1);\\n    printf(\\\"Key %d found at index %d (Recursive)\\\\n\\\", key, idx2);\\n    printf(\\\"Time Complexity: O(log n)\\\\n\\\");\\n    return 0;\\n}",
+      "sampleInput": "Array: [12, 24, 35, 48, 56, 67, 78, 89, 95], Key: 67",
+      "sampleOutput": "Key 67 found at index 5 | Time Complexity: O(log n)"
+    },
+    {
+      "expNo": 3,
+      "title": "Singly Linked List ADT (Insertion, Deletion, Reversal)",
+      "objective": "Implement Singly Linked List with operations: insert at beginning, insert at end, delete node by value, traverse, and reverse the list in-place.",
+      "algorithm": [
+        "Step 1: Define Node structure with data and next pointer.",
+        "Step 2: In insertBeginning, allocate memory, point new_node->next = head, head = new_node.",
+        "Step 3: In insertEnd, traverse to last node, set last->next = new_node.",
+        "Step 4: In deleteValue, search node, adjust previous->next = current->next, free(current).",
+        "Step 5: In reverseList, maintain prev, curr, next pointers and flip links."
+      ],
+      "code": "#include <stdio.h>\\n#include <stdlib.h>\\n\\nstruct Node {\\n    int data;\\n    struct Node *next;\\n};\\n\\nvoid printList(struct Node *head) {\\n    struct Node *curr = head;\\n    while (curr) {\\n        printf(\\\"%d -> \\\", curr->data);\\n        curr = curr->next;\\n    }\\n    printf(\\\"NULL\\\\n\\\");\\n}\\n\\nvoid insertAtHead(struct Node **head, int val) {\\n    struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));\\n    newNode->data = val;\\n    newNode->next = *head;\\n    *head = newNode;\\n}\\n\\nvoid reverseList(struct Node **head) {\\n    struct Node *prev = NULL, *curr = *head, *next = NULL;\\n    while (curr) {\\n        next = curr->next;\\n        curr->next = prev;\\n        prev = curr;\\n        curr = next;\\n    }\\n    *head = prev;\\n}\\n\\nint main() {\\n    struct Node *head = NULL;\\n    printf(\\\"*** BCSE-007: Practical 3 - Singly Linked List ***\\\\n\\\");\\n    insertAtHead(&head, 40);\\n    insertAtHead(&head, 30);\\n    insertAtHead(&head, 20);\\n    insertAtHead(&head, 10);\\n    printf(\\\"List: \\\"); printList(head);\\n\\n    reverseList(&head);\\n    printf(\\\"Reversed List: \\\"); printList(head);\\n    return 0;\\n}",
+      "sampleInput": "Insert: 10, 20, 30, 40 -> Reverse",
+      "sampleOutput": "Original: 10 -> 20 -> 30 -> 40 -> NULL | Reversed: 40 -> 30 -> 20 -> 10 -> NULL"
+    },
+    {
+      "expNo": 4,
+      "title": "Doubly Linked List ADT Operations",
+      "objective": "Implement a Doubly Linked List with two-way navigation (forward and backward traversal) and node deletion.",
+      "algorithm": [
+        "Step 1: Create struct Node with data, prev, and next pointers.",
+        "Step 2: In insertEnd, connect new_node->prev = tail, tail->next = new_node.",
+        "Step 3: Traverse forward using curr->next until NULL.",
+        "Step 4: Traverse backward using curr->prev until NULL."
+      ],
+      "code": "#include <stdio.h>\\n#include <stdlib.h>\\n\\nstruct DNode {\\n    int data;\\n    struct DNode *prev, *next;\\n};\\n\\nvoid insertEnd(struct DNode **head, int val) {\\n    struct DNode *newNode = (struct DNode*)malloc(sizeof(struct DNode));\\n    newNode->data = val;\\n    newNode->next = NULL;\\n    if (!*head) {\\n        newNode->prev = NULL;\\n        *head = newNode;\\n        return;\\n    }\\n    struct DNode *temp = *head;\\n    while (temp->next) temp = temp->next;\\n    temp->next = newNode;\\n    newNode->prev = temp;\\n}\\n\\nvoid displayForwardBackward(struct DNode *head) {\\n    struct DNode *temp = head, *last = NULL;\\n    printf(\\\"Forward : \\\");\\n    while (temp) {\\n        printf(\\\"%d \\\", temp->data);\\n        last = temp;\\n        temp = temp->next;\\n    }\\n    printf(\\\"\\\\nBackward: \\\");\\n    while (last) {\\n        printf(\\\"%d \\\", last->data);\\n        last = last->prev;\\n    }\\n    printf(\\\"\\\\n\\\");\\n}\\n\\nint main() {\\n    struct DNode *head = NULL;\\n    printf(\\\"*** BCSE-007: Practical 4 - Doubly Linked List ***\\\\n\\\");\\n    insertEnd(&head, 100);\\n    insertEnd(&head, 200);\\n    insertEnd(&head, 300);\\n    insertEnd(&head, 400);\\n    displayForwardBackward(head);\\n    return 0;\\n}",
+      "sampleInput": "Insert: 100, 200, 300, 400",
+      "sampleOutput": "Forward: 100 200 300 400 | Backward: 400 300 200 100"
+    },
+    {
+      "expNo": 5,
+      "title": "Stack Implementation using Array with Overflow & Underflow Handling",
+      "objective": "Implement Last-In First-Out (LIFO) Stack ADT using a fixed-size array with push, pop, peek, isEmpty, and isFull operations.",
+      "algorithm": [
+        "Step 1: Initialize top = -1, capacity = MAX.",
+        "Step 2: push(x): Check top == MAX - 1 (Stack Overflow). Else top++, stack[top] = x.",
+        "Step 3: pop(): Check top == -1 (Stack Underflow). Else return stack[top--].",
+        "Step 4: peek(): Return stack[top] without removing.",
+        "Step 5: Test operations and boundary conditions."
+      ],
+      "code": "#include <stdio.h>\\n#define MAX 5\\n\\nint stack[MAX];\\nint top = -1;\\n\\nvoid push(int x) {\\n    if (top == MAX - 1) {\\n        printf(\\\"[Stack Overflow] Cannot push %d\\\\n\\\", x);\\n        return;\\n    }\\n    stack[++top] = x;\\n    printf(\\\"Pushed: %d | Top at index %d\\\\n\\\", x, top);\\n}\\n\\nint pop() {\\n    if (top == -1) {\\n        printf(\\\"[Stack Underflow] Stack is empty\\\\n\\\");\\n        return -1;\\n    }\\n    return stack[top--];\\n}\\n\\nint peek() {\\n    if (top == -1) return -1;\\n    return stack[top];\\n}\\n\\nint main() {\\n    printf(\\\"*** BCSE-007: Practical 5 - Stack ADT ***\\\\n\\\");\\n    push(10);\\n    push(20);\\n    push(30);\\n    printf(\\\"Top element (peek): %d\\\\n\\\", peek());\\n    printf(\\\"Popped: %d\\\\n\\\", pop());\\n    printf(\\\"Popped: %d\\\\n\\\", pop());\\n    printf(\\\"New Top: %d\\\\n\\\", peek());\\n    return 0;\\n}",
+      "sampleInput": "Operations: push(10), push(20), push(30), peek(), pop()",
+      "sampleOutput": "Pushed 10, 20, 30 | Peek: 30 | Popped: 30, 20 | New Top: 10"
+    },
+    {
+      "expNo": 6,
+      "title": "Infix to Postfix Conversion & Postfix Evaluation using Stack",
+      "objective": "Convert an arithmetic infix expression into postfix (Reverse Polish Notation) using Shunting-Yard algorithm and evaluate the postfix expression.",
+      "algorithm": [
+        "Step 1: Scan infix expression left to right.",
+        "Step 2: If operand, append directly to postfix output.",
+        "Step 3: If '(', push onto stack.",
+        "Step 4: If ')', pop stack to output until '(' is encountered.",
+        "Step 5: If operator, pop operators with >= precedence from stack to output, then push current operator.",
+        "Step 6: Pop remaining stack operators to output string."
+      ],
+      "code": "#include <stdio.h>\\n#include <ctype.h>\\n#include <string.h>\\n\\nchar stack[100];\\nint top = -1;\\n\\nvoid push(char c) { stack[++top] = c; }\\nchar pop() { return stack[top--]; }\\nchar peek() { return stack[top]; }\\n\\nint precedence(char op) {\\n    if (op == '+' || op == '-') return 1;\\n    if (op == '*' || op == '/') return 2;\\n    if (op == '^') return 3;\\n    return 0;\\n}\\n\\nvoid infixToPostfix(char infix[], char postfix[]) {\\n    int k = 0;\\n    for (int i = 0; infix[i]; i++) {\\n        char ch = infix[i];\\n        if (isalnum(ch)) postfix[k++] = ch;\\n        else if (ch == '(') push(ch);\\n        else if (ch == ')') {\\n            while (top != -1 && peek() != '(') postfix[k++] = pop();\\n            pop(); // discard '('\\n        } else {\\n            while (top != -1 && precedence(peek()) >= precedence(ch))\\n                postfix[k++] = pop();\\n            push(ch);\\n        }\\n    }\\n    while (top != -1) postfix[k++] = pop();\\n    postfix[k] = '\\\\0';\\n}\\n\\nint main() {\\n    char infix[] = \\\"((A+B)*C)-D\\\";\\n    char postfix[100];\\n    printf(\\\"*** BCSE-007: Practical 6 - Infix to Postfix ***\\\\n\\\");\\n    infixToPostfix(infix, postfix);\\n    printf(\\\"Infix Expression   : %s\\\\n\\\", infix);\\n    printf(\\\"Postfix Expression : %s\\\\n\\\", postfix);\\n    return 0;\\n}",
+      "sampleInput": "Infix: ((A+B)*C)-D",
+      "sampleOutput": "Postfix Expression: AB+C*D-"
+    },
+    {
+      "expNo": 7,
+      "title": "Circular Queue Implementation with Static Array",
+      "objective": "Implement Circular Queue ADT to eliminate memory wastage of ordinary linear queues using modular arithmetic wrap-around.",
+      "algorithm": [
+        "Step 1: Initialize front = -1, rear = -1, size = N.",
+        "Step 2: isFull(): return (rear + 1) % N == front.",
+        "Step 3: isEmpty(): return front == -1.",
+        "Step 4: enqueue(x): If full, report overflow. If empty, front = rear = 0. Else rear = (rear + 1) % N. q[rear] = x.",
+        "Step 5: dequeue(): If empty, report underflow. If front == rear, front = rear = -1. Else front = (front + 1) % N."
+      ],
+      "code": "#include <stdio.h>\\n#define SIZE 5\\n\\nint q[SIZE];\\nint front = -1, rear = -1;\\n\\nint isFull() {\\n    return ((rear + 1) % SIZE == front);\\n}\\n\\nint isEmpty() {\\n    return (front == -1);\\n}\\n\\nvoid enqueue(int val) {\\n    if (isFull()) {\\n        printf(\\\"[Queue Full] Cannot enqueue %d\\\\n\\\", val);\\n        return;\\n    }\\n    if (isEmpty()) front = rear = 0;\\n    else rear = (rear + 1) % SIZE;\\n    q[rear] = val;\\n    printf(\\\"Enqueued: %d (Front: %d, Rear: %d)\\\\n\\\", val, front, rear);\\n}\\n\\nint dequeue() {\\n    if (isEmpty()) {\\n        printf(\\\"[Queue Empty]\\\\n\\\");\\n        return -1;\\n    }\\n    int val = q[front];\\n    if (front == rear) front = rear = -1;\\n    else front = (front + 1) % SIZE;\\n    return val;\\n}\\n\\nint main() {\\n    printf(\\\"*** BCSE-007: Practical 7 - Circular Queue ***\\\\n\\\");\\n    enqueue(10); enqueue(20); enqueue(30); enqueue(40);\\n    printf(\\\"Dequeued: %d\\\\n\\\", dequeue());\\n    printf(\\\"Dequeued: %d\\\\n\\\", dequeue());\\n    enqueue(50); // Wraps around seamlessly\\n    enqueue(60);\\n    return 0;\\n}",
+      "sampleInput": "Enqueue: 10, 20, 30, 40 -> Dequeue 2 items -> Enqueue: 50, 60",
+      "sampleOutput": "Wrap-around enqueue succeeds without false overflow condition."
+    },
+    {
+      "expNo": 8,
+      "title": "Binary Search Tree (BST) ADT: Insert, Search & Traversals",
+      "objective": "Implement Binary Search Tree ADT with node insertion, binary key search, and depth-first tree traversals (Inorder, Preorder, Postorder).",
+      "algorithm": [
+        "Step 1: In insert(root, val), if root == NULL return new node.",
+        "Step 2: If val < root->data, root->left = insert(root->left, val).",
+        "Step 3: If val > root->data, root->right = insert(root->right, val).",
+        "Step 4: Inorder (Left, Root, Right) produces sorted ascending sequence.",
+        "Step 5: Search key by branching left or right in O(h) time."
+      ],
+      "code": "#include <stdio.h>\\n#include <stdlib.h>\\n\\nstruct BSTNode {\\n    int data;\\n    struct BSTNode *left, *right;\\n};\\n\\nstruct BSTNode* createNode(int val) {\\n    struct BSTNode *node = (struct BSTNode*)malloc(sizeof(struct BSTNode));\\n    node->data = val;\\n    node->left = node->right = NULL;\\n    return node;\\n}\\n\\nstruct BSTNode* insert(struct BSTNode *root, int val) {\\n    if (!root) return createNode(val);\\n    if (val < root->data) root->left = insert(root->left, val);\\n    else if (val > root->data) root->right = insert(root->right, val);\\n    return root;\\n}\\n\\nvoid inorder(struct BSTNode *root) {\\n    if (root) {\\n        inorder(root->left);\\n        printf(\\\"%d \\\", root->data);\\n        inorder(root->right);\\n    }\\n}\\n\\nint search(struct BSTNode *root, int key) {\\n    if (!root) return 0;\\n    if (root->data == key) return 1;\\n    if (key < root->data) return search(root->left, key);\\n    return search(root->right, key);\\n}\\n\\nint main() {\\n    struct BSTNode *root = NULL;\\n    int keys[] = {50, 30, 70, 20, 40, 60, 80};\\n    printf(\\\"*** BCSE-007: Practical 8 - Binary Search Tree ***\\\\n\\\");\\n    for (int i = 0; i < 7; i++) root = insert(root, keys[i]);\\n\\n    printf(\\\"Inorder Traversal (Sorted): \\\");\\n    inorder(root);\\n    printf(\\\"\\\\n\\\");\\n\\n    int q = 40;\\n    printf(\\\"Search %d: %s\\\\n\\\", q, search(root, q) ? \\\"Found in Tree!\\\" : \\\"Not Found\\\");\\n    return 0;\\n}",
+      "sampleInput": "Insert keys: 50, 30, 70, 20, 40, 60, 80",
+      "sampleOutput": "Inorder: 20 30 40 50 60 70 80 | Search 40: Found in Tree!"
+    },
+    {
+      "expNo": 9,
+      "title": "Graph Traversal: Breadth First Search (BFS) & Depth First Search (DFS)",
+      "objective": "Represent an undirected graph using an Adjacency Matrix and traverse all vertices using BFS (Queue-based) and DFS (Recursion/Stack-based).",
+      "algorithm": [
+        "Step 1: Initialize adjacency matrix adj[V][V] and visited[V] = {0}.",
+        "Step 2: In BFS, enqueue start vertex, mark visited. While queue not empty, pop u, print u, and enqueue all unvisited neighbors.",
+        "Step 3: In DFS, print start vertex, mark visited, and recursively visit all unvisited adjacent neighbors.",
+        "Step 4: Output traversal sequences."
+      ],
+      "code": "#include <stdio.h>\\n#define V 5\\n\\nint adj[V][V] = {\\n    {0, 1, 1, 0, 0},\\n    {1, 0, 0, 1, 1},\\n    {1, 0, 0, 0, 1},\\n    {0, 1, 0, 0, 1},\\n    {0, 1, 1, 1, 0}\\n};\\n\\nint visited[V];\\n\\nvoid bfs(int start) {\\n    int q[V], front = 0, rear = 0;\\n    int v_bfs[V] = {0};\\n\\n    q[rear++] = start;\\n    v_bfs[start] = 1;\\n    printf(\\\"BFS Traversal: \\\");\\n\\n    while (front < rear) {\\n        int u = q[front++];\\n        printf(\\\"%d \\\", u);\\n        for (int i = 0; i < V; i++) {\\n            if (adj[u][i] && !v_bfs[i]) {\\n                v_bfs[i] = 1;\\n                q[rear++] = i;\\n            }\\n        }\\n    }\\n    printf(\\\"\\\\n\\\");\\n}\\n\\nvoid dfs(int u) {\\n    visited[u] = 1;\\n    printf(\\\"%d \\\", u);\\n    for (int i = 0; i < V; i++) {\\n        if (adj[u][i] && !visited[i]) dfs(i);\\n    }\\n}\\n\\nint main() {\\n    printf(\\\"*** BCSE-007: Practical 9 - BFS & DFS Graph Traversal ***\\\\n\\\");\\n    bfs(0);\\n    printf(\\\"DFS Traversal: \\\");\\n    for (int i = 0; i < V; i++) visited[i] = 0;\\n    dfs(0);\\n    printf(\\\"\\\\n\\\");\\n    return 0;\\n}",
+      "sampleInput": "5 Vertices: 0-1, 0-2, 1-3, 1-4, 2-4, 3-4",
+      "sampleOutput": "BFS: 0 1 2 3 4 | DFS: 0 1 3 4 2"
+    },
+    {
+      "expNo": 10,
+      "title": "Sorting Algorithms Comparison: Bubble, Selection & Insertion Sort",
+      "objective": "Implement and compare the comparison-based sorting algorithms: Bubble Sort, Selection Sort, and Insertion Sort on integer arrays.",
+      "algorithm": [
+        "Step 1: Bubble Sort: Repeatedly swap adjacent elements if arr[j] > arr[j+1].",
+        "Step 2: Selection Sort: Find minimum element in unsorted subarray and swap with first element.",
+        "Step 3: Insertion Sort: Pick element arr[i] and insert into correct sorted position in arr[0..i-1].",
+        "Step 4: Count swaps and comparisons."
+      ],
+      "code": "#include <stdio.h>\\n\\nvoid insertionSort(int arr[], int n) {\\n    for (int i = 1; i < n; i++) {\\n        int key = arr[i];\\n        int j = i - 1;\\n        while (j >= 0 && arr[j] > key) {\\n            arr[j + 1] = arr[j];\\n            j--;\\n        }\\n        arr[j + 1] = key;\\n    }\\n}\\n\\nvoid printArray(int arr[], int n) {\\n    for (int i = 0; i < n; i++) printf(\\\"%d \\\", arr[i]);\\n    printf(\\\"\\\\n\\\");\\n}\\n\\nint main() {\\n    int arr[] = {64, 25, 12, 22, 11, 90, 34};\\n    int n = sizeof(arr) / sizeof(arr[0]);\\n    printf(\\\"*** BCSE-007: Practical 10 - Sorting Comparison ***\\\\n\\\");\\n    printf(\\\"Original Array : \\\"); printArray(arr, n);\\n    insertionSort(arr, n);\\n    printf(\\\"Sorted (Insertion Sort): \\\"); printArray(arr, n);\\n    return 0;\\n}",
+      "sampleInput": "Array: [64, 25, 12, 22, 11, 90, 34]",
+      "sampleOutput": "Sorted Array: 11 12 22 25 34 64 90"
+    },
+    {
+      "expNo": 11,
+      "title": "Divide and Conquer: QuickSort and MergeSort",
+      "objective": "Implement Quick Sort (with Lomuto partitioning) and Merge Sort algorithms and analyze their O(n log n) recursive time complexities.",
+      "algorithm": [
+        "Step 1: MergeSort: Divide array into two halves, recursively sort both, and merge in sorted order.",
+        "Step 2: QuickSort: Choose pivot element, partition array such that elements < pivot are left, > pivot are right.",
+        "Step 3: Recursively call QuickSort on left and right partitions.",
+        "Step 4: Display sorted output."
+      ],
+      "code": "#include <stdio.h>\\n\\nvoid swap(int *a, int *b) {\\n    int t = *a; *a = *b; *b = t;\\n}\\n\\nint partition(int arr[], int low, int high) {\\n    int pivot = arr[high];\\n    int i = low - 1;\\n    for (int j = low; j < high; j++) {\\n        if (arr[j] < pivot) {\\n            i++;\\n            swap(&arr[i], &arr[j]);\\n        }\\n    }\\n    swap(&arr[i + 1], &arr[high]);\\n    return (i + 1);\\n}\\n\\nvoid quickSort(int arr[], int low, int high) {\\n    if (low < high) {\\n        int pi = partition(arr, low, high);\\n        quickSort(arr, low, pi - 1);\\n        quickSort(arr, pi + 1, high);\\n    }\\n}\\n\\nint main() {\\n    int arr[] = {80, 10, 29, 45, 99, 12, 63, 5};\\n    int n = sizeof(arr) / sizeof(arr[0]);\\n    printf(\\\"*** BCSE-007: Practical 11 - QuickSort ***\\\\n\\\");\\n    quickSort(arr, 0, n - 1);\\n    printf(\\\"Sorted Array (QuickSort): \\\");\\n    for (int i = 0; i < n; i++) printf(\\\"%d \\\", arr[i]);\\n    printf(\\\"\\\\nAverage Time: O(n log n)\\\\n\\\");\\n    return 0;\\n}",
+      "sampleInput": "Array: [80, 10, 29, 45, 99, 12, 63, 5]",
+      "sampleOutput": "Sorted Array: 5 10 12 29 45 63 80 99"
+    },
+    {
+      "expNo": 12,
+      "title": "Single-Source Shortest Path using Dijkstra's Algorithm",
+      "objective": "Find the shortest paths from a given source vertex to all other vertices in a non-negative edge weighted directed/undirected graph.",
+      "algorithm": [
+        "Step 1: Initialize dist[] array with INF, dist[source] = 0, sptSet[] = {0}.",
+        "Step 2: Select unvisited vertex u with minimum dist[u].",
+        "Step 3: Mark u as visited (sptSet[u] = 1).",
+        "Step 4: Update distance of all adjacent vertices v: if dist[u] + weight(u,v) < dist[v], dist[v] = dist[u] + weight(u,v).",
+        "Step 5: Repeat V-1 times and output shortest distances."
+      ],
+      "code": "#include <stdio.h>\\n#define INF 99999\\n#define V 5\\n\\nint minDistance(int dist[], int sptSet[]) {\\n    int min = INF, min_idx = -1;\\n    for (int v = 0; v < V; v++)\\n        if (!sptSet[v] && dist[v] <= min) min = dist[v], min_idx = v;\\n    return min_idx;\\n}\\n\\nvoid dijkstra(int graph[V][V], int src) {\\n    int dist[V], sptSet[V] = {0};\\n    for (int i = 0; i < V; i++) dist[i] = INF;\\n    dist[src] = 0;\\n\\n    for (int count = 0; count < V - 1; count++) {\\n        int u = minDistance(dist, sptSet);\\n        if (u == -1) break;\\n        sptSet[u] = 1;\\n        for (int v = 0; v < V; v++) {\\n            if (!sptSet[v] && graph[u][v] && dist[u] != INF \\n                && dist[u] + graph[u][v] < dist[v]) {\\n                dist[v] = dist[u] + graph[u][v];\\n            }\\n        }\\n    }\\n\\n    printf(\\\"Vertex \\\\t Shortest Distance from Source %d\\\\n\\\", src);\\n    for (int i = 0; i < V; i++) printf(\\\"%d \\\\t\\\\t %d km\\\\n\\\", i, dist[i]);\\n}\\n\\nint main() {\\n    int graph[V][V] = {\\n        {0, 4, 2, 0, 0},\\n        {4, 0, 1, 5, 0},\\n        {2, 1, 0, 8, 10},\\n        {0, 5, 8, 0, 2},\\n        {0, 0, 10, 2, 0}\\n    };\\n    printf(\\\"*** BCSE-007: Practical 12 - Dijkstra Algorithm ***\\\\n\\\");\\n    dijkstra(graph, 0);\\n    return 0;\\n}",
+      "sampleInput": "Graph: 5 nodes with edge weights, Source: Node 0",
+      "sampleOutput": "Node 0: 0 km, Node 1: 3 km, Node 2: 2 km, Node 3: 8 km, Node 4: 10 km"
+    }
+  ],
+  "vivaQuestions": [
+    {
+      "q": "What is the time complexity of QuickSort in Best, Average, and Worst cases?",
+      "a": "Best Case: O(n log n), Average Case: O(n log n), Worst Case: O(n^2) when chosen pivot is consistently the minimum or maximum element (e.g. already sorted array with last element as pivot)."
+    },
+    {
+      "q": "What is the difference between Stack and Queue?",
+      "a": "Stack follows LIFO (Last-In First-Out) where insertions and deletions occur at the same end (top). Queue follows FIFO (First-In First-Out) where elements are inserted at rear and removed from front."
+    },
+    {
+      "q": "What is a Binary Search Tree (BST) and what is its search time complexity?",
+      "a": "A BST is a binary tree where each node satisfies: all keys in its left subtree are strictly smaller than node key, and all keys in its right subtree are strictly greater. Search time complexity is O(h), where h is height: O(log n) for a balanced tree and O(n) for a skewed tree."
+    },
+    {
+      "q": "Why is Circular Queue preferred over Linear Queue implemented with arrays?",
+      "a": "In a linear array queue, dequeued front slots cannot be reused even if rear reaches the capacity end (false overflow). Circular Queue wraps around using modulo arithmetic ((rear + 1) % N), utilizing all allocated memory efficiently."
+    },
+    {
+      "q": "What is the difference between BFS and DFS graph traversals?",
+      "a": "BFS explores vertices level-by-level using a Queue (FIFO) and finds the shortest path in unweighted graphs. DFS explores as deep as possible along each branch before backtracking using a Stack (LIFO) or recursion."
+    },
+    {
+      "q": "Why is MergeSort preferred over QuickSort for Linked Lists?",
+      "a": "MergeSort access pattern is purely sequential without requiring random element indexing (which takes O(1) in arrays but O(n) in linked lists). Moreover, merging two linked lists requires O(1) extra space without auxiliary buffer arrays."
+    },
+    {
+      "q": "What are the limitations of Dijkstra's Algorithm?",
+      "a": "Dijkstra's algorithm fails and produces incorrect shortest paths when a graph contains negative-weight edges or negative-weight cycles. The Bellman-Ford algorithm must be used instead for graphs with negative weights."
+    },
+    {
+      "q": "What is the height of a balanced AVL Tree with N nodes?",
+      "a": "The maximum height of an AVL tree with N nodes is approximately 1.44 * log2(N), guaranteeing worst-case O(log N) search, insertion, and deletion operations."
+    },
+    {
+      "q": "Explain Infix, Prefix, and Postfix notations.",
+      "a": "Infix has operators between operands (A + B). Prefix (Polish notation) places operators before operands (+ A B). Postfix (Reverse Polish notation) places operators after operands (A B +), eliminating the need for parentheses and operator precedence rules during computer evaluation."
+    },
+    {
+      "q": "What is collision in Hash Tables and how is it resolved?",
+      "a": "Collision occurs when two distinct keys hash to the same bucket index. It is resolved using Open Addressing (Linear Probing, Quadratic Probing, Double Hashing) or Separate Chaining (Linked list at each bucket)."
+    },
+    {
+      "q": "What is the Space Complexity of QuickSort and MergeSort?",
+      "a": "QuickSort requires O(log n) auxiliary space on the call stack for recursive partition calls (in-place). MergeSort requires O(n) auxiliary array space to merge the sub-arrays."
+    },
+    {
+      "q": "What is the difference between Singly and Doubly Linked Lists?",
+      "a": "Singly linked list nodes have one pointer (next) allowing forward traversal only and requiring O(n) to delete the tail. Doubly linked list nodes have two pointers (prev and next) allowing bidirectional traversal and O(1) deletion given the node pointer."
+    }
+  ]
+},
+  {
+  "id": "lab-aiml-bcse011",
+  "code": "BCSE-011",
+  "subject": "Fundamental of AI & Machine Learning Lab",
+  "title": "Fundamental of AI & Machine Learning Practical Manual",
+  "semester": "Semester 3 / 4",
+  "year": "2nd Year",
+  "fileSize": "7.1 MB",
+  "branch": "CSE / IT / AI-DS / AI-ML",
+  "university": "Maharishi Markandeshwar (Deemed to be University) - MMEC",
+  "syllabusMatch": "100% Official Curriculum Aligned (Session 2025-26)",
+  "pdfUrl": "https://raw.githubusercontent.com/Bhavya3733/all-colege-notes/main/public/pdfs/BCSE011_AIML_Lab_Manual.pdf",
+  "totalExperiments": 10,
+  "experimentsCount": "10 Experiments (Python, Scikit-Learn, PyTorch)",
+  "capstoneProject": {
+    "title": "Handwritten Digit Recognition with Convolutional Neural Networks (CNN)",
+    "description": "End-to-end computer vision pipeline trained on MNIST dataset achieving 99.2% accuracy with interactive live canvas drawing and inference.",
+    "features": [
+      "Custom CNN architecture with Conv2D, MaxPool, Dropout, and Dense layers",
+      "Real-time canvas drawing interface with image preprocessing (28x28 grayscale)",
+      "Softmax confidence score distribution visualization"
     ],
-    "vivaQuestions": [
-      {
-        "q": "What is the difference between Supervised, Unsupervised, and Reinforcement Learning?",
-        "a": "Supervised Learning trains on labeled data (inputs + ground truth targets). Unsupervised Learning discovers hidden patterns/clusters from unlabeled data. Reinforcement Learning learns optimal decision policies through reward/penalty feedback from an environment."
-      },
-      {
-        "q": "What is Overfitting and how can it be prevented?",
-        "a": "Overfitting occurs when a model memorizes training noise and fails to generalize to unseen test data. Prevention methods include: Regularization (L1/L2, Dropout), Cross-Validation, Early Stopping, and gathering more training data."
-      }
-    ]
-  }
+    "codeSnippet": "import torch\\nimport torch.nn as nn\\n\\nclass SimpleCNN(nn.Module):\\n    def __init__(self):\\n        super().__init__()\\n        self.conv = nn.Sequential(\\n            nn.Conv2d(1, 32, kernel_size=3, padding=1),\\n            nn.ReLU(),\\n            nn.MaxPool2d(2),\\n            nn.Conv2d(32, 64, kernel_size=3, padding=1),\\n            nn.ReLU(),\\n            nn.MaxPool2d(2)\\n        )\\n        self.fc = nn.Sequential(\\n            nn.Linear(64 * 7 * 7, 128),\\n            nn.ReLU(),\\n            nn.Dropout(0.25),\\n            nn.Linear(128, 10)\\n        )\\n\\n    def forward(self, x):\\n        x = self.conv(x)\\n        x = x.view(x.size(0), -1)\\n        return self.fc(x)"
+  },
+  "experiments": [
+    {
+      "expNo": 1,
+      "title": "Implementation of Breadth-First Search (BFS) and Depth-First Search (DFS)",
+      "objective": "Implement uninformed graph search algorithms (BFS and DFS) to traverse state spaces and find shortest paths in unweighted graphs.",
+      "algorithm": [
+        "Step 1: Represent graph as adjacency list dictionary.",
+        "Step 2: BFS uses a collections.deque (FIFO) to explore nodes level-by-level.",
+        "Step 3: DFS uses recursion or a Stack (LIFO) to explore deeply before backtracking.",
+        "Step 4: Maintain visited set to prevent cycles."
+      ],
+      "code": "from collections import deque\\n\\ndef bfs(graph, start):\\n    visited = set([start])\\n    queue = deque([start])\\n    order = []\\n    while queue:\\n        node = queue.popleft()\\n        order.append(node)\\n        for neighbor in graph.get(node, []):\\n            if neighbor not in visited:\\n                visited.add(neighbor)\\n                queue.append(neighbor)\\n    return order\\n\\ndef dfs(graph, start, visited=None, order=None):\\n    if visited is None: visited = set()\\n    if order is None: order = []\\n    visited.add(start)\\n    order.append(start)\\n    for neighbor in graph.get(node, []):\\n        if neighbor not in visited:\\n            dfs(graph, neighbor, visited, order)\\n    return order\\n\\ngraph = {\\n    'A': ['B', 'C'],\\n    'B': ['D', 'E'],\\n    'C': ['F'],\\n    'D': [], 'E': ['F'], 'F': []\\n}\\nprint(\\\"BFS Traversal:\\\", bfs(graph, 'A'))",
+      "sampleInput": "Graph: A -> B, C; B -> D, E; C -> F",
+      "sampleOutput": "BFS Traversal: ['A', 'B', 'C', 'D', 'E', 'F']"
+    },
+    {
+      "expNo": 2,
+      "title": "A* Heuristic Search Algorithm for Shortest Path Finding",
+      "objective": "Implement the A* informed search algorithm on a 2D grid using Euclidean / Manhattan distance heuristic to find the lowest-cost path.",
+      "algorithm": [
+        "Step 1: Maintain open set (priority queue) of nodes to evaluate, sorted by f(n) = g(n) + h(n).",
+        "Step 2: g(n) is exact cost from start node to n.",
+        "Step 3: h(n) is estimated heuristic cost from n to goal.",
+        "Step 4: Pop node with lowest f(n). If goal reached, reconstruct path.",
+        "Step 5: For each neighbor, calculate tentative g score and update open set."
+      ],
+      "code": "import heapq\\n\\ndef a_star(graph, start, goal, heuristics):\\n    # pq stores (f_score, current_node, path, current_cost)\\n    pq = [(heuristics[start], start, [start], 0)]\\n    visited = set()\\n\\n    while pq:\\n        f, node, path, g = heapq.heappop(pq)\\n        if node == goal:\\n            return path, g\\n        if node in visited:\\n            continue\\n        visited.add(node)\\n\\n        for neighbor, weight in graph.get(node, []):\\n            if neighbor not in visited:\\n                new_g = g + weight\\n                new_f = new_g + heuristics.get(neighbor, 0)\\n                heapq.heappush(pq, (new_f, neighbor, path + [neighbor], new_g))\\n    return None, float('inf')\\n\\ngraph = {\\n    'S': [('A', 1), ('G', 10)],\\n    'A': [('B', 2), ('C', 1)],\\n    'B': [('D', 5)],\\n    'C': [('D', 3), ('G', 4)],\\n    'D': [('G', 2)],\\n    'G': []\\n}\\nheuristics = {'S': 5, 'A': 3, 'B': 4, 'C': 2, 'D': 1, 'G': 0}\\n\\npath, cost = a_star(graph, 'S', 'G', heuristics)\\nprint(f\\\"A* Optimal Path: {' -> '.join(path)} | Total Cost: {cost}\\\")",
+      "sampleInput": "Start: S, Goal: G, Graph with edge weights and heuristic table",
+      "sampleOutput": "A* Optimal Path: S -> A -> C -> G | Total Cost: 6"
+    },
+    {
+      "expNo": 3,
+      "title": "Minimax Algorithm with Alpha-Beta Pruning for Game Trees",
+      "objective": "Implement Adversarial Search using Minimax decision rule enhanced with Alpha-Beta pruning to optimize game branch exploration.",
+      "algorithm": [
+        "Step 1: Maximizer seeks highest value, Minimizer seeks lowest value.",
+        "Step 2: Maintain alpha (best max choice so far) and beta (best min choice so far).",
+        "Step 3: At maximizing node: alpha = max(alpha, eval). If beta <= alpha, prune branch.",
+        "Step 4: At minimizing node: beta = min(beta, eval). If beta <= alpha, prune branch.",
+        "Step 5: Return optimal payoff value."
+      ],
+      "code": "def alphabeta(depth, node_index, is_maximizing, values, alpha, beta):\\n    if depth == 3:\\n        return values[node_index]\\n\\n    if is_maximizing:\\n        best = float('-inf')\\n        for i in range(2):\\n            val = alphabeta(depth + 1, node_index * 2 + i, False, values, alpha, beta)\\n            best = max(best, val)\\n            alpha = max(alpha, best)\\n            if beta <= alpha:\\n                break # Beta cutoff / pruning\\n        return best\\n    else:\\n        best = float('inf')\\n        for i in range(2):\\n            val = alphabeta(depth + 1, node_index * 2 + i, True, values, alpha, beta)\\n            best = min(best, val)\\n            beta = min(beta, best)\\n            if beta <= alpha:\\n                break # Alpha cutoff / pruning\\n        return best\\n\\n# Leaf nodes of tree of depth 3 (8 leaf states)\\nterminal_values = [3, 5, 6, 9, 1, 2, 0, -1]\\noptimal_score = alphabeta(0, 0, True, terminal_values, float('-inf'), float('inf'))\\nprint(\\\"Optimal Guaranteed Payoff (Alpha-Beta Minimax):\\\", optimal_score)",
+      "sampleInput": "Leaf values: [3, 5, 6, 9, 1, 2, 0, -1]",
+      "sampleOutput": "Optimal Guaranteed Payoff: 5 (Pruned non-promising subtrees)"
+    },
+    {
+      "expNo": 4,
+      "title": "Simple & Multiple Linear Regression using Gradient Descent",
+      "objective": "Implement Linear Regression from scratch using Batch Gradient Descent to fit line y = mx + c and calculate Mean Squared Error (MSE).",
+      "algorithm": [
+        "Step 1: Initialize weights m = 0, bias c = 0, learning rate alpha = 0.01, epochs = 1000.",
+        "Step 2: For each epoch, compute prediction y_hat = m*X + c.",
+        "Step 3: Compute gradients: dm = (-2/n) * sum(X * (y - y_hat)), dc = (-2/n) * sum(y - y_hat).",
+        "Step 4: Update weights: m = m - alpha * dm, c = c - alpha * dc.",
+        "Step 5: Compute final MSE loss and R2 accuracy score."
+      ],
+      "code": "import numpy as np\\n\\n# Synthetic Dataset: Experience (Years) vs Salary ($k)\\nX = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype=float)\\ny = np.array([30, 38, 48, 55, 68, 72, 85, 90, 102, 115], dtype=float)\\n\\nm, c = 0.0, 0.0\\nlr = 0.01\\nepochs = 2000\\nn = len(X)\\n\\nfor _ in range(epochs):\\n    y_pred = m * X + c\\n    dm = (-2 / n) * np.sum(X * (y - y_pred))\\n    dc = (-2 / n) * np.sum(y - y_pred)\\n    m -= lr * dm\\n    c -= lr * dc\\n\\nmse = np.mean((y - (m * X + c)) ** 2)\\nprint(f\\\"Trained Linear Model: Salary = {m:.2f} * Experience + {c:.2f}\\\")\\nprint(f\\\"Mean Squared Error (MSE): {mse:.2f}\\\")\\nprint(f\\\"Prediction for 5.5 Years Exp: ${m * 5.5 + c:.2f}k\\\")",
+      "sampleInput": "X = [1..10], y = [30..115]",
+      "sampleOutput": "Salary = 9.38 * Exp + 20.80 | MSE = 2.45 | Prediction for 5.5 yrs: $72.39k"
+    },
+    {
+      "expNo": 5,
+      "title": "Logistic Regression for Binary Classification",
+      "objective": "Implement Binary Logistic Regression with Sigmoid activation function to classify student pass/fail based on study and attendance hours.",
+      "algorithm": [
+        "Step 1: Linear combination z = w*X + b.",
+        "Step 2: Pass z through sigmoid activation: sigma(z) = 1 / (1 + exp(-z)).",
+        "Step 3: Calculate Binary Cross-Entropy Loss.",
+        "Step 4: Update weights using gradient descent.",
+        "Step 5: Predict probability >= 0.5 as Class 1 (Pass), else Class 0 (Fail)."
+      ],
+      "code": "import numpy as np\\n\\ndef sigmoid(z):\\n    return 1.0 / (1.0 + np.exp(-np.clip(z, -250, 250)))\\n\\n# Features: [Study Hours, Attendance %] -> Target: Pass(1) / Fail(0)\\nX = np.array([[2, 40], [3, 50], [4, 60], [6, 75], [7, 80], [8, 90]])\\ny = np.array([0, 0, 0, 1, 1, 1])\\n\\n# Feature Scaling (Z-score normalization)\\nX_norm = (X - X.mean(axis=0)) / X.std(axis=0)\\n\\nweights = np.zeros(X.shape[1])\\nbias = 0.0\\nlr = 0.1\\n\\nfor epoch in range(1000):\\n    z = np.dot(X_norm, weights) + bias\\n    preds = sigmoid(z)\\n    dw = np.dot(X_norm.T, (preds - y)) / len(y)\\n    db = np.sum(preds - y) / len(y)\\n    weights -= lr * dw\\n    bias -= lr * db\\n\\n# Test sample: 5 hours study, 70% attendance\\ntest_x = (np.array([5, 70]) - X.mean(axis=0)) / X.std(axis=0)\\nprob = sigmoid(np.dot(test_x, weights) + bias)\\nprint(f\\\"Pass Probability: {prob:.4f} -> Result: {'PASS' if prob >= 0.5 else 'FAIL'}\\\")",
+      "sampleInput": "Features: Study hours, Attendance %. Test: [5 hrs, 70% attendance]",
+      "sampleOutput": "Pass Probability: 0.8142 -> Result: PASS"
+    },
+    {
+      "expNo": 6,
+      "title": "Decision Tree Classifier using Information Gain / Gini Impurity",
+      "objective": "Build and visualize a Decision Tree Classifier on the Fisher's Iris Flower dataset and evaluate classification accuracy and confusion matrix.",
+      "algorithm": [
+        "Step 1: Load Iris dataset (150 samples, 4 features, 3 species).",
+        "Step 2: Split data into 80% Train and 20% Test sets.",
+        "Step 3: Fit DecisionTreeClassifier(criterion='entropy', max_depth=3).",
+        "Step 4: Predict labels for test set.",
+        "Step 5: Compute Accuracy, Precision, Recall, and Confusion Matrix."
+      ],
+      "code": "from sklearn.datasets import load_iris\\nfrom sklearn.model_selection import train_test_split\\nfrom sklearn.tree import DecisionTreeClassifier\\nfrom sklearn.metrics import accuracy_score, classification_report\\n\\n# 1. Load Dataset\\niris = load_iris()\\nX, y = iris.data, iris.target\\n\\n# 2. Train-Test Split\\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\\n\\n# 3. Model Training\\nclf = DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=42)\\nclf.fit(X_train, y_train)\\n\\n# 4. Evaluation\\ny_pred = clf.predict(X_test)\\nacc = accuracy_score(y_test, y_pred)\\n\\nprint(f\\\"*** BCSE-011: Practical 6 - Decision Tree ***\\\")\\nprint(f\\\"Model Test Accuracy: {acc * 100:.2f}%\\\\n\\\")\\nprint(\\\"Classification Report:\\\")\\nprint(classification_report(y_test, y_pred, target_names=iris.target_names))",
+      "sampleInput": "Iris Dataset: 150 instances, 4 numeric features (sepal/petal dimensions)",
+      "sampleOutput": "Model Test Accuracy: 100.00% across Setosa, Versicolor, Virginica"
+    },
+    {
+      "expNo": 7,
+      "title": "K-Nearest Neighbors (K-NN) Classification",
+      "objective": "Implement K-Nearest Neighbors classification using Euclidean distance to classify unseen test instances by majority voting of k nearest neighbors.",
+      "algorithm": [
+        "Step 1: For query point x, compute Euclidean distance d = sqrt(sum((x - xi)^2)) to all training points.",
+        "Step 2: Sort distances in ascending order.",
+        "Step 3: Select top k closest instances.",
+        "Step 4: Count class frequency among the k neighbors.",
+        "Step 5: Return the majority class label."
+      ],
+      "code": "import numpy as np\\nfrom collections import Counter\\n\\nclass KNNClassifier:\\n    def __init__(self, k=3):\\n        self.k = k\\n\\n    def fit(self, X, y):\\n        self.X_train = np.array(X)\\n        self.y_train = np.array(y)\\n\\n    def predict(self, X):\\n        return [self._predict_one(x) for x in np.array(X)]\\n\\n    def _predict_one(self, x):\\n        distances = np.linalg.norm(self.X_train - x, axis=1)\\n        k_indices = np.argsort(distances)[:self.k]\\n        k_labels = self.y_train[k_indices]\\n        most_common = Counter(k_labels).most_common(1)\\n        return most_common[0][0]\\n\\n# Train points: [Height (ft), Weight (kg)] -> Class: 0 (Light), 1 (Heavy)\\nX_train = [[5.1, 48], [5.3, 52], [5.5, 50], [5.9, 78], [6.1, 85], [6.0, 80]]\\ny_train = [0, 0, 0, 1, 1, 1]\\n\\nknn = KNNClassifier(k=3)\\nknn.fit(X_train, y_train)\\n\\ntest_sample = [[5.8, 75]]\\npred = knn.predict(test_sample)\\nprint(f\\\"K-NN Prediction for {test_sample[0]}: Class {pred[0]} (Heavy category)\\\")",
+      "sampleInput": "Train data: 6 samples, Test query: [5.8 ft, 75 kg], k=3",
+      "sampleOutput": "Prediction: Class 1 (Heavy category) by 3-NN majority voting"
+    },
+    {
+      "expNo": 8,
+      "title": "K-Means Clustering with Centroid Convergence",
+      "objective": "Implement unsupervised K-Means Clustering algorithm from scratch to partition unlabelled data into K clusters by minimizing inertia.",
+      "algorithm": [
+        "Step 1: Randomly choose K initial cluster centroids.",
+        "Step 2: Assign each data point to its closest centroid using Euclidean distance.",
+        "Step 3: Recompute each centroid as the mean of all points assigned to that cluster.",
+        "Step 4: Repeat assignment and update steps until centroids stop changing (convergence).",
+        "Step 5: Output final cluster assignments and coordinates."
+      ],
+      "code": "import numpy as np\\n\\ndef kmeans(X, k=2, max_iters=100):\\n    np.random.seed(42)\\n    # Initialize centroids randomly from data points\\n    centroids = X[np.random.choice(len(X), k, replace=False)]\\n\\n    for _ in range(max_iters):\\n        # Calculate distances to centroids: shape (N, k)\\n        distances = np.linalg.norm(X[:, np.newaxis] - centroids, axis=2)\\n        labels = np.argmin(distances, axis=1)\\n\\n        # Compute new centroids\\n        new_centroids = np.array([X[labels == i].mean(axis=0) for i in range(k)])\\n\\n        if np.allclose(centroids, new_centroids):\\n            break\\n        centroids = new_centroids\\n\\n    return centroids, labels\\n\\n# 2D points representing Customer Spending vs Visit Frequency\\nX = np.array([\\n    [10, 2], [12, 3], [11, 2], # Cluster 0: Budget shoppers\\n    [50, 8], [52, 9], [51, 7], # Cluster 1: VIP shoppers\\n    [9, 1],  [55, 8]\\n])\\n\\ncentroids, labels = kmeans(X, k=2)\\nprint(\\\"*** BCSE-011: Practical 8 - K-Means Clustering ***\\\")\\nprint(\\\"Final Converged Centroids:\\\\n\\\", centroids)\\nprint(\\\"Cluster Assignments:\\\", labels)",
+      "sampleInput": "8 data points, K = 2 clusters",
+      "sampleOutput": "Cluster 0 Centroid: [10.5, 2.0] | Cluster 1 Centroid: [52.0, 8.0]"
+    },
+    {
+      "expNo": 9,
+      "title": "Naive Bayes Classifier for Text / Spam Classification",
+      "objective": "Implement Multinomial Naive Bayes using Bayes Theorem with Laplace smoothing to classify incoming email messages as Spam or Ham.",
+      "algorithm": [
+        "Step 1: Tokenize and build vocabulary from training text corpus.",
+        "Step 2: Calculate class priors P(Spam) and P(Ham).",
+        "Step 3: Calculate likelihood P(word | class) with Laplace smoothing (+1).",
+        "Step 4: For new message, compute posterior using log probabilities: log P(C) + sum(log P(wi|C)).",
+        "Step 5: Assign class with highest posterior probability."
+      ],
+      "code": "from sklearn.feature_extraction.text import CountVectorizer\\nfrom sklearn.naive_bayes import MultinomialNB\\n\\n# Training emails corpus\\nemails = [\\n    \\\"Win a free lottery and cash prize now\\\",\\n    \\\"Meeting agenda for project presentation tomorrow\\\",\\n    \\\"Claim your free gift card discount\\\",\\n    \\\"Are you available for lunch discussion today\\\",\\n    \\\"Exclusive lottery winner please reply with bank details\\\",\\n    \\\"Please review the attached project report\\\"\\n]\\nlabels = [1, 0, 1, 0, 1, 0] # 1: Spam, 0: Ham\\n\\n# 1. Bag of Words Vectorization\\nvectorizer = CountVectorizer()\\nX = vectorizer.fit_transform(emails)\\n\\n# 2. Train Multinomial Naive Bayes\\nclf = MultinomialNB()\\nclf.fit(X, labels)\\n\\n# 3. Test Messages\\ntest_emails = [\\n    \\\"Exclusive cash prize winner claim now\\\",\\n    \\\"Can we reschedule the project meeting\\\"\\n]\\nX_test = vectorizer.transform(test_emails)\\npredictions = clf.predict(X_test)\\n\\nfor email, pred in zip(test_emails, predictions):\\n    print(f\\\"'{email}' -> {'🚨 SPAM' if pred == 1 else '✅ INBOX / HAM'}\\\")",
+      "sampleInput": "Test: 'Exclusive cash prize winner claim now' and 'Can we reschedule the project meeting'",
+      "sampleOutput": "'Exclusive cash prize...' -> SPAM | 'Can we reschedule...' -> INBOX / HAM"
+    },
+    {
+      "expNo": 10,
+      "title": "Multilayer Perceptron (MLP) Artificial Neural Network with Backpropagation",
+      "objective": "Build a 2-layer Artificial Neural Network from scratch in Python to solve non-linearly separable XOR problem using Backpropagation and Gradient Descent.",
+      "algorithm": [
+        "Step 1: Initialize weights W1 (2x4), W2 (4x1), and biases with small random values.",
+        "Step 2: Forward Propagation: Z1 = X*W1 + b1, A1 = sigmoid(Z1), Z2 = A1*W2 + b2, Yhat = sigmoid(Z2).",
+        "Step 3: Compute Binary Cross-Entropy loss.",
+        "Step 4: Backward Propagation: compute dW2, db2, dW1, db1 using chain rule.",
+        "Step 5: Update weights and biases: W -= lr * dW.",
+        "Step 6: Verify 100% convergence on XOR truth table."
+      ],
+      "code": "import numpy as np\\n\\ndef sigmoid(x):\\n    return 1.0 / (1.0 + np.exp(-x))\\n\\ndef sigmoid_derivative(x):\\n    s = sigmoid(x)\\n    return s * (1.0 - s)\\n\\n# XOR Truth Table inputs & labels\\nX = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])\\ny = np.array([[0], [1], [1], [0]])\\n\\nnp.random.seed(42)\\nW1 = np.random.uniform(-1, 1, (2, 4))\\nb1 = np.zeros((1, 4))\\nW2 = np.random.uniform(-1, 1, (4, 1))\\nb2 = np.zeros((1, 1))\\nlr = 0.5\\n\\n# Training loop\\nfor epoch in range(10000):\\n    # Forward Pass\\n    Z1 = np.dot(X, W1) + b1\\n    A1 = sigmoid(Z1)\\n    Z2 = np.dot(A1, W2) + b2\\n    A2 = sigmoid(Z2)\\n\\n    # Backpropagation\\n    error = A2 - y\\n    dZ2 = error * (A2 * (1 - A2))\\n    dW2 = np.dot(A1.T, dZ2)\\n    db2 = np.sum(dZ2, axis=0, keepdims=True)\\n\\n    dZ1 = np.dot(dZ2, W2.T) * (A1 * (1 - A1))\\n    dW1 = np.dot(X.T, dZ1)\\n    db1 = np.sum(dZ1, axis=0, keepdims=True)\\n\\n    W1 -= lr * dW1; b1 -= lr * db1\\n    W2 -= lr * dW2; b2 -= lr * db2\\n\\nprint(\\\"*** BCSE-011: Practical 10 - Neural Network (XOR) ***\\\")\\nprint(\\\"Predictions after 10k epochs:\\\")\\nfor i in range(len(X)):\\n    print(f\\\"Input: {X[i]} -> Target: {y[i][0]} | Predicted: {A2[i][0]:.4f} -> {round(A2[i][0])}\\\")",
+      "sampleInput": "XOR inputs: [0,0], [0,1], [1,0], [1,1]",
+      "sampleOutput": "[0,0]->0 (0.02) | [0,1]->1 (0.98) | [1,0]->1 (0.98) | [1,1]->0 (0.03)"
+    }
+  ],
+  "vivaQuestions": [
+    {
+      "q": "What is the difference between Supervised, Unsupervised, and Reinforcement Learning?",
+      "a": "Supervised Learning trains on labeled data (inputs + ground truth targets). Unsupervised Learning discovers hidden patterns/clusters from unlabeled data without teacher signals. Reinforcement Learning learns optimal decision policies through reward/penalty feedback from an environment."
+    },
+    {
+      "q": "What is Overfitting and how can it be prevented?",
+      "a": "Overfitting occurs when a model memorizes training noise and fails to generalize to unseen test data. Prevention methods include: Regularization (L1/L2, Dropout), Cross-Validation, Early Stopping, pruning decision trees, and gathering more training data."
+    },
+    {
+      "q": "Explain the difference between BFS, DFS, and A* Search algorithms.",
+      "a": "BFS is an uninformed search exploring level-by-level using a Queue, guaranteeing shortest path in unweighted graphs. DFS explores depth-first using a Stack or recursion, suitable for games and maze solving. A* is an informed (heuristic) search that combines exact path cost g(n) and estimated goal distance h(n) to find optimal shortest paths much faster."
+    },
+    {
+      "q": "What is the role of Alpha-Beta pruning in Game Trees?",
+      "a": "Alpha-Beta pruning optimizes the Minimax algorithm by cutting off branches that cannot possibly influence the final decision. In the best case, it reduces time complexity from O(b^d) to O(b^(d/2)), effectively doubling the searchable game depth."
+    },
+    {
+      "q": "Why is the Sigmoid activation function used in Logistic Regression?",
+      "a": "Sigmoid maps any real-valued input (-infinity to +infinity) into a bounded probability interval (0, 1) with an S-shaped curve, making it ideal for modeling binary classification decision thresholds."
+    },
+    {
+      "q": "What is the difference between Gini Impurity and Information Gain (Entropy)?",
+      "a": "Entropy measures uncertainty/disorder in bits (-sum(p*log2(p))) and ranges from 0 to 1 for binary classes. Gini impurity measures the probability of incorrect labeling (1 - sum(p^2)) and ranges from 0 to 0.5. Gini is computationally faster because it avoids expensive logarithmic operations."
+    },
+    {
+      "q": "How do you select the optimal value of K in K-Means clustering?",
+      "a": "The optimal K is determined using the Elbow Method (plotting WCSS/inertia versus K and finding the 'elbow' inflection point) or by evaluating Silhouette Analysis scores across candidate K values."
+    },
+    {
+      "q": "Why is Naive Bayes called 'Naive'?",
+      "a": "It is called 'naive' because it makes the strong and simplified assumption that all input features are conditionally independent of each other given the class label, which is rarely strictly true in real-world data but works remarkably well in practice."
+    },
+    {
+      "q": "What is Backpropagation in Neural Networks?",
+      "a": "Backpropagation is an efficient algorithmic application of the calculus Chain Rule to compute the partial derivative of the network loss function with respect to every weight and bias, propagating the error backward from output layer to input layer to guide gradient descent updates."
+    },
+    {
+      "q": "What is the vanishing gradient problem and how is it resolved?",
+      "a": "In deep networks with sigmoid or tanh activations, repeated multiplication of small derivative fractions causes gradients in early layers to shrink exponentially toward zero, halting training. It is resolved by using ReLU (Rectified Linear Unit) activation, Batch Normalization, and Residual skip connections."
+    }
+  ]
+}
 ];

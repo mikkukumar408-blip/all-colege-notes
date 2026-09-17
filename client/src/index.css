@@ -59,6 +59,8 @@ body {
 .custom-scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--neon-cyan) rgba(10, 15, 26, 0.85);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .custom-scroll::-webkit-scrollbar {
@@ -81,6 +83,28 @@ body {
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background: var(--neon-cyan);
   box-shadow: 0 0 14px var(--neon-cyan);
+}
+
+/* Responsive styles for Lab Studio Modal */
+@media (max-width: 820px) {
+  .lab-studio-body {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+  }
+  .lab-studio-sidebar {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-height: 220px !important;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    flex-shrink: 0 !important;
+  }
+  .lab-studio-content {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-height: 420px !important;
+    padding: 14px 16px !important;
+  }
 }
 
 /* Typography Helpers */

@@ -862,7 +862,8 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
               justifyContent: 'space-between',
               alignItems: 'center',
               flexWrap: 'wrap',
-              gap: '10px'
+              gap: '10px',
+              flexShrink: 0
             }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
@@ -935,7 +936,8 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
               padding: '8px 20px',
               background: 'rgba(7, 10, 18, 0.95)',
               borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-              overflowX: 'auto'
+              overflowX: 'auto',
+              flexShrink: 0
             }}>
               <button
                 onClick={() => {
@@ -1007,13 +1009,13 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
             </div>
 
             {/* Modal Body Container */}
-            <div style={{ flex: 1, minHeight: 0, height: '100%', overflow: 'hidden', display: 'flex' }}>
+            <div style={{ flex: '1 1 0%', minHeight: 0, height: '100%', overflow: 'hidden', display: 'flex' }}>
               {/* TAB 1: EXPERIMENTS & WORKING CODES */}
               {labActiveTab === 'experiments' && (
-                <div style={{ display: 'flex', width: '100%', height: '100%', minHeight: 0, overflow: 'hidden' }}>
+                <div className="lab-studio-body" style={{ display: 'flex', width: '100%', height: '100%', minHeight: 0, flex: '1 1 0%', overflow: 'hidden' }}>
                   {/* Left Sidebar: Experiments List */}
                   <div 
-                    className="custom-scroll"
+                    className="custom-scroll lab-studio-sidebar"
                     style={{
                       width: '320px',
                       minWidth: '280px',
@@ -1022,7 +1024,9 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                       borderRight: '1px solid rgba(255, 255, 255, 0.08)',
                       background: 'rgba(8, 11, 19, 0.7)',
                       overflowY: 'auto',
-                      padding: '12px'
+                      WebkitOverflowScrolling: 'touch',
+                      padding: '12px',
+                      flexShrink: 0
                     }}
                   >
                     <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', padding: '0 8px' }}>
@@ -1085,18 +1089,22 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                       ? `experiment_${exp.expNo}.c` 
                       : selectedLab.code?.includes('BCSE-013') 
                         ? `practical_${exp.expNo}.html` 
-                        : selectedLab.code?.includes('CS301') || selectedLab.code?.includes('CS601')
-                          ? `lab_${exp.expNo}.py`
-                          : `experiment_${exp.expNo}.c`;
+                        : selectedLab.code?.includes('BELE')
+                          ? `circuit_exp_${exp.expNo}.c`
+                          : selectedLab.code?.includes('BCSE-007')
+                            ? `dsa_exp_${exp.expNo}.c`
+                            : `aiml_lab_${exp.expNo}.py`;
 
                     return (
                       <div 
-                        className="custom-scroll"
+                        key={`${selectedLab.id}-${selectedExpIndex}`}
+                        className="custom-scroll lab-studio-content"
                         style={{
-                          flex: 1,
+                          flex: '1 1 0%',
                           height: '100%',
                           minHeight: 0,
                           overflowY: 'auto',
+                          WebkitOverflowScrolling: 'touch',
                           padding: '18px 24px',
                           display: 'flex',
                           flexDirection: 'column',
@@ -1470,12 +1478,15 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
               {/* TAB 2: UNIVERSITY VIVA-VOCE Q&A BANK */}
               {labActiveTab === 'viva' && (
                 <div 
+                  key={`${selectedLab.id}-viva`}
                   className="custom-scroll"
                   style={{
                     width: '100%',
                     height: '100%',
                     minHeight: 0,
+                    flex: '1 1 0%',
                     overflowY: 'auto',
+                    WebkitOverflowScrolling: 'touch',
                     padding: '20px 28px',
                     display: 'flex',
                     flexDirection: 'column',
@@ -1574,12 +1585,15 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
               {/* TAB 3: CAPSTONE COURSE PROJECT */}
               {labActiveTab === 'capstone' && selectedLab.capstoneProject && (
                 <div 
+                  key={`${selectedLab.id}-capstone`}
                   className="custom-scroll"
                   style={{
                     width: '100%',
                     height: '100%',
                     minHeight: 0,
+                    flex: '1 1 0%',
                     overflowY: 'auto',
+                    WebkitOverflowScrolling: 'touch',
                     padding: '20px 28px',
                     display: 'flex',
                     flexDirection: 'column',
@@ -1729,7 +1743,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                             <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
                             <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }} />
                             <span style={{ marginLeft: '8px', fontSize: '0.82rem', color: '#fbbf24', fontFamily: 'monospace', fontWeight: 700 }}>
-                              {selectedLab.code.includes('BCSE-001') ? 'pacman_game_in_c.c' : 'university_portal.html'}
+                              {selectedLab.code.includes('BCSE-001') ? 'pacman_game_in_c.c' : selectedLab.code.includes('BCSE-013') ? 'university_portal.html' : selectedLab.code.includes('BELE') ? 'regulated_dc_power_supply.c' : selectedLab.code.includes('BCSE-007') ? 'metro_route_planner.c' : 'digit_recognition_cnn.py'}
                             </span>
                           </div>
 
@@ -1872,7 +1886,8 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
               justifyContent: 'space-between',
               alignItems: 'center',
               flexWrap: 'wrap',
-              gap: '10px'
+              gap: '10px',
+              flexShrink: 0
             }}>
               <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>
                 Certified Curriculum • <strong>Maharishi Markandeshwar Engineering College</strong> • 2025-2026
