@@ -321,6 +321,9 @@ const handleChangePassword = async (req, res) => {
   }
 
   const clean = username.trim();
+  if (clean.toLowerCase() === 'bhavya mishra') {
+    return res.status(403).json({ error: 'Cannot change password for Master Super Admin account' });
+  }
   const idx = registeredUsers.findIndex(u => u.username.toLowerCase() === clean.toLowerCase());
   const now = new Date().toISOString();
 

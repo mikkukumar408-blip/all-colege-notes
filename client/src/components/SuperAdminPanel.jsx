@@ -132,6 +132,17 @@ export default function SuperAdminPanel() {
   const handleSavePassword = async (e) => {
     e.preventDefault();
     if (!passwordModalUser || !newPassword) return;
+
+    if (passwordModalUser.username?.toLowerCase() === 'bhavya mishra' || passwordModalUser.isSuperAdmin) {
+      setFeedbackMsg({ 
+        type: 'error', 
+        text: '🛑 Access Denied: The Master Super Admin password cannot be altered from this panel.' 
+      });
+      setPasswordModalUser(null);
+      setTimeout(() => setFeedbackMsg({ type: '', text: '' }), 4500);
+      return;
+    }
+
     setIsUpdatingPassword(true);
 
     const res = await adminChangeUserPassword(passwordModalUser.username, newPassword);
@@ -492,57 +503,71 @@ export default function SuperAdminPanel() {
                       boxShadow: '-4px 0 8px rgba(0, 0, 0, 0.5)'
                     }}>
                       <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
-                        {/* Change Password Button */}
-                        <button
-                          onClick={() => {
-                            setPasswordModalUser(acc);
-                            setNewPassword('');
-                          }}
-                          style={{
-                            background: 'rgba(0, 240, 255, 0.15)',
-                            border: '1px solid var(--neon-cyan)',
-                            color: 'var(--neon-cyan)',
+                        {!isRootAdmin ? (
+                          <>
+                            {/* Change Password Button (Allowed only for other users and admins) */}
+                            <button
+                              onClick={() => {
+                                setPasswordModalUser(acc);
+                                setNewPassword('');
+                              }}
+                              style={{
+                                background: 'rgba(0, 240, 255, 0.15)',
+                                border: '1px solid var(--neon-cyan)',
+                                color: 'var(--neon-cyan)',
+                                borderRadius: '6px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                transition: 'all 0.15s ease'
+                              }}
+                              title={`Change password for @${acc.username}`}
+                            >
+                              <Key size={14} /> Change Pass
+                            </button>
+
+                            {/* Delete User Button */}
+                            <button
+                              onClick={() => setDeleteModalUser(acc)}
+                              style={{
+                                background: 'rgba(239, 68, 68, 0.15)',
+                                border: '1px solid #ef4444',
+                                color: '#fca5a5',
+                                borderRadius: '6px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                transition: 'all 0.15s ease'
+                              }}
+                              title={`Delete user account @${acc.username}`}
+                            >
+                              <Trash2 size={14} /> Delete
+                            </button>
+                          </>
+                        ) : (
+                          <div style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '6px 14px',
+                            background: 'rgba(245, 158, 11, 0.12)',
+                            border: '1px solid rgba(245, 158, 11, 0.35)',
                             borderRadius: '6px',
-                            padding: '6px 12px',
-                            cursor: 'pointer',
+                            color: '#fbbf24',
                             fontSize: '0.78rem',
                             fontWeight: 700,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '5px',
-                            transition: 'all 0.15s ease'
-                          }}
-                          title={`Change password for @${acc.username}`}
-                        >
-                          <Key size={14} /> Change Pass
-                        </button>
-
-                        {/* Delete User Button (Disabled for Root Master Admin) */}
-                        {!isRootAdmin ? (
-                          <button
-                            onClick={() => setDeleteModalUser(acc)}
-                            style={{
-                              background: 'rgba(239, 68, 68, 0.15)',
-                              border: '1px solid #ef4444',
-                              color: '#fca5a5',
-                              borderRadius: '6px',
-                              padding: '6px 12px',
-                              cursor: 'pointer',
-                              fontSize: '0.78rem',
-                              fontWeight: 700,
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '5px',
-                              transition: 'all 0.15s ease'
-                            }}
-                            title={`Delete user account @${acc.username}`}
-                          >
-                            <Trash2 size={14} /> Delete
-                          </button>
-                        ) : (
-                          <span style={{ fontSize: '0.74rem', color: '#64748b', fontStyle: 'italic', padding: '0 6px' }}>
-                            Protected (Master Root)
-                          </span>
+                            letterSpacing: '0.02em'
+                          }}>
+                            <Lock size={13} color="#f59e0b" /> Protected Master Root
+                          </div>
                         )}
                       </div>
                     </td>

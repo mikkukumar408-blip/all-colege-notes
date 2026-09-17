@@ -233,6 +233,14 @@ export async function adminChangeUserPassword(username, newPassword) {
     return { success: false, message: 'New password must be at least 5 characters.' };
   }
 
+  // Guard against changing Master Super Admin root password
+  if (username.trim().toLowerCase() === 'bhavya mishra') {
+    return { 
+      success: false, 
+      message: '🛑 Access Denied: The Master Super Admin root password (@Bhavya Mishra) is permanently protected and cannot be changed from this panel.' 
+    };
+  }
+
   try {
     // 1. First fetch latest cloud accounts to prevent overwriting other sessions
     const local = getLocalUsers();
