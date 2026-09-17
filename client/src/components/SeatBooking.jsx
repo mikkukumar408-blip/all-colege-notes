@@ -840,28 +840,29 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
           <div 
             style={{
               background: '#0a0d16',
-              border: '1px solid rgba(0, 240, 255, 0.35)',
+              border: '1px solid rgba(0, 240, 255, 0.4)',
               borderRadius: '16px',
               width: '100%',
-              maxWidth: '1180px',
-              height: '92vh',
+              maxWidth: '1220px',
+              height: '94vh',
+              maxHeight: '94vh',
               display: 'flex',
               flexDirection: 'column',
-              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.95), 0 0 30px rgba(0, 240, 255, 0.15)',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(0, 240, 255, 0.2)',
               overflow: 'hidden',
               position: 'relative'
             }}
           >
             {/* Modal Header */}
             <div style={{
-              padding: '18px 24px',
+              padding: '14px 20px',
               borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
               background: 'linear-gradient(180deg, rgba(16, 24, 40, 0.95) 0%, rgba(10, 15, 26, 0.95) 100%)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
               flexWrap: 'wrap',
-              gap: '12px'
+              gap: '10px'
             }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
@@ -1006,19 +1007,24 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
             </div>
 
             {/* Modal Body Container */}
-            <div style={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
+            <div style={{ flex: 1, minHeight: 0, height: '100%', overflow: 'hidden', display: 'flex' }}>
               {/* TAB 1: EXPERIMENTS & WORKING CODES */}
               {labActiveTab === 'experiments' && (
-                <div style={{ display: 'flex', width: '100%', height: '100%' }}>
+                <div style={{ display: 'flex', width: '100%', height: '100%', minHeight: 0, overflow: 'hidden' }}>
                   {/* Left Sidebar: Experiments List */}
-                  <div style={{
-                    width: '320px',
-                    minWidth: '280px',
-                    borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-                    background: 'rgba(8, 11, 19, 0.7)',
-                    overflowY: 'auto',
-                    padding: '12px'
-                  }}>
+                  <div 
+                    className="custom-scroll"
+                    style={{
+                      width: '320px',
+                      minWidth: '280px',
+                      height: '100%',
+                      minHeight: 0,
+                      borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+                      background: 'rgba(8, 11, 19, 0.7)',
+                      overflowY: 'auto',
+                      padding: '12px'
+                    }}
+                  >
                     <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', padding: '0 8px' }}>
                       List of Practical Experiments ({selectedLab.experiments?.length || 0})
                     </div>
@@ -1084,15 +1090,20 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                           : `experiment_${exp.expNo}.c`;
 
                     return (
-                      <div style={{
-                        flex: 1,
-                        overflowY: 'auto',
-                        padding: '22px 28px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '16px',
-                        background: '#070a12'
-                      }}>
+                      <div 
+                        className="custom-scroll"
+                        style={{
+                          flex: 1,
+                          height: '100%',
+                          minHeight: 0,
+                          overflowY: 'auto',
+                          padding: '18px 24px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '14px',
+                          background: '#070a12'
+                        }}
+                      >
                         {/* Title & Badge Header */}
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
@@ -1291,19 +1302,21 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                                 </button>
                               </div>
 
-                              {/* Preformatted Code Box with comfortable height and scroll */}
-                              <pre style={{
-                                margin: 0,
-                                padding: '20px 22px',
-                                overflowX: 'auto',
-                                maxHeight: '480px',
-                                overflowY: 'auto',
-                                fontFamily: 'Consolas, "Fira Code", monospace',
-                                fontSize: '0.86rem',
-                                color: '#38bdf8',
-                                lineHeight: 1.65,
-                                background: '#040711'
-                              }}>
+                              {/* Preformatted Code Box with comfortable scroll */}
+                              <pre 
+                                className="custom-scroll"
+                                style={{
+                                  margin: 0,
+                                  padding: '16px 20px',
+                                  overflowX: 'auto',
+                                  overflowY: 'visible',
+                                  fontFamily: 'Consolas, "Fira Code", monospace',
+                                  fontSize: '0.86rem',
+                                  color: '#38bdf8',
+                                  lineHeight: 1.65,
+                                  background: '#040711'
+                                }}
+                              >
                                 <code>{exp.code}</code>
                               </pre>
                             </div>
@@ -1456,16 +1469,19 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
 
               {/* TAB 2: UNIVERSITY VIVA-VOCE Q&A BANK */}
               {labActiveTab === 'viva' && (
-                <div style={{
-                  width: '100%',
-                  height: '100%',
-                  overflowY: 'auto',
-                  padding: '24px 32px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '20px',
-                  background: '#070a12'
-                }}>
+                <div 
+                  className="custom-scroll"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    minHeight: 0,
+                    overflowY: 'auto',
+                    padding: '20px 28px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '18px',
+                    background: '#070a12'
+                  }}>
                   {/* Viva Header & Search */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
                     <div>
@@ -1557,16 +1573,19 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
 
               {/* TAB 3: CAPSTONE COURSE PROJECT */}
               {labActiveTab === 'capstone' && selectedLab.capstoneProject && (
-                <div style={{
-                  width: '100%',
-                  height: '100%',
-                  overflowY: 'auto',
-                  padding: '22px 28px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '16px',
-                  background: '#070a12'
-                }}>
+                <div 
+                  className="custom-scroll"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    minHeight: 0,
+                    overflowY: 'auto',
+                    padding: '20px 28px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '14px',
+                    background: '#070a12'
+                  }}>
                   {/* Capstone Header */}
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
@@ -1735,18 +1754,20 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                           </button>
                         </div>
 
-                        <pre style={{
-                          margin: 0,
-                          padding: '20px 22px',
-                          overflowX: 'auto',
-                          fontFamily: 'Consolas, "Fira Code", monospace',
-                          fontSize: '0.86rem',
-                          color: '#fbbf24',
-                          lineHeight: 1.65,
-                          background: '#040711',
-                          maxHeight: '520px',
-                          overflowY: 'auto'
-                        }}>
+                        <pre 
+                          className="custom-scroll"
+                          style={{
+                            margin: 0,
+                            padding: '16px 20px',
+                            overflowX: 'auto',
+                            overflowY: 'visible',
+                            fontFamily: 'Consolas, "Fira Code", monospace',
+                            fontSize: '0.86rem',
+                            color: '#fbbf24',
+                            lineHeight: 1.65,
+                            background: '#040711'
+                          }}
+                        >
                           <code>{selectedLab.capstoneProject.codeSnippet}</code>
                         </pre>
                       </div>
@@ -1844,14 +1865,14 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
 
             {/* Modal Footer Bar */}
             <div style={{
-              padding: '14px 24px',
+              padding: '10px 20px',
               background: 'rgba(8, 12, 22, 0.95)',
               borderTop: '1px solid rgba(255, 255, 255, 0.08)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
               flexWrap: 'wrap',
-              gap: '12px'
+              gap: '10px'
             }}>
               <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>
                 Certified Curriculum • <strong>Maharishi Markandeshwar Engineering College</strong> • 2025-2026
