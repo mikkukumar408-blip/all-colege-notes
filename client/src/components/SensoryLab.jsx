@@ -136,6 +136,11 @@ function cleanMathTypography(str) {
   s = s.replace(/(?<!\\(?:begin|end|text|frac|sqrt|mathbf|substack|array|cases|aligned|bmatrix|matrix))\{([0-9\s,\.\+\-\*\/=]+)\}/g, '($1)');
   s = s.replace(/\$\$/g, '').replace(/\$([^$]+?)\$/g, '$1');
 
+  // Purge any stray \left and \right outside KaTeX (never let literal "left" or "right" leak)
+  s = s.replace(/\\*left\s*([(\[{])/gi, '$1');
+  s = s.replace(/\\*right\s*([)\]}])/gi, '$1');
+  s = s.replace(/\\*(?:left|right)\b(?!\s*[-]?\s*hand)/gi, '');
+
   return s;
 }
 
@@ -260,19 +265,38 @@ function renderKaTeXSafe(formula, isDisplay = false) {
       throwOnError: false,
       strict: false
     });
-    if (!retry.includes('katex-error')) {
-      return retry;
+    // Retry 2: Normalize \left and \right if mismatched brackets caused the KaTeX error
+    const bracketsNormalized = clean
+      .replace(/\\left\s*([(\[{])/g, '(')
+      .replace(/\\right\s*([)\]}])/g, ')')
+      .replace(/\\left\./g, '')
+      .replace(/\\right\./g, '');
+    const retry2 = katex.renderToString(bracketsNormalized, {
+      displayMode: isDisplay,
+      throwOnError: false,
+      strict: false
+    });
+    if (!retry2.includes('katex-error')) {
+      return retry2;
     }
   } catch (e) {}
 
   // Safe fallback: Render sanitized formula inside KaTeX \text block so typography is always styled math
   try {
-    return katex.renderToString(`\\text{${clean.replace(/[{}\\]/g, ' ')}}`, {
+    const cleanFallback = clean
+      .replace(/\\*(?:left|right)\s*([(\[{])/gi, '$1')
+      .replace(/\\*(?:left|right)\s*([)\]}])/gi, '$1')
+      .replace(/\\*(?:left|right)\b(?!\s*[-]?\s*hand)/gi, '')
+      .replace(/[{}\\]/g, ' ');
+    return katex.renderToString(`\\text{${cleanFallback}}`, {
       displayMode: isDisplay,
       throwOnError: false
     });
   } catch (e) {
-    return clean;
+    return clean
+      .replace(/\\*(?:left|right)\s*([(\[{])/gi, '$1')
+      .replace(/\\*(?:left|right)\s*([)\]}])/gi, '$1')
+      .replace(/\\*(?:left|right)\b(?!\s*[-]?\s*hand)/gi, '');
   }
 }
 
@@ -558,7 +582,11 @@ function formatNoteContent(content) {
         .replace(/\bI_1\b/g, 'I₁')
         .replace(/\bI_2\b/g, 'I₂')
         .replace(/\bS_1\b/g, 'S₁')
-        .replace(/\bS_2\b/g, 'S₂');
+        .replace(/\bS_2\b/g, 'S₂')
+        // Purge any stray \left and \right outside KaTeX (never let literal "left" or "right" leak)
+        .replace(/\\*left\s*([(\[{])/gi, '$1')
+        .replace(/\\*right\s*([)\]}])/gi, '$1')
+        .replace(/\\*(?:left|right)\b(?!\s*[-]?\s*hand)/gi, '');
     }
   }
   html = textSegments.join('');
