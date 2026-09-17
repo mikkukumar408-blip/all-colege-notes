@@ -12,8 +12,6 @@ export const getApiBase = () => {
   return 'https://all-college-notes.vercel.app/api/users';
 };
 
-// Primary KV backup object ID (Active & verified)
-const BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0ae98a56225a3';
 const STORAGE_KEY_USERS = 'college_notes_registered_users';
 const STORAGE_KEY_DELETED = 'college_notes_deleted_users';
 
@@ -170,43 +168,17 @@ export async function pullCloudUsers() {
   let serverUsers = null;
   let backupUsers = null;
 
-  try {
-    const results = await Promise.allSettled([
-      // 1. First-Party Vercel Serverless Endpoint (/api/users)
-      (async () => {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 3500);
-        const res = await fetch(getApiBase(), { signal: controller.signal });
-        clearTimeout(timeout);
-        if (res.ok) {
-          const json = await res.json();
-          if (json && Array.isArray(json.users) && json.users.length > 0) {
-            return json.users;
-          }
-        }
-        return null;
-      })(),
-      // 2. Secondary: Backup external KV store
-      (async () => {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 3500);
-        const res = await fetch(BACKUP_URL, { signal: controller.signal });
-        clearTimeout(timeout);
-        if (res.ok) {
-          const json = await res.json();
-          if (json && json.data && Array.isArray(json.data.users) && json.data.users.length > 0) {
-            return json.data.users;
-          }
-        }
-        return null;
-      })()
-    ]);
 
-    if (results[0].status === 'fulfilled' && results[0].value) {
-      serverUsers = results[0].value;
-    }
-    if (results[1].status === 'fulfilled' && results[1].value) {
-      backupUsers = results[1].value;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch(getApiBase(), { signal: controller.signal });
+    clearTimeout(timeout);
+    if (res.ok) {
+      const json = await res.json();
+      if (json && Array.isArray(json.users) && json.users.length > 0) {
+        serverUsers = json.users;
+      }
     }
   } catch (err) {
     // fallback
@@ -246,11 +218,6 @@ export async function pushCloudUsers(usersList) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ users: usersList })
-      }),
-      fetch(BACKUP_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
       })
     ]);
   } catch (e) {}
