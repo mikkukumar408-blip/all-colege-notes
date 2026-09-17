@@ -351,99 +351,222 @@ export const initialSubjects = [
    Fast-track revision guides, formula sheets & exam summaries.
    ------------------------------------------------------------------------- */
 export const initialShortNotes = [
+  // ==================== SEMESTER 1 ====================
   {
     id: 'sn-math1',
     subject: 'Engineering Mathematics I (BMAT-001)',
     code: 'BMAT-001',
     semester: 'Semester 1',
     category: 'Mathematics',
-    type: 'High-Yield Exam Formulae & Quick Proofs',
+    type: 'KaTeX High-Yield Formulae & Quick Proofs',
     pdfUrl: '/Mathematics_1_Short_Notes_Exam_Ready.pdf',
     downloadName: 'Mathematics_1_Short_Notes_Exam_Ready.pdf',
-    fileSize: '246 KB',
-    pages: '4 Pages Quick Revision',
-    downloads: 3820,
+    fileSize: '240 KB',
+    pages: '2 Pages KaTeX Revision',
+    downloads: 4820,
     highlights: [
-      'Cayley-Hamilton Theorem & Inverse Shortcut',
-      'Rolle\'s, LMVT & Cauchy Mean Value Proofs',
-      'Euler\'s Homogeneous Functions & Beta-Gamma Formulas',
-      'Fourier Series Euler Coefficients (a₀, aₙ, bₙ)'
+      'Matrices, Rank, Echelon Form & Cayley-Hamilton Theorem',
+      'Rolle\'s, LMVT, Cauchy MVT & Radius of Curvature ρ',
+      'Euler\'s Homogeneous Theorem, Beta-Gamma Function Proofs',
+      'Fourier Series Dirichlet Conditions & Euler Formulas'
     ]
   },
   {
     id: 'sn-beee',
-    subject: 'Basic Electrical & Electronics (BEEE)',
+    subject: 'Basic Electrical & Electronics (BELE-001)',
     code: 'BELE-001',
     semester: 'Semester 1',
     category: 'Core Engineering',
-    type: 'Circuit Theorems & Rapid Derivations',
+    type: 'KaTeX Circuit Theorems & Rapid Derivations',
     pdfUrl: '/BEEE_Short_Notes_Exam_Ready.pdf',
     downloadName: 'BEEE_Short_Notes_Exam_Ready.pdf',
-    fileSize: '260 KB',
-    pages: '4 Pages Quick Revision',
-    downloads: 4150,
+    fileSize: '250 KB',
+    pages: '2 Pages KaTeX Revision',
+    downloads: 5120,
     highlights: [
-      'Thevenin & Norton Equivalent Circuits & Derivations',
-      'Maximum Power Transfer Theorem Proof',
-      'Transformer EMF Equation & OC/SC Tests',
-      'P-N Diode Rectifier Ripple Factors & Efficiency'
+      'Thevenin, Norton & Maximum Power Transfer Proofs',
+      'AC Phasors, Impedance, Resonance & Quality Factor Q',
+      'Transformer EMF Equation, Losses & Efficiency',
+      'P-N Diode Rectifiers, Ripple Factors & BJT Configurations'
     ]
   },
   {
     id: 'sn-c',
-    subject: 'Computational Problem Solving using C',
+    subject: 'Computational Problem Solving using C (BCSE-008)',
     code: 'BCSE-008',
     semester: 'Semester 1',
     category: 'Computer Science',
-    type: 'Syntax, Memory Layout & Pointers Cheat Sheet',
+    type: 'KaTeX Syntax, Memory Layout & Pointers Cheat Sheet',
     pdfUrl: '/C Programming Exam Revision Sheet.pdf',
     downloadName: 'C_Programming_Exam_Revision_Sheet.pdf',
-    fileSize: '456 KB',
-    pages: '4 Pages Quick Revision',
-    downloads: 3490,
+    fileSize: '449 KB',
+    pages: '2 Pages KaTeX Revision',
+    downloads: 4490,
     highlights: [
       '4-Stage Compilation Pipeline & Preprocessor Directives',
       'Memory Segmentation (Code, Data, BSS, Heap, Stack)',
-      'Pointer Arithmetic, Dynamic Allocation (malloc/calloc)',
-      'Struct Memory Alignment & File Operations'
+      '2D Array Row/Col Major Addressing & KaTeX Offsets',
+      'Pointer Arithmetic, Dynamic Allocation (malloc/calloc)'
     ]
   },
   {
     id: 'sn-webtech',
-    subject: 'Fundamentals of Web Technologies',
+    subject: 'Fundamentals of Web Technologies (BCSE-012)',
     code: 'BCSE-012',
     semester: 'Semester 1',
     category: 'Computer Science',
-    type: 'Protocols, HTML5/CSS3 & DOM Quick Sheet',
+    type: 'KaTeX Protocols, CSS Box Model & Web Architecture',
     pdfUrl: '/Web Technologies Exam Revision Sheet.pdf',
     downloadName: 'Web_Technologies_Exam_Revision_Sheet.pdf',
-    fileSize: '328 KB',
-    pages: '4 Pages Quick Revision',
-    downloads: 2980,
+    fileSize: '333 KB',
+    pages: '2 Pages KaTeX Revision',
+    downloads: 3780,
     highlights: [
-      'HTTP Request-Response Lifecycle & DNS Resolution',
-      'Semantic HTML5 Architecture & Canvas API',
-      'CSS Flexbox, Grid & Box Model Calculations',
-      'JavaScript DOM Manipulation & Event Bubbling'
+      'HTTP Request-Response Lifecycle & DNS Resolution Cycle',
+      'Semantic HTML5 Architecture & Client-Side Image Maps',
+      'CSS Specificity Vectors & Total Box Model Width Formulas',
+      'JavaScript Event Bubbling, Capturing & Web Storage'
     ]
   },
   {
     id: 'sn-aiml',
-    subject: 'Fundamentals of Artificial Intelligence & ML',
+    subject: 'Fundamentals of Artificial Intelligence & ML (BCSE-011)',
     code: 'BCSE-011',
     semester: 'Semester 1',
     category: 'Artificial Intelligence',
-    type: 'Search Algorithms, Logic & ML Architecture',
+    type: 'KaTeX Search Algorithms, Logic & ML Formulae',
     pdfUrl: '/AIML_Short_Notes_Exam_Ready.pdf',
     downloadName: 'AIML_Short_Notes_Exam_Ready.pdf',
-    fileSize: '285 KB',
-    pages: '4 Pages Quick Revision',
-    downloads: 3640,
+    fileSize: '280 KB',
+    pages: '2 Pages KaTeX Revision',
+    downloads: 4340,
     highlights: [
-      'PEAS Agent Architecture & State Space Formulation',
-      'A* Search Heuristic Admissibility & Monotonicity',
-      'Propositional Logic & Resolution Refutation',
-      'Supervised vs Unsupervised ML & Evaluation Metrics'
+      'PEAS Agent Architecture & State Space Search Formulations',
+      'A* Evaluation Function f(n)=g(n)+h(n) & Heuristic Proofs',
+      'Propositional Logic, CNF Conversion & Resolution Refutation',
+      'Entropy H(S), Information Gain & Apriori Association Rules'
+    ]
+  },
+
+  // ==================== SEMESTER 2 ====================
+  {
+    id: 'sn-physics',
+    subject: 'Applied Physics (PHYS102)',
+    code: 'PHYS102',
+    semester: 'Semester 2',
+    category: 'Core Engineering',
+    type: 'KaTeX Optics, Quantum Mechanics & Lasers Formula Sheet',
+    pdfUrl: '/PHYS102_Applied_Physics_Short_Notes_Exam_Ready.pdf',
+    downloadName: 'PHYS102_Applied_Physics_Short_Notes_Exam_Ready.pdf',
+    fileSize: '179 KB',
+    pages: '2 Pages KaTeX Revision',
+    downloads: 3620,
+    highlights: [
+      'Interference Fringe Width, Newton\'s Rings & Grating Equation',
+      'Time-Independent Schrödinger Equation & Particle-in-a-Box',
+      'Einstein\'s A and B Coefficients & Population Inversion',
+      'Optical Fiber Acceptance Angle, Numerical Aperture & Meissner Effect'
+    ]
+  },
+
+  // ==================== SEMESTER 3 ====================
+  {
+    id: 'sn-dsa',
+    subject: 'Data Structures & Algorithms (CS301)',
+    code: 'CS301',
+    semester: 'Semester 3',
+    category: 'Computer Science',
+    type: 'KaTeX Complexity Matrices, Trees & Graph Formula Sheet',
+    pdfUrl: '/CS301_Data_Structures_and_Algorithms_Short_Notes.pdf',
+    downloadName: 'CS301_Data_Structures_and_Algorithms_Short_Notes.pdf',
+    fileSize: '159 KB',
+    pages: '2 Pages KaTeX Revision',
+    downloads: 5430,
+    highlights: [
+      'Master Theorem Formulas & 1D/2D Array Address Calculations',
+      'Circular Queue Modulo Arithmetic & Stack Postfix Evaluation',
+      'BST Inorder Successor & AVL Tree 4 Rotation Balance Factors',
+      'Dijkstra, Bellman-Ford, Kruskal/Prim MST & Hashing Probing'
+    ]
+  },
+  {
+    id: 'sn-dld',
+    subject: 'Digital Logic & Computer Design (CS302)',
+    code: 'CS302',
+    semester: 'Semester 3',
+    category: 'Computer Science',
+    type: 'KaTeX Boolean Theorems, K-Maps & Sequential Circuits',
+    pdfUrl: '/CS302_Digital_Logic_and_Design_Short_Notes.pdf',
+    downloadName: 'CS302_Digital_Logic_and_Design_Short_Notes.pdf',
+    fileSize: '146 KB',
+    pages: '2 Pages KaTeX Revision',
+    downloads: 3890,
+    highlights: [
+      'Radix Complements & IEEE 754 Single Precision Floating-Point',
+      'De Morgan\'s Laws, Boolean Duality & Gray Code Conversion',
+      'K-Map Grouping Rules, Carry Look-Ahead (CLA) Adder Equations',
+      'Flip-Flop Characteristic Equations (SR, JK, D, T) & FSM Design'
+    ]
+  },
+
+  // ==================== SEMESTER 4 ====================
+  {
+    id: 'sn-os',
+    subject: 'Operating Systems (CS401)',
+    code: 'CS401',
+    semester: 'Semester 4',
+    category: 'Systems & Networks',
+    type: 'KaTeX CPU Scheduling, Deadlock & Paging Calculations',
+    pdfUrl: '/CS401_Operating_Systems_Short_Notes.pdf',
+    downloadName: 'CS401_Operating_Systems_Short_Notes.pdf',
+    fileSize: '142 KB',
+    pages: '2 Pages KaTeX Revision',
+    downloads: 4760,
+    highlights: [
+      'Turnaround & Waiting Time Metrics for FCFS, SJF, SRTF, RR',
+      'Peterson\'s Algorithm & Banker\'s Algorithm Safety Test',
+      'Paging Address Translation & Effective Memory Access Time (EMAT)',
+      'Page Fault Algorithms (FIFO, LRU, Optimal) & SSTF/SCAN/C-SCAN'
+    ]
+  },
+  {
+    id: 'sn-dbms',
+    subject: 'Database Management Systems (CS402)',
+    code: 'CS402',
+    semester: 'Semester 4',
+    category: 'Computer Science',
+    type: 'KaTeX Relational Algebra, Normalization & ACID Formulae',
+    pdfUrl: '/CS402_Database_Management_Systems_Short_Notes.pdf',
+    downloadName: 'CS402_Database_Management_Systems_Short_Notes.pdf',
+    fileSize: '153 KB',
+    pages: '2 Pages KaTeX Revision',
+    downloads: 4980,
+    highlights: [
+      'Relational Algebra Operations: Selection, Projection, Natural Join',
+      'Armstrong\'s Axioms & Attribute Closure Canonical Form',
+      '1NF, 2NF, 3NF and BCNF Normal Forms & Lossless Join Tests',
+      'Conflict Serializability Precedence Graph, 2PL & B+ Tree Capacity'
+    ]
+  },
+
+  // ==================== SEMESTER 5 ====================
+  {
+    id: 'sn-cn',
+    subject: 'Computer Networks (CS501)',
+    code: 'CS501',
+    semester: 'Semester 5',
+    category: 'Systems & Networks',
+    type: 'KaTeX Network Layer Protocols, Delays & Subnetting',
+    pdfUrl: '/CS501_Computer_Networks_Short_Notes.pdf',
+    downloadName: 'CS501_Computer_Networks_Short_Notes.pdf',
+    fileSize: '142 KB',
+    pages: '2 Pages KaTeX Revision',
+    downloads: 4610,
+    highlights: [
+      'Transmission vs Propagation Delay & Shannon Channel Capacity',
+      'Stop-and-Wait & Selective Repeat Efficiency Formulae',
+      'CRC Polynomial Long Division & Minimum CSMA/CD Frame Size',
+      'CIDR IPv4 Subnetting Calculations, Bellman-Ford & TCP Tahoe/Reno'
     ]
   }
 ];

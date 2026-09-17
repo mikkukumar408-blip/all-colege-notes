@@ -33,7 +33,7 @@ export default function Theaters({ currentUser }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const categories = ['All', 'Mathematics', 'Core Engineering', 'Computer Science', 'Artificial Intelligence'];
+  const categories = ['All', 'Mathematics', 'Core Engineering', 'Computer Science', 'Artificial Intelligence', 'Systems & Networks'];
 
   // Filter notes based on search text and subject category
   const filteredNotes = shortNotes.filter(item => {
@@ -67,7 +67,7 @@ export default function Theaters({ currentUser }) {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <span className="badge-neon font-display">⚡ HIGH-YIELD REVISION ARCHIVE</span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>Semester 1 Exam-Ready Short Notes</span>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>All Subjects • KaTeX Exam-Ready Short Notes</span>
           </div>
           <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff' }}>Short Notes &amp; Exam Revision Sheets</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.94rem', maxWidth: '750px' }}>
