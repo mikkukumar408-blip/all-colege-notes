@@ -738,6 +738,62 @@ export default function SensoryLab({
           ? 'Official MMDU syllabus long notes: Matrices, Gauss-Jordan, Curvature, Indeterminate forms, Beta-Gamma, and Fourier series with solved exam questions.'
           : 'Official MMDU syllabus long notes: DC/AC circuits, KCL/KVL, Thevenin equivalent, Transformers, DC machines, BJT, and Boolean logic with solved exam questions.';
 
+  const activeExamAlignedBadge = isWebTech
+    ? "Covers HTTP/HTTPS request-response cycles, DNS resolution hierarchy, semantic HTML5, CSS Flexbox/Grid box model, JavaScript DOM manipulation, and AJAX/Fetch."
+    : isC
+      ? "Covers 4-stage compilation pipeline, memory segmentation (Stack/Heap/BSS), pointers & dynamic memory (malloc/calloc/free), struct alignment, and file I/O operations."
+      : isAIML
+        ? "Covers PEAS agent classification, BFS/DFS, A* heuristic proofs, Minimax & Alpha-Beta pruning, Propositional logic & resolution refutation, Supervised vs Unsupervised ML, and Bias-Variance tradeoff."
+        : isMath1
+          ? "Covers Cayley-Hamilton & Eigenvalues, Rank & Gauss-Jordan, Rolle's & LMVT, Beta-Gamma integrals, Euler's homogeneous theorem, Taylor series, Vector curl/divergence, and Fourier expansions."
+          : "Covers DC/AC circuit proofs, Maximum Power Transfer derivation, transformer equivalent circuits, OC/SC tests, P-N junction diode rectifiers, BJT characteristics, and De Morgan's theorem proofs.";
+
+  const getTopperExamNote = () => {
+    if (isMath1) {
+      if (selectedUnitNum === 1) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Clear row/column operation notation (e.g. R₂ → R₂ - 2R₁)</strong>, <strong>(2) Exact rank condition definitions</strong>, <strong>(3) Verification of Cayley-Hamilton equation</strong>. Always verify matrix dimensions and non-zero pivot entries!</>
+        );
+      }
+      if (selectedUnitNum === 2) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Stating continuity & differentiability hypotheses before applying MVT</strong>, <strong>(2) Accurate successive derivatives for Maclaurin/Taylor series</strong>, <strong>(3) Exact radius of curvature formula substitution</strong>. Always box the value of c!</>
+        );
+      }
+      if (selectedUnitNum === 3) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Euler's theorem degree verification for homogeneous functions</strong>, <strong>(2) Cross-derivative equality ∂²u/∂x∂y = ∂²u/∂y∂x</strong>, <strong>(3) Vector curl & divergence notation with unit vectors î, ĵ, k̂</strong>. Always state conditions for solenoidal (div F = 0) and irrotational (curl F = 0) fields!</>
+        );
+      }
+      if (selectedUnitNum === 4) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Stating convergence test conditions (D'Alembert, Cauchy, Raabe's)</strong>, <strong>(2) Euler Fourier coefficient integrals (a₀, aₙ, bₙ)</strong>, <strong>(3) Symmetry checks (even/odd) to eliminate integrals</strong>. Always write the complete Fourier series summation!</>
+        );
+      }
+      return (
+        <>In semester exams, examiners check for: <strong>(1) Stating formula & theorem conditions first</strong>, <strong>(2) Step-by-step substitution & simplification</strong>, <strong>(3) Highlighting the final boxed answer</strong>. Always write intermediate simplification steps clearly!</>
+      );
+    }
+    if (isAIML) {
+      return (
+        <>In semester exams, examiners check for: <strong>(1) State space & node expansion trace tables</strong>, <strong>(2) Admissible heuristic definitions</strong>, <strong>(3) Pruning cut-offs clearly marked in game trees</strong>. Always show step-by-step resolution refutation clauses!</>
+      );
+    }
+    if (isC) {
+      return (
+        <>In semester exams, examiners check for: <strong>(1) Complete syntax including header files</strong>, <strong>(2) Pointer dereference safety & NULL checks</strong>, <strong>(3) Accurate memory layout diagrams (Stack/Heap)</strong>. Always declare variables before usage in ANSI C!</>
+      );
+    }
+    if (isWebTech) {
+      return (
+        <>In semester exams, examiners check for: <strong>(1) Clean semantic HTML5 structure</strong>, <strong>(2) Accurate CSS box-model diagrams</strong>, <strong>(3) JavaScript event listeners with proper syntax</strong>. Always explain the client-server request/response flow!</>
+      );
+    }
+    return (
+      <>In semester exams, examiners check for: <strong>(1) Circuit Schematics with labeled arrows</strong>, <strong>(2) Exact definitions</strong>, <strong>(3) Step-by-step mathematical steps with units</strong>. Always draw the equivalent circuit before writing equations!</>
+    );
+  };
+
   const activeSubject = isC
     ? cSubjectDetails
     : isWebTech
@@ -1452,7 +1508,7 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
                 <Sparkles size={16} /> 100% University Exam Aligned
               </div>
               <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                Covers DC/AC circuit proofs, Maximum Power Transfer derivation, transformer equivalent circuits, OC/SC tests, P-N junction diode rectifiers, BJT characteristics, and De Morgan's theorem proofs.
+                {activeExamAlignedBadge}
               </p>
             </div>
           </div>
@@ -1754,7 +1810,7 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
               fontSize: '0.9rem', 
               lineHeight: 1.6 
             }}>
-              In semester exams, examiners check for: <strong>(1) Circuit Schematics with labeled arrows</strong>, <strong>(2) Exact definitions</strong>, <strong>(3) Step-by-step mathematical steps with units</strong>. Always draw the equivalent circuit before writing equations!
+              {getTopperExamNote()}
             </p>
           </div>
 
