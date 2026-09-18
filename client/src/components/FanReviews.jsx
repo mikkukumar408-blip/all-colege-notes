@@ -30,6 +30,7 @@ import {
 import katex from 'katex';
 import { logUserActivity } from '../utils/activityTracker';
 import { getDeviceName } from '../utils/cloudSync';
+import { matchAcademicKB, generateAnalyticalSolution } from '../data/academicKnowledgeBase';
 
 function formatForumContent(text) {
   if (!text) return '';
@@ -205,12 +206,59 @@ export default function FanReviews({ currentUser }) {
       }
     } catch (err) {
       console.warn('Backend solver fallback invoked:', err.message);
-      const fallbackAnswer = `📌 **Core Concept & Principle**\nThis question in **${currentSubject}** covers standard university examination syllabus modules.\n\n📐 **Visual System Diagram**\n\`\`\`text\n   [Student Doubt] ---> [CampusNotes AI Engine] ---> [Verified]\n\`\`\`\n\n⚡ **Step-by-Step Guidance**\nFor rigorous numerical steps, refer to the corresponding subject unit notes in the **Semester Notes & Lab Manuals** tabs.\n\n💡 **University Exam Topper Tip**\nAlways draw standard schematics and write the general governing formula first to secure partial marking.`;
+
+      let fallbackAnswer = null;
+      let usedModel = 'campusnotes-curriculum-kb';
+
+      // 1. Direct browser query to free AI inference
+      try {
+        const clientRes = await fetch('https://text.pollinations.ai/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [
+              { 
+                role: 'system', 
+                content: 'You are CampusNotes Elite AI Academic Tutor. Solve university engineering questions with 100% mathematical precision. Mandatory 4-part format: Core Concept & Principle, Visual System Diagram inside ```text```, Step-by-Step Solution with authentic KaTeX ($...$ or $$...$$), and University Exam Topper Tip.' 
+              },
+              { 
+                role: 'user', 
+                content: `[STUDENT QUESTION DETAILS]\nSubject: ${currentSubject}\nQuestion: ${currentQuestion}\n\nPlease provide an exam-grade solution following the mandatory 4-part format.` 
+              }
+            ],
+            model: 'openai',
+            seed: 42
+          })
+        });
+
+        if (clientRes.ok) {
+          const text = await clientRes.text();
+          if (text && text.trim().length > 60 && !text.includes('<!DOCTYPE html>')) {
+            fallbackAnswer = text.trim();
+            usedModel = 'pollinations/openai-direct';
+          }
+        }
+      } catch (clientErr) {
+        console.warn('Direct AI query failed, switching to offline theorem database:', clientErr);
+      }
+
+      // 2. Offline Curriculum Theorem Knowledge Base
+      if (!fallbackAnswer) {
+        const kbMatch = matchAcademicKB(currentQuestion, currentSubject);
+        if (kbMatch) {
+          fallbackAnswer = kbMatch.content;
+          usedModel = 'campusnotes-curriculum-kb';
+        } else {
+          fallbackAnswer = generateAnalyticalSolution(currentSubject, currentQuestion);
+          usedModel = 'campusnotes-analytical-synthesizer';
+        }
+      }
       
       setDoubts(prev => prev.map(d => d.id === tempId ? {
         ...d,
         isAiLoading: false,
-        bestAnswer: fallbackAnswer
+        bestAnswer: fallbackAnswer,
+        aiModel: usedModel
       } : d));
 
       try {
@@ -220,8 +268,8 @@ export default function FanReviews({ currentUser }) {
           currentSubject,
           currentQuestion,
           {
-            solutionSnippet: 'Standard curriculum guidance provided',
-            model: 'curriculum-fallback',
+            solutionSnippet: fallbackAnswer.slice(0, 300),
+            model: usedModel,
             device: currentDevice
           }
         );

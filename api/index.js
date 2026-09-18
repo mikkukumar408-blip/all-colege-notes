@@ -209,32 +209,73 @@ Your primary duty is to solve college engineering doubts immediately with 100% m
    - Highly authoritative, crisp, and encouraging.
    - No robotic conversational fillers. Jump straight into the structured solution.`;
 
-async function callAcademicAI(subject, question) {
-  const modelsToTry = [
-    'openai/gpt-oss-120b',
-    'qwen/qwen3.8-27b',
-    'openai/gpt-oss-20b'
-  ];
+const { matchAcademicKB, generateAnalyticalSolution } = require('./academicKnowledgeBase');
 
-  for (const model of modelsToTry) {
+async function callAcademicAI(subject, question) {
+  // 1. TIER 1: GROQ CLOUD INFERENCE (If GROQ_API_KEY is configured in env)
+  if (GROQ_API_KEY && GROQ_API_KEY.startsWith('gsk_')) {
+    const groqModels = [
+      'llama-3.3-70b-versatile',
+      'llama-3.1-8b-instant',
+      'deepseek-r1-distill-llama-70b',
+      'gemma2-9b-it'
+    ];
+
+    for (const model of groqModels) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 9000);
+
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${GROQ_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: 'system', content: ACADEMIC_TUTOR_SYSTEM_PROMPT },
+              { role: 'user', content: `[STUDENT QUESTION DETAILS]\nSubject: ${subject}\nQuestion: ${question}\n\nPlease provide an exam-grade solution following the mandatory 4-part format (Core Concept, Visual Diagram, Step-by-Step Solution with KaTeX, and Exam Tip).` }
+            ],
+            max_tokens: 2500,
+            temperature: 0.1
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeout);
+
+        if (response.ok) {
+          const json = await response.json();
+          const content = json.choices?.[0]?.message?.content;
+          if (content && content.trim().length > 50) {
+            return { content: content.trim(), model: `groq/${model}` };
+          }
+        }
+      } catch (err) {
+        console.warn(`Groq model ${model} attempt failed:`, err.message);
+      }
+    }
+  }
+
+  // 2. TIER 2: HIGH-INTELLIGENCE FREE CLOUD INFERENCE (Pollinations AI - No Key Needed)
+  const pollModels = ['openai', 'mistral', 'qwen-coder'];
+  for (const model of pollModels) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 14000);
+      const timeout = setTimeout(() => controller.abort(), 11000);
 
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetch('https://text.pollinations.ai/', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${GROQ_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model,
           messages: [
             { role: 'system', content: ACADEMIC_TUTOR_SYSTEM_PROMPT },
             { role: 'user', content: `[STUDENT QUESTION DETAILS]\nSubject: ${subject}\nQuestion: ${question}\n\nPlease provide an exam-grade solution following the mandatory 4-part format (Core Concept, Visual Diagram, Step-by-Step Solution with KaTeX, and Exam Tip).` }
           ],
-          max_tokens: 2500,
-          temperature: 0.1
+          model,
+          seed: 42
         }),
         signal: controller.signal
       });
@@ -242,20 +283,29 @@ async function callAcademicAI(subject, question) {
       clearTimeout(timeout);
 
       if (response.ok) {
-        const json = await response.json();
-        const content = json.choices?.[0]?.message?.content;
-        if (content && content.trim().length > 30) {
-          return { content: content.trim(), model };
+        const text = await response.text();
+        if (text && text.trim().length > 60 && !text.includes('<!DOCTYPE html>')) {
+          return { content: text.trim(), model: `pollinations/${model}` };
         }
       }
     } catch (err) {
-      console.warn(`Model ${model} attempt failed:`, err.message);
+      console.warn(`Pollinations ${model} attempt failed:`, err.message);
     }
   }
 
+  // 3. TIER 3: CURRICULUM THEOREM KNOWLEDGE BASE (Guaranteed Instant Offline Resolution)
+  const kbMatch = matchAcademicKB(question, subject);
+  if (kbMatch) {
+    return {
+      content: kbMatch.content,
+      model: 'campusnotes-curriculum-kb'
+    };
+  }
+
+  // 4. TIER 4: STRUCTURED ANALYTICAL SYNTHESIZER (Always Pedagogical & Exam-Ready)
   return {
-    content: `📌 **Core Concept & Principle**\nThis question in **${subject}** involves fundamental university curriculum concepts and standard analytical derivation.\n\n📐 **Visual System Diagram**\n\`\`\`text\n   [Input Query] ---> [Curriculum Engine] ---> [Solution Verified]\n\`\`\`\n\n⚡ **Step-by-Step Solution / Derivation**\nReview the core textbook references and semester lecture modules for **${subject}**.\n\n💡 **University Exam Topper Tip**\nAlways state standard assumptions and write the general governing formula first to lock in partial marking.`,
-    model: 'offline-fallback'
+    content: generateAnalyticalSolution(subject, question),
+    model: 'campusnotes-analytical-synthesizer'
   };
 }
 
