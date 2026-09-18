@@ -25,7 +25,8 @@ import {
   Terminal,
   Cpu,
   Layers,
-  Zap
+  Zap,
+  Presentation
 } from 'lucide-react';
 import katex from 'katex';
 import { logUserActivity } from '../utils/activityTracker';
@@ -40,16 +41,32 @@ function formatForumContent(text) {
     return `<pre style="background: rgba(0, 0, 0, 0.75); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 8px; padding: 12px; font-family: 'Courier New', Courier, monospace; font-size: 0.82rem; line-height: 1.35; color: #00f0ff; overflow-x: auto; white-space: pre; margin: 10px 0;">${code.trim()}</pre>`;
   });
 
-  // 2. Process block display equations $$...$$
+  // 2. Process block display equations $$...$$ and \[...\]
   processed = processed.replace(/\$\$([^\$]+)\$\$/g, (_, math) => {
     try {
       return katex.renderToString(math.trim(), { throwOnError: false, displayMode: true, strict: false });
     } catch {
-      return `<div style="overflow-x: auto; font-family: monospace; color: #00f0ff;">${math}</div>`;
+      return `<div style="overflow-x: auto; font-family: monospace; color: #00f0ff; margin: 8px 0;">${math}</div>`;
     }
   });
 
-  // 3. Process inline equations $...$
+  processed = processed.replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => {
+    try {
+      return katex.renderToString(math.trim(), { throwOnError: false, displayMode: true, strict: false });
+    } catch {
+      return `<div style="overflow-x: auto; font-family: monospace; color: #00f0ff; margin: 8px 0;">${math}</div>`;
+    }
+  });
+
+  // 3. Process inline equations $...$ and \(...\)
+  processed = processed.replace(/\\\(([\s\S]*?)\\\)/g, (_, math) => {
+    try {
+      return katex.renderToString(math.trim(), { throwOnError: false, displayMode: false, strict: false });
+    } catch {
+      return math;
+    }
+  });
+
   processed = processed.replace(/\$([^\$]+)\$/g, (_, math) => {
     try {
       return katex.renderToString(math.trim(), { throwOnError: false, displayMode: false, strict: false });
@@ -685,26 +702,53 @@ export default function FanReviews({ currentUser }) {
                     </div>
 
                     {!d.isAiLoading && (
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(d.id, d.bestAnswer)}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          color: copiedId === d.id ? 'var(--neon-green)' : 'var(--text-dim)',
-                          cursor: 'pointer',
-                          fontSize: '0.74rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          padding: '4px 8px',
-                          borderRadius: '6px'
-                        }}
-                        title="Copy complete solution"
-                      >
-                        {copiedId === d.id ? <Check size={13} /> : <Copy size={13} />}
-                        <span>{copiedId === d.id ? 'Copied!' : 'Copy Solution'}</span>
-                      </button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            window.dispatchEvent(new CustomEvent('open-deepsearch', { detail: { query: d.question } }));
+                          }}
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(112, 0, 255, 0.15))',
+                            border: '1px solid rgba(0, 240, 255, 0.35)',
+                            color: 'var(--neon-cyan)',
+                            cursor: 'pointer',
+                            fontSize: '0.74rem',
+                            fontWeight: 700,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            transition: 'all 0.15s'
+                          }}
+                          title="Open in Interactive 16:9 Presentation Slides mode"
+                        >
+                          <Presentation size={13} />
+                          <span>16:9 Slides</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(d.id, d.bestAnswer)}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            color: copiedId === d.id ? 'var(--neon-green)' : 'var(--text-dim)',
+                            cursor: 'pointer',
+                            fontSize: '0.74rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            padding: '4px 8px',
+                            borderRadius: '6px'
+                          }}
+                          title="Copy complete solution"
+                        >
+                          {copiedId === d.id ? <Check size={13} /> : <Copy size={13} />}
+                          <span>{copiedId === d.id ? 'Copied!' : 'Copy Solution'}</span>
+                        </button>
+                      </div>
                     )}
                   </div>
 

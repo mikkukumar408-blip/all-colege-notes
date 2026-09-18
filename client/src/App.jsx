@@ -19,7 +19,8 @@ import FanReviews from './components/FanReviews';
 import SecurityShield from './components/SecurityShield';
 import AuthPage from './components/AuthPage';
 import SuperAdminPanel from './components/SuperAdminPanel';
-import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut } from 'lucide-react';
+import DeepSearchModal from './components/DeepSearchModal';
+import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot } from 'lucide-react';
 import { logSecurityEvent } from './utils/security';
 import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers } from './utils/cloudSync';
 import './App.css';
@@ -101,6 +102,35 @@ export default function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isUnitsCollapsed, setIsUnitsCollapsed] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState(null);
+
+  // AI DeepSearch Assistant & 16:9 Presentation Slides State
+  const [deepSearchOpen, setDeepSearchOpen] = useState(false);
+  const [deepSearchInitialQuery, setDeepSearchInitialQuery] = useState('');
+
+  // Global Hotkey Listener: Alt + Space or Ctrl + K for DeepSearch Ecosystem HUD
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if ((e.altKey && e.code === 'Space') || (e.ctrlKey && e.key.toLowerCase() === 'k')) {
+        e.preventDefault();
+        setDeepSearchOpen(prev => !prev);
+      }
+    };
+
+    const handleOpenDeepSearchEvent = (e) => {
+      if (e.detail?.query) {
+        setDeepSearchInitialQuery(e.detail.query);
+      }
+      setDeepSearchOpen(true);
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    window.addEventListener('open-deepsearch', handleOpenDeepSearchEvent);
+
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+      window.removeEventListener('open-deepsearch', handleOpenDeepSearchEvent);
+    };
+  }, []);
 
   /* -----------------------------------------------------------------------
      2. CROSS-SECTION ACTION HANDLERS
@@ -313,6 +343,31 @@ export default function App() {
 
             <button 
               className="btn-secondary" 
+              style={{ 
+                padding: '6px 14px', 
+                fontSize: '0.82rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '6px', 
+                borderColor: 'rgba(0, 240, 255, 0.45)', 
+                color: 'var(--neon-cyan)', 
+                background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.12), rgba(112, 0, 255, 0.12))', 
+                cursor: 'pointer',
+                boxShadow: '0 0 12px rgba(0, 240, 255, 0.2)'
+              }}
+              onClick={() => {
+                setDeepSearchInitialQuery('');
+                setDeepSearchOpen(true);
+              }}
+              title="AI DeepSearch & 16:9 Presentation Slides (Alt + Space)"
+            >
+              <Sparkles size={14} color="var(--neon-cyan)" />
+              <span style={{ fontWeight: 800 }}>DeepSearch</span>
+              <span style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+Space</span>
+            </button>
+
+            <button 
+              className="btn-secondary" 
               style={{ padding: '6px 14px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px', borderColor: 'rgba(255, 75, 75, 0.4)', color: '#ff6b6b', background: 'rgba(255, 75, 75, 0.08)', cursor: 'pointer' }}
               onClick={() => {
                 if (currentUser && currentUser.username) {
@@ -344,6 +399,55 @@ export default function App() {
           {renderActiveSection()}
         </main>
       </div>
+
+      {/* Floating AI Assistant Robot Widget (Bottom Right) */}
+      <button
+        onClick={() => {
+          setDeepSearchInitialQuery('');
+          setDeepSearchOpen(true);
+        }}
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 9999,
+          width: '54px',
+          height: '54px',
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #00f0ff 0%, #7000ff 100%)',
+          border: '2px solid rgba(255, 255, 255, 0.4)',
+          boxShadow: '0 0 25px rgba(0, 240, 255, 0.6), 0 8px 24px rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          animation: 'pulse 2.5s infinite'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1) translateY(-2px)'}
+        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        title="CampusNotes AI Assistant • DeepSearch & 16:9 Slides (Alt + Space)"
+      >
+        <Bot size={28} color="#040711" />
+        <span style={{
+          position: 'absolute',
+          top: '-2px',
+          right: '-2px',
+          width: '12px',
+          height: '12px',
+          borderRadius: '50%',
+          background: '#10b981',
+          border: '2px solid #070a13',
+          boxShadow: '0 0 8px #10b981'
+        }} />
+      </button>
+
+      {/* Global AI DeepSearch & 16:9 Presentation Slides Modal */}
+      <DeepSearchModal 
+        isOpen={deepSearchOpen} 
+        onClose={() => setDeepSearchOpen(false)} 
+        initialQuery={deepSearchInitialQuery} 
+      />
     </div>
   );
 }
