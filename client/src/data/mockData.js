@@ -174,6 +174,44 @@ export const initialSubjects = [
       { num: 4, title: 'Crystal Structures & Free Electron Theory', pages: 32, status: 'Verified' }
     ]
   },
+  {
+    id: 'sub-py',
+    semester: 2,
+    year: '1st Year',
+    name: 'Python Programming',
+    code: 'BCSE-004',
+    credits: 2,
+    instructor: 'Department of Computer Science & Engineering (MMDU)',
+    notesCount: '4 Units Complete Long Notes & Solved Papers',
+    rating: 5.0,
+    description: 'Official MMDU syllabus (BCSE-004): Python programming foundations, CPython compilation & PVM execution pipeline, variable reference model, 9-tier operator precedence, branching & looping (break/continue/pass/for-else), functions & LEGB scope, Lists, Tuples, Dictionaries (hash table internals), File Handling (modes, context managers), and Object-Oriented Programming (Classes, Dunder methods, Operator Overloading, MRO, Polymorphism, Composition).',
+    banner: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
+    units: [
+      { num: 1, title: 'Introduction to Programming and Python', pages: 32, status: 'Verified' },
+      { num: 2, title: 'Decision Making, Branching & Functions', pages: 28, status: 'Verified' },
+      { num: 3, title: 'Data Types in Python (Lists, Tuples, Dictionaries)', pages: 34, status: 'Verified' },
+      { num: 4, title: 'File Handling & Object-Oriented Programming (OOP)', pages: 36, status: 'Verified' }
+    ]
+  },
+  {
+    id: 'sub-dsa-bcse007',
+    semester: 2,
+    year: '1st Year',
+    name: 'Data Structure',
+    code: 'BCSE-007',
+    credits: 3,
+    instructor: 'Department of Computer Science & Engineering (MMDU)',
+    notesCount: '4 Units Complete Master Notes & Solved Papers',
+    rating: 5.0,
+    description: 'Official MMDU syllabus (BCSE-007): Mathematical notation, asymptotic bounds, 1D/2D/3D array addressing, sparse matrices, Bubble/Selection/Insertion/Merge/Quick/Heap sorting, Linear/Binary searching, Stacks (LIFO), Infix-Postfix-Prefix conversion & evaluation, recursion & Tower of Hanoi, Linear/Circular/Deque/Priority Queues, Singly/Doubly/Circular Linked Lists, Binary Trees, BST traversals & deletion cases, Graph representations (Adjacency Matrix/List), and BFS/DFS graph traversals.',
+    banner: 'https://images.unsplash.com/photo-1516116211227-bbc13c73335c?auto=format&fit=crop&w=800&q=80',
+    units: [
+      { num: 1, title: 'Foundations, Arrays, Searching & Sorting', pages: 3, status: 'Verified' },
+      { num: 2, title: 'Stacks, Expressions & Recursion (Tower of Hanoi)', pages: 3, status: 'Verified' },
+      { num: 3, title: 'Queues & Linked Lists Topologies', pages: 3, status: 'Verified' },
+      { num: 4, title: 'Trees, BST & Graph Algorithms (BFS/DFS)', pages: 3, status: 'Verified' }
+    ]
+  },
 
   // ==================== SEMESTER 3 ====================
   {
@@ -467,6 +505,44 @@ export const initialShortNotes = [
       'Maxwell\'s 4 Equations, Displacement Current & Skin Depth',
       '1D Infinite Box Wavefunctions & Nuclear Electron Uncertainty Proof',
       'Cubic Crystal Geometries: SC (52%), BCC (68%), FCC (74%) APF Derivations'
+    ]
+  },
+  {
+    id: 'sn-python',
+    subject: 'Python Programming (BCSE-004)',
+    code: 'BCSE-004',
+    semester: 'Semester 2',
+    category: 'Computer Science',
+    type: 'Flowchart Architecture, 9-Tier Precedence, Hash Tables & C3 MRO Sheet',
+    pdfUrl: '/Python_Programming_Exam_Revision_Sheet.pdf',
+    downloadName: 'Python Programming Exam Revision Sheet.pdf',
+    fileSize: '190 KB',
+    pages: '2 Pages High-Yield Revision',
+    downloads: 5120,
+    highlights: [
+      'CPython Compiler & PVM Execution Pipeline with Object Reference Model',
+      '9-Tier Operator Precedence Matrix & Flowchart Decision Trees',
+      'List vs Tuple vs Dictionary Hash Table Internals & Shallow vs Deep Copy',
+      'Context Manager Protocol (__enter__/__exit__) & C3 Linearization MRO'
+    ]
+  },
+  {
+    id: 'sn-dsa-bcse007',
+    subject: 'Data Structure (BCSE-007)',
+    code: 'BCSE-007',
+    semester: 'Semester 2',
+    category: 'Computer Science',
+    type: 'Flowchart Architecture, Array Addressing, BST Deletion & BFS/DFS Sheet',
+    pdfUrl: '/Data_Structures_Exam_Revision_Sheet.pdf',
+    downloadName: 'Data Structures Exam Revision Sheet.pdf',
+    fileSize: '160 KB',
+    pages: '2 Pages High-Yield Revision',
+    downloads: 5890,
+    highlights: [
+      'Asymptotic Notations (O, Ω, Θ) & 1D/2D/3D Array Memory Addressing Formulas',
+      'Master Sorting & Searching Matrix (Time/Space/Stability comparison)',
+      'Stack LIFO, Shunting-Yard Infix-Postfix, Postfix Eval & Tower of Hanoi Recurrence',
+      'Circular Queue Modulo Math, SLL/DLL Pointer Rewiring, BST 3-Case Deletion & BFS/DFS'
     ]
   },
 

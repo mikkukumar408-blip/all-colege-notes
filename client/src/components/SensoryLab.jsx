@@ -38,6 +38,8 @@ import { math1UnitsData, math1SubjectDetails } from '../data/math1NotesData';
 import { webTechUnitsData, webTechSubjectDetails } from '../data/webTechNotesData';
 import { cUnitsData, cSubjectDetails } from '../data/cNotesData';
 import { physicsUnitsData, physicsSubjectDetails } from '../data/physicsNotesData';
+import { pythonUnitsData, pythonSubjectDetails } from '../data/pythonNotesData';
+import { dsaUnitsData, dsaSubjectDetails } from '../data/dsaNotesData';
 import HandwrittenDiagram from './HandwrittenDiagram';
 import InteractiveTheveninLab from './InteractiveTheveninLab';
 import { ForensicWatermark } from './SecurityShield';
@@ -608,7 +610,7 @@ function formatNoteContent(content) {
   return html;
 }
 
-const ALLOWED_SUBJECT_IDS = ['sub-beee', 'sub-aiml', 'sub-m1', 'sub-c1', 'sub-webtech', 'sub-p1', 'sub-physics'];
+const ALLOWED_SUBJECT_IDS = ['sub-beee', 'sub-aiml', 'sub-m1', 'sub-c1', 'sub-webtech', 'sub-p1', 'sub-physics', 'sub-py', 'sub-python'];
 export const isSensorySubjectAllowed = (id) => ALLOWED_SUBJECT_IDS.includes(id);
 
 export default function SensoryLab({ 
@@ -617,15 +619,16 @@ export default function SensoryLab({
   isUnitsCollapsed: controlledIsUnitsCollapsed, 
   setIsUnitsCollapsed: controlledSetIsUnitsCollapsed 
 }) {
-  // Combine Physics, C, Web Tech, BEEE, AIML, and Math 1 with other subjects
+  // Combine Physics, Python, C, Web Tech, BEEE, AIML, and Math 1 with other subjects
   const allSubjects = [
     physicsSubjectDetails,
+    pythonSubjectDetails,
     cSubjectDetails,
     webTechSubjectDetails,
     beeeSubjectDetails,
     aimlSubjectDetails,
     math1SubjectDetails,
-    ...initialSubjects.filter(s => s.id !== 'sub-p1' && s.id !== 'sub-physics' && s.id !== 'sub-c1' && s.id !== 'sub-webtech' && s.id !== 'sub-beee' && s.id !== 'sub-aiml' && s.id !== 'sub-m1' && s.id !== 'sub-math1')
+    ...initialSubjects.filter(s => s.id !== 'sub-p1' && s.id !== 'sub-physics' && s.id !== 'sub-py' && s.id !== 'sub-python' && s.id !== 'sub-c1' && s.id !== 'sub-webtech' && s.id !== 'sub-beee' && s.id !== 'sub-aiml' && s.id !== 'sub-m1' && s.id !== 'sub-math1')
   ];
   
   const [currentSubjectId, setCurrentSubjectId] = useState(() => {
@@ -688,6 +691,8 @@ export default function SensoryLab({
   }, [currentSubjectId, selectedUnitNum, themeMode]);
 
   // Active Subject & Active Unit Data
+  const isDSA = currentSubjectId === 'sub-dsa' || currentSubjectId === 'sub-dsa-bcse007' || currentSubjectId === 'BCSE-007' || currentSubjectId === 'CS301' || currentSubjectId === 'sub-bcse007';
+  const isPython = currentSubjectId === 'sub-py' || currentSubjectId === 'BCSE-004' || currentSubjectId === 'sub-python';
   const isPhysics = currentSubjectId === 'sub-p1' || currentSubjectId === 'PHYS102' || currentSubjectId === 'BPHY-001' || currentSubjectId === 'sub-physics';
   const isC = currentSubjectId === 'sub-c1' || currentSubjectId === 'BCSE-008' || currentSubjectId === 'CS102' || currentSubjectId === 'sub-c';
   const isAIML = currentSubjectId === 'sub-aiml' || currentSubjectId === 'BCSE-011';
@@ -695,66 +700,86 @@ export default function SensoryLab({
   const isMath1 = currentSubjectId === 'sub-m1' || currentSubjectId === 'sub-math1' || currentSubjectId === 'BMAT-001' || currentSubjectId === 'MATH101';
   const isWebTech = currentSubjectId === 'sub-webtech' || currentSubjectId === 'BCSE-012' || currentSubjectId === 'sub-web';
 
-  const activePdfUrl = isPhysics
-    ? "/Applied_Physics_Master_Notes.pdf"
-    : isWebTech
-      ? "/BCSE012_Fundamental_of_Web_Technologies_Long_Notes.pdf"
-      : isC
-        ? "/BCSE008_Computational_and_Problem_Solving_using_C_notes.pdf"
-        : isAIML
-          ? "/AIML_notes_handwritten.pdf"
-          : isMath1
-            ? "/BMAT001_Mathematics_I_MMU_Handwritten_Notes.pdf"
-            : isBEEE
-              ? "/BEEE_notes.pdf"
-              : null;
+  const activePdfUrl = isDSA
+    ? "/Data_Structures_Master_Notes.pdf"
+    : isPython
+      ? "/Python_Programming_Master_Notes.pdf"
+      : isPhysics
+        ? "/Applied_Physics_Master_Notes.pdf"
+        : isWebTech
+          ? "/BCSE012_Fundamental_of_Web_Technologies_Long_Notes.pdf"
+          : isC
+            ? "/BCSE008_Computational_and_Problem_Solving_using_C_notes.pdf"
+            : isAIML
+              ? "/AIML_notes_handwritten.pdf"
+              : isMath1
+                ? "/BMAT001_Mathematics_I_MMU_Handwritten_Notes.pdf"
+                : isBEEE
+                  ? "/BEEE_notes.pdf"
+                  : null;
 
-  const activePdfDownloadName = isPhysics
-    ? "Applied Physics Master Notes.pdf"
-    : isWebTech
-      ? "Fundamental of Web Technologies notes.pdf"
-      : isC
-        ? "Computational and Problem Solving using C notes.pdf"
-        : isAIML
-          ? "AIML notes.pdf"
-          : isMath1
-            ? "Mathematics 1 notes.pdf"
-            : isBEEE
-              ? "BEEE notes.pdf"
-              : "Long_Notes.pdf";
+  const activePdfDownloadName = isDSA
+    ? "Data Structures Master Notes.pdf"
+    : isPython
+      ? "Python Programming Master Notes.pdf"
+      : isPhysics
+        ? "Applied Physics Master Notes.pdf"
+        : isWebTech
+          ? "Fundamental of Web Technologies notes.pdf"
+          : isC
+            ? "Computational and Problem Solving using C notes.pdf"
+            : isAIML
+              ? "AIML notes.pdf"
+              : isMath1
+                ? "Mathematics 1 notes.pdf"
+                : isBEEE
+                  ? "BEEE notes.pdf"
+                  : "Long_Notes.pdf";
 
-  const activePdfPageBadge = isPhysics
-    ? "BPHY-001 • 12 Pages Long Notes"
-    : isWebTech
-      ? "BCSE-012 • 17 Pages Long Notes"
-      : isC
-        ? "BCSE-008 • 16 Pages Long Notes"
-        : isAIML
-          ? "BCSE-011 • 13 Pages Long Notes"
-          : isMath1
-            ? "BMAT-001 • 11 Pages Long Notes"
-            : isBEEE
-              ? "BELE-001 • 13 Pages Long Notes"
-              : "University Long Notes";
+  const activePdfPageBadge = isDSA
+    ? "BCSE-007 • 12 Pages Long Notes"
+    : isPython
+      ? "BCSE-004 • 12 Pages Long Notes"
+      : isPhysics
+        ? "BPHY-001 • 12 Pages Long Notes"
+        : isWebTech
+          ? "BCSE-012 • 17 Pages Long Notes"
+          : isC
+            ? "BCSE-008 • 16 Pages Long Notes"
+            : isAIML
+              ? "BCSE-011 • 13 Pages Long Notes"
+              : isMath1
+                ? "BMAT-001 • 11 Pages Long Notes"
+                : isBEEE
+                  ? "BELE-001 • 13 Pages Long Notes"
+                  : "University Long Notes";
 
-  const activePdfDescription = isPhysics
-    ? "Official MMDU syllabus long notes: Wave optics, Newton's rings derivations, Fraunhofer single-slit diffraction, lasers (Ruby & He-Ne 4-level system), Maxwell's equations, skin depth, Schrödinger wave mechanics, and crystal APF derivations."
-    : isWebTech
-      ? 'Official MMDU syllabus long notes: Internet vs WWW, DNS resolution, TCP/IP, HTML5 semantics, Canvas, and CSS box model with solved exam questions.'
-      : isC
-        ? 'Official MMDU syllabus long notes: Computational problem solving, 4-stage compilation pipeline, memory segmentation, DMA, pointers, and file I/O with solved exam questions.'
-        : isAIML
-          ? 'Official MMDU syllabus long notes: PEAS framework, A* search traces, CNF conversion, Resolution Refutation, Decision Trees, and Apriori with solved exam questions.'
-          : isMath1
-            ? 'Official MMDU syllabus long notes: Matrices, Gauss-Jordan, Curvature, Indeterminate forms, Beta-Gamma, and Fourier series with solved exam questions.'
-            : 'Official MMDU syllabus long notes: DC/AC circuits, KCL/KVL, Thevenin equivalent, Transformers, DC machines, BJT, and Boolean logic with solved exam questions.';
+  const activePdfDescription = isDSA
+    ? "Official MMDU syllabus master notes: Asymptotic notation (O, Ω, Θ), 1D/2D/3D array memory addressing, sparse matrix triplet COO representation, complete sorting suite (Bubble/Selection/Insertion/Merge/Quick/Heap/Radix), Linear/Binary searching, Stacks (LIFO), Infix-Postfix-Prefix conversion & evaluation, recursion & Tower of Hanoi, Linear/Circular/Deque/Priority Queues, Singly/Doubly/Circular Linked Lists, Binary Trees, BST traversals & deletion cases, Graph representations (Adjacency Matrix/List), and BFS/DFS graph traversals."
+    : isPython
+      ? "Official MMDU syllabus long notes: CPython compilation pipeline & PVM architecture, object reference memory model, 9-tier operator precedence, branching & looping (break/continue/pass/for-else), functions & LEGB scope, Lists, Tuples, Dictionaries (hash table internals), File Handling (modes, context managers), and Object-Oriented Programming (Classes, Dunder methods, Operator Overloading, MRO, Polymorphism, Composition)."
+      : isPhysics
+        ? "Official MMDU syllabus long notes: Wave optics, Newton's rings derivations, Fraunhofer single-slit diffraction, lasers (Ruby & He-Ne 4-level system), Maxwell's equations, skin depth, Schrödinger wave mechanics, and crystal APF derivations."
+        : isWebTech
+          ? 'Official MMDU syllabus long notes: Internet vs WWW, DNS resolution, TCP/IP, HTML5 semantics, Canvas, and CSS box model with solved exam questions.'
+          : isC
+            ? 'Official MMDU syllabus long notes: Computational problem solving, 4-stage compilation pipeline, memory segmentation, DMA, pointers, and file I/O with solved exam questions.'
+            : isAIML
+              ? 'Official MMDU syllabus long notes: PEAS framework, A* search traces, CNF conversion, Resolution Refutation, Decision Trees, and Apriori with solved exam questions.'
+              : isMath1
+                ? 'Official MMDU syllabus long notes: Matrices, Gauss-Jordan, Curvature, Indeterminate forms, Beta-Gamma, and Fourier series with solved exam questions.'
+                : 'Official MMDU syllabus long notes: DC/AC circuits, KCL/KVL, Thevenin equivalent, Transformers, DC machines, BJT, and Boolean logic with solved exam questions.';
 
-  const activeExamAlignedBadge = isPhysics
-    ? "Covers Newton's rings derivations, single-slit phasor intensity, He-Ne 4-level resonant pumping, Maxwell curl equations, skin depth in conductors, 1D infinite well quantization, and SC/BCC/FCC APF calculations."
-    : isWebTech
-      ? "Covers HTTP/HTTPS request-response cycles, DNS resolution hierarchy, semantic HTML5, CSS Flexbox/Grid box model, JavaScript DOM manipulation, and AJAX/Fetch."
-      : isC
-        ? "Covers 4-stage compilation pipeline, memory segmentation (Stack/Heap/BSS), pointers & dynamic memory (malloc/calloc/free), struct alignment, and file I/O operations."
+  const activeExamAlignedBadge = isDSA
+    ? "Covers Big-O/Omega/Theta proofs, 1D/2D/3D address calculations, Lomuto/Hoare Quick Sort partitioning, Tower of Hanoi recurrence T(n)=2T(n-1)+1, circular queue modulo arithmetic, SLL/DLL pointer rewiring, BST 3-case deletion with inorder successor, and BFS/DFS graph traversals."
+    : isPython
+      ? "Covers CPython vs PVM bytecode compilation, 9-tier operator precedence, for-else & break/continue loop flows, LEGB scope resolution, list shallow vs deep copies, dictionary hash table bucket chaining, file context managers (with statement), and C3 linearization MRO."
+    : isPhysics
+      ? "Covers Newton's rings derivations, single-slit phasor intensity, He-Ne 4-level resonant pumping, Maxwell curl equations, skin depth in conductors, 1D infinite well quantization, and SC/BCC/FCC APF calculations."
+      : isWebTech
+        ? "Covers HTTP/HTTPS request-response cycles, DNS resolution hierarchy, semantic HTML5, CSS Flexbox/Grid box model, JavaScript DOM manipulation, and AJAX/Fetch."
+        : isC
+          ? "Covers 4-stage compilation pipeline, memory segmentation (Stack/Heap/BSS), pointers & dynamic memory (malloc/calloc/free), struct alignment, and file I/O operations."
         : isAIML
           ? "Covers PEAS agent classification, BFS/DFS, A* heuristic proofs, Minimax & Alpha-Beta pruning, Propositional logic & resolution refutation, Supervised vs Unsupervised ML, and Bias-Variance tradeoff."
           : isMath1
@@ -822,6 +847,56 @@ export default function SensoryLab({
         <>In semester exams, examiners check for: <strong>(1) Step-by-step physical derivations</strong>, <strong>(2) Accurate ray/energy schematics</strong>, <strong>(3) Boxed final mathematical expressions</strong>. Always write definitions before deriving equations!</>
       );
     }
+    if (isDSA) {
+      if (selectedUnitNum === 1) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Formal limit definitions for O, &Omega;, &Theta;</strong>, <strong>(2) Exact 2D Row-Major vs Col-Major address formula derivation</strong>, <strong>(3) Step-by-step trace of Quick/Merge Sort partitions</strong>. Always specify Base Address B and element size W in array formulas!</>
+        );
+      }
+      if (selectedUnitNum === 2) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Stack overflow and underflow boundary conditions</strong>, <strong>(2) Infix to Postfix conversion table with operator stack states</strong>, <strong>(3) Tower of Hanoi 3-step recursive induction and 2ⁿ - 1 moves proof</strong>. Remember the first popped item is operand 2 during postfix evaluation!</>
+        );
+      }
+      if (selectedUnitNum === 3) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Circular Queue full condition: (rear + 1) % MAX == front</strong>, <strong>(2) Singly Linked List pointer rewiring: newNode-&gt;next = head; head = newNode;</strong>, <strong>(3) Difference between Linear Queue false overflow and Circular Queue</strong>. Always free allocated heap memory with free()!</>
+        );
+      }
+      if (selectedUnitNum === 4) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) BST Inorder traversal producing strictly sorted keys</strong>, <strong>(2) BST deletion Case 3: Inorder Successor replacement</strong>, <strong>(3) BFS Queue vs DFS Stack traversal trace tables</strong>. Always state time complexity as O(V + E) for adjacency lists!</>
+        );
+      }
+      return (
+        <>In semester exams, examiners check for: <strong>(1) Complete algorithm step-by-step logic</strong>, <strong>(2) Memory pointer diagrams</strong>, <strong>(3) Big-O Time &amp; Space complexity derivations</strong>. Always handle edge cases like empty structures!</>
+      );
+    }
+    if (isPython) {
+      if (selectedUnitNum === 1) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) CPython compilation pipeline (Source code &rarr; Bytecode (.pyc) &rarr; PVM)</strong>, <strong>(2) Reference model diagrams (variables point to heap objects)</strong>, <strong>(3) Operator precedence hierarchy</strong>. Always highlight that everything in Python is an object!</>
+        );
+      }
+      if (selectedUnitNum === 2) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) for-else loop termination conditions (else runs only on normal exit)</strong>, <strong>(2) *args (tuple) and **kwargs (dict) signatures</strong>, <strong>(3) LEGB scope resolution order (Local &rarr; Enclosing &rarr; Global &rarr; Built-in)</strong>. Always provide clean indentation!</>
+        );
+      }
+      if (selectedUnitNum === 3) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Shallow copy (copy.copy) vs Deep copy (copy.deepcopy) memory pointer diagrams</strong>, <strong>(2) Hash table open addressing vs bucket chaining for dicts</strong>, <strong>(3) Tuple immutability and the single-element comma rule (42,)</strong>. Always write list/dict comprehensions!</>
+        );
+      }
+      if (selectedUnitNum === 4) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Context manager protocol (__enter__ and __exit__ with exception suppression)</strong>, <strong>(2) C3 Linearization MRO merge algorithm calculation</strong>, <strong>(3) Dunder methods for operator overloading (__add__, __str__, __repr__)</strong>. Always illustrate class vs instance attribute namespaces!</>
+        );
+      }
+      return (
+        <>In semester exams, examiners check for: <strong>(1) Complete syntax and indentation</strong>, <strong>(2) Object-oriented memory layouts</strong>, <strong>(3) Standard library function usage</strong>. Always write clean Pythonic code!</>
+      );
+    }
     if (isWebTech) {
       return (
         <>In semester exams, examiners check for: <strong>(1) Clean semantic HTML5 structure</strong>, <strong>(2) Accurate CSS box-model diagrams</strong>, <strong>(3) JavaScript event listeners with proper syntax</strong>. Always explain the client-server request/response flow!</>
@@ -832,46 +907,58 @@ export default function SensoryLab({
     );
   };
 
-  const activeSubject = isPhysics
-    ? physicsSubjectDetails
-    : isC
-      ? cSubjectDetails
-      : isWebTech
-        ? webTechSubjectDetails
-        : isAIML 
-          ? aimlSubjectDetails 
-          : isBEEE 
-            ? beeeSubjectDetails 
-            : isMath1
-              ? math1SubjectDetails
-              : (allSubjects.find(s => s.id === currentSubjectId) || beeeSubjectDetails);
+  const activeSubject = isDSA
+    ? dsaSubjectDetails
+    : isPython
+      ? pythonSubjectDetails
+      : isPhysics
+        ? physicsSubjectDetails
+        : isC
+          ? cSubjectDetails
+          : isWebTech
+            ? webTechSubjectDetails
+            : isAIML 
+              ? aimlSubjectDetails 
+              : isBEEE 
+                ? beeeSubjectDetails 
+                : isMath1
+                  ? math1SubjectDetails
+                  : (allSubjects.find(s => s.id === currentSubjectId) || beeeSubjectDetails);
 
-  const unitsList = isPhysics
-    ? physicsUnitsData
-    : isC
-      ? cUnitsData
-      : isWebTech
-        ? webTechUnitsData
-        : isAIML 
-          ? aimlUnitsData 
-          : isBEEE 
-            ? beeeUnitsData 
-            : isMath1 
-              ? math1UnitsData 
-              : (activeSubject.units || []);
-  const beeeUnit = isPhysics
-    ? (physicsUnitsData.find(u => u.unitNum === selectedUnitNum) || physicsUnitsData[0])
-    : isC
-      ? (cUnitsData.find(u => u.unitNum === selectedUnitNum) || cUnitsData[0])
-      : isWebTech
-        ? (webTechUnitsData.find(u => u.unitNum === selectedUnitNum) || webTechUnitsData[0])
-        : isAIML 
-          ? (aimlUnitsData.find(u => u.unitNum === selectedUnitNum) || aimlUnitsData[0])
-          : isBEEE 
-            ? (beeeUnitsData.find(u => u.unitNum === selectedUnitNum) || beeeUnitsData[0])
-            : isMath1
-              ? (math1UnitsData.find(u => u.unitNum === selectedUnitNum) || math1UnitsData[0])
-              : (activeSubject.units?.find(u => (u.unitNum || u.num) === selectedUnitNum) || activeSubject.units?.[0] || {});
+  const unitsList = isDSA
+    ? dsaUnitsData
+    : isPython
+      ? pythonUnitsData
+      : isPhysics
+        ? physicsUnitsData
+        : isC
+          ? cUnitsData
+          : isWebTech
+            ? webTechUnitsData
+            : isAIML 
+              ? aimlUnitsData 
+              : isBEEE 
+                ? beeeUnitsData 
+                : isMath1 
+                  ? math1UnitsData 
+                  : (activeSubject.units || []);
+  const beeeUnit = isDSA
+    ? (dsaUnitsData.find(u => u.unitNum === selectedUnitNum) || dsaUnitsData[0])
+    : isPython
+      ? (pythonUnitsData.find(u => u.unitNum === selectedUnitNum) || pythonUnitsData[0])
+      : isPhysics
+        ? (physicsUnitsData.find(u => u.unitNum === selectedUnitNum) || physicsUnitsData[0])
+        : isC
+          ? (cUnitsData.find(u => u.unitNum === selectedUnitNum) || cUnitsData[0])
+          : isWebTech
+            ? (webTechUnitsData.find(u => u.unitNum === selectedUnitNum) || webTechUnitsData[0])
+            : isAIML 
+              ? (aimlUnitsData.find(u => u.unitNum === selectedUnitNum) || aimlUnitsData[0])
+              : isBEEE 
+                ? (beeeUnitsData.find(u => u.unitNum === selectedUnitNum) || beeeUnitsData[0])
+                : isMath1
+                  ? (math1UnitsData.find(u => u.unitNum === selectedUnitNum) || math1UnitsData[0])
+                  : (activeSubject.units?.find(u => (u.unitNum || u.num) === selectedUnitNum) || activeSubject.units?.[0] || {});
 
   const notesPanelRef = useRef(null);
   const [isPrinting, setIsPrinting] = useState(false);
@@ -1394,6 +1481,96 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
             >
               <Download size={16} /> Official Long Notes PDF (16 Pgs)
             </a>
+          )}
+
+          {isPython && (
+            <>
+              <a
+                href="/Python_Programming_Master_Notes.pdf"
+                download="Python Programming Master Notes.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-outline"
+                style={{
+                  borderColor: '#38bdf8',
+                  color: '#38bdf8',
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                title="Download Official BCSE-004 Comprehensive Master Notes PDF (12 Pages)"
+              >
+                <Download size={16} /> Master Notes PDF (12 Pgs)
+              </a>
+              <a
+                href="/Python_Programming_Exam_Revision_Sheet.pdf"
+                download="Python Programming Exam Revision Sheet.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-outline"
+                style={{
+                  borderColor: '#4ade80',
+                  color: '#4ade80',
+                  background: 'rgba(74, 222, 128, 0.12)',
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                title="Download Official BCSE-004 2-Page Flowchart Exam Revision Sheet"
+              >
+                <Download size={16} /> Exam Revision Sheet (2 Pgs)
+              </a>
+            </>
+          )}
+
+          {isDSA && (
+            <>
+              <a
+                href="/Data_Structures_Master_Notes.pdf"
+                download="Data Structures Master Notes.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-outline"
+                style={{
+                  borderColor: '#38bdf8',
+                  color: '#38bdf8',
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                title="Download Official BCSE-007 Comprehensive Master Notes PDF (12 Pages)"
+              >
+                <Download size={16} /> Master Notes PDF (12 Pgs)
+              </a>
+              <a
+                href="/Data_Structures_Exam_Revision_Sheet.pdf"
+                download="Data Structures Exam Revision Sheet.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-outline"
+                style={{
+                  borderColor: '#4ade80',
+                  color: '#4ade80',
+                  background: 'rgba(74, 222, 128, 0.12)',
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                title="Download Official BCSE-007 2-Page Flowchart Exam Revision Sheet"
+              >
+                <Download size={16} /> Exam Revision Sheet (2 Pgs)
+              </a>
+            </>
           )}
 
           <button 

@@ -109,6 +109,8 @@ function getAssistantResponse(query, subjects = []) {
   const mathSub = findSubject('sub-m1') || findSubject('BMAT-001');
   const aimlSub = findSubject('sub-aiml') || findSubject('BCSE-011');
   const webSub = findSubject('sub-webtech') || findSubject('BCSE-012');
+  const pythonSub = findSubject('sub-py') || findSubject('BCSE-004') || findSubject('sub-python');
+  const dsaSub = findSubject('sub-dsa-bcse007') || findSubject('BCSE-007') || findSubject('sub-dsa');
 
   // =========================================================================
   // 0. NATURAL CONVERSATIONAL GREETINGS & INTENTS
@@ -229,6 +231,234 @@ Covering:
       actions: [
         { label: '📖 Open Math Reader', type: 'reader', subject: mathSub },
         { label: '📥 Download Math PDF', type: 'navigate', tab: 'downloads-lab' }
+      ]
+    };
+  }
+
+  // Short single-subject trigger: "python"
+  if (cleanQ === 'python' || cleanQ === 'py' || cleanQ === 'bcse004' || cleanQ === 'bcse 004' || cleanQ === 'python programming') {
+    return {
+      text: `🐍 **Python Programming (BCSE-004)**
+Official MMDU B.Tech 2nd Semester Curriculum:
+• **Unit 1**: Introduction to Programming, CPython Architecture, PVM, Reference Model, Tokens, Indentation & 9-Tier Operators
+• **Unit 2**: Decision Making, Branching, Loops (\`for-else\`, \`break\`, \`continue\`), Functions, \`*args\`/\`**kwargs\`, LEGB Scope & Lambda
+• **Unit 3**: Data Structures (Lists, Tuples, Dictionaries), Shallow vs Deep Copy, Hash Table Buckets & Comprehensions
+• **Unit 4**: File Handling (9 modes, Context Managers \`with\`, \`seek\`/\`tell\`) & OOP (Classes, Dunder methods, Operator Overloading, MRO & C3 Linearization)`,
+      actions: [
+        { label: '📖 Open Python Reader', type: 'reader', subject: pythonSub },
+        { label: '📥 Download 12-Page Master Notes', type: 'download', url: '/Python_Programming_Master_Notes.pdf' },
+        { label: '⚡ 2-Page Flowchart Revision Sheet', type: 'download', url: '/Python_Programming_Exam_Revision_Sheet.pdf' }
+      ]
+    };
+  }
+
+  // Short single-subject trigger: "dsa" / "data structure"
+  if (cleanQ === 'dsa' || cleanQ === 'data structure' || cleanQ === 'data structures' || cleanQ === 'bcse007' || cleanQ === 'bcse 007') {
+    return {
+      text: `🌳 **Data Structure (BCSE-007)**
+Official MMDU B.Tech 2nd Semester Curriculum:
+• **Unit 1**: Asymptotic Notations (O, Ω, Θ), Order of Growth, 1D/2D/3D Array Memory Addressing, Sparse Matrix Triplet Representation, Searching (Linear, Binary) & Sorting (Bubble, Selection, Insertion, Merge, Quick, Heap, Radix)
+• **Unit 2**: Stack ADT (LIFO), Primitive Push/Pop/Peek Operations, Infix to Postfix/Prefix (Shunting-Yard), Postfix Evaluation, Recursion Activation Records & Tower of Hanoi (2ⁿ - 1 moves)
+• **Unit 3**: Queue ADT (FIFO), Linear Queue False Overflow, Circular Queue Modulo Arithmetic, Deque, Priority Queue & Linked Lists (Singly, Doubly, Circular, Header List) with Pointer Rewiring
+• **Unit 4**: Trees Terminology, Binary Trees Properties, Binary Search Trees (BST Search, Insert, 3-Case Deletion), Traversals (Inorder, Preorder, Postorder), Graph Representations (Matrix vs List) & BFS/DFS Traversals`,
+      actions: [
+        { label: '📖 Open Data Structure Reader', type: 'reader', subject: dsaSub },
+        { label: '📥 Download 12-Page Master Notes', type: 'download', url: '/Data_Structures_Master_Notes.pdf' },
+        { label: '⚡ 2-Page Flowchart Revision Sheet', type: 'download', url: '/Data_Structures_Exam_Revision_Sheet.pdf' }
+      ]
+    };
+  }
+
+  // DSA: Array Addressing & Sparse Matrices
+  if ((q.includes('array') && (q.includes('address') || q.includes('row major') || q.includes('column major') || q.includes('3d'))) || q.includes('sparse matrix')) {
+    return {
+      text: `📌 **Array Memory Addressing & Sparse Matrix Triplet Representation**
+
+⚡ **1D Array:**
+\`Loc(A[i]) = B + (i - L) * W\`
+
+⚡ **2D Array Row-Major Order (RMO):**
+\`Loc(A[i][j]) = B + [(i - L1) * N + (j - L2)] * W\`
+*(N = Total columns = U2 - L2 + 1)*
+
+⚡ **2D Array Column-Major Order (CMO):**
+\`Loc(A[i][j]) = B + [(j - L2) * M + (i - L1)] * W\`
+*(M = Total rows = U1 - L1 + 1)*
+
+⚡ **Sparse Matrix Triplet (Coordinate List):**
+Matrix having ≥70% zero elements. Stored in (K+1) × 3 table where Row 0 is \`[Total_Rows, Total_Cols, NonZeros]\`, reducing storage from O(M*N) to O(K).`,
+      actions: [
+        { label: '📖 Read Unit 1 in DSA Reader', type: 'reader', subject: dsaSub },
+        { label: '📥 Download DSA Master Notes', type: 'download', url: '/Data_Structures_Master_Notes.pdf' },
+        { label: '⚡ 2-Page Revision Sheet', type: 'download', url: '/Data_Structures_Exam_Revision_Sheet.pdf' }
+      ]
+    };
+  }
+
+  // DSA: Tower of Hanoi & Infix/Postfix
+  if (q.includes('hanoi') || q.includes('shunting yard') || q.includes('infix to postfix') || q.includes('postfix evaluation')) {
+    return {
+      text: `📌 **Tower of Hanoi & Stack Expression Conversion**
+
+⚡ **Tower of Hanoi:**
+- Move n disks from Source (S) to Destination (D) using Auxiliary (A).
+- Recurrence: \`T(n) = 2*T(n-1) + 1\`, with \`T(1) = 1\`
+- Solution: \`T(n) = 2ⁿ - 1 moves\`, Time Complexity: \`O(2ⁿ)\`.
+
+⚡ **Infix to Postfix (Shunting-Yard):**
+- Operands go directly to output.
+- Left parenthesis '(' pushed to operator stack; right parenthesis ')' pops to output until '('.
+- Operators pop higher/equal precedence operators from stack before pushing incoming operator.
+
+⚡ **Postfix Evaluation:**
+- Operands pushed to stack.
+- On operator: \`op2 = pop()\`, \`op1 = pop()\`, compute \`op1 [op] op2\`, push result. First popped item is always operand 2!`,
+      actions: [
+        { label: '📖 Read Unit 2 in DSA Reader', type: 'reader', subject: dsaSub },
+        { label: '📥 Download DSA Master Notes', type: 'download', url: '/Data_Structures_Master_Notes.pdf' },
+        { label: '⚡ 2-Page Revision Sheet', type: 'download', url: '/Data_Structures_Exam_Revision_Sheet.pdf' }
+      ]
+    };
+  }
+
+  // DSA: Circular Queue, BST & Graphs
+  if (q.includes('circular queue') || q.includes('bst') || (q.includes('binary search tree') && q.includes('delet')) || (q.includes('bfs') && q.includes('dfs'))) {
+    return {
+      text: `📌 **Circular Queue Modulo Math, BST Deletion & Graph Search**
+
+⚡ **Circular Queue Modulo Arithmetic:**
+- Full condition: \`(rear + 1) % MAX == front\`
+- Enqueue: \`rear = (rear + 1) % MAX; queue[rear] = val;\`
+- Dequeue: \`val = queue[front]; front = (front + 1) % MAX;\`
+
+⚡ **BST 3-Case Deletion:**
+1. **Leaf node:** Set parent link to NULL, free node.
+2. **One child:** Bypass node directly to child.
+3. **Two children:** Replace with **Inorder Successor** (minimum node of right subtree), then delete successor recursively.
+
+⚡ **BFS vs DFS:**
+- **BFS (Breadth-First):** Uses FIFO Queue. Level-order exploration. Finds shortest path in unweighted graphs. Time: O(V + E).
+- **DFS (Depth-First):** Uses LIFO Stack / recursion. Cycle detection, topological sort. Time: O(V + E).`,
+      actions: [
+        { label: '📖 Read Units 3 & 4 in DSA Reader', type: 'reader', subject: dsaSub },
+        { label: '📥 Download DSA Master Notes', type: 'download', url: '/Data_Structures_Master_Notes.pdf' },
+        { label: '⚡ 2-Page Revision Sheet', type: 'download', url: '/Data_Structures_Exam_Revision_Sheet.pdf' }
+      ]
+    };
+  }
+
+  // PYTHON: CPython, PVM, Bytecode & Reference Model
+  if (q.includes('cpython') || q.includes('pvm') || (q.includes('bytecode') && q.includes('python')) || q.includes('reference model') || (q.includes('mutable') && q.includes('immutable') && q.includes('python'))) {
+    return {
+      text: `📌 **CPython Architecture, Bytecode & Memory Reference Model**
+
+⚡ **CPython 2-Tier Execution Pipeline:**
+1. **Source Code (\`.py\`)** &rarr; Parsed by CPython Compiler into AST.
+2. **Bytecode (\`.pyc\`)** &rarr; Stored in \`__pycache__/\` as stack-oriented virtual instructions.
+3. **Python Virtual Machine (PVM)** &rarr; Runtime loop converting bytecode to native OS system calls.
+
+⚡ **C "Box Model" vs Python "Object Reference Model":**
+• **C / C++:** \`int x = 10;\` allocates a named 4-byte memory box at \`&x\`. Writing \`x = 20;\` overwrites the contents of the box.
+• **Python:** \`x = 10\` creates an **integer object** \`10\` in heap memory (\`PyObject\` with type \`int\`, value \`10\`, and \`ref_count=1\`). \`x\` is purely a **pointer/reference binding**. Writing \`x = 20\` binds \`x\` to a brand new object \`20\`!
+
+⚡ **Mutable vs Immutable Types:**
+• **Immutable (Cannot be altered in-place):** \`int\`, \`float\`, \`str\`, \`tuple\`, \`frozenset\`, \`bool\`.
+• **Mutable (Altered in-place, same \`id()\`)**: \`list\`, \`dict\`, \`set\`, \`bytearray\`.`,
+      actions: [
+        { label: '📖 Read Unit 1 in Python Reader', type: 'reader', subject: pythonSub },
+        { label: '📥 Download Master Notes PDF', type: 'download', url: '/Python_Programming_Master_Notes.pdf' },
+        { label: '⚡ 2-Page Revision Sheet', type: 'download', url: '/Python_Programming_Exam_Revision_Sheet.pdf' }
+      ]
+    };
+  }
+
+  // PYTHON: Lists, Tuples, Dicts, Hash Tables & Copies
+  if ((q.includes('list') && q.includes('tuple')) || q.includes('shallow copy') || q.includes('deep copy') || (q.includes('dict') && q.includes('hash')) || q.includes('hash table') || (q.includes('comprehension') && q.includes('python'))) {
+    return {
+      text: `📌 **Python Data Types: Lists, Tuples, Dictionaries & Hash Tables**
+
+⚡ **Lists vs Tuples vs Dictionaries:**
+| Property | List (\`[]\`) | Tuple (\`()\`) | Dictionary (\`{}\`) |
+| :--- | :--- | :--- | :--- |
+| **Mutability** | Mutable (\`append\`, \`pop\`) | **Immutable** | Keys: Immutable; Values: Mutable |
+| **Indexing** | Integer (\`0, 1, ...\`) | Integer (\`0, 1, ...\`) | **Hashable Key** (\`dict[key]\`) |
+| **Lookup Time** | $O(n)$ search | $O(n)$ search | **Average $O(1)$** via Hash Table |
+| **Overhead** | Over-allocates dynamic array | Compact fixed array | Sparse hash table array |
+
+⚡ **Shallow Copy (\`copy.copy\`) vs Deep Copy (\`copy.deepcopy\`):**
+• **Shallow Copy:** Constructs a new compound object and inserts *references* to the original children. Modifying nested mutable objects affects **both** copies!
+• **Deep Copy:** Recursively constructs new objects and duplicates all nested children. Completely independent memory trees.
+
+⚡ **Dictionary Hash Table Internals:**
+1. Calls \`hash(key)\` and maps to array index: \`idx = hash(key) % capacity\`.
+2. Resolves collisions using perturbation open addressing or bucket chaining.
+3. Every key must be **hashable** (must implement \`__hash__\` and \`__eq__\`). Hence lists cannot be dictionary keys!`,
+      actions: [
+        { label: '📖 Read Unit 3 in Python Reader', type: 'reader', subject: pythonSub },
+        { label: '📥 Download Python Master Notes', type: 'download', url: '/Python_Programming_Master_Notes.pdf' },
+        { label: '⚡ 2-Page Revision Sheet', type: 'download', url: '/Python_Programming_Exam_Revision_Sheet.pdf' }
+      ]
+    };
+  }
+
+  // PYTHON: OOP, MRO & C3 Linearization, Dunder Methods
+  if (q.includes('mro') || (q.includes('c3') && q.includes('linearization')) || q.includes('dunder') || q.includes('magic method') || (q.includes('operator overloading') && q.includes('python')) || (q.includes('inheritance') && q.includes('python'))) {
+    return {
+      text: `📌 **Python OOP, Dunder Methods & C3 Linearization (MRO)**
+
+⚡ **C3 Linearization Algorithm for Method Resolution Order (MRO):**
+The MRO of class $C$ inheriting from parents $B_1, B_2, \\dots, B_n$ is:
+$$L[C] = [C] + \\text{merge}(L[B_1], L[B_2], \\dots, L[B_n], [B_1, B_2, \\dots, B_n])$$
+• **Merge Rule:** Pick the head of the first list whose head does **not** appear in the tail of any other list. Append to result and remove from all lists. Repeat until all lists are exhausted.
+
+⚡ **Essential Dunder (Magic) Methods:**
+• **Object Lifecycle:** \`__new__(cls)\` (creates object), \`__init__(self)\` (initializes instance).
+• **String Representations:** \`__str__(self)\` (human-friendly), \`__repr__(self)\` (unambiguous developer debug view).
+• **Operator Overloading:**
+  - Addition (\`+\`): \`__add__(self, other)\`
+  - Equality (\`==\`): \`__eq__(self, other)\`
+  - Indexing (\`obj[k]\`): \`__getitem__(self, key)\`
+• **Context Managers:** \`__enter__(self)\` and \`__exit__(self, exc_type, exc_val, exc_tb)\`.`,
+      actions: [
+        { label: '📖 Read Unit 4 in Python Reader', type: 'reader', subject: pythonSub },
+        { label: '📥 Download Python Master Notes', type: 'download', url: '/Python_Programming_Master_Notes.pdf' },
+        { label: '⚡ 2-Page Revision Sheet', type: 'download', url: '/Python_Programming_Exam_Revision_Sheet.pdf' }
+      ]
+    };
+  }
+
+  // PYTHON: File Handling, Modes & Context Managers
+  if ((q.includes('file') && (q.includes('python') || q.includes('seek') || q.includes('tell') || (q.includes('mode') && q.includes('read')))) || q.includes('context manager') || q.includes('with statement')) {
+    return {
+      text: `📌 **Python File Handling & Context Managers**
+
+⚡ **File Access Modes Matrix:**
+| Mode | Meaning | File Must Exist? | Pointer Starts At | Overwrites or Preserves? |
+| :---: | :--- | :---: | :---: | :--- |
+| \`'r'\` | Read only (Default) | **Yes** (Raises \`FileNotFoundError\`) | Beginning (\`0\`) | Preserves (read-only) |
+| \`'w'\` | Write only | No (Creates if absent) | Beginning (\`0\`) | **Truncates (overwrites)** |
+| \`'a'\` | Append only | No (Creates if absent) | End of file | **Preserves existing data** |
+| \`'r+'\`| Read + Write | **Yes** | Beginning (\`0\`) | Overwrites characters in-place |
+| \`'w+'\`| Write + Read | No | Beginning (\`0\`) | **Truncates to 0 bytes** |
+| \`'a+'\`| Append + Read | No | End (Writes at end) | Preserves existing data |
+
+⚡ **The \`with\` Context Manager Protocol:**
+\`\`\`python
+with open('data.txt', 'r') as f:
+    content = f.read()
+# Automatically invokes f.__exit__() even if an exception occurs!
+\`\`\`
+
+⚡ **Cursor Navigation (\`seek\` and \`tell\`):**
+• \`f.tell()\` &rarr; Returns integer byte position of current file pointer.
+• \`f.seek(offset, whence)\`:
+  - \`whence = 0\` (Default): Absolute offset from start of file.
+  - \`whence = 1\`: Relative to current cursor position (binary files \`'rb'\`).
+  - \`whence = 2\`: Relative to end of file.`,
+      actions: [
+        { label: '📖 Read Unit 4 in Python Reader', type: 'reader', subject: pythonSub },
+        { label: '📥 Download Python Master Notes', type: 'download', url: '/Python_Programming_Master_Notes.pdf' },
+        { label: '⚡ 2-Page Revision Sheet', type: 'download', url: '/Python_Programming_Exam_Revision_Sheet.pdf' }
       ]
     };
   }

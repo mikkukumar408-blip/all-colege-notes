@@ -131,6 +131,36 @@ export const handwrittenNotebooks = [
     borderColor: 'rgba(45, 212, 191, 0.35)',
     badgeBg: 'rgba(45, 212, 191, 0.15)'
   },
+  {
+    id: 'nb-py',
+    code: 'BCSE-004',
+    subjectCode: 'BCSE-004',
+    semester: '1st Year (Sem 2)',
+    semNumber: 2,
+    pages: '12 Pages • Publication Quality High-Res',
+    title: 'Python Programming Comprehensive Master Notes',
+    description: 'Official MMDU syllabus (BCSE-004): CPython compilation pipeline & PVM, variable reference model, 9-tier operator precedence, branching & loops (for-else/break/continue), functions & LEGB scope, Lists/Tuples/Dictionaries (hash table internals), File Handling (modes, context managers), and OOP (Classes, Dunder methods, Operator Overloading, MRO, Polymorphism, Composition).',
+    pdfUrl: '/Python_Programming_Master_Notes.pdf',
+    downloadName: 'Python Programming Master Notes.pdf',
+    accentColor: '#38bdf8',
+    borderColor: 'rgba(56, 189, 248, 0.35)',
+    badgeBg: 'rgba(56, 189, 248, 0.15)'
+  },
+  {
+    id: 'nb-dsa-bcse007',
+    code: 'BCSE-007',
+    subjectCode: 'BCSE-007',
+    semester: '1st Year (Sem 2)',
+    semNumber: 2,
+    pages: '12 Pages • Publication Quality High-Res',
+    title: 'Data Structure Comprehensive Master Notes',
+    description: 'Official MMDU syllabus (BCSE-007): Mathematical notation, asymptotic bounds, 1D/2D/3D array addressing, sparse matrices, Bubble/Selection/Insertion/Merge/Quick/Heap sorting, Linear/Binary searching, Stacks (LIFO), Infix-Postfix-Prefix conversion & evaluation, recursion & Tower of Hanoi, Linear/Circular/Deque/Priority Queues, Singly/Doubly/Circular Linked Lists, Binary Trees, BST traversals & deletion cases, Graph representations (Adjacency Matrix/List), and BFS/DFS graph traversals.',
+    pdfUrl: '/Data_Structures_Master_Notes.pdf',
+    downloadName: 'Data Structures Master Notes.pdf',
+    accentColor: '#38bdf8',
+    borderColor: 'rgba(56, 189, 248, 0.35)',
+    badgeBg: 'rgba(56, 189, 248, 0.15)'
+  },
 
   // ==================== SEMESTER 3 ====================
   {
@@ -294,9 +324,40 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
   const [expSubView, setExpSubView] = useState('code'); // 'code' | 'algorithm' | 'both'
   const [capstoneSubView, setCapstoneSubView] = useState('code'); // 'code' | 'overview'
 
+  const formatDisplayCode = (raw) => {
+    if (!raw) return '';
+    let s = String(raw);
+    if (!s.includes('\\n') && !s.includes('\\t') && !s.includes('\\"')) return s;
+
+    // Protect double-escaped sequences (e.g. \\n in C string literal printf("...\n"))
+    s = s
+      .replace(/\\\\n/g, '__LITERAL_ESC_N__')
+      .replace(/\\\\t/g, '__LITERAL_ESC_T__')
+      .replace(/\\\\"/g, '__LITERAL_ESC_QUOTE__')
+      .replace(/\\\\'/g, '__LITERAL_ESC_SQUOTE__');
+
+    // Convert escaped newlines, tabs, and quotes to actual characters
+    s = s
+      .replace(/\\r\\n/g, '\n')
+      .replace(/\\n/g, '\n')
+      .replace(/\\t/g, '    ')
+      .replace(/\\"/g, '"')
+      .replace(/\\'/g, "'");
+
+    // Restore protected in-code literal escapes
+    s = s
+      .replace(/__LITERAL_ESC_N__/g, '\\n')
+      .replace(/__LITERAL_ESC_T__/g, '\\t')
+      .replace(/__LITERAL_ESC_QUOTE__/g, '\\"')
+      .replace(/__LITERAL_ESC_SQUOTE__/g, "\\'");
+
+    return s;
+  };
+
   const handleCopyCode = (codeText) => {
+    const cleanCode = formatDisplayCode(codeText);
     if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(codeText);
+      navigator.clipboard.writeText(cleanCode);
     }
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
@@ -1332,11 +1393,11 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                                     color: '#38bdf8',
                                     lineHeight: 1.65,
                                     background: '#040711',
-                                    whiteSpace: 'pre-wrap',
-                                    wordBreak: 'break-word'
+                                    whiteSpace: 'pre',
+                                    tabSize: 4
                                   }}
                                 >
-                                  <code>{exp.code}</code>
+                                  <code>{formatDisplayCode(exp.code)}</code>
                                 </pre>
                               </div>
 
@@ -1817,11 +1878,11 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                               color: '#fbbf24',
                               lineHeight: 1.65,
                               background: '#040711',
-                              whiteSpace: 'pre-wrap',
-                              wordBreak: 'break-word'
+                              whiteSpace: 'pre',
+                              tabSize: 4
                             }}
                           >
-                            <code>{selectedLab.capstoneProject.codeSnippet}</code>
+                            <code>{formatDisplayCode(selectedLab.capstoneProject.codeSnippet)}</code>
                           </pre>
                         </div>
 

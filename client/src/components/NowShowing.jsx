@@ -40,12 +40,16 @@ const ACTIVE_SUBJECT_IDS = new Set([
   'sub-c1',
   'sub-webtech',
   'sub-p1',
-  'sub-physics'
+  'sub-physics',
+  'sub-py',
+  'sub-python',
+  'sub-dsa-bcse007',
+  'sub-bcse007'
 ]);
 
 export const isSubjectCardActive = (sub) => {
   if (!sub) return false;
-  // Explicitly dead cards (DSA, etc.)
+  // Explicitly dead cards
   if (sub.id === 'sub-ai' || sub.code === 'CS601') return false;
   if (sub.id === 'sub-dsa' || sub.code === 'CS301') return false;
 
@@ -58,6 +62,8 @@ export const isSubjectCardActive = (sub) => {
   if (code === 'BCSE-008' || code === 'CS102') return true;
   if (code === 'BCSE-012') return true;
   if (code === 'PHYS102' || code === 'BPHY-001') return true;
+  if (code === 'BCSE-004' || code === 'PYTHON') return true;
+  if (code === 'BCSE-007' || code === 'DSA') return true;
 
   return false;
 };
