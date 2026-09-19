@@ -221,17 +221,16 @@ export const initialSubjects = [
     name: 'Data Structures & Algorithms',
     code: 'CS301',
     credits: 4,
-    instructor: 'Dr. Priya Nair',
-    notesCount: '5 Units Complete',
+    instructor: 'Department of Computer Science & Engineering (MMDU)',
+    notesCount: '4 Units Complete Master Notes & Solved Papers',
     rating: 5.0,
-    description: 'Linked Lists, Stacks, Queues, Trees, AVL Trees, Graphs, Sorting, Dynamic Programming with asymptotic analysis.',
+    description: 'Official MMDU syllabus (CS301 / BCSE-007): Mathematical notation, asymptotic bounds, 1D/2D/3D array addressing, sparse matrices, Bubble/Selection/Insertion/Merge/Quick/Heap sorting, Linear/Binary searching, Stacks (LIFO), Infix-Postfix-Prefix conversion & evaluation, recursion & Tower of Hanoi, Linear/Circular/Deque/Priority Queues, Singly/Doubly/Circular Linked Lists, Binary Trees, BST traversals & deletion cases, Graph representations (Adjacency Matrix/List), and BFS/DFS graph traversals.',
     banner: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
     units: [
-      { num: 1, title: 'Linear Structures: Stacks, Queues, Lists', pages: 40, status: 'Verified' },
-      { num: 2, title: 'Binary Trees & BST & Heaps', pages: 46, status: 'Verified' },
-      { num: 3, title: 'Balanced Trees: AVL & B-Trees', pages: 32, status: 'Verified' },
-      { num: 4, title: 'Graph Algorithms: BFS, DFS, MST', pages: 48, status: 'Verified' },
-      { num: 5, title: 'Hashing & Sorting Complexity', pages: 35, status: 'Verified' }
+      { num: 1, title: 'Foundations, Arrays, Searching & Sorting', pages: 3, status: 'Verified' },
+      { num: 2, title: 'Stacks, Expressions & Recursion (Tower of Hanoi)', pages: 3, status: 'Verified' },
+      { num: 3, title: 'Queues & Linked Lists Topologies', pages: 3, status: 'Verified' },
+      { num: 4, title: 'Trees, BST & Graph Algorithms (BFS/DFS)', pages: 3, status: 'Verified' }
     ]
   },
   {
@@ -554,10 +553,10 @@ export const initialShortNotes = [
     semester: 'Semester 3',
     category: 'Computer Science',
     type: 'KaTeX Complexity Matrices, Trees & Graph Formula Sheet',
-    pdfUrl: '/CS301_Data_Structures_and_Algorithms_Short_Notes.pdf',
-    downloadName: 'CS301_Data_Structures_and_Algorithms_Short_Notes.pdf',
-    fileSize: '159 KB',
-    pages: '2 Pages KaTeX Revision',
+    pdfUrl: '/Data_Structures_Exam_Revision_Sheet.pdf',
+    downloadName: 'Data Structures Exam Revision Sheet.pdf',
+    fileSize: '160 KB',
+    pages: '2 Pages High-Yield Revision',
     downloads: 5430,
     highlights: [
       'Master Theorem Formulas & 1D/2D Array Address Calculations',

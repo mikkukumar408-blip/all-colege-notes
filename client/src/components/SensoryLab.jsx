@@ -610,8 +610,27 @@ function formatNoteContent(content) {
   return html;
 }
 
-const ALLOWED_SUBJECT_IDS = ['sub-beee', 'sub-aiml', 'sub-m1', 'sub-c1', 'sub-webtech', 'sub-p1', 'sub-physics', 'sub-py', 'sub-python'];
-export const isSensorySubjectAllowed = (id) => ALLOWED_SUBJECT_IDS.includes(id);
+const ALLOWED_SUBJECT_IDS = [
+  'sub-beee', 
+  'sub-aiml', 
+  'sub-m1', 
+  'sub-c1', 
+  'sub-webtech', 
+  'sub-p1', 
+  'sub-physics', 
+  'sub-py', 
+  'sub-python',
+  'sub-dsa',
+  'sub-dsa-bcse007',
+  'sub-bcse007',
+  'CS301',
+  'BCSE-007'
+];
+export const isSensorySubjectAllowed = (id) => {
+  if (!id) return false;
+  const val = String(id).toLowerCase().trim();
+  return ALLOWED_SUBJECT_IDS.includes(id) || ['sub-dsa', 'sub-dsa-bcse007', 'sub-bcse007', 'cs301', 'bcse-007', 'dsa'].includes(val);
+};
 
 export default function SensoryLab({ 
   currentUser,
@@ -619,16 +638,17 @@ export default function SensoryLab({
   isUnitsCollapsed: controlledIsUnitsCollapsed, 
   setIsUnitsCollapsed: controlledSetIsUnitsCollapsed 
 }) {
-  // Combine Physics, Python, C, Web Tech, BEEE, AIML, and Math 1 with other subjects
+  // Combine Physics, Python, DSA, C, Web Tech, BEEE, AIML, and Math 1 with other subjects
   const allSubjects = [
     physicsSubjectDetails,
     pythonSubjectDetails,
+    dsaSubjectDetails,
     cSubjectDetails,
     webTechSubjectDetails,
     beeeSubjectDetails,
     aimlSubjectDetails,
     math1SubjectDetails,
-    ...initialSubjects.filter(s => s.id !== 'sub-p1' && s.id !== 'sub-physics' && s.id !== 'sub-py' && s.id !== 'sub-python' && s.id !== 'sub-c1' && s.id !== 'sub-webtech' && s.id !== 'sub-beee' && s.id !== 'sub-aiml' && s.id !== 'sub-m1' && s.id !== 'sub-math1')
+    ...initialSubjects.filter(s => s.id !== 'sub-p1' && s.id !== 'sub-physics' && s.id !== 'sub-py' && s.id !== 'sub-python' && s.id !== 'sub-c1' && s.id !== 'sub-webtech' && s.id !== 'sub-beee' && s.id !== 'sub-aiml' && s.id !== 'sub-m1' && s.id !== 'sub-math1' && s.id !== 'sub-dsa' && s.id !== 'sub-dsa-bcse007')
   ];
   
   const [currentSubjectId, setCurrentSubjectId] = useState(() => {
