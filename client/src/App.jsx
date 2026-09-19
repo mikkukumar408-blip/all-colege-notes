@@ -20,6 +20,8 @@ import SecurityShield from './components/SecurityShield';
 import AuthPage from './components/AuthPage';
 import SuperAdminPanel from './components/SuperAdminPanel';
 import DeepSearchModal from './components/DeepSearchModal';
+import CampusAIChatbot from './components/CampusAIChatbot';
+import { initialSubjects } from './data/mockData';
 import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot } from 'lucide-react';
 import { logSecurityEvent } from './utils/security';
 import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers } from './utils/cloudSync';
@@ -400,47 +402,16 @@ export default function App() {
         </main>
       </div>
 
-      {/* Floating AI Assistant Robot Widget (Bottom Right) */}
-      <button
-        onClick={() => {
-          setDeepSearchInitialQuery('');
+      {/* Floating AI Assistant Chatbot (Bottom Right) */}
+      <CampusAIChatbot
+        onOpenNotesReader={handleOpenNotesReader}
+        onNavigate={setActiveTab}
+        onOpenDeepSearch={(query) => {
+          setDeepSearchInitialQuery(query || '');
           setDeepSearchOpen(true);
         }}
-        style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          zIndex: 9999,
-          width: '54px',
-          height: '54px',
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, #00f0ff 0%, #7000ff 100%)',
-          border: '2px solid rgba(255, 255, 255, 0.4)',
-          boxShadow: '0 0 25px rgba(0, 240, 255, 0.6), 0 8px 24px rgba(0, 0, 0, 0.7)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          animation: 'pulse 2.5s infinite'
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1) translateY(-2px)'}
-        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-        title="CampusNotes AI Assistant • DeepSearch & 16:9 Slides (Alt + Space)"
-      >
-        <Bot size={28} color="#040711" />
-        <span style={{
-          position: 'absolute',
-          top: '-2px',
-          right: '-2px',
-          width: '12px',
-          height: '12px',
-          borderRadius: '50%',
-          background: '#10b981',
-          border: '2px solid #070a13',
-          boxShadow: '0 0 8px #10b981'
-        }} />
-      </button>
+        subjects={initialSubjects}
+      />
 
       {/* Global AI DeepSearch & 16:9 Presentation Slides Modal */}
       <DeepSearchModal 
