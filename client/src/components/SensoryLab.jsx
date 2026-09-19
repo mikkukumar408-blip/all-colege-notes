@@ -1665,7 +1665,7 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
                 Select Subject:
               </label>
               <select
-                value={currentSubjectId}
+                value={isDSA ? 'sub-dsa-bcse007' : currentSubjectId}
                 onChange={(e) => {
                   const targetId = e.target.value;
                   if (!isSensorySubjectAllowed(targetId)) {
@@ -1704,7 +1704,7 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
             {/* Unit Switcher */}
             <div>
               <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Select Unit ({(isBEEE || isAIML || isMath1 || isWebTech || isC) ? '4 Units Syllabus' : `${activeSubject.units?.length || 0} Units`}):
+                Select Unit ({(isBEEE || isAIML || isMath1 || isWebTech || isC || isPython || isDSA) ? '4 Units Syllabus' : `${activeSubject.units?.length || 0} Units`}):
               </label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {unitsList.map(u => {

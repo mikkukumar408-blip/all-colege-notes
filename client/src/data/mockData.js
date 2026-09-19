@@ -204,7 +204,7 @@ export const initialSubjects = [
     notesCount: '4 Units Complete Master Notes & Solved Papers',
     rating: 5.0,
     description: 'Official MMDU syllabus (BCSE-007): Mathematical notation, asymptotic bounds, 1D/2D/3D array addressing, sparse matrices, Bubble/Selection/Insertion/Merge/Quick/Heap sorting, Linear/Binary searching, Stacks (LIFO), Infix-Postfix-Prefix conversion & evaluation, recursion & Tower of Hanoi, Linear/Circular/Deque/Priority Queues, Singly/Doubly/Circular Linked Lists, Binary Trees, BST traversals & deletion cases, Graph representations (Adjacency Matrix/List), and BFS/DFS graph traversals.',
-    banner: 'https://images.unsplash.com/photo-1516116211227-bbc13c73335c?auto=format&fit=crop&w=800&q=80',
+    banner: 'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?auto=format&fit=crop&w=800&q=80',
     units: [
       { num: 1, title: 'Foundations, Arrays, Searching & Sorting', pages: 3, status: 'Verified' },
       { num: 2, title: 'Stacks, Expressions & Recursion (Tower of Hanoi)', pages: 3, status: 'Verified' },
