@@ -110,6 +110,129 @@ function getAssistantResponse(query, subjects = []) {
   const aimlSub = findSubject('sub-aiml') || findSubject('BCSE-011');
   const webSub = findSubject('sub-webtech') || findSubject('BCSE-012');
 
+  // =========================================================================
+  // 0. NATURAL CONVERSATIONAL GREETINGS & INTENTS
+  // =========================================================================
+  const cleanQ = q.replace(/[^\w\s]/gi, '').trim();
+
+  // Greetings: "hi", "hello", "hey", etc.
+  const greetings = ['hi', 'hello', 'hey', 'heya', 'hola', 'yo', 'sup', 'good morning', 'good afternoon', 'good evening', 'howdy', 'namaste', 'hii', 'hiii', 'hi bot', 'hello bot'];
+  if (greetings.includes(cleanQ) || greetings.some(g => cleanQ === g || cleanQ.startsWith(g + ' '))) {
+    return {
+      text: `Hey Bhavya! 👋 How can I help with your studies today?
+
+Feel free to ask me:
+• ⚡ Any formula or derivation (*Newton's rings*, *Schrödinger equation*, *Norton's theorem*)
+• 📖 To open any unit in the interactive notes reader
+• 📥 To download 12-page Master Notes or 2-page Revision Sheets`,
+      actions: [
+        { label: "⚡ Newton's Rings formula", type: 'prompt', text: "Explain Newton's Rings formula" },
+        { label: "🔬 Schrödinger 1D Box", type: 'prompt', text: "Derive Schrödinger 1D box" },
+        { label: "📖 Open Physics Reader", type: 'reader', subject: physicsSub },
+        { label: "📥 Download Physics PDF", type: 'download', url: '/Applied_Physics_Master_Notes.pdf' }
+      ]
+    };
+  }
+
+  // Pleasantries / How are you
+  if (cleanQ.includes('how are you') || cleanQ.includes('how r u') || cleanQ.includes('how do you do') || cleanQ === 'whats up' || cleanQ === 'sup') {
+    return {
+      text: `I'm doing great, fully online and ready! 🚀 Which topic or subject are you revising right now?`,
+      actions: [
+        { label: "📘 Applied Physics", type: 'reader', subject: physicsSub },
+        { label: "⚡ BEEE Theorems", type: 'reader', subject: beeeSub },
+        { label: "📐 Engineering Math", type: 'reader', subject: mathSub }
+      ]
+    };
+  }
+
+  // Identity / Capabilities / Help
+  if (cleanQ.includes('who are you') || cleanQ.includes('what are you') || cleanQ.includes('your name') || cleanQ === 'help' || cleanQ.includes('what can you do')) {
+    return {
+      text: `I'm your **Campus AI Study Copilot**! 🤖
+
+I'm built right into your notes portal to help you:
+• 📐 **Explain Derivations & Formulas**: Step-by-step mathematical proofs with KaTeX
+• 📚 **Direct You to Notes & PDFs**: Master Notes (12 pages) & Exam Revision Sheets (2 pages)
+• 💡 **Exam Preparation Advice**: High-yield university questions & scoring tips
+• 📊 **16:9 Presentation Slides**: Fullscreen visual slide decks via DeepSearch
+
+What subject would you like to explore?`,
+      actions: [
+        { label: "📖 Applied Physics Reader", type: 'reader', subject: physicsSub },
+        { label: "⚡ Short Notes Hub", type: 'navigate', tab: 'short-notes' },
+        { label: "📥 Download Center", type: 'navigate', tab: 'downloads-lab' }
+      ]
+    };
+  }
+
+  // Gratitude / Polite closures
+  if (cleanQ.includes('thank') || cleanQ === 'thx' || cleanQ === 'thanks' || cleanQ.includes('thank you') || cleanQ === 'awesome' || cleanQ === 'great' || cleanQ === 'perfect' || cleanQ === 'cool' || cleanQ === 'ok' || cleanQ === 'okay' || cleanQ === 'got it') {
+    return {
+      text: `You're very welcome! 😊 Keep up the great prep, and let me know whenever you need another formula or derivation!`,
+      actions: []
+    };
+  }
+
+  // Farewells
+  if (cleanQ === 'bye' || cleanQ === 'goodbye' || cleanQ === 'cya' || cleanQ === 'see you' || cleanQ.includes('good night') || cleanQ === 'gn') {
+    return {
+      text: `Goodbye and happy studying! 🎓 Feel free to tap me anytime you have another question.`,
+      actions: []
+    };
+  }
+
+  // Short single-subject triggers: "physics"
+  if (cleanQ === 'physics' || cleanQ === 'applied physics' || cleanQ === 'bphy001' || cleanQ === 'phys102') {
+    return {
+      text: `📘 **Applied Physics (PHYS102 / BPHY-001)**
+Here is what's available for Applied Physics:
+• **Unit 1**: Wave Optics, Newton's Rings & Lasers
+• **Unit 2**: Electrostatics, Magnetostatics & Maxwell's Equations
+• **Unit 3**: Quantum Mechanics & 1D Schrödinger Infinite Well
+• **Unit 4**: Crystal Structures (SC, BCC, FCC) & Free Electron Theory
+
+Both the **12-Page Master Notes** and **2-Page Rapid Revision Sheet** are ready!`,
+      actions: [
+        { label: '📖 Open Physics Reader', type: 'reader', subject: physicsSub },
+        { label: '📥 Download 12-Page Master PDF', type: 'download', url: '/Applied_Physics_Master_Notes.pdf' },
+        { label: '⚡ Download 2-Page Revision Sheet', type: 'download', url: '/Applied_Physics_Exam_Revision_Sheet.pdf' }
+      ]
+    };
+  }
+
+  // Short single-subject trigger: "beee"
+  if (cleanQ === 'beee' || cleanQ === 'basic electrical' || cleanQ === 'ee101' || cleanQ === 'bele001') {
+    return {
+      text: `⚡ **Basic Electrical & Electronics Engineering (BEEE)**
+Covering:
+• **Unit 1**: DC Circuits & Network Theorems (Thevenin, Norton, Superposition)
+• **Unit 2**: Transformers & Electrical Machines
+• **Unit 3**: Semiconductor Devices, Diodes & BJTs
+• **Unit 4**: Number Systems & Boolean Algebra`,
+      actions: [
+        { label: '📖 Open BEEE Reader', type: 'reader', subject: beeeSub },
+        { label: '⚡ Thevenin Lab Simulator', type: 'navigate', tab: 'notes-reader' }
+      ]
+    };
+  }
+
+  // Short single-subject trigger: "math"
+  if (cleanQ === 'math' || cleanQ === 'maths' || cleanQ === 'mathematics' || cleanQ === 'bmat001' || cleanQ === 'math101') {
+    return {
+      text: `📐 **Engineering Mathematics I (BMAT-001)**
+Covering:
+• **Unit 1**: Matrices, Cayley-Hamilton & Gauss-Jordan Inversion
+• **Unit 2**: Calculus, Curvature & Beta-Gamma Functions
+• **Unit 3**: Multivariable Calculus & Vector Differentiation
+• **Unit 4**: Sequences, Series & Fourier Series`,
+      actions: [
+        { label: '📖 Open Math Reader', type: 'reader', subject: mathSub },
+        { label: '📥 Download Math PDF', type: 'navigate', tab: 'downloads-lab' }
+      ]
+    };
+  }
+
   // 1. APPLIED PHYSICS: Newton's Rings
   if (q.includes('newton') || (q.includes('ring') && (q.includes('diameter') || q.includes('physics')))) {
     return {
@@ -344,7 +467,29 @@ Which subject would you like to explore in detail?`,
     };
   }
 
-  // 10. Default Generative Solution for any academic topic
+  // 10. Fallback: Check if query is very short or vague (under 4 words and not clearly academic)
+  const words = cleanQ.split(/\s+/).filter(Boolean);
+  const isClearlyAcademic = q.includes('derive') || q.includes('formula') || q.includes('law') || q.includes('explain') || q.includes('what is') || q.includes('how does') || q.includes('theorem') || q.includes('equation') || q.includes('solve') || q.includes('calculate');
+
+  if (words.length <= 3 && !isClearlyAcademic) {
+    return {
+      text: `I'm here to help! Could you specify what topic or question you'd like to explore?
+
+For example, you can ask:
+• *"Explain Newton's Rings formula"*
+• *"Derive 1D Schrödinger box"*
+• *"What is Norton's theorem?"*
+• *"Show Applied Physics notes"*`,
+      actions: [
+        { label: "⚡ Newton's Rings", type: 'prompt', text: "Explain Newton's Rings formula" },
+        { label: "🔬 Schrödinger 1D Box", type: 'prompt', text: "Derive Schrödinger 1D box" },
+        { label: "🔌 Norton's Theorem", type: 'prompt', text: "Norton's Theorem derivation" },
+        { label: "📖 Applied Physics Reader", type: 'reader', subject: physicsSub }
+      ]
+    };
+  }
+
+  // Genuine academic query fallback
   const analyticalText = generateAnalyticalSolution('University Engineering', query);
   return {
     text: analyticalText,
@@ -493,6 +638,8 @@ Ask me any academic question or pick a quick prompt below!`,
       onNavigate(action.tab);
     } else if (action.type === 'slides' && onOpenDeepSearch) {
       onOpenDeepSearch(action.query || '');
+    } else if (action.type === 'prompt' && action.text) {
+      handleSendMessage(action.text);
     }
   };
 
@@ -877,16 +1024,22 @@ Ask me any academic question or pick a quick prompt below!`,
                                       ? 'rgba(16, 185, 129, 0.15)' 
                                       : act.type === 'reader'
                                       ? 'rgba(0, 240, 255, 0.15)'
+                                      : act.type === 'prompt'
+                                      ? 'rgba(245, 158, 11, 0.18)'
                                       : 'rgba(112, 0, 255, 0.2)',
                                     border: act.type === 'download'
                                       ? '1px solid rgba(16, 185, 129, 0.4)'
                                       : act.type === 'reader'
                                       ? '1px solid rgba(0, 240, 255, 0.4)'
+                                      : act.type === 'prompt'
+                                      ? '1px solid rgba(245, 158, 11, 0.4)'
                                       : '1px solid rgba(112, 0, 255, 0.4)',
                                     color: act.type === 'download'
                                       ? '#34d399'
                                       : act.type === 'reader'
                                       ? 'var(--neon-cyan)'
+                                      : act.type === 'prompt'
+                                      ? '#fbbf24'
                                       : '#c084fc',
                                     fontSize: '0.74rem',
                                     fontWeight: 700,
@@ -909,6 +1062,7 @@ Ask me any academic question or pick a quick prompt below!`,
                                   {act.type === 'reader' && <BookOpen size={12} />}
                                   {act.type === 'slides' && <Layers size={12} />}
                                   {act.type === 'navigate' && <ExternalLink size={12} />}
+                                  {act.type === 'prompt' && <Zap size={12} />}
                                   <span>{act.label}</span>
                                 </button>
                               ))}
