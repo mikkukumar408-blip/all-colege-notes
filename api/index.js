@@ -88,7 +88,7 @@ const subjects = [
   { id: 'sub-m1', semester: 1, year: '1st Year', name: 'Engineering Mathematics I', code: 'MATH101', credits: 4, notesCount: '5 Units Complete', rating: 4.9 },
   { id: 'sub-p1', semester: 1, year: '1st Year', name: 'Applied Physics', code: 'PHYS102', credits: 4, notesCount: '5 Units Complete', rating: 4.8 },
   { id: 'sub-c1', semester: 2, year: '1st Year', name: 'Programming & Problem Solving in C', code: 'CS102', credits: 4, notesCount: '5 Units Complete', rating: 4.9 },
-  { id: 'sub-dsa', semester: 3, year: '2nd Year', name: 'Data Structures & Algorithms', code: 'CS301', credits: 4, notesCount: '5 Units Complete', rating: 5.0 },
+  { id: 'sub-dsa', semester: 2, year: '1st Year', name: 'Data Structures & Algorithms', code: 'CS301', credits: 4, notesCount: '5 Units Complete', rating: 5.0 },
   { id: 'sub-dld', semester: 3, year: '2nd Year', name: 'Digital Logic & Computer Design', code: 'CS302', credits: 3, notesCount: '5 Units Complete', rating: 4.7 },
   { id: 'sub-os', semester: 4, year: '2nd Year', name: 'Operating Systems', code: 'CS401', credits: 4, notesCount: '5 Units Complete', rating: 4.9 },
   { id: 'sub-dbms', semester: 4, year: '2nd Year', name: 'Database Management Systems', code: 'CS402', credits: 4, notesCount: '5 Units Complete', rating: 4.9 },
