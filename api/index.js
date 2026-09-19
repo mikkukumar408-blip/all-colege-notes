@@ -382,8 +382,7 @@ let registeredUsers = [
     createdAt: '2026-09-12T08:00:00.000Z'
   },
   { username: 'student', password: 'password123', role: 'student', createdAt: '2026-01-01T00:00:00.000Z' },
-  { username: 'mikumandal', password: 'password123', role: 'student', createdAt: '2026-02-15T00:00:00.000Z' },
-  { username: 'engineer', password: 'password123', role: 'student', createdAt: '2026-02-20T00:00:00.000Z' }
+  { username: 'mikumandal', password: 'password123', role: 'student', createdAt: '2026-02-15T00:00:00.000Z' }
 ];
 
 // Helper to load persistent users from backup KV
