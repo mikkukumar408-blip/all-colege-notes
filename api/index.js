@@ -184,10 +184,17 @@ Your primary duty is to solve college engineering doubts immediately with 100% m
    \`\`\`text
    [Diagram here]
    \`\`\`
-   - For Circuit / Electrical: Use clean ASCII circuit schematics with standard symbols (+, -, [R], [L], [C], GND, nodes).
-   - For Data Structures / Algorithms / Math: Use tree structures, array/pointer boxes, graph state transitions, or ASCII flow charts.
+   - For Circuit / Electrical Networks:
+     * NEVER draw zigzag resistors with slashes like '/\\/\\' or floating disconnected GND tags. Monospace fonts distort them.
+     * Use rectangular boxes: [ R1 ], [ R_N ], [ R_L ] for resistors.
+     * Use circular symbols: (+) V_s (-) for voltage sources, and (↑) I_N for independent current sources.
+     * Always connect parallel and series branches with clean box-drawing lines (┌ ─ ┐ │ └ ┘) or standard (+ - |).
+     * Clearly label output terminals as '──○ Terminal A' and '──○ Terminal B'.
+     * For Norton's Theorem: Draw (↑) I_N in parallel with [ R_N ] between horizontal top & bottom rails, with Terminal A and Terminal B on the right.
+     * For Thevenin's Theorem: Draw (+) V_th (-) in series with [ R_th ], with Terminal A and Terminal B on the right.
+   - For Data Structures / Algorithms / Math: Use tree structures, array/pointer boxes, graph state transitions, or clean block flowcharts.
    - For Computer Science / Operating Systems / Networks: Use block diagrams, layer stacks, or state machine charts.
-   - CONSTRAINT: Keep diagrams under 42 characters wide so they fit perfectly on mobile screens without horizontal wrapping.
+   - CONSTRAINT: Keep diagrams between 35-50 characters wide so they fit cleanly on mobile screens without horizontal wrapping.
 
 2. AUTHENTIC KaTeX MATHEMATICAL NOTATION:
    - Every formula, equation, theorem, variable, integral, and matrix MUST be enclosed in standard LaTeX math delimiters:
@@ -212,7 +219,16 @@ Your primary duty is to solve college engineering doubts immediately with 100% m
 const { matchAcademicKB, generateAnalyticalSolution } = require('./academicKnowledgeBase');
 
 async function callAcademicAI(subject, question) {
-  // 1. TIER 1: GROQ CLOUD INFERENCE (If GROQ_API_KEY is configured in env)
+  // 1. TIER 1: CURRICULUM THEOREM KNOWLEDGE BASE (Instant, Peer-Reviewed Exam-Grade Solutions)
+  const kbMatch = matchAcademicKB(question, subject);
+  if (kbMatch) {
+    return {
+      content: kbMatch.content,
+      model: 'campusnotes-curriculum-kb'
+    };
+  }
+
+  // 2. TIER 2: GROQ CLOUD INFERENCE (If GROQ_API_KEY is configured in env)
   if (GROQ_API_KEY && GROQ_API_KEY.startsWith('gsk_')) {
     const groqModels = [
       'llama-3.3-70b-versatile',
@@ -259,7 +275,7 @@ async function callAcademicAI(subject, question) {
     }
   }
 
-  // 2. TIER 2: HIGH-INTELLIGENCE FREE CLOUD INFERENCE (Pollinations AI - No Key Needed)
+  // 3. TIER 3: HIGH-INTELLIGENCE FREE CLOUD INFERENCE (Pollinations AI - No Key Needed)
   const pollModels = ['openai', 'mistral', 'qwen-coder'];
   for (const model of pollModels) {
     try {
@@ -291,15 +307,6 @@ async function callAcademicAI(subject, question) {
     } catch (err) {
       console.warn(`Pollinations ${model} attempt failed:`, err.message);
     }
-  }
-
-  // 3. TIER 3: CURRICULUM THEOREM KNOWLEDGE BASE (Guaranteed Instant Offline Resolution)
-  const kbMatch = matchAcademicKB(question, subject);
-  if (kbMatch) {
-    return {
-      content: kbMatch.content,
-      model: 'campusnotes-curriculum-kb'
-    };
   }
 
   // 4. TIER 4: STRUCTURED ANALYTICAL SYNTHESIZER (Always Pedagogical & Exam-Ready)

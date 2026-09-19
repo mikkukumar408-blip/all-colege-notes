@@ -37,8 +37,8 @@ function formatForumContent(text) {
   if (!text) return '';
 
   // 1. Process code blocks ```text ... ``` or ```...``` into clean monospace pre tags
-  let processed = text.replace(/```(?:text|ascii|[\w-]*)\n([\s\S]*?)```/g, (_, code) => {
-    return `<pre style="background: rgba(0, 0, 0, 0.75); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 8px; padding: 12px; font-family: 'Courier New', Courier, monospace; font-size: 0.82rem; line-height: 1.35; color: #00f0ff; overflow-x: auto; white-space: pre; margin: 10px 0;">${code.trim()}</pre>`;
+  let processed = text.replace(/```(?:text|ascii|[\w-]*)\n?([\s\S]*?)```/g, (_, code) => {
+    return `<pre style="background: rgba(4, 7, 13, 0.94); border: 1px solid rgba(0, 240, 255, 0.35); border-radius: 8px; padding: 14px 16px; font-family: 'Consolas', 'Fira Code', 'Courier New', monospace; font-size: 0.84rem; line-height: 1.38; color: #00f0ff; letter-spacing: 0; tab-size: 2; overflow-x: auto; white-space: pre; margin: 12px 0; box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);">${code.trim()}</pre>`;
   });
 
   // 2. Process block display equations $$...$$ and \[...\]
@@ -227,45 +227,46 @@ export default function FanReviews({ currentUser }) {
       let fallbackAnswer = null;
       let usedModel = 'campusnotes-curriculum-kb';
 
-      // 1. Direct browser query to free AI inference
-      try {
-        const clientRes = await fetch('https://text.pollinations.ai/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [
-              { 
-                role: 'system', 
-                content: 'You are CampusNotes Elite AI Academic Tutor. Solve university engineering questions with 100% mathematical precision. Mandatory 4-part format: Core Concept & Principle, Visual System Diagram inside ```text```, Step-by-Step Solution with authentic KaTeX ($...$ or $$...$$), and University Exam Topper Tip.' 
-              },
-              { 
-                role: 'user', 
-                content: `[STUDENT QUESTION DETAILS]\nSubject: ${currentSubject}\nQuestion: ${currentQuestion}\n\nPlease provide an exam-grade solution following the mandatory 4-part format.` 
-              }
-            ],
-            model: 'openai',
-            seed: 42
-          })
-        });
+      // 1. Peer-reviewed Curriculum Theorem Knowledge Base (Instant, Exam-Grade Verified)
+      const kbMatch = matchAcademicKB(currentQuestion, currentSubject);
+      if (kbMatch) {
+        fallbackAnswer = kbMatch.content;
+        usedModel = 'campusnotes-curriculum-kb';
+      } else {
+        // 2. Direct browser query to free AI inference with strict circuit schematic guidelines
+        try {
+          const clientRes = await fetch('https://text.pollinations.ai/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              messages: [
+                { 
+                  role: 'system', 
+                  content: 'You are CampusNotes Elite AI Academic Tutor. Solve university engineering questions with 100% mathematical precision. Mandatory 4-part format: Core Concept & Principle, Visual System Diagram inside ```text```, Step-by-Step Solution with authentic KaTeX ($...$ or $$...$$), and University Exam Topper Tip. For circuit diagrams, NEVER use slash resistors (\\/\\/). Use boxes [ R ], sources (↑) I_N or (+) V_s (-), and clean connected wires with Terminal A and Terminal B.' 
+                },
+                { 
+                  role: 'user', 
+                  content: `[STUDENT QUESTION DETAILS]\nSubject: ${currentSubject}\nQuestion: ${currentQuestion}\n\nPlease provide an exam-grade solution following the mandatory 4-part format.` 
+                }
+              ],
+              model: 'openai',
+              seed: 42
+            })
+          });
 
-        if (clientRes.ok) {
-          const text = await clientRes.text();
-          if (text && text.trim().length > 60 && !text.includes('<!DOCTYPE html>')) {
-            fallbackAnswer = text.trim();
-            usedModel = 'pollinations/openai-direct';
+          if (clientRes.ok) {
+            const text = await clientRes.text();
+            if (text && text.trim().length > 60 && !text.includes('<!DOCTYPE html>')) {
+              fallbackAnswer = text.trim();
+              usedModel = 'pollinations/openai-direct';
+            }
           }
+        } catch (clientErr) {
+          console.warn('Direct AI query failed, switching to analytical synthesizer:', clientErr);
         }
-      } catch (clientErr) {
-        console.warn('Direct AI query failed, switching to offline theorem database:', clientErr);
-      }
 
-      // 2. Offline Curriculum Theorem Knowledge Base
-      if (!fallbackAnswer) {
-        const kbMatch = matchAcademicKB(currentQuestion, currentSubject);
-        if (kbMatch) {
-          fallbackAnswer = kbMatch.content;
-          usedModel = 'campusnotes-curriculum-kb';
-        } else {
+        // 3. Structured Analytical Synthesizer fallback
+        if (!fallbackAnswer) {
           fallbackAnswer = generateAnalyticalSolution(currentSubject, currentQuestion);
           usedModel = 'campusnotes-analytical-synthesizer';
         }

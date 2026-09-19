@@ -36,8 +36,8 @@ import { matchAcademicKB, generateAnalyticalSolution, ACADEMIC_THEOREM_KB } from
 function formatSlideMath(text) {
   if (!text) return '';
 
-  let processed = text.replace(/```(?:text|ascii|[\w-]*)\n([\s\S]*?)```/g, (_, code) => {
-    return `<pre style="background: rgba(4, 7, 13, 0.9); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 8px; padding: 14px; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.84rem; line-height: 1.4; color: #00f0ff; overflow-x: auto; white-space: pre; margin: 12px 0;">${code.trim()}</pre>`;
+  let processed = text.replace(/```(?:text|ascii|[\w-]*)\n?([\s\S]*?)```/g, (_, code) => {
+    return `<pre style="background: rgba(4, 7, 13, 0.94); border: 1px solid rgba(0, 240, 255, 0.35); border-radius: 8px; padding: 14px 16px; font-family: 'Consolas', 'Fira Code', 'Courier New', monospace; font-size: 0.84rem; line-height: 1.38; color: #00f0ff; letter-spacing: 0; tab-size: 2; overflow-x: auto; white-space: pre; margin: 12px 0; box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);">${code.trim()}</pre>`;
   });
 
   processed = processed.replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => {
@@ -227,7 +227,7 @@ export default function DeepSearchModal({ isOpen, onClose, initialQuery = '' }) 
             messages: [
               {
                 role: 'system',
-                content: 'You are CampusNotes Elite AI Academic Tutor. Provide an exam-grade university derivation following the mandatory 4-part format: 📌 **Core Concept & Principle**, 📐 **Visual System Diagram** inside ```text, ⚡ **Step-by-Step Solution / Derivation** with KaTeX, and 💡 **University Exam Topper Tip**.'
+                content: 'You are CampusNotes Elite AI Academic Tutor. Provide an exam-grade university derivation following the mandatory 4-part format: 📌 **Core Concept & Principle**, 📐 **Visual System Diagram** inside ```text, ⚡ **Step-by-Step Solution / Derivation** with KaTeX, and 💡 **University Exam Topper Tip**. For circuit diagrams, NEVER use slash resistors (\\/\\/). Use boxes [ R ], sources (↑) I_N or (+) V_s (-), and clean connected wires with Terminal A and Terminal B.'
               },
               {
                 role: 'user',

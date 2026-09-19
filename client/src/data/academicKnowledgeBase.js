@@ -11,12 +11,15 @@ Norton's Theorem states that any linear, active, bilateral two-terminal network 
 
 📐 **Visual System Diagram**
 \`\`\`text
-   [Original Active Network]        Norton Equivalent Circuit
-        +--------(A)                   +--------(A)
-        |                              |          |
-     [Network]                        (↑) I_N   [R_N]   [R_L] (Load)
-        |                              |          |
-        +--------(B)                   +--------(B)
+  Original Active Network:             Norton Equivalent Circuit:
+  ┌───────────────────────┐            ┌──────────────┬──────────────┐──○ Terminal A
+  │                       │──○ (A)     │              │              │
+  │   Linear Two-Terminal │            │             ┌┴┐            ┌┴┐
+  │     Active Network    │           (↑) I_N        │ │ R_N        │ │ R_L (Load)
+  │  (Independent Sources │            │             └┬┘            └┬┘
+  │    & Resistors)       │──○ (B)     │              │              │
+  └───────────────────────┘            └──────────────┴──────────────┘──○ Terminal B
+                                       [Current Source] [Norton Res.] [Load]
 \`\`\`
 
 ⚡ **Step-by-Step Solution / Derivation**
@@ -59,12 +62,15 @@ Thevenin's Theorem states that any linear, active, bilateral electrical network 
 
 📐 **Visual System Diagram**
 \`\`\`text
-   [Original Active Network]        Thevenin Equivalent Circuit
-        +--------(A)                   +-----[R_th]-----(A)
-        |                              |                  |
-     [Network]                        [+] V_th          [R_L] (Load)
-        |                             [-]                 |
-        +--------(B)                   +----------------(B)
+  Original Active Network:             Thevenin Equivalent Circuit:
+  ┌───────────────────────┐                    R_th
+  │                       │──○ (A)       ┌────[====]────┬──────────○ Terminal A
+  │   Linear Two-Terminal │              │              │
+  │     Active Network    │             (+)            ┌┴┐
+  │  (Independent Sources │             V_th           │ │ R_L (Load)
+  │    & Resistors)       │──○ (B)      (-)            └┬┘
+  └───────────────────────┘              │              │
+                                         └──────────────┴──────────○ Terminal B
 \`\`\`
 
 ⚡ **Step-by-Step Solution / Derivation**
@@ -102,11 +108,15 @@ The Maximum Power Transfer Theorem states that maximum active power is transferr
 
 📐 **Visual System Diagram**
 \`\`\`text
-          +-----[R_th]-----+-----(A)
-          |                |
-         [+] V_th         [R_L] (Load: R_L = R_th)
-         [-]               |
-          +----------------+-----(B)
+           Thevenin Source                Load Terminal
+        ┌──────────[ R_th ]──────────┬──────────○ Terminal A
+        │                            │
+       (+)                          ┌┴┐
+       V_th                         │ │ R_L (Load Resistor)
+       (-)                          └┬┘
+        │                            │
+        └────────────────────────────┴──────────○ Terminal B
+        ⚡ Condition: R_L = R_th  |  Max Power: P_max = V_th² / (4 · R_th)
 \`\`\`
 
 ⚡ **Step-by-Step Solution / Derivation**
@@ -136,13 +146,14 @@ The Superposition Theorem states that in any linear, active, bilateral network c
 
 📐 **Visual System Diagram**
 \`\`\`text
-   Total Response:   Response (Source 1):    Response (Source 2):
-     V1 & V2 Active      V1 ON, V2 Short         V1 Short, V2 ON
-      +--[R1]--+--[R2]--+   +--[R1]--+--[R2]--+   +--[R1]--+--[R2]--+
-      |        |        |   |        |        |   |        |        |
-     (V1)     [R3]     (V2)(V1)     [R3]    (Short)(Short) [R3]     (V2)
-      |        |        |   |        |        |   |        |        |
-      +--------+--------+   +--------+--------+   +--------+--------+
+    Case 1: V1 Active, V2 Shorted          Case 2: V1 Shorted, V2 Active
+      ┌───[ R1 ]───┬───[ R2 ]───┐            ┌───[ R1 ]───┬───[ R2 ]───┐
+      │            │            │            │            │            │
+     (+)          ┌┴┐          [|]          [|]          ┌┴┐          (+)
+     V1           │ │ R3      (Short)      (Short)       │ │ R3       V2
+     (-)          └┬┘           │            │           └┬┘          (-)
+      │            │            │            │            │            │
+      └───[====]───┴────────────┘            └────────────┴───[====]───┘
 \`\`\`
 
 ⚡ **Step-by-Step Solution / Derivation**
@@ -166,14 +177,15 @@ Kirchhoff's Laws are fundamental circuit theorems grounded in conservation laws:
 
 📐 **Visual System Diagram**
 \`\`\`text
-   KCL at Node A (Charge Conservation):    KVL in Closed Loop (Energy):
-               I1 (in)                          +---[R1]--->--+
-                 ↓                              |    V1       |
-        --------(A)--------                     |            [R2] V2
-        ↙                 ↘                    (Vs)           |
-     I2 (out)            I3 (out)               |    V3       ↓
-      Σ I_in = Σ I_out                         +---[R3]---<--+
-                                                Σ V_loop = 0
+  KCL at Node A (Charge Conservation):    KVL in Closed Loop (Energy Conservation):
+              I1 (in)                                 ┌───[ R1 ]───┐  Clockwise
+                ↓                                     │    (V1)    │    Loop
+       ────────(A)────────                           (+)          ┌┴┐    ↷
+       ↙                 ↘                           Vs           │ │ R2 (V2)
+    I2 (out)            I3 (out)                     (-)          └┬┘
+     Rule: Σ I_in = Σ I_out                           │    (V3)    │
+     (I1 = I2 + I3  ⟹  Σ I = 0)                       └───[ R3 ]───┘
+                                                      Rule: Σ V_rises = Σ V_drops
 \`\`\`
 
 ⚡ **Step-by-Step Solution / Derivation**
