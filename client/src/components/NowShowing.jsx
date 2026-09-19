@@ -31,20 +31,22 @@ import { initialSubjects, academicYears } from '../data/mockData';
    3. Mathematics I (sub-m1)
    4. Computational & Problem Solving in C (sub-c1)
    5. Fundamentals of Web Technologies (sub-webtech)
+   6. Applied Physics (sub-p1 / PHYS102 / BPHY-001)
    ------------------------------------------------------------------------- */
 const ACTIVE_SUBJECT_IDS = new Set([
   'sub-beee',
   'sub-aiml',
   'sub-m1',
   'sub-c1',
-  'sub-webtech'
+  'sub-webtech',
+  'sub-p1',
+  'sub-physics'
 ]);
 
 export const isSubjectCardActive = (sub) => {
   if (!sub) return false;
-  // Explicitly dead cards (Applied Physics, DSA, etc.)
+  // Explicitly dead cards (DSA, etc.)
   if (sub.id === 'sub-ai' || sub.code === 'CS601') return false;
-  if (sub.id === 'sub-p1' || sub.code === 'PHYS102') return false;
   if (sub.id === 'sub-dsa' || sub.code === 'CS301') return false;
 
   if (ACTIVE_SUBJECT_IDS.has(sub.id)) return true;
@@ -55,6 +57,7 @@ export const isSubjectCardActive = (sub) => {
   if (code === 'BMAT-001') return true;
   if (code === 'BCSE-008' || code === 'CS102') return true;
   if (code === 'BCSE-012') return true;
+  if (code === 'PHYS102' || code === 'BPHY-001') return true;
 
   return false;
 };
@@ -283,7 +286,7 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center', borderTop: '1px solid var(--border-dim)', paddingTop: '12px' }}>
           <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginRight: '6px' }}>Semester:</span>
           {['All', '1', '2', '3', '4', '5', '6', '7', '8'].map(sem => {
-            const isDead = sem !== 'All' && sem !== '1';
+            const isDead = sem !== 'All' && sem !== '1' && sem !== '2';
             return (
               <button
                 key={sem}

@@ -37,6 +37,7 @@ import { aimlUnitsData, aimlSubjectDetails } from '../data/aimlNotesData';
 import { math1UnitsData, math1SubjectDetails } from '../data/math1NotesData';
 import { webTechUnitsData, webTechSubjectDetails } from '../data/webTechNotesData';
 import { cUnitsData, cSubjectDetails } from '../data/cNotesData';
+import { physicsUnitsData, physicsSubjectDetails } from '../data/physicsNotesData';
 import HandwrittenDiagram from './HandwrittenDiagram';
 import InteractiveTheveninLab from './InteractiveTheveninLab';
 import { ForensicWatermark } from './SecurityShield';
@@ -607,7 +608,7 @@ function formatNoteContent(content) {
   return html;
 }
 
-const ALLOWED_SUBJECT_IDS = ['sub-beee', 'sub-aiml', 'sub-m1', 'sub-c1', 'sub-webtech'];
+const ALLOWED_SUBJECT_IDS = ['sub-beee', 'sub-aiml', 'sub-m1', 'sub-c1', 'sub-webtech', 'sub-p1', 'sub-physics'];
 export const isSensorySubjectAllowed = (id) => ALLOWED_SUBJECT_IDS.includes(id);
 
 export default function SensoryLab({ 
@@ -616,14 +617,15 @@ export default function SensoryLab({
   isUnitsCollapsed: controlledIsUnitsCollapsed, 
   setIsUnitsCollapsed: controlledSetIsUnitsCollapsed 
 }) {
-  // Combine C, Web Tech, BEEE, AIML, and Math 1 with other subjects
+  // Combine Physics, C, Web Tech, BEEE, AIML, and Math 1 with other subjects
   const allSubjects = [
+    physicsSubjectDetails,
     cSubjectDetails,
     webTechSubjectDetails,
     beeeSubjectDetails,
     aimlSubjectDetails,
     math1SubjectDetails,
-    ...initialSubjects.filter(s => s.id !== 'sub-c1' && s.id !== 'sub-webtech' && s.id !== 'sub-beee' && s.id !== 'sub-aiml' && s.id !== 'sub-m1' && s.id !== 'sub-math1')
+    ...initialSubjects.filter(s => s.id !== 'sub-p1' && s.id !== 'sub-physics' && s.id !== 'sub-c1' && s.id !== 'sub-webtech' && s.id !== 'sub-beee' && s.id !== 'sub-aiml' && s.id !== 'sub-m1' && s.id !== 'sub-math1')
   ];
   
   const [currentSubjectId, setCurrentSubjectId] = useState(() => {
@@ -686,67 +688,78 @@ export default function SensoryLab({
   }, [currentSubjectId, selectedUnitNum, themeMode]);
 
   // Active Subject & Active Unit Data
+  const isPhysics = currentSubjectId === 'sub-p1' || currentSubjectId === 'PHYS102' || currentSubjectId === 'BPHY-001' || currentSubjectId === 'sub-physics';
   const isC = currentSubjectId === 'sub-c1' || currentSubjectId === 'BCSE-008' || currentSubjectId === 'CS102' || currentSubjectId === 'sub-c';
   const isAIML = currentSubjectId === 'sub-aiml' || currentSubjectId === 'BCSE-011';
   const isBEEE = currentSubjectId === 'sub-beee' || currentSubjectId === 'BELE-001' || currentSubjectId === 'EE101';
   const isMath1 = currentSubjectId === 'sub-m1' || currentSubjectId === 'sub-math1' || currentSubjectId === 'BMAT-001' || currentSubjectId === 'MATH101';
   const isWebTech = currentSubjectId === 'sub-webtech' || currentSubjectId === 'BCSE-012' || currentSubjectId === 'sub-web';
 
-  const activePdfUrl = isWebTech
-    ? "/BCSE012_Fundamental_of_Web_Technologies_Long_Notes.pdf"
-    : isC
-      ? "/BCSE008_Computational_and_Problem_Solving_using_C_notes.pdf"
-      : isAIML
-        ? "/AIML_notes_handwritten.pdf"
-        : isMath1
-          ? "/BMAT001_Mathematics_I_MMU_Handwritten_Notes.pdf"
-          : isBEEE
-            ? "/BEEE_notes.pdf"
-            : null;
+  const activePdfUrl = isPhysics
+    ? "/Applied_Physics_Master_Notes.pdf"
+    : isWebTech
+      ? "/BCSE012_Fundamental_of_Web_Technologies_Long_Notes.pdf"
+      : isC
+        ? "/BCSE008_Computational_and_Problem_Solving_using_C_notes.pdf"
+        : isAIML
+          ? "/AIML_notes_handwritten.pdf"
+          : isMath1
+            ? "/BMAT001_Mathematics_I_MMU_Handwritten_Notes.pdf"
+            : isBEEE
+              ? "/BEEE_notes.pdf"
+              : null;
 
-  const activePdfDownloadName = isWebTech
-    ? "Fundamental of Web Technologies notes.pdf"
-    : isC
-      ? "Computational and Problem Solving using C notes.pdf"
-      : isAIML
-        ? "AIML notes.pdf"
-        : isMath1
-          ? "Mathematics 1 notes.pdf"
-          : isBEEE
-            ? "BEEE notes.pdf"
-            : "Long_Notes.pdf";
+  const activePdfDownloadName = isPhysics
+    ? "Applied Physics Master Notes.pdf"
+    : isWebTech
+      ? "Fundamental of Web Technologies notes.pdf"
+      : isC
+        ? "Computational and Problem Solving using C notes.pdf"
+        : isAIML
+          ? "AIML notes.pdf"
+          : isMath1
+            ? "Mathematics 1 notes.pdf"
+            : isBEEE
+              ? "BEEE notes.pdf"
+              : "Long_Notes.pdf";
 
-  const activePdfPageBadge = isWebTech
-    ? "BCSE-012 • 17 Pages Long Notes"
-    : isC
-      ? "BCSE-008 • 16 Pages Long Notes"
-      : isAIML
-        ? "BCSE-011 • 13 Pages Long Notes"
-        : isMath1
-          ? "BMAT-001 • 11 Pages Long Notes"
-          : isBEEE
-            ? "BELE-001 • 13 Pages Long Notes"
-            : "University Long Notes";
+  const activePdfPageBadge = isPhysics
+    ? "BPHY-001 • 12 Pages Long Notes"
+    : isWebTech
+      ? "BCSE-012 • 17 Pages Long Notes"
+      : isC
+        ? "BCSE-008 • 16 Pages Long Notes"
+        : isAIML
+          ? "BCSE-011 • 13 Pages Long Notes"
+          : isMath1
+            ? "BMAT-001 • 11 Pages Long Notes"
+            : isBEEE
+              ? "BELE-001 • 13 Pages Long Notes"
+              : "University Long Notes";
 
-  const activePdfDescription = isWebTech
-    ? 'Official MMDU syllabus long notes: Internet vs WWW, DNS resolution, TCP/IP, HTML5 semantics, Canvas, and CSS box model with solved exam questions.'
-    : isC
-      ? 'Official MMDU syllabus long notes: Computational problem solving, 4-stage compilation pipeline, memory segmentation, DMA, pointers, and file I/O with solved exam questions.'
-      : isAIML
-        ? 'Official MMDU syllabus long notes: PEAS framework, A* search traces, CNF conversion, Resolution Refutation, Decision Trees, and Apriori with solved exam questions.'
-        : isMath1
-          ? 'Official MMDU syllabus long notes: Matrices, Gauss-Jordan, Curvature, Indeterminate forms, Beta-Gamma, and Fourier series with solved exam questions.'
-          : 'Official MMDU syllabus long notes: DC/AC circuits, KCL/KVL, Thevenin equivalent, Transformers, DC machines, BJT, and Boolean logic with solved exam questions.';
+  const activePdfDescription = isPhysics
+    ? "Official MMDU syllabus long notes: Wave optics, Newton's rings derivations, Fraunhofer single-slit diffraction, lasers (Ruby & He-Ne 4-level system), Maxwell's equations, skin depth, Schrödinger wave mechanics, and crystal APF derivations."
+    : isWebTech
+      ? 'Official MMDU syllabus long notes: Internet vs WWW, DNS resolution, TCP/IP, HTML5 semantics, Canvas, and CSS box model with solved exam questions.'
+      : isC
+        ? 'Official MMDU syllabus long notes: Computational problem solving, 4-stage compilation pipeline, memory segmentation, DMA, pointers, and file I/O with solved exam questions.'
+        : isAIML
+          ? 'Official MMDU syllabus long notes: PEAS framework, A* search traces, CNF conversion, Resolution Refutation, Decision Trees, and Apriori with solved exam questions.'
+          : isMath1
+            ? 'Official MMDU syllabus long notes: Matrices, Gauss-Jordan, Curvature, Indeterminate forms, Beta-Gamma, and Fourier series with solved exam questions.'
+            : 'Official MMDU syllabus long notes: DC/AC circuits, KCL/KVL, Thevenin equivalent, Transformers, DC machines, BJT, and Boolean logic with solved exam questions.';
 
-  const activeExamAlignedBadge = isWebTech
-    ? "Covers HTTP/HTTPS request-response cycles, DNS resolution hierarchy, semantic HTML5, CSS Flexbox/Grid box model, JavaScript DOM manipulation, and AJAX/Fetch."
-    : isC
-      ? "Covers 4-stage compilation pipeline, memory segmentation (Stack/Heap/BSS), pointers & dynamic memory (malloc/calloc/free), struct alignment, and file I/O operations."
-      : isAIML
-        ? "Covers PEAS agent classification, BFS/DFS, A* heuristic proofs, Minimax & Alpha-Beta pruning, Propositional logic & resolution refutation, Supervised vs Unsupervised ML, and Bias-Variance tradeoff."
-        : isMath1
-          ? "Covers Cayley-Hamilton & Eigenvalues, Rank & Gauss-Jordan, Rolle's & LMVT, Beta-Gamma integrals, Euler's homogeneous theorem, Taylor series, Vector curl/divergence, and Fourier expansions."
-          : "Covers DC/AC circuit proofs, Maximum Power Transfer derivation, transformer equivalent circuits, OC/SC tests, P-N junction diode rectifiers, BJT characteristics, and De Morgan's theorem proofs.";
+  const activeExamAlignedBadge = isPhysics
+    ? "Covers Newton's rings derivations, single-slit phasor intensity, He-Ne 4-level resonant pumping, Maxwell curl equations, skin depth in conductors, 1D infinite well quantization, and SC/BCC/FCC APF calculations."
+    : isWebTech
+      ? "Covers HTTP/HTTPS request-response cycles, DNS resolution hierarchy, semantic HTML5, CSS Flexbox/Grid box model, JavaScript DOM manipulation, and AJAX/Fetch."
+      : isC
+        ? "Covers 4-stage compilation pipeline, memory segmentation (Stack/Heap/BSS), pointers & dynamic memory (malloc/calloc/free), struct alignment, and file I/O operations."
+        : isAIML
+          ? "Covers PEAS agent classification, BFS/DFS, A* heuristic proofs, Minimax & Alpha-Beta pruning, Propositional logic & resolution refutation, Supervised vs Unsupervised ML, and Bias-Variance tradeoff."
+          : isMath1
+            ? "Covers Cayley-Hamilton & Eigenvalues, Rank & Gauss-Jordan, Rolle's & LMVT, Beta-Gamma integrals, Euler's homogeneous theorem, Taylor series, Vector curl/divergence, and Fourier expansions."
+            : "Covers DC/AC circuit proofs, Maximum Power Transfer derivation, transformer equivalent circuits, OC/SC tests, P-N junction diode rectifiers, BJT characteristics, and De Morgan's theorem proofs.";
 
   const getTopperExamNote = () => {
     if (isMath1) {
@@ -784,6 +797,31 @@ export default function SensoryLab({
         <>In semester exams, examiners check for: <strong>(1) Complete syntax including header files</strong>, <strong>(2) Pointer dereference safety & NULL checks</strong>, <strong>(3) Accurate memory layout diagrams (Stack/Heap)</strong>. Always declare variables before usage in ANSI C!</>
       );
     }
+    if (isPhysics) {
+      if (selectedUnitNum === 1) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Stokes' phase reversal (&plusmn;&lambda;/2) condition</strong>, <strong>(2) Clear Newton's rings dark/bright diameter derivations</strong>, <strong>(3) He-Ne 4-level energy transfer diagram</strong>. Always state why the central ring is dark!</>
+        );
+      }
+      if (selectedUnitNum === 2) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Continuity equation &nabla;&middot;J + &part;&rho;/&part;t = 0</strong>, <strong>(2) Displacement current density J<sub>d</sub> = &part;D/&part;t</strong>, <strong>(3) Skin depth derivation &delta; = &radic;[2/(&omega;&mu;&sigma;)]</strong>. Always write both differential and integral Maxwell equations!</>
+        );
+      }
+      if (selectedUnitNum === 3) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Non-existence of nuclear electrons uncertainty proof</strong>, <strong>(2) Normalized 1D box wavefunctions &psi;<sub>n</sub> = &radic;(2/L) sin(n&pi;x/L)</strong>, <strong>(3) Quantized energy levels E<sub>n</sub> = n<sup>2</sup>h<sup>2</sup>/(8mL<sup>2</sup>)</strong>. Always mention zero-point energy E<sub>1</sub> &gt; 0!</>
+        );
+      }
+      if (selectedUnitNum === 4) {
+        return (
+          <>In semester exams, examiners check for: <strong>(1) Step-by-step SC, BCC, FCC APF derivations (52%, 68%, 74%)</strong>, <strong>(2) 12-point Schottky vs Frenkel comparison</strong>, <strong>(3) Fermi-Dirac step function at T=0 K and Richardson equation</strong>. Always draw unit cell sphere packing!</>
+        );
+      }
+      return (
+        <>In semester exams, examiners check for: <strong>(1) Step-by-step physical derivations</strong>, <strong>(2) Accurate ray/energy schematics</strong>, <strong>(3) Boxed final mathematical expressions</strong>. Always write definitions before deriving equations!</>
+      );
+    }
     if (isWebTech) {
       return (
         <>In semester exams, examiners check for: <strong>(1) Clean semantic HTML5 structure</strong>, <strong>(2) Accurate CSS box-model diagrams</strong>, <strong>(3) JavaScript event listeners with proper syntax</strong>. Always explain the client-server request/response flow!</>
@@ -794,40 +832,46 @@ export default function SensoryLab({
     );
   };
 
-  const activeSubject = isC
-    ? cSubjectDetails
-    : isWebTech
-      ? webTechSubjectDetails
-      : isAIML 
-        ? aimlSubjectDetails 
-        : isBEEE 
-          ? beeeSubjectDetails 
-          : isMath1
-            ? math1SubjectDetails
-            : (allSubjects.find(s => s.id === currentSubjectId) || beeeSubjectDetails);
+  const activeSubject = isPhysics
+    ? physicsSubjectDetails
+    : isC
+      ? cSubjectDetails
+      : isWebTech
+        ? webTechSubjectDetails
+        : isAIML 
+          ? aimlSubjectDetails 
+          : isBEEE 
+            ? beeeSubjectDetails 
+            : isMath1
+              ? math1SubjectDetails
+              : (allSubjects.find(s => s.id === currentSubjectId) || beeeSubjectDetails);
 
-  const unitsList = isC
-    ? cUnitsData
-    : isWebTech
-      ? webTechUnitsData
-      : isAIML 
-        ? aimlUnitsData 
-        : isBEEE 
-          ? beeeUnitsData 
-          : isMath1 
-            ? math1UnitsData 
-            : (activeSubject.units || []);
-  const beeeUnit = isC
-    ? (cUnitsData.find(u => u.unitNum === selectedUnitNum) || cUnitsData[0])
-    : isWebTech
-      ? (webTechUnitsData.find(u => u.unitNum === selectedUnitNum) || webTechUnitsData[0])
-      : isAIML 
-        ? (aimlUnitsData.find(u => u.unitNum === selectedUnitNum) || aimlUnitsData[0])
-        : isBEEE 
-          ? (beeeUnitsData.find(u => u.unitNum === selectedUnitNum) || beeeUnitsData[0])
-          : isMath1
-            ? (math1UnitsData.find(u => u.unitNum === selectedUnitNum) || math1UnitsData[0])
-            : (activeSubject.units?.find(u => (u.unitNum || u.num) === selectedUnitNum) || activeSubject.units?.[0] || {});
+  const unitsList = isPhysics
+    ? physicsUnitsData
+    : isC
+      ? cUnitsData
+      : isWebTech
+        ? webTechUnitsData
+        : isAIML 
+          ? aimlUnitsData 
+          : isBEEE 
+            ? beeeUnitsData 
+            : isMath1 
+              ? math1UnitsData 
+              : (activeSubject.units || []);
+  const beeeUnit = isPhysics
+    ? (physicsUnitsData.find(u => u.unitNum === selectedUnitNum) || physicsUnitsData[0])
+    : isC
+      ? (cUnitsData.find(u => u.unitNum === selectedUnitNum) || cUnitsData[0])
+      : isWebTech
+        ? (webTechUnitsData.find(u => u.unitNum === selectedUnitNum) || webTechUnitsData[0])
+        : isAIML 
+          ? (aimlUnitsData.find(u => u.unitNum === selectedUnitNum) || aimlUnitsData[0])
+          : isBEEE 
+            ? (beeeUnitsData.find(u => u.unitNum === selectedUnitNum) || beeeUnitsData[0])
+            : isMath1
+              ? (math1UnitsData.find(u => u.unitNum === selectedUnitNum) || math1UnitsData[0])
+              : (activeSubject.units?.find(u => (u.unitNum || u.num) === selectedUnitNum) || activeSubject.units?.[0] || {});
 
   const notesPanelRef = useRef(null);
   const [isPrinting, setIsPrinting] = useState(false);

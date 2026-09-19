@@ -162,17 +162,16 @@ export const initialSubjects = [
     name: 'Applied Physics',
     code: 'PHYS102',
     credits: 4,
-    instructor: 'Prof. Ananya Sen',
-    notesCount: '5 Units Complete',
-    rating: 4.8,
-    description: 'Wave optics, lasers, fiber optics, quantum mechanics, and solid-state crystal physics with diagrams.',
+    instructor: 'Department of Physics & Applied Sciences',
+    notesCount: '4 Units Complete',
+    rating: 5.0,
+    description: "Official MMDU syllabus (BPHY-001 / PHYS102): Wave optics, Newton's rings derivations, Fraunhofer diffraction, lasers, Maxwell's equations, skin depth, Schrödinger wave mechanics, and crystal APF derivations.",
     banner: 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=800&q=80',
     units: [
-      { num: 1, title: 'Wave Optics & Interference', pages: 26, status: 'Verified' },
-      { num: 2, title: 'Lasers & Holography', pages: 22, status: 'Verified' },
-      { num: 3, title: 'Fiber Optics Communication', pages: 24, status: 'Verified' },
-      { num: 4, title: 'Quantum Mechanics Basics', pages: 34, status: 'Verified' },
-      { num: 5, title: 'Solid State & Band Theory', pages: 30, status: 'Verified' }
+      { num: 1, title: 'Wave Optics & Lasers', pages: 28, status: 'Verified' },
+      { num: 2, title: 'Electrostatics, Magnetostatics & EM Waves', pages: 26, status: 'Verified' },
+      { num: 3, title: 'Wave Nature of Particles & Schrödinger Equation', pages: 30, status: 'Verified' },
+      { num: 4, title: 'Crystal Structures & Free Electron Theory', pages: 32, status: 'Verified' }
     ]
   },
 
@@ -453,21 +452,21 @@ export const initialShortNotes = [
   // ==================== SEMESTER 2 ====================
   {
     id: 'sn-physics',
-    subject: 'Applied Physics (PHYS102)',
+    subject: 'Applied Physics (BPHY-001 / PHYS102)',
     code: 'PHYS102',
     semester: 'Semester 2',
     category: 'Core Engineering',
-    type: 'KaTeX Optics, Quantum Mechanics & Lasers Formula Sheet',
-    pdfUrl: '/PHYS102_Applied_Physics_Short_Notes_Exam_Ready.pdf',
-    downloadName: 'PHYS102_Applied_Physics_Short_Notes_Exam_Ready.pdf',
-    fileSize: '179 KB',
-    pages: '2 Pages KaTeX Revision',
-    downloads: 3620,
+    type: 'Optics, Maxwell EM Waves, Quantum 1D Box & Crystal APF Formula Sheet',
+    pdfUrl: '/Applied_Physics_Exam_Revision_Sheet.pdf',
+    downloadName: 'Applied Physics Exam Revision Sheet.pdf',
+    fileSize: '325 KB',
+    pages: '2 Pages High-Yield Revision',
+    downloads: 4890,
     highlights: [
-      'Interference Fringe Width, Newton\'s Rings & Grating Equation',
-      'Time-Independent Schrödinger Equation & Particle-in-a-Box',
-      'Einstein\'s A and B Coefficients & Population Inversion',
-      'Optical Fiber Acceptance Angle, Numerical Aperture & Meissner Effect'
+      'Newton\'s Rings Radii Derivations & Optical Path Difference',
+      'Maxwell\'s 4 Equations, Displacement Current & Skin Depth',
+      '1D Infinite Box Wavefunctions & Nuclear Electron Uncertainty Proof',
+      'Cubic Crystal Geometries: SC (52%), BCC (68%), FCC (74%) APF Derivations'
     ]
   },
 

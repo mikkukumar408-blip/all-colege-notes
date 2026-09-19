@@ -136,12 +136,12 @@ export default function App() {
      2. CROSS-SECTION ACTION HANDLERS
      Passes selected subject data from catalog to reader or download hub
      ----------------------------------------------------------------------- */
-  const ALLOWED_CORE_IDS = ['sub-beee', 'sub-aiml', 'sub-m1', 'sub-c1', 'sub-webtech'];
+  const ALLOWED_CORE_IDS = ['sub-beee', 'sub-aiml', 'sub-m1', 'sub-c1', 'sub-webtech', 'sub-p1', 'sub-physics'];
   const isSubjectValid = (subject) => {
     if (!subject) return false;
     if (ALLOWED_CORE_IDS.includes(subject.id)) return true;
     const code = (subject.code || '').toUpperCase().trim();
-    return ['BELE-001', 'EE101', 'BCSE-011', 'BMAT-001', 'BCSE-008', 'CS102', 'BCSE-012'].includes(code);
+    return ['BELE-001', 'EE101', 'BCSE-011', 'BMAT-001', 'BCSE-008', 'CS102', 'BCSE-012', 'PHYS102', 'BPHY-001'].includes(code);
   };
 
   const handleSelectSubjectForDownload = (subject) => {
