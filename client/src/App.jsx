@@ -319,7 +319,7 @@ export default function App() {
            Contains sidebar collapse toggle, section title, and quick download
            ----------------------------------------------------------------- */}
         <header className="top-navbar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0, flex: 1, marginRight: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: '180px', flex: '1 1 auto', marginRight: '8px' }}>
             <button 
               className="sidebar-toggle-btn"
               onClick={() => {
@@ -407,7 +407,7 @@ export default function App() {
               )}
             </div>
 
-            {/* Desktop Action Buttons (Hidden on Mobile/Tablet via CSS) */}
+            {/* Desktop Action Buttons (Hidden on Laptops/Tablets <=1380px via CSS) */}
             <button 
               className="btn-secondary desktop-nav-action" 
               style={{ 
@@ -430,7 +430,7 @@ export default function App() {
             >
               <Sparkles size={14} color="var(--neon-cyan)" />
               <span style={{ fontWeight: 800 }}>DeepSearch</span>
-              <span style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+Space</span>
+              <span className="nav-kbd-badge" style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+Space</span>
             </button>
 
             <button 
@@ -441,7 +441,7 @@ export default function App() {
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: '6px', 
-                borderColor: 'rgba(16, 185, 129, 0.45)', 
+                borderColor: 'rgba(168, 185, 129, 0.45)', 
                 color: '#86efac', 
                 background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(0, 240, 255, 0.08))', 
                 cursor: 'pointer'
@@ -451,7 +451,7 @@ export default function App() {
             >
               <Cpu size={14} color="#10b981" />
               <span style={{ fontWeight: 800 }}>Circuit Sim</span>
-              <span style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+C</span>
+              <span className="nav-kbd-badge" style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+C</span>
             </button>
 
             <button 
@@ -472,7 +472,7 @@ export default function App() {
             >
               <Award size={14} color="#eab308" />
               <span style={{ fontWeight: 800 }}>Mock Exam</span>
-              <span style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+Q</span>
+              <span className="nav-kbd-badge" style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+Q</span>
             </button>
 
             <button 
@@ -493,7 +493,7 @@ export default function App() {
             >
               <Zap size={14} color="#c084fc" />
               <span style={{ fontWeight: 800 }}>Formulas</span>
-              <span style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+F</span>
+              <span className="nav-kbd-badge" style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+F</span>
             </button>
 
             <button 

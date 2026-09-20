@@ -9,6 +9,7 @@ import { logUserActivity } from '../utils/activityTracker';
    ========================================================================= */
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   DownloadCloud, 
   FileText, 
@@ -1025,13 +1026,13 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
       {/* -------------------------------------------------------------------
          PART C: INTERACTIVE GOD-LEVEL PRACTICAL LAB & CODE STUDIO MODAL
          ------------------------------------------------------------------- */}
-      {selectedLab && (
+      {selectedLab && createPortal(
         <div 
           style={{
             position: 'fixed',
             inset: 0,
-            zIndex: 9999,
-            background: 'rgba(4, 7, 13, 0.88)',
+            zIndex: 999999,
+            background: 'rgba(4, 7, 13, 0.92)',
             backdropFilter: 'blur(16px)',
             display: 'flex',
             alignItems: 'center',
@@ -2200,7 +2201,8 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
