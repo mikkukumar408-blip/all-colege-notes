@@ -11,19 +11,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import NowShowing from './components/NowShowing';
-import SensoryLab from './components/SensoryLab';
-import TechGuide from './components/TechGuide';
-import Theaters from './components/Theaters';
-import SeatBooking from './components/SeatBooking';
-import FanReviews from './components/FanReviews';
 import SecurityShield from './components/SecurityShield';
 import AuthPage from './components/AuthPage';
-import SuperAdminPanel from './components/SuperAdminPanel';
-import DeepSearchModal from './components/DeepSearchModal';
 import CampusAIChatbot from './components/CampusAIChatbot';
-import CircuitSimulatorModal from './components/CircuitSimulatorModal';
-import ExamQuizModal from './components/ExamQuizModal';
-import FormulaHUDModal from './components/FormulaHUDModal';
+const SensoryLab = React.lazy(() => import('./components/SensoryLab'));
+const TechGuide = React.lazy(() => import('./components/TechGuide'));
+const Theaters = React.lazy(() => import('./components/Theaters'));
+const SeatBooking = React.lazy(() => import('./components/SeatBooking'));
+const FanReviews = React.lazy(() => import('./components/FanReviews'));
+const SuperAdminPanel = React.lazy(() => import('./components/SuperAdminPanel'));
+const DeepSearchModal = React.lazy(() => import('./components/DeepSearchModal'));
+const CircuitSimulatorModal = React.lazy(() => import('./components/CircuitSimulatorModal'));
+const ExamQuizModal = React.lazy(() => import('./components/ExamQuizModal'));
+const FormulaHUDModal = React.lazy(() => import('./components/FormulaHUDModal'));
 import { initialSubjects } from './data/mockData';
 import { Menu, ChevronLeft, ChevronRight, ChevronDown, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot, Cpu, Award, Zap } from 'lucide-react';
 import { logSecurityEvent } from './utils/security';
@@ -52,6 +52,7 @@ export default function App() {
     if (!currentUser) return;
 
     const resetActivity = () => {
+      if (Date.now() - lastActivityRef.current < 2000) return;
       lastActivityRef.current = Date.now();
     };
 
@@ -653,7 +654,14 @@ export default function App() {
 
         {/* Main Content Viewport */}
         <main className="content-container">
-          {renderActiveSection()}
+          <React.Suspense fallback={
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '350px', color: 'var(--neon-cyan)', gap: '12px' }}>
+              <div className="typing-dot" style={{ width: 10, height: 10, background: 'var(--neon-cyan)', borderRadius: '50%' }}></div>
+              <span style={{ fontSize: '0.9rem', letterSpacing: '0.5px', fontFamily: 'var(--font-heading)' }}>Loading Academic Section...</span>
+            </div>
+          }>
+            {renderActiveSection()}
+          </React.Suspense>
         </main>
       </div>
 
@@ -668,31 +676,42 @@ export default function App() {
         subjects={initialSubjects}
       />
 
-      {/* Global AI DeepSearch & 16:9 Presentation Slides Modal */}
-      <DeepSearchModal 
-        isOpen={deepSearchOpen} 
-        onClose={() => setDeepSearchOpen(false)} 
-        initialQuery={deepSearchInitialQuery} 
-      />
+      {/* Code-Split Lazy Loaded Heavy Modals wrapped in Suspense */}
+      <React.Suspense fallback={null}>
+        {/* Global AI DeepSearch & 16:9 Presentation Slides Modal */}
+        {deepSearchOpen && (
+          <DeepSearchModal 
+            isOpen={deepSearchOpen} 
+            onClose={() => setDeepSearchOpen(false)} 
+            initialQuery={deepSearchInitialQuery} 
+          />
+        )}
 
-      {/* Interactive Deterministic Circuit Simulator & Mathematical Sandbox Modal */}
-      <CircuitSimulatorModal
-        isOpen={circuitSimOpen}
-        onClose={() => setCircuitSimOpen(false)}
-        initialValues={circuitSimInitialValues}
-      />
+        {/* Interactive Deterministic Circuit Simulator & Mathematical Sandbox Modal */}
+        {circuitSimOpen && (
+          <CircuitSimulatorModal
+            isOpen={circuitSimOpen}
+            onClose={() => setCircuitSimOpen(false)}
+            initialValues={circuitSimInitialValues}
+          />
+        )}
 
-      {/* Active-Recall University Exam Quiz Generator Modal */}
-      <ExamQuizModal
-        isOpen={examQuizOpen}
-        onClose={() => setExamQuizOpen(false)}
-      />
+        {/* Active-Recall University Exam Quiz Generator Modal */}
+        {examQuizOpen && (
+          <ExamQuizModal
+            isOpen={examQuizOpen}
+            onClose={() => setExamQuizOpen(false)}
+          />
+        )}
 
-      {/* Engineering Formula, Identities & Physical Constants Quick Drawer */}
-      <FormulaHUDModal
-        isOpen={formulaHUDOpen}
-        onClose={() => setFormulaHUDOpen(false)}
-      />
+        {/* Engineering Formula, Identities & Physical Constants Quick Drawer */}
+        {formulaHUDOpen && (
+          <FormulaHUDModal
+            isOpen={formulaHUDOpen}
+            onClose={() => setFormulaHUDOpen(false)}
+          />
+        )}
+      </React.Suspense>
     </div>
   );
 }
