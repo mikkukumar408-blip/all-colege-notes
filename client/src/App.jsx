@@ -21,8 +21,9 @@ import AuthPage from './components/AuthPage';
 import SuperAdminPanel from './components/SuperAdminPanel';
 import DeepSearchModal from './components/DeepSearchModal';
 import CampusAIChatbot from './components/CampusAIChatbot';
+import CircuitSimulatorModal from './components/CircuitSimulatorModal';
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot, Cpu } from 'lucide-react';
 import { logSecurityEvent } from './utils/security';
 import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers } from './utils/cloudSync';
 import './App.css';
@@ -108,13 +109,18 @@ export default function App() {
   // AI DeepSearch Assistant & 16:9 Presentation Slides State
   const [deepSearchOpen, setDeepSearchOpen] = useState(false);
   const [deepSearchInitialQuery, setDeepSearchInitialQuery] = useState('');
+  const [circuitSimOpen, setCircuitSimOpen] = useState(false);
+  const [circuitSimInitialValues, setCircuitSimInitialValues] = useState({});
 
-  // Global Hotkey Listener: Alt + Space or Ctrl + K for DeepSearch Ecosystem HUD
+  // Global Hotkey Listener: Alt + Space (DeepSearch) and Alt + C (Circuit Sandbox)
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if ((e.altKey && e.code === 'Space') || (e.ctrlKey && e.key.toLowerCase() === 'k')) {
         e.preventDefault();
         setDeepSearchOpen(prev => !prev);
+      } else if (e.altKey && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        setCircuitSimOpen(prev => !prev);
       }
     };
 
@@ -125,12 +131,35 @@ export default function App() {
       setDeepSearchOpen(true);
     };
 
+    const handleOpenCircuitSimEvent = (e) => {
+      if (e.detail) {
+        setCircuitSimInitialValues(e.detail);
+      }
+      setCircuitSimOpen(true);
+    };
+
+    // Cross-App Synapse Memory Bridge (Bhavya Ecosystem Sync)
+    let synapseChannel = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        synapseChannel = new BroadcastChannel('bhavya_ecosystem_synapse');
+        synapseChannel.onmessage = (msg) => {
+          if (msg.data?.type === 'ECOSYSTEM_QUERY_SYNC' && msg.data?.query) {
+            setDeepSearchInitialQuery(msg.data.query);
+          }
+        };
+      }
+    } catch (err) {}
+
     window.addEventListener('keydown', handleGlobalKeyDown);
     window.addEventListener('open-deepsearch', handleOpenDeepSearchEvent);
+    window.addEventListener('open-circuit-sim', handleOpenCircuitSimEvent);
 
     return () => {
       window.removeEventListener('keydown', handleGlobalKeyDown);
       window.removeEventListener('open-deepsearch', handleOpenDeepSearchEvent);
+      window.removeEventListener('open-circuit-sim', handleOpenCircuitSimEvent);
+      if (synapseChannel) synapseChannel.close();
     };
   }, []);
 
@@ -380,6 +409,27 @@ export default function App() {
 
             <button 
               className="btn-secondary" 
+              style={{ 
+                padding: '6px 12px', 
+                fontSize: '0.82rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '6px', 
+                borderColor: 'rgba(16, 185, 129, 0.45)', 
+                color: '#86efac', 
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(0, 240, 255, 0.08))', 
+                cursor: 'pointer'
+              }}
+              onClick={() => setCircuitSimOpen(true)}
+              title="Interactive Circuit & Mathematical Sandbox (Alt + C)"
+            >
+              <Cpu size={14} color="#10b981" />
+              <span style={{ fontWeight: 800 }}>Circuit Sim</span>
+              <span style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+C</span>
+            </button>
+
+            <button 
+              className="btn-secondary" 
               style={{ padding: '6px 14px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px', borderColor: 'rgba(255, 75, 75, 0.4)', color: '#ff6b6b', background: 'rgba(255, 75, 75, 0.08)', cursor: 'pointer' }}
               onClick={() => {
                 if (currentUser && currentUser.username) {
@@ -428,6 +478,13 @@ export default function App() {
         isOpen={deepSearchOpen} 
         onClose={() => setDeepSearchOpen(false)} 
         initialQuery={deepSearchInitialQuery} 
+      />
+
+      {/* Interactive Deterministic Circuit Simulator & Mathematical Sandbox Modal */}
+      <CircuitSimulatorModal
+        isOpen={circuitSimOpen}
+        onClose={() => setCircuitSimOpen(false)}
+        initialValues={circuitSimInitialValues}
       />
     </div>
   );

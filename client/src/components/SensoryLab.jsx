@@ -88,7 +88,7 @@ function cleanMathTypography(str) {
   // Stacked Fractions: render \frac{num}{den} with real horizontal fraction bar via KaTeX
   s = s.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, (m, num, den) => {
     try {
-      return katex.renderToString(`\\frac{${num.trim()}}{${den.trim()}}`, { displayMode: false, throwOnError: false });
+      return katex.renderToString(`\\frac{${num.trim()}}{${den.trim()}}`, { displayMode: false, throwOnError: false, strict: 'ignore' });
     } catch(e) {
       return `<span class="frac"><span class="frac-num">${num.trim()}</span><span class="frac-den">${den.trim()}</span></span>`;
     }
@@ -104,7 +104,7 @@ function cleanMathTypography(str) {
     }
     if (/[0-9a-zA-ZλρθμπσωφΔ∇]/.test(trimmedNum) && /[0-9a-zA-ZλρθμπσωφΔ∇]/.test(trimmedDen)) {
       try {
-        return katex.renderToString(`\\frac{${trimmedNum}}{${trimmedDen}}`, { displayMode: false, throwOnError: false });
+        return katex.renderToString(`\\frac{${trimmedNum}}{${trimmedDen}}`, { displayMode: false, throwOnError: false, strict: 'ignore' });
       } catch(e) {
         return `<span class="frac"><span class="frac-num">${trimmedNum}</span><span class="frac-den">${trimmedDen}</span></span>`;
       }
@@ -240,6 +240,12 @@ function renderKaTeXSafe(formula, isDisplay = false) {
     .replace(/\\?ω/g, '\\omega ')
     .replace(/\\?Ω/g, '\\Omega ')
     .replace(/\\?π/g, '\\pi ')
+    .replace(/\\?φ|\\?ϕ|\\?Φ/g, '\\phi ')
+    .replace(/\\?θ|\\?Θ/g, '\\theta ')
+    .replace(/\\?ρ/g, '\\rho ')
+    .replace(/\\?σ/g, '\\sigma ')
+    .replace(/\\?Δ/g, '\\Delta ')
+    .replace(/\\?∇/g, '\\nabla ')
     .replace(/\\?∞/g, '\\infty ')
     .replace(/\\?∈/g, '\\in ')
     .replace(/\\?∂/g, '\\partial ')
@@ -256,7 +262,7 @@ function renderKaTeXSafe(formula, isDisplay = false) {
     const rendered = katex.renderToString(clean, {
       displayMode: isDisplay,
       throwOnError: false,
-      strict: false
+      strict: 'ignore'
     });
     if (!rendered.includes('katex-error')) {
       return rendered;
@@ -266,7 +272,7 @@ function renderKaTeXSafe(formula, isDisplay = false) {
     const retry = katex.renderToString(stripped, {
       displayMode: isDisplay,
       throwOnError: false,
-      strict: false
+      strict: 'ignore'
     });
     // Retry 2: Normalize \left and \right if mismatched brackets caused the KaTeX error
     const bracketsNormalized = clean
@@ -277,7 +283,7 @@ function renderKaTeXSafe(formula, isDisplay = false) {
     const retry2 = katex.renderToString(bracketsNormalized, {
       displayMode: isDisplay,
       throwOnError: false,
-      strict: false
+      strict: 'ignore'
     });
     if (!retry2.includes('katex-error')) {
       return retry2;

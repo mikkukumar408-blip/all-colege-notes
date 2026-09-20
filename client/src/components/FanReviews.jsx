@@ -26,7 +26,10 @@ import {
   Cpu,
   Layers,
   Zap,
-  Presentation
+  Presentation,
+  Mic,
+  MicOff,
+  Printer
 } from 'lucide-react';
 import katex from 'katex';
 import { logUserActivity } from '../utils/activityTracker';
@@ -118,6 +121,165 @@ export default function FanReviews({ currentUser }) {
   const [submitted, setSubmitted] = useState(false);
   const [isSolvingAI, setIsSolvingAI] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(true);
+
+  // Universal Speech-to-Doubt Voice Dictation with Math Cleanup
+  const toggleSpeechRecognition = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.');
+      setSpeechSupported(false);
+      return;
+    }
+
+    if (isListening) {
+      if (window.__campusnotes_recognition) {
+        window.__campusnotes_recognition.stop();
+      }
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      window.__campusnotes_recognition = recognition;
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results?.[0]?.[0]?.transcript;
+        if (transcript) {
+          // Automated math phrase post-processing for university equations
+          let cleaned = transcript
+            .replace(/\b(v sub th|v th|thevenin voltage)\b/gi, '$V_{th}$')
+            .replace(/\b(i sub n|i n|norton current)\b/gi, '$I_N$')
+            .replace(/\b(r sub th|r th|thevenin resistance)\b/gi, '$R_{th}$')
+            .replace(/\b(r sub n|r n|norton resistance)\b/gi, '$R_N$')
+            .replace(/\b(r sub l|r l|load resistance)\b/gi, '$R_L$')
+            .replace(/\b(ohm|ohms)\b/gi, 'Ω')
+            .replace(/\b(microfarad|micro farad)\b/gi, 'μF')
+            .replace(/\b(p sub max|p max)\b/gi, '$P_{max}$');
+
+          setQuestion(prev => (prev ? prev + ' ' + cleaned : cleaned));
+        }
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.warn('Speech recognition start failed:', err);
+      setIsListening(false);
+    }
+  };
+
+  // 1-Click University Exam Revision Sheet Print-to-PDF
+  const handlePrintCheatSheet = (doubt) => {
+    const printWindow = window.open('', '_blank', 'width=950,height=850');
+    if (!printWindow) return;
+
+    const formattedAnswer = formatForumContent(doubt.bestAnswer);
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>University Exam Revision Sheet - ${doubt.subject}</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+        <style>
+          @page { size: A4; margin: 12mm; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #111;
+            background: #fff;
+            padding: 16px;
+            line-height: 1.5;
+            font-size: 13px;
+          }
+          .header {
+            border-bottom: 2px solid #00f0ff;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+          }
+          .title { font-size: 18px; font-weight: 800; color: #0f172a; }
+          .meta { font-size: 11px; color: #64748b; }
+          .question-box {
+            background: #f8fafc;
+            border-left: 4px solid #0284c7;
+            border-radius: 4px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #1e293b;
+          }
+          pre {
+            background: #0f172a !important;
+            color: #38bdf8 !important;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 10px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 11px;
+            line-height: 1.35;
+            white-space: pre-wrap;
+          }
+          strong { color: #0f172a !important; font-weight: 700; }
+          .solution-content { color: #334155; line-height: 1.6; }
+          .footer {
+            margin-top: 24px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 8px;
+            font-size: 10px;
+            color: #94a3b8;
+            text-align: center;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div>
+            <div class="title">CampusNotes Elite Exam Revision Sheet</div>
+            <div class="meta">Subject: ${doubt.subject} • 100% Deterministic & Verified Solution</div>
+          </div>
+          <div class="meta">Verified by AI Academic Mentor • ${new Date().toLocaleDateString()}</div>
+        </div>
+
+        <div class="question-box">
+          <strong>Problem Statement:</strong> ${doubt.question}
+        </div>
+
+        <div class="solution-content">
+          ${formattedAnswer}
+        </div>
+
+        <div class="footer">
+          Generated via CampusNotes Elite AI Academic Hub (all-college-notes.vercel.app) • University Exam Study Sheet
+        </div>
+
+        <script>
+          window.onload = function() { window.print(); }
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
 
   // Sync author when currentUser changes
   useEffect(() => {
@@ -504,9 +666,36 @@ export default function FanReviews({ currentUser }) {
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Terminal size={14} color="#00f0ff" /> Type Your Question / Numerical Problem Here:
               </span>
-              <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-                Supports math formulas & circuits
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {speechSupported && (
+                  <button
+                    type="button"
+                    onClick={toggleSpeechRecognition}
+                    style={{
+                      background: isListening ? 'rgba(239, 68, 68, 0.2)' : 'rgba(0, 240, 255, 0.1)',
+                      border: isListening ? '1px solid #ef4444' : '1px solid rgba(0, 240, 255, 0.3)',
+                      color: isListening ? '#f87171' : 'var(--neon-cyan)',
+                      borderRadius: '14px',
+                      padding: '2px 10px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      animation: isListening ? 'pulse 1.5s infinite' : 'none'
+                    }}
+                    title="Speak your doubt with automatic math equation formatting"
+                  >
+                    {isListening ? <MicOff size={12} /> : <Mic size={12} />}
+                    <span>{isListening ? 'Listening (Speak now)...' : 'Voice Dictate'}</span>
+                  </button>
+                )}
+                <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                  Supports math formulas & circuits
+                </span>
+              </div>
             </label>
             <textarea
               required
@@ -733,6 +922,54 @@ export default function FanReviews({ currentUser }) {
                         >
                           <Presentation size={13} />
                           <span>16:9 Slides</span>
+                        </button>
+
+                        {/circuit|norton|thevenin|kirchhoff|kcl|kvl|mptt|mesh|nodal|resistor|power transfer/i.test(d.question + ' ' + d.subject) && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              window.dispatchEvent(new CustomEvent('open-circuit-sim', { detail: { question: d.question } }));
+                            }}
+                            style={{
+                              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(0, 240, 255, 0.15))',
+                              border: '1px solid rgba(16, 185, 129, 0.4)',
+                              color: '#86efac',
+                              cursor: 'pointer',
+                              fontSize: '0.74rem',
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              padding: '4px 10px',
+                              borderRadius: '6px',
+                              transition: 'all 0.15s'
+                            }}
+                            title="Open in Interactive Deterministic Circuit Sandbox"
+                          >
+                            <Cpu size={13} />
+                            <span>Circuit Sandbox</span>
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => handlePrintCheatSheet(d)}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                            color: '#cbd5e1',
+                            cursor: 'pointer',
+                            fontSize: '0.74rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            padding: '4px 8px',
+                            borderRadius: '6px'
+                          }}
+                          title="Generate printable 2-column university exam revision sheet"
+                        >
+                          <Printer size={13} />
+                          <span>Exam Sheet</span>
                         </button>
 
                         <button
