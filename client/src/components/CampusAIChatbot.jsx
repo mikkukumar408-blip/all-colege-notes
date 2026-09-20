@@ -110,7 +110,7 @@ function getAssistantResponse(query, subjects = []) {
   const aimlSub = findSubject('sub-aiml') || findSubject('BCSE-011');
   const webSub = findSubject('sub-webtech') || findSubject('BCSE-012');
   const pythonSub = findSubject('sub-py') || findSubject('BCSE-004') || findSubject('sub-python');
-  const dsaSub = findSubject('sub-dsa-bcse007') || findSubject('BCSE-007') || findSubject('sub-dsa');
+  const dsaSub = findSubject('sub-dsa-bcse007') || findSubject('BCSE-007');
 
   // =========================================================================
   // 0. NATURAL CONVERSATIONAL GREETINGS & INTENTS

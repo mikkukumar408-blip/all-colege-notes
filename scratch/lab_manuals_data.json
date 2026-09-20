@@ -1,7 +1,4 @@
-// Comprehensive God-Level Practical Lab Manuals Data
-// Mapped 1-to-1 with Official MMEC Syllabus (Session 2025-26)
-
-export const comprehensiveLabManuals = [
+[
   {
     "id": "lab-c-bcse001",
     "code": "BCSE-001",
@@ -13,7 +10,7 @@ export const comprehensiveLabManuals = [
     "branch": "CSE / IT / AI-DS / AI-ML / ECE",
     "university": "Maharishi Markandeshwar (Deemed to be University) - MMEC",
     "syllabusMatch": "100% Official Curriculum Aligned (Session 2025-26)",
-    "pdfUrl": "/pdfs/BCSE001_C_Programming_Lab_Manual.pdf",
+    "pdfUrl": "https://raw.githubusercontent.com/Bhavya3733/all-colege-notes/main/public/pdfs/BCSE001_C_Programming_Lab_Manual.pdf",
     "totalExperiments": 21,
     "experimentsCount": "21 Experiments (Full Syllabus)",
     "capstoneProject": {
@@ -407,7 +404,7 @@ export const comprehensiveLabManuals = [
     "branch": "CSE / IT / AI-DS / AI-ML",
     "university": "Maharishi Markandeshwar (Deemed to be University) - MMEC",
     "syllabusMatch": "100% Official Curriculum Aligned (Session 2025-26)",
-    "pdfUrl": "/pdfs/BCSE013_Web_Tech_Lab_Manual.pdf",
+    "pdfUrl": "https://raw.githubusercontent.com/Bhavya3733/all-colege-notes/main/public/pdfs/BCSE013_Web_Tech_Lab_Manual.pdf",
     "totalExperiments": 10,
     "experimentsCount": "10 Experiments (Full Syllabus)",
     "capstoneProject": {
@@ -626,7 +623,7 @@ export const comprehensiveLabManuals = [
     "branch": "All Branches (First Year Common)",
     "university": "Maharishi Markandeshwar (Deemed to be University) - MMEC",
     "syllabusMatch": "100% Official Curriculum Aligned (Session 2025-26)",
-    "pdfUrl": "/pdfs/BELE001_BEEE_Lab_Manual.pdf",
+    "pdfUrl": "https://raw.githubusercontent.com/Bhavya3733/all-colege-notes/main/public/pdfs/BELE001_BEEE_Lab_Manual.pdf",
     "totalExperiments": 8,
     "experimentsCount": "8 Experiments + Hardware Schematics",
     "capstoneProject": {
@@ -806,7 +803,7 @@ export const comprehensiveLabManuals = [
     "branch": "CSE / IT / AI-DS",
     "university": "Maharishi Markandeshwar (Deemed to be University) - MMEC",
     "syllabusMatch": "100% Official Curriculum Aligned (Session 2025-26)",
-    "pdfUrl": "/pdfs/BCSE007_DSA_Lab_Manual.pdf",
+    "pdfUrl": "https://raw.githubusercontent.com/Bhavya3733/all-colege-notes/main/public/pdfs/BCSE007_DSA_Lab_Manual.pdf",
     "totalExperiments": 12,
     "experimentsCount": "12 Experiments (Arrays, Stacks, Queues, Trees, Graphs)",
     "capstoneProject": {
@@ -1060,7 +1057,7 @@ export const comprehensiveLabManuals = [
     "branch": "CSE / IT / AI-DS / AI-ML",
     "university": "Maharishi Markandeshwar (Deemed to be University) - MMEC",
     "syllabusMatch": "100% Official Curriculum Aligned (Session 2025-26)",
-    "pdfUrl": "/pdfs/BCSE011_AIML_Lab_Manual.pdf",
+    "pdfUrl": "https://raw.githubusercontent.com/Bhavya3733/all-colege-notes/main/public/pdfs/BCSE011_AIML_Lab_Manual.pdf",
     "totalExperiments": 10,
     "experimentsCount": "10 Experiments (Python, Scikit-Learn, PyTorch)",
     "capstoneProject": {
@@ -1268,4 +1265,4 @@ export const comprehensiveLabManuals = [
       }
     ]
   }
-];
+]

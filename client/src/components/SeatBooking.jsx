@@ -169,14 +169,15 @@ export const handwrittenNotebooks = [
     subjectCode: 'CS301',
     semester: '2nd Year (Sem 3)',
     semNumber: 3,
-    pages: '12 Pages • Publication Quality High-Res',
-    title: 'Data Structures & Algorithms Master Notes',
-    description: 'Official MMDU syllabus (CS301 / BCSE-007): Mathematical notation, asymptotic bounds, 1D/2D/3D array addressing, sparse matrices, Bubble/Selection/Insertion/Merge/Quick/Heap sorting, Linear/Binary searching, Stacks (LIFO), Infix-Postfix-Prefix conversion & evaluation, recursion & Tower of Hanoi, Linear/Circular/Deque/Priority Queues, Singly/Doubly/Circular Linked Lists, Binary Trees, BST traversals & deletion cases, Graph representations (Adjacency Matrix/List), and BFS/DFS graph traversals.',
-    pdfUrl: '/Data_Structures_Master_Notes.pdf',
-    downloadName: 'Data Structures Master Notes.pdf',
-    accentColor: '#34d399',
-    borderColor: 'rgba(52, 211, 153, 0.35)',
-    badgeBg: 'rgba(52, 211, 153, 0.15)'
+    isDead: true,
+    pages: 'Under Preparation',
+    title: 'Data Structures & Algorithms Master Notes (Under Preparation)',
+    description: 'Semester 3 Advanced DSA Syllabus (AVL Trees, Red-Black Trees, Dynamic Programming, Greedy Methods, Dijkstra, Bellman-Ford) is currently under preparation. Please refer to Semester 2 Data Structures (BCSE-007) for active master notes.',
+    pdfUrl: '#',
+    downloadName: '',
+    accentColor: '#94a3b8',
+    borderColor: 'rgba(148, 163, 184, 0.25)',
+    badgeBg: 'rgba(148, 163, 184, 0.1)'
   },
   {
     id: 'nb-dld',
@@ -375,9 +376,19 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
     if (lab.pdfUrl) {
       const link = document.createElement('a');
       link.href = lab.pdfUrl;
-      link.download = `${lab.code || 'Lab'}_Manual.pdf`;
+      link.download = `${(lab.code || 'Lab').replace(/[^a-zA-Z0-9_-]/g, '_')}_Manual.pdf`;
       link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      try {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.75 }
+        });
+      } catch (err) {}
     } else {
       alert(`Downloading official PDF manual for ${lab.title}...`);
     }
@@ -655,21 +666,53 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
 
                   <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
                     <a
-                      href={nb.pdfUrl}
-                      target="_blank"
+                      href={nb.isDead || nb.code === 'CS301' ? undefined : nb.pdfUrl}
+                      target={nb.isDead || nb.code === 'CS301' ? undefined : "_blank"}
                       rel="noopener noreferrer"
                       className="btn-secondary"
-                      onClick={() => handleReviewNotebook(nb)}
-                      style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', padding: '8px 14px' }}
+                      onClick={(e) => {
+                        if (nb.isDead || nb.code === 'CS301') {
+                          e.preventDefault();
+                          return;
+                        }
+                        handleReviewNotebook(nb);
+                      }}
+                      style={{ 
+                        textDecoration: 'none', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '6px', 
+                        fontSize: '0.82rem', 
+                        padding: '8px 14px',
+                        opacity: nb.isDead || nb.code === 'CS301' ? 0.35 : 1,
+                        cursor: nb.isDead || nb.code === 'CS301' ? 'not-allowed' : 'pointer'
+                      }}
+                      title={nb.isDead || nb.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Open & Review PDF'}
                     >
                       <Eye size={15} /> Open &amp; Review PDF
                     </a>
                     <a
-                      href={nb.pdfUrl}
-                      download={nb.downloadName}
-                      className="btn-primary"
-                      onClick={() => handleDownloadNotebook(nb)}
-                      style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', padding: '8px 14px' }}
+                      href={nb.isDead || nb.code === 'CS301' ? undefined : nb.pdfUrl}
+                      download={nb.isDead || nb.code === 'CS301' ? undefined : nb.downloadName}
+                      className={nb.isDead || nb.code === 'CS301' ? "btn-secondary" : "btn-primary"}
+                      onClick={(e) => {
+                        if (nb.isDead || nb.code === 'CS301') {
+                          e.preventDefault();
+                          return;
+                        }
+                        handleDownloadNotebook(nb);
+                      }}
+                      style={{ 
+                        textDecoration: 'none', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '6px', 
+                        fontSize: '0.82rem', 
+                        padding: '8px 14px',
+                        opacity: nb.isDead || nb.code === 'CS301' ? 0.35 : 1,
+                        cursor: nb.isDead || nb.code === 'CS301' ? 'not-allowed' : 'pointer'
+                      }}
+                      title={nb.isDead || nb.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Download PDF'}
                     >
                       <DownloadCloud size={15} /> Download PDF
                     </a>

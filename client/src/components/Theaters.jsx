@@ -408,8 +408,8 @@ export default function Theaters({ currentUser }) {
               {/* Direct Open & Download Actions */}
               <div style={{ marginTop: 'auto', paddingTop: '8px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 <a 
-                  href={item.pdfUrl}
-                  target="_blank"
+                  href={item.isDead || item.code === 'CS301' ? undefined : item.pdfUrl}
+                  target={item.isDead || item.code === 'CS301' ? undefined : "_blank"}
                   rel="noopener noreferrer"
                   className="btn-secondary" 
                   style={{ 
@@ -420,16 +420,30 @@ export default function Theaters({ currentUser }) {
                     alignItems: 'center', 
                     gap: '6px',
                     fontSize: '0.84rem',
-                    padding: '10px 12px'
+                    padding: '10px 12px',
+                    opacity: item.isDead || item.code === 'CS301' ? 0.35 : 1,
+                    cursor: item.isDead || item.code === 'CS301' ? 'not-allowed' : 'pointer'
                   }}
+                  onClick={(e) => {
+                    if (item.isDead || item.code === 'CS301') {
+                      e.preventDefault();
+                    }
+                  }}
+                  title={item.isDead || item.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Open & Review PDF'}
                 >
                   <Eye size={16} /> Open &amp; Review PDF
                 </a>
                 <a 
-                  href={item.pdfUrl}
-                  download={item.downloadName}
-                  onClick={() => handleDownloadClick(item)}
-                  className="btn-primary" 
+                  href={item.isDead || item.code === 'CS301' ? undefined : item.pdfUrl}
+                  download={item.isDead || item.code === 'CS301' ? undefined : item.downloadName}
+                  onClick={(e) => {
+                    if (item.isDead || item.code === 'CS301') {
+                      e.preventDefault();
+                      return;
+                    }
+                    handleDownloadClick(item);
+                  }}
+                  className={item.isDead || item.code === 'CS301' ? "btn-secondary" : "btn-primary"} 
                   style={{ 
                     flex: 1.2, 
                     justifyContent: 'center', 
@@ -438,8 +452,11 @@ export default function Theaters({ currentUser }) {
                     alignItems: 'center', 
                     gap: '6px',
                     fontSize: '0.84rem',
-                    padding: '10px 12px'
+                    padding: '10px 12px',
+                    opacity: item.isDead || item.code === 'CS301' ? 0.35 : 1,
+                    cursor: item.isDead || item.code === 'CS301' ? 'not-allowed' : 'pointer'
                   }}
+                  title={item.isDead || item.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Download Short Notes'}
                 >
                   <Download size={16} /> Download Short Notes
                 </a>

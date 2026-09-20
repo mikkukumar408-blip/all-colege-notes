@@ -53,7 +53,7 @@ export default function TechGuide() {
          ------------------------------------------------------------------- */}
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
         {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => {
-          const isDead = sem > 1;
+          const isDead = sem !== 1 && sem !== 2;
           return (
             <button
               key={sem}

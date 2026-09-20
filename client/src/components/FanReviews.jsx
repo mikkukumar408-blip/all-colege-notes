@@ -265,10 +265,16 @@ export default function FanReviews({ currentUser }) {
           console.warn('Direct AI query failed, switching to analytical synthesizer:', clientErr);
         }
 
-        // 3. Structured Analytical Synthesizer fallback
+        // 3. Graceful unavailability message (replaces dummy formula generator)
         if (!fallbackAnswer) {
-          fallbackAnswer = generateAnalyticalSolution(currentSubject, currentQuestion);
-          usedModel = 'campusnotes-analytical-synthesizer';
+          fallbackAnswer = `📌 **Answer Being Prepared**\n\n` +
+            `Your question about **"${currentQuestion.slice(0, 80)}${currentQuestion.length > 80 ? '...' : ''}"** has been registered.\n\n` +
+            `> ⚠️ The AI tutor is temporarily unavailable. Please try:\n` +
+            `> 1. Using **DeepSearch** (Alt+Space) for a detailed answer\n` +
+            `> 2. Checking the **Interactive Notes** section for **${currentSubject}**\n` +
+            `> 3. Resubmitting your question in a few moments\n\n` +
+            `_Our servers are experiencing high load. Your question has been saved and will be answered shortly._`;
+          usedModel = 'campusnotes-curriculum-service';
         }
       }
       

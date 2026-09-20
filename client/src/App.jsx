@@ -138,12 +138,14 @@ export default function App() {
      2. CROSS-SECTION ACTION HANDLERS
      Passes selected subject data from catalog to reader or download hub
      ----------------------------------------------------------------------- */
-  const ALLOWED_CORE_IDS = ['sub-beee', 'sub-aiml', 'sub-m1', 'sub-c1', 'sub-webtech', 'sub-p1', 'sub-physics', 'sub-py', 'sub-python', 'sub-dsa-bcse007', 'sub-dsa', 'sub-bcse007'];
+  const ALLOWED_CORE_IDS = ['sub-beee', 'sub-aiml', 'sub-m1', 'sub-c1', 'sub-webtech', 'sub-p1', 'sub-physics', 'sub-py', 'sub-python', 'sub-dsa-bcse007', 'sub-bcse007'];
   const isSubjectValid = (subject) => {
     if (!subject) return false;
+    // CS301 (Data Structures and Algorithms) is dead as per user instructions
+    if (subject.id === 'sub-dsa' || subject.code === 'CS301') return false;
     if (ALLOWED_CORE_IDS.includes(subject.id)) return true;
     const code = (subject.code || '').toUpperCase().trim();
-    return ['BELE-001', 'EE101', 'BCSE-011', 'BMAT-001', 'BCSE-008', 'CS102', 'BCSE-012', 'PHYS102', 'BPHY-001', 'BCSE-004', 'PYTHON', 'BCSE-007', 'CS301', 'DSA'].includes(code);
+    return ['BELE-001', 'EE101', 'BCSE-011', 'BMAT-001', 'BCSE-008', 'CS102', 'BCSE-012', 'PHYS102', 'BPHY-001', 'BCSE-004', 'PYTHON', 'BCSE-007'].includes(code);
   };
 
   const handleSelectSubjectForDownload = (subject) => {

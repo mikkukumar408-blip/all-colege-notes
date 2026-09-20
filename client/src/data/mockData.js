@@ -9,7 +9,7 @@
    5. initialForumDoubts-> Community Q&A questions and verified peer answers
    ========================================================================= */
 
-import { comprehensiveLabManuals } from './labManualsData';
+import { comprehensiveLabManuals } from './labManualsData.js';
 
 /* -------------------------------------------------------------------------
    1. ACADEMIC YEARS & SEMESTERS HIERARCHY
@@ -69,7 +69,8 @@ export const initialSubjects = [
     notesCount: '4 Units Exhaustive Notes & MMDU Solved Papers',
     rating: 5.0,
     description: 'Complete handwritten god-level notes for DC/AC circuits, transformers, electrical machines, semiconductor diodes, BJTs, number systems, and Boolean algebra with MMDU solved examination papers.',
-    banner: 'https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?auto=format&fit=crop&w=800&q=80',
+    banner: '/images/beee.jpg',
+    textbook: '1. Basic Electrical Engineering by D. P. Kothari & I. J. Nagrath | 2. Electronic Devices and Circuit Theory by Boylestad',
     units: [
       { num: 1, title: 'DC Circuits & AC Circuit Analysis', pages: 48, status: 'Verified' },
       { num: 2, title: 'Transformers & Electrical Machines', pages: 52, status: 'Verified' },
@@ -88,7 +89,8 @@ export const initialSubjects = [
     notesCount: '4 Units Exhaustive Notes & Solved Numericals',
     rating: 5.0,
     description: 'Maharishi Markandeshwar University (MMU) official syllabus: Matrices & Gauss-Jordan Inversion, Mean Value Theorems, Curvature, Indeterminate Forms, Beta-Gamma Functions, Multivariable Calculus, Vector Differentiation, Sequences & Series, and Fourier Series.',
-    banner: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=800&q=80',
+    banner: '/images/math1.jpg',
+    textbook: '1. Higher Engineering Mathematics by B. S. Grewal | 2. Advanced Engineering Mathematics by Erwin Kreyszig',
     units: [
       { num: 1, title: 'Matrices, Rank & Gauss-Jordan Inversion', pages: 34, status: 'Verified' },
       { num: 2, title: 'Calculus, Curvature & Beta-Gamma Functions', pages: 46, status: 'Verified' },
@@ -107,7 +109,8 @@ export const initialSubjects = [
     notesCount: '4 Units Comprehensive Long Notes & Solved Questions',
     rating: 5.0,
     description: 'Official MMDU syllabus (BCSE-008): Computational problem classifications, Deductive/Inductive logic, 4-stage compilation pipeline, memory segmentation, 9-tier operator precedence, typecasting, 2D array row-major addressing, 12-point storage classes matrix, Near/Far/Huge pointers, DMA, and file streams with solved examination questions.',
-    banner: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=800&q=80',
+    banner: '/images/c_prog.jpg',
+    textbook: '1. Programming in ANSI C by E. Balagurusamy | 2. The C Programming Language by Brian Kernighan & Dennis Ritchie',
     units: [
       { num: 1, title: 'Programming Fundamentals, Compilation Pipeline & Problem Solving', pages: 36, status: 'Verified' },
       { num: 2, title: 'Core Programming Concepts, Operators & Control Structures', pages: 34, status: 'Verified' },
@@ -126,7 +129,8 @@ export const initialSubjects = [
     notesCount: '4 Units Comprehensive Notes & University Numericals',
     rating: 5.0,
     description: 'Foundations of AI, Agent architectures, PEAS framework, State Space Search, A* trace, Logic, CNF, Resolution Refutation, Semantic Nets, Frames, Scripts, Expert Systems, Decision Trees ID3, SVM, Clustering, and Apriori algorithm with solved numericals.',
-    banner: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=800&q=80',
+    banner: '/images/aiml.jpg',
+    textbook: '1. Artificial Intelligence: A Modern Approach by Stuart Russell & Peter Norvig | 2. Pattern Recognition and Machine Learning by Christopher Bishop',
     units: [
       { num: 1, title: 'Foundations of Artificial Intelligence', pages: 32, status: 'Verified' },
       { num: 2, title: 'Searching Algorithms & Knowledge Representation', pages: 44, status: 'Verified' },
@@ -145,7 +149,8 @@ export const initialSubjects = [
     notesCount: '4 Units Comprehensive Long Notes & Solved Questions',
     rating: 5.0,
     description: 'Complete university syllabus notes for BCSE-012: Internet vs WWW, DNS resolution, TCP/IP HTTP transaction cycles, HTML5 Semantic page blueprints, Client-side image maps, Multimedia APIs, Canvas 2D graphics, Web Storage, and CSS architecture with solved university questions.',
-    banner: 'https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&w=800&q=80',
+    banner: '/images/webtech.jpg',
+    textbook: '1. HTML & CSS: Design and Build Websites by Jon Duckett | 2. Internet and World Wide Web How to Program by Deitel & Deitel',
     units: [
       { num: 1, title: 'Internet & World Wide Web Architecture', pages: 42, status: 'Verified' },
       { num: 2, title: 'Basics of HTML & Website Engineering', pages: 38, status: 'Verified' },
@@ -166,7 +171,8 @@ export const initialSubjects = [
     notesCount: '4 Units Complete',
     rating: 5.0,
     description: "Official MMDU syllabus (BPHY-001 / PHYS102): Wave optics, Newton's rings derivations, Fraunhofer diffraction, lasers, Maxwell's equations, skin depth, Schrödinger wave mechanics, and crystal APF derivations.",
-    banner: 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=800&q=80',
+    banner: '/images/physics.jpg',
+    textbook: '1. Engineering Physics by H. K. Malik & A. K. Singh | 2. Optics by Ajoy Ghatak',
     units: [
       { num: 1, title: 'Wave Optics & Lasers', pages: 28, status: 'Verified' },
       { num: 2, title: 'Electrostatics, Magnetostatics & EM Waves', pages: 26, status: 'Verified' },
@@ -185,7 +191,8 @@ export const initialSubjects = [
     notesCount: '4 Units Complete Long Notes & Solved Papers',
     rating: 5.0,
     description: 'Official MMDU syllabus (BCSE-004): Python programming foundations, CPython compilation & PVM execution pipeline, variable reference model, 9-tier operator precedence, branching & looping (break/continue/pass/for-else), functions & LEGB scope, Lists, Tuples, Dictionaries (hash table internals), File Handling (modes, context managers), and Object-Oriented Programming (Classes, Dunder methods, Operator Overloading, MRO, Polymorphism, Composition).',
-    banner: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
+    banner: '/images/python.jpg',
+    textbook: '1. Python Crash Course by Eric Matthes | 2. Learning Python by Mark Lutz',
     units: [
       { num: 1, title: 'Introduction to Programming and Python', pages: 32, status: 'Verified' },
       { num: 2, title: 'Decision Making, Branching & Functions', pages: 28, status: 'Verified' },
@@ -197,19 +204,80 @@ export const initialSubjects = [
     id: 'sub-dsa-bcse007',
     semester: 2,
     year: '1st Year',
-    name: 'Data Structure',
+    name: 'Data Structures',
     code: 'BCSE-007',
     credits: 3,
     instructor: 'Department of Computer Science & Engineering (MMDU)',
     notesCount: '4 Units Complete Master Notes & Solved Papers',
     rating: 5.0,
     description: 'Official MMDU syllabus (BCSE-007): Mathematical notation, asymptotic bounds, 1D/2D/3D array addressing, sparse matrices, Bubble/Selection/Insertion/Merge/Quick/Heap sorting, Linear/Binary searching, Stacks (LIFO), Infix-Postfix-Prefix conversion & evaluation, recursion & Tower of Hanoi, Linear/Circular/Deque/Priority Queues, Singly/Doubly/Circular Linked Lists, Binary Trees, BST traversals & deletion cases, Graph representations (Adjacency Matrix/List), and BFS/DFS graph traversals.',
-    banner: 'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?auto=format&fit=crop&w=800&q=80',
+    banner: '/images/dsa.jpg',
+    textbook: '1. Fundamentals of Data Structures in C by Horowitz & Sahni | 2. Data Structures Using C by Reema Thareja',
     units: [
-      { num: 1, title: 'Foundations, Arrays, Searching & Sorting', pages: 3, status: 'Verified' },
-      { num: 2, title: 'Stacks, Expressions & Recursion (Tower of Hanoi)', pages: 3, status: 'Verified' },
-      { num: 3, title: 'Queues & Linked Lists Topologies', pages: 3, status: 'Verified' },
-      { num: 4, title: 'Trees, BST & Graph Algorithms (BFS/DFS)', pages: 3, status: 'Verified' }
+      { num: 1, title: 'Foundations, Arrays, Searching & Sorting', pages: 38, status: 'Verified' },
+      { num: 2, title: 'Stacks, Expressions & Recursion (Tower of Hanoi)', pages: 42, status: 'Verified' },
+      { num: 3, title: 'Queues & Linked Lists Topologies', pages: 44, status: 'Verified' },
+      { num: 4, title: 'Trees, BST & Graph Algorithms (BFS/DFS)', pages: 48, status: 'Verified' }
+    ]
+  },
+  {
+    id: 'sub-m2',
+    semester: 2,
+    year: '1st Year',
+    name: 'Mathematics II',
+    code: 'BMAT-002',
+    credits: 4,
+    instructor: 'Department of Mathematics & Humanities (MMDU)',
+    notesCount: '4 Units Complete Syllabus & Solved Papers',
+    rating: 5.0,
+    description: 'Official MMDU syllabus (BMAT-002): Ordinary differential equations of first and higher order with constant/variable coefficients, Cauchy-Euler equations, Laplace transforms and applications to initial value problems, Vector calculus (gradient, divergence, curl, line/surface integrals, Green\'s, Gauss Divergence, and Stokes\' theorems), and Complex analysis (analytic functions, Cauchy-Riemann equations, contour integrals, and Cauchy residue theorem).',
+    banner: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1200&q=80',
+    textbook: '1. Advanced Engineering Mathematics by Erwin Kreyszig | 2. Higher Engineering Mathematics by B. S. Grewal',
+    units: [
+      { num: 1, title: 'First & Higher Order Ordinary Differential Equations', pages: 38, status: 'Verified' },
+      { num: 2, title: 'Laplace Transforms & Differential Equations', pages: 42, status: 'Verified' },
+      { num: 3, title: 'Vector Calculus, Divergence & Stokes Theorems', pages: 46, status: 'Verified' },
+      { num: 4, title: 'Complex Variables, Cauchy-Riemann & Residue Calculus', pages: 40, status: 'Verified' }
+    ]
+  },
+  {
+    id: 'sub-env',
+    semester: 2,
+    year: '1st Year',
+    name: 'Environmental Studies & Disaster Management',
+    code: 'BENV-001',
+    credits: 2,
+    instructor: 'Department of Environmental Sciences (MMDU)',
+    notesCount: '4 Units Complete UGC Syllabus',
+    rating: 4.9,
+    description: 'UGC and MMDU official syllabus (BENV-001): Ecosystem ecology, biodiversity conservation hot-spots, renewable vs non-renewable energy resources, environmental pollution (air, water, soil, noise, solid waste), climate change, greenhouse effect, ozone depletion, environmental protection acts, and disaster management mitigation strategies.',
+    banner: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80',
+    textbook: '1. Environmental Studies by Erach Bharucha (UGC) | 2. Perspectives in Environmental Studies by Anubha Kaushik',
+    units: [
+      { num: 1, title: 'Ecosystems, Natural Resources & Biodiversity', pages: 30, status: 'Verified' },
+      { num: 2, title: 'Environmental Pollution & Solid Waste Management', pages: 34, status: 'Verified' },
+      { num: 3, title: 'Environmental Policies, Acts & Global Climate Change', pages: 28, status: 'Verified' },
+      { num: 4, title: 'Disaster Management, Field Studies & Case Analyses', pages: 26, status: 'Verified' }
+    ]
+  },
+  {
+    id: 'sub-eg',
+    semester: 2,
+    year: '1st Year',
+    name: 'Engineering Graphics & Design',
+    code: 'BME-002',
+    credits: 3,
+    instructor: 'Department of Mechanical Engineering (MMDU)',
+    notesCount: '4 Units Technical Drawings & Projections',
+    rating: 4.9,
+    description: 'Official MMDU syllabus (BME-002): Introduction to engineering drawing instruments, lettering, dimensioning, scales (plain, diagonal, vernier), engineering curves (conics, cycloids, involutes), orthographic projections of points, straight lines and planes, projections of solids, section of solids, isometric views, and CAD drafting principles.',
+    banner: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+    textbook: '1. Engineering Drawing by N. D. Bhatt | 2. Engineering Graphics with AutoCAD by James D. Bethune',
+    units: [
+      { num: 1, title: 'Drawing Standards, Scales & Engineering Conics', pages: 32, status: 'Verified' },
+      { num: 2, title: 'Orthographic Projections of Points, Lines & Planes', pages: 38, status: 'Verified' },
+      { num: 3, title: 'Projections of Solids & Sectional Views', pages: 36, status: 'Verified' },
+      { num: 4, title: 'Isometric Projections & Computer-Aided Drafting (CAD)', pages: 34, status: 'Verified' }
     ]
   },
 
@@ -222,15 +290,15 @@ export const initialSubjects = [
     code: 'CS301',
     credits: 4,
     instructor: 'Department of Computer Science & Engineering (MMDU)',
-    notesCount: '4 Units Complete Master Notes & Solved Papers',
-    rating: 5.0,
-    description: 'Official MMDU syllabus (CS301 / BCSE-007): Mathematical notation, asymptotic bounds, 1D/2D/3D array addressing, sparse matrices, Bubble/Selection/Insertion/Merge/Quick/Heap sorting, Linear/Binary searching, Stacks (LIFO), Infix-Postfix-Prefix conversion & evaluation, recursion & Tower of Hanoi, Linear/Circular/Deque/Priority Queues, Singly/Doubly/Circular Linked Lists, Binary Trees, BST traversals & deletion cases, Graph representations (Adjacency Matrix/List), and BFS/DFS graph traversals.',
-    banner: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
+    notesCount: 'Advanced DSA Syllabus (Under Preparation)',
+    rating: 4.8,
+    description: 'Department of Computer Science & Engineering (CS301): Advanced Data Structures and Algorithms curriculum covering AVL Trees, Red-Black Trees, B-Trees, Dynamic Programming, Greedy Methods, Dijkstra, Bellman-Ford, Kruskal/Prim MST, and NP-Completeness.',
+    banner: '/images/dsa.jpg',
     units: [
-      { num: 1, title: 'Foundations, Arrays, Searching & Sorting', pages: 3, status: 'Verified' },
-      { num: 2, title: 'Stacks, Expressions & Recursion (Tower of Hanoi)', pages: 3, status: 'Verified' },
-      { num: 3, title: 'Queues & Linked Lists Topologies', pages: 3, status: 'Verified' },
-      { num: 4, title: 'Trees, BST & Graph Algorithms (BFS/DFS)', pages: 3, status: 'Verified' }
+      { num: 1, title: 'Advanced Trees & Balanced Search Trees', pages: 28, status: 'Under Preparation' },
+      { num: 2, title: 'Divide & Conquer and Dynamic Programming', pages: 32, status: 'Under Preparation' },
+      { num: 3, title: 'Greedy Algorithms & Graph Optimization', pages: 34, status: 'Under Preparation' },
+      { num: 4, title: 'String Matching & Complexity Classes (P/NP)', pages: 30, status: 'Under Preparation' }
     ]
   },
   {
@@ -527,7 +595,7 @@ export const initialShortNotes = [
   },
   {
     id: 'sn-dsa-bcse007',
-    subject: 'Data Structure (BCSE-007)',
+    subject: 'Data Structures (BCSE-007)',
     code: 'BCSE-007',
     semester: 'Semester 2',
     category: 'Computer Science',
@@ -551,18 +619,17 @@ export const initialShortNotes = [
     subject: 'Data Structures & Algorithms (CS301)',
     code: 'CS301',
     semester: 'Semester 3',
+    isDead: true,
     category: 'Computer Science',
-    type: 'KaTeX Complexity Matrices, Trees & Graph Formula Sheet',
-    pdfUrl: '/Data_Structures_Exam_Revision_Sheet.pdf',
-    downloadName: 'Data Structures Exam Revision Sheet.pdf',
-    fileSize: '160 KB',
-    pages: '2 Pages High-Yield Revision',
-    downloads: 5430,
+    type: 'KaTeX Complexity Matrices, Trees & Graph Formula Sheet (Under Preparation)',
+    pdfUrl: '#',
+    downloadName: '',
+    fileSize: 'Under Prep',
+    pages: 'Under Preparation',
+    downloads: 0,
     highlights: [
-      'Master Theorem Formulas & 1D/2D Array Address Calculations',
-      'Circular Queue Modulo Arithmetic & Stack Postfix Evaluation',
-      'BST Inorder Successor & AVL Tree 4 Rotation Balance Factors',
-      'Dijkstra, Bellman-Ford, Kruskal/Prim MST & Hashing Probing'
+      'Semester 3 Advanced DSA Syllabus currently under preparation',
+      'Please refer to Semester 2 Data Structures (BCSE-007) for active exam revision sheets'
     ]
   },
   {

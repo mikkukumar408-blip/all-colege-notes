@@ -43,15 +43,15 @@ const ACTIVE_SUBJECT_IDS = new Set([
   'sub-physics',
   'sub-py',
   'sub-python',
-  'sub-dsa',
   'sub-dsa-bcse007',
   'sub-bcse007'
 ]);
 
 export const isSubjectCardActive = (sub) => {
   if (!sub) return false;
-  // Explicitly dead cards
+  // Explicitly dead cards: AI, CS601, and CS301 (Data Structures & Algorithms)
   if (sub.id === 'sub-ai' || sub.code === 'CS601') return false;
+  if (sub.id === 'sub-dsa' || sub.code === 'CS301') return false;
 
   if (ACTIVE_SUBJECT_IDS.has(sub.id)) return true;
 
@@ -63,7 +63,7 @@ export const isSubjectCardActive = (sub) => {
   if (code === 'BCSE-012') return true;
   if (code === 'PHYS102' || code === 'BPHY-001') return true;
   if (code === 'BCSE-004' || code === 'PYTHON') return true;
-  if (code === 'BCSE-007' || code === 'CS301' || code === 'DSA') return true;
+  if (code === 'BCSE-007') return true;
 
   return false;
 };
@@ -118,8 +118,12 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
           }}
         >
           <img 
-            src={featuredSubject.banner} 
+            src={featuredSubject.banner || '/images/dsa.jpg'} 
             alt={featuredSubject.name}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = '/images/dsa.jpg';
+            }}
             style={{
               position: 'absolute',
               inset: 0,
@@ -195,7 +199,12 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
 
             <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
               <button 
-                className="btn-primary"
+                className={isSubjectCardActive(featuredSubject) ? "btn-primary" : "btn-secondary"}
+                disabled={!isSubjectCardActive(featuredSubject)}
+                style={{
+                  opacity: isSubjectCardActive(featuredSubject) ? 1 : 0.4,
+                  cursor: isSubjectCardActive(featuredSubject) ? 'pointer' : 'not-allowed'
+                }}
                 onClick={() => {
                   if (!isSubjectCardActive(featuredSubject)) return;
                   onReadNotes && onReadNotes(featuredSubject);
@@ -205,12 +214,17 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
               </button>
               <button 
                 className="btn-outline"
+                disabled={!isSubjectCardActive(featuredSubject)}
+                style={{
+                  opacity: isSubjectCardActive(featuredSubject) ? 1 : 0.4,
+                  cursor: isSubjectCardActive(featuredSubject) ? 'pointer' : 'not-allowed'
+                }}
                 onClick={() => {
                   if (!isSubjectCardActive(featuredSubject)) return;
                   onSelectSubject && onSelectSubject(featuredSubject);
                 }}
               >
-                <Download size={16} color="var(--neon-cyan)" /> Download Study Materials
+                <Download size={16} color={isSubjectCardActive(featuredSubject) ? "var(--neon-cyan)" : "var(--text-dim)"} /> Download Study Materials
               </button>
             </div>
           </div>
@@ -388,11 +402,11 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
               {/* Subject Thumbnail Banner */}
               <div style={{ position: 'relative', height: '140px', overflow: 'hidden' }}>
                 <img 
-                  src={sub.banner} 
+                  src={sub.banner || '/images/dsa.jpg'} 
                   alt={sub.name}
                   onError={(e) => {
                     e.currentTarget.onerror = null;
-                    e.currentTarget.src = 'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?auto=format&fit=crop&w=800&q=80';
+                    e.currentTarget.src = '/images/dsa.jpg';
                   }}
                   style={{ 
                     width: '100%', 

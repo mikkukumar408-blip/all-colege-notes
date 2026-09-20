@@ -250,7 +250,19 @@ export default function DeepSearchModal({ isOpen, onClose, initialQuery = '' }) 
       }
 
       if (!aiContent) {
-        aiContent = generateAnalyticalSolution('Engineering & Computer Science', q);
+        // Try KB one more time with a broader subject scope before falling back
+        const broadKbMatch = matchAcademicKB(q, 'Engineering');
+        if (broadKbMatch) {
+          aiContent = broadKbMatch.content;
+        } else {
+          aiContent = `📌 **Answer Being Prepared**\n\n` +
+            `Your query **"${q.slice(0, 80)}${q.length > 80 ? '...' : ''}"** has been received.\n\n` +
+            `> ⚠️ Live AI inference is temporarily unavailable. Please try:\n` +
+            `> 1. Rephrasing your question (e.g. "Explain Arrays", "Thevenin's theorem")\n` +
+            `> 2. Visiting the **Interactive Notes** section\n` +
+            `> 3. Retrying in a few moments\n\n` +
+            `_High server load detected. The system will retry automatically._`;
+        }
       }
 
       const generated = {

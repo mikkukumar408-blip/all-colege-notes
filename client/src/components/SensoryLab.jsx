@@ -304,6 +304,188 @@ function renderKaTeXSafe(formula, isDisplay = false) {
 }
 
 /* -------------------------------------------------------------------------
+   CODE EDITOR / IDE RENDERING ENGINE & SYNTAX HIGHLIGHTER
+   Authentic modern editor with line numbers, file tab, badge, and copy button.
+   ------------------------------------------------------------------------- */
+function escapeHtmlForCode(str) {
+  return (str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function highlightCodeLine(line, lang) {
+  if (!line || line.trim() === '') return '&nbsp;';
+
+  const l = (lang || '').toLowerCase();
+  const isPy = l.includes('py') || line.includes('#') || line.includes('def ') || line.includes('print(');
+  const isC = l.includes('c') || line.includes('#include') || line.includes('printf(') || line.includes('int ') || line.includes('void ');
+  const isJS = l.includes('js') || l.includes('script') || line.includes('console.log') || line.includes('const ') || line.includes('let ');
+
+  // 1. Comment handling
+  let commentRegex = null;
+  if (isPy) commentRegex = /^(.*?)(\s*(?:#.*))$/;
+  else if (isC || isJS) commentRegex = /^(.*?)(\s*(?:\/\/.*))$/;
+  else if (l.includes('html')) commentRegex = /^(.*?)(\s*(?:<!--[\s\S]*?-->))$/;
+
+  let codePart = line;
+  let commentPart = '';
+
+  if (commentRegex) {
+    const match = line.match(commentRegex);
+    if (match) {
+      codePart = match[1];
+      commentPart = `<span class="tok-comment">${escapeHtmlForCode(match[2])}</span>`;
+    }
+  }
+
+  // 2. String masking
+  const stringPlaceholders = [];
+  const strRegex = /(f?"""[\s\S]*?"""|f?'''[\s\S]*?'''|f?"(?:\\.|[^"\\])*"|f?'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)/g;
+  let masked = codePart.replace(strRegex, (match) => {
+    const idx = stringPlaceholders.length;
+    stringPlaceholders.push(`<span class="tok-string">${escapeHtmlForCode(match)}</span>`);
+    return `___STR_${idx}___`;
+  });
+
+  // 3. Escape HTML
+  let highlighted = escapeHtmlForCode(masked);
+
+  // 4. Function definitions
+  highlighted = highlighted.replace(/\b(def|function)\s+([a-zA-Z_]\w*)/g, 
+    '<span class="tok-keyword">$1</span> <span class="tok-func">$2</span>');
+
+  // 5. C preprocessor headers
+  highlighted = highlighted.replace(/&lt;(stdio\.h|stdlib\.h|string\.h|math\.h|stdbool\.h|limits\.h|ctype\.h|time\.h|conio\.h|assert\.h|iostream|vector|string|algorithm|map|set)&gt;/g,
+    '&lt;<span class="tok-string">$1</span>&gt;');
+
+  // 6. Keywords
+  const pyKeywords = [
+    'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del',
+    'elif', 'else', 'except', 'False', 'finally', 'for', 'from', 'global', 'if', 'import',
+    'in', 'is', 'lambda', 'None', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return',
+    'True', 'try', 'while', 'with', 'yield'
+  ];
+  const cKeywords = [
+    'auto', 'break', 'case', 'char', 'const', 'continue', 'default', 'do', 'double',
+    'else', 'enum', 'extern', 'float', 'for', 'goto', 'if', 'inline', 'int', 'long',
+    'register', 'restrict', 'return', 'short', 'signed', 'sizeof', 'static', 'struct',
+    'switch', 'typedef', 'union', 'unsigned', 'void', 'volatile', 'while', 'include', 'define', 'NULL'
+  ];
+  const jsKeywords = [
+    'async', 'await', 'break', 'case', 'catch', 'class', 'const', 'continue', 'default',
+    'delete', 'do', 'else', 'export', 'extends', 'false', 'finally', 'for', 'function',
+    'if', 'import', 'in', 'instanceof', 'let', 'new', 'null', 'return', 'super', 'switch',
+    'this', 'throw', 'true', 'try', 'typeof', 'var', 'void', 'while', 'with', 'yield'
+  ];
+
+  const keywords = isPy ? pyKeywords : (isC ? cKeywords : [...new Set([...pyKeywords, ...cKeywords, ...jsKeywords])]);
+  const kwRegex = new RegExp(`\\b(${keywords.join('|')})\\b`, 'g');
+  highlighted = highlighted.replace(kwRegex, '<span class="tok-keyword">$1</span>');
+
+  // 7. Builtins & standard library types
+  const builtins = [
+    'print', 'range', 'len', 'input', 'str', 'list', 'dict', 'set', 'tuple', 'type',
+    'min', 'max', 'sum', 'sorted', 'enumerate', 'zip', 'open', 'any', 'all',
+    'printf', 'scanf', 'malloc', 'calloc', 'realloc', 'free', 'exit', 'strlen', 'strcpy',
+    'cout', 'cin', 'endl', 'console', 'log', 'document', 'window'
+  ];
+  const builtinRegex = new RegExp(`\\b(${builtins.join('|')})\\b`, 'g');
+  highlighted = highlighted.replace(builtinRegex, '<span class="tok-builtin">$1</span>');
+
+  // 8. Numbers
+  highlighted = highlighted.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="tok-number">$1</span>');
+
+  // 9. Common operators
+  highlighted = highlighted.replace(/(&amp;&amp;|\|\||==|!=|&lt;=|&gt;=|\+=|-=|\*=|\/=|%=|-&gt;)/g, '<span class="tok-operator">$1</span>');
+
+  // 10. Restore strings
+  stringPlaceholders.forEach((strHtml, idx) => {
+    highlighted = highlighted.replace(`___STR_${idx}___`, strHtml);
+  });
+
+  return highlighted + commentPart;
+}
+
+function renderCodeEditor(rawCode, rawLang) {
+  const code = (rawCode || '').trim();
+  const lang = (rawLang || '').toLowerCase().trim();
+
+  let filename = 'main.py';
+  let badge = 'PYTHON 3.12';
+
+  if (lang === 'c' || (!lang && (/#include|int main|printf\(|scanf\(|malloc\b|typedef struct/.test(code)))) {
+    filename = 'solution.c';
+    badge = 'C11';
+  } else if (lang === 'cpp' || lang === 'c++' || (!lang && (/std::|cout|cin|#include <iostream>/.test(code)))) {
+    filename = 'solution.cpp';
+    badge = 'C++20';
+  } else if (lang === 'java' || (!lang && (/public class|System\.out\.println/.test(code)))) {
+    filename = 'Solution.java';
+    badge = 'Java 21';
+  } else if (lang === 'html' || (!lang && (/<!DOCTYPE|<html|<div|<head|<body/.test(code)))) {
+    filename = 'index.html';
+    badge = 'HTML5';
+  } else if (lang === 'css' || (!lang && (/\{[\s\S]*?[a-z-]+:\s*[^;]+;[\s\S]*?\}/.test(code) && /margin|padding|color:|background:/.test(code)))) {
+    filename = 'styles.css';
+    badge = 'CSS3';
+  } else if (lang === 'javascript' || lang === 'js' || (!lang && (/const |let |console\.log|=>|function\b/.test(code)))) {
+    filename = 'app.js';
+    badge = 'JavaScript';
+  } else if (lang === 'sql' || (!lang && (/SELECT .* FROM|INSERT INTO|CREATE TABLE/.test(code)))) {
+    filename = 'query.sql';
+    badge = 'SQL';
+  } else if (lang === 'algo' || lang === 'pseudocode') {
+    filename = 'algorithm.algo';
+    badge = 'Algorithm';
+  } else if (lang === 'bash' || lang === 'sh') {
+    filename = 'script.sh';
+    badge = 'Bash';
+  } else if (lang === 'python' || lang === 'py' || (!lang && (/def |import |for .* in |print\(|elif |#/.test(code)))) {
+    filename = 'main.py';
+    badge = 'Python 3.12';
+  } else {
+    filename = 'snippet.txt';
+    badge = 'Code';
+  }
+
+  const lines = code.split('\n');
+  const gutterHtml = lines.map((_, i) => `<div class="code-line-num">${i + 1}</div>`).join('');
+  const contentHtml = lines.map(line => `<div class="code-line">${highlightCodeLine(line, lang || badge)}</div>`).join('');
+
+  return `<div class="code-editor-box" data-code="${encodeURIComponent(code)}">
+    <div class="code-editor-header">
+      <div class="code-editor-header-left">
+        <div class="code-editor-dots">
+          <span class="code-dot red"></span>
+          <span class="code-dot yellow"></span>
+          <span class="code-dot green"></span>
+        </div>
+        <div class="code-editor-file-tab">
+          <svg class="code-editor-file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>${filename}</span>
+        </div>
+      </div>
+      <div class="code-editor-header-right">
+        <span class="code-editor-lang-badge">${badge}</span>
+        <button class="code-copy-btn" type="button" title="Copy code to clipboard">
+          <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+    </div>
+    <div class="code-editor-body">
+      <div class="code-editor-gutter">${gutterHtml}</div>
+      <div class="code-editor-content"><pre class="code-pre">${contentHtml}</pre></div>
+    </div>
+  </div>`;
+}
+
+/* -------------------------------------------------------------------------
    MATHEMATICAL & ADVANCED MARKDOWN CONTENT FORMATTER
    Renders LaTeX math via KaTeX, colored callout cards (Traps, Mnemonics, Laws),
    headings (###, ####), and highlighters.
@@ -329,11 +511,16 @@ function formatNoteContent(content) {
   // Step 0 (PRE-PASS): Extract triple-backtick code blocks FIRST before any other processing,
   // clean any embedded math notation inside them, and replace with unique placeholders.
   const codeBlocks = [];
-  html = html.replace(/```(?:[a-zA-Z]*)\n?([\s\S]*?)```/g, (match, code) => {
-    // If the block contains math derivations or LaTeX:
-    const isMathDerivation = /`[^`]+`|\\frac|frac-num|\b(?:Solution|Derivation|Slope|LMVT|Rolle|Rank|Eigen|Cauchy|Trace)\b|[=≠≤≥⇒⇔]/.test(code);
+  html = html.replace(/```([a-zA-Z0-9_\-\+]*)\n?([\s\S]*?)```/g, (match, lang, code) => {
+    const trimmedCode = code.trim();
+    const l = (lang || '').toLowerCase().trim();
+
+    // Check if it is a pure mathematical derivation without programming tokens
+    const isMathDerivation = /^\s*(?:Solution|Question)\s+[A-Za-z0-9\s]+(?:Derivation|Equation|Trace|Formulation|Matrix|Transformation):/i.test(trimmedCode) ||
+      (!l && /`[^`]+`|\\frac|frac-num|\b(?:Cayley|Eigen|Cauchy|Rolle|LMVT)\b/i.test(trimmedCode) && !/\b(?:def|for|while|import|printf|scanf|#include|int\s+main|return|public|class)\b/.test(trimmedCode));
+
     if (isMathDerivation) {
-      let cleanCode = code.replace(/`([^`\n]+)`/g, (m, rawMath) => {
+      let cleanCode = trimmedCode.replace(/`([^`\n]+)`/g, (m, rawMath) => {
         let math = rawMath.trim();
         // Separate English labels (e.g. "Net Reactance X = ...", "2. Impedance: ...") from math expressions
         const labelMatch = math.match(/^([0-9]+\.\s*[A-Za-z\s]+:|Power\s*Factor:|Active\s*Power:|Reactive\s*Power:|Net\s*Reactance\s*[A-Za-z]*\s*=)\s*(.*)$/);
@@ -350,13 +537,22 @@ function formatNoteContent(content) {
       return placeholder;
     }
 
-    let cleanCode = cleanMathTypography(code);
-    const escaped = cleanCode
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    // Check if it's an ASCII diagram (lines made of +, -, |, etc.)
+    const isAsciiDiagram = !l && /^[+\-| /\\=_]{4,}/m.test(trimmedCode) && !/\b(?:def|for|while|import|printf|int|void)\b/.test(trimmedCode);
+    if (isAsciiDiagram) {
+      let cleanCode = cleanMathTypography(trimmedCode);
+      const escaped = cleanCode
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      const placeholder = `\x00CODEBLOCK_${codeBlocks.length}\x00`;
+      codeBlocks.push(`<div class="ascii-diagram-box"><pre class="ascii-diagram-pre">${escaped}</pre></div>`);
+      return placeholder;
+    }
+
+    // Authentic Code Editor / IDE box for all programming languages and code snippets
     const placeholder = `\x00CODEBLOCK_${codeBlocks.length}\x00`;
-    codeBlocks.push(`<div class="ascii-diagram-box"><pre class="ascii-diagram-pre">${escaped}</pre></div>`);
+    codeBlocks.push(renderCodeEditor(trimmedCode, l));
     return placeholder;
   });
 
@@ -548,6 +744,9 @@ function formatNoteContent(content) {
   // Step 6: Markdown Italics
   html = html.replace(/\*([^*\n]+?)\*/g, '<em>$1</em>');
 
+  // Step 6.5: Inline Monospace Code Badges (e.g. `break`, `for`, `int x`)
+  html = html.replace(/`([^`\n]+)`/g, '<code class="inline-code-badge">$1</code>');
+
   // Step 7: Numbered Lists & Bullets transformed to handwritten items
   html = html.replace(/^(\d+)\.\s+(.*?)$/gm, '<div class="handwritten-list-item"><span class="handwritten-num">$1.</span><span>$2</span></div>');
   html = html.replace(/^[-*]\s+(.*?)$/gm, '<div class="handwritten-list-item"><span class="handwritten-bullet">✎</span><span>$1</span></div>');
@@ -620,16 +819,16 @@ const ALLOWED_SUBJECT_IDS = [
   'sub-physics', 
   'sub-py', 
   'sub-python',
-  'sub-dsa',
   'sub-dsa-bcse007',
   'sub-bcse007',
-  'CS301',
   'BCSE-007'
 ];
 export const isSensorySubjectAllowed = (id) => {
   if (!id) return false;
+  // CS301 (Data Structures and Algorithms) is dead as per user instructions
+  if (id === 'sub-dsa' || id === 'CS301' || String(id).toLowerCase() === 'cs301') return false;
   const val = String(id).toLowerCase().trim();
-  return ALLOWED_SUBJECT_IDS.includes(id) || ['sub-dsa', 'sub-dsa-bcse007', 'sub-bcse007', 'cs301', 'bcse-007', 'dsa'].includes(val);
+  return ALLOWED_SUBJECT_IDS.includes(id) || ['sub-dsa-bcse007', 'sub-bcse007', 'bcse-007'].includes(val);
 };
 
 export default function SensoryLab({ 
@@ -648,7 +847,7 @@ export default function SensoryLab({
     beeeSubjectDetails,
     aimlSubjectDetails,
     math1SubjectDetails,
-    ...initialSubjects.filter(s => s.id !== 'sub-p1' && s.id !== 'sub-physics' && s.id !== 'sub-py' && s.id !== 'sub-python' && s.id !== 'sub-c1' && s.id !== 'sub-webtech' && s.id !== 'sub-beee' && s.id !== 'sub-aiml' && s.id !== 'sub-m1' && s.id !== 'sub-math1' && s.id !== 'sub-dsa' && s.id !== 'sub-dsa-bcse007')
+    ...initialSubjects.filter(s => s.id !== 'sub-p1' && s.id !== 'sub-physics' && s.id !== 'sub-py' && s.id !== 'sub-python' && s.id !== 'sub-c1' && s.id !== 'sub-webtech' && s.id !== 'sub-beee' && s.id !== 'sub-aiml' && s.id !== 'sub-m1' && s.id !== 'sub-math1' && s.id !== 'sub-dsa-bcse007')
   ];
   
   const [currentSubjectId, setCurrentSubjectId] = useState(() => {
@@ -710,8 +909,34 @@ export default function SensoryLab({
     } catch (e) {}
   }, [currentSubjectId, selectedUnitNum, themeMode]);
 
+  // Global clipboard copy listener for code editor blocks
+  useEffect(() => {
+    const handleCopyClick = (e) => {
+      const btn = e.target.closest('.code-copy-btn');
+      if (!btn) return;
+      const box = btn.closest('.code-editor-box');
+      if (!box) return;
+      const rawCode = decodeURIComponent(box.getAttribute('data-code') || '');
+      if (!rawCode) return;
+      navigator.clipboard.writeText(rawCode).then(() => {
+        btn.classList.add('copied');
+        const textSpan = btn.querySelector('.copy-text');
+        if (textSpan) textSpan.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          if (textSpan) textSpan.textContent = 'Copy';
+        }, 2000);
+      }).catch(err => {
+        console.error('Clipboard copy failed:', err);
+      });
+    };
+
+    document.addEventListener('click', handleCopyClick);
+    return () => document.removeEventListener('click', handleCopyClick);
+  }, []);
+
   // Active Subject & Active Unit Data
-  const isDSA = currentSubjectId === 'sub-dsa' || currentSubjectId === 'sub-dsa-bcse007' || currentSubjectId === 'BCSE-007' || currentSubjectId === 'CS301' || currentSubjectId === 'sub-bcse007';
+  const isDSA = currentSubjectId === 'sub-dsa-bcse007' || currentSubjectId === 'BCSE-007' || currentSubjectId === 'sub-bcse007';
   const isPython = currentSubjectId === 'sub-py' || currentSubjectId === 'BCSE-004' || currentSubjectId === 'sub-python';
   const isPhysics = currentSubjectId === 'sub-p1' || currentSubjectId === 'PHYS102' || currentSubjectId === 'BPHY-001' || currentSubjectId === 'sub-physics';
   const isC = currentSubjectId === 'sub-c1' || currentSubjectId === 'BCSE-008' || currentSubjectId === 'CS102' || currentSubjectId === 'sub-c';
@@ -1118,11 +1343,17 @@ body, body.theme-paper, .theme-paper, .notes-reader-panel.theme-paper {
 .theme-paper .notes-html-content,
 .theme-paper .notes-html-content p,
 .theme-paper .notes-html-content li,
-.theme-paper .notes-html-content span:not(.katex *):not(.pill-badge),
+.theme-paper .notes-html-content span:not(.katex *):not(.pill-badge):not(.code-editor-box *):not(.inline-code-badge):not(pre *):not(code *),
 .theme-paper .handwritten-list-item span {
   font-family: 'Caveat', 'Patrick Hand', cursive !important;
   color: #1e3a8a !important;
   font-size: 13.5pt !important;
+}
+
+.code-editor-box,
+.code-editor-box *,
+.inline-code-badge {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace !important;
 }
 
 .theme-paper .handwritten-bullet,

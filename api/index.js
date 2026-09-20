@@ -169,9 +169,9 @@ router.post('/doubts', postRateLimiter, (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// 3B. CAMPUSNOTES ELITE AI ACADEMIC TUTOR (Automated Doubt Solver)
-// ---------------------------------------------------------------------------
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const ACADEMIC_TUTOR_SYSTEM_PROMPT = `You are the "CampusNotes Elite AI Academic Tutor", an expert university professor and engineering topper assistant embedded inside the Student Doubt Clearing Forum.
 
@@ -218,7 +218,7 @@ Your primary duty is to solve college engineering doubts immediately with 100% m
 
 const { matchAcademicKB, generateAnalyticalSolution } = require('./academicKnowledgeBase');
 
-async function callAcademicAI(subject, question) {
+async function callAcademicAI(subject, question, customApiKey = null) {
   // 1. TIER 1: CURRICULUM THEOREM KNOWLEDGE BASE (Instant, Peer-Reviewed Exam-Grade Solutions)
   const kbMatch = matchAcademicKB(question, subject);
   if (kbMatch) {
@@ -228,8 +228,47 @@ async function callAcademicAI(subject, question) {
     };
   }
 
-  // 2. TIER 2: GROQ CLOUD INFERENCE (If GROQ_API_KEY is configured in env)
-  if (GROQ_API_KEY && GROQ_API_KEY.startsWith('gsk_')) {
+  // 2A. TIER 2A: GOOGLE GEMINI 1.5 FLASH (Fast, High Token Limit, Code & Math Specialized)
+  const activeGeminiKey = (customApiKey && customApiKey.startsWith('AIza')) ? customApiKey : GEMINI_API_KEY;
+  if (activeGeminiKey) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+
+      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeGeminiKey}`;
+      const response = await fetch(geminiEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            role: 'user',
+            parts: [{ text: `${ACADEMIC_TUTOR_SYSTEM_PROMPT}\n\n[STUDENT QUESTION DETAILS]\nSubject: ${subject}\nQuestion: ${question}\n\nPlease provide an exam-grade solution following the mandatory 4-part format (Core Concept, Visual Diagram, Step-by-Step Solution with KaTeX, and Exam Tip).` }]
+          }],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 2500
+          }
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (response.ok) {
+        const json = await response.json();
+        const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text && text.trim().length > 50) {
+          return { content: text.trim(), model: 'google/gemini-1.5-flash' };
+        }
+      }
+    } catch (err) {
+      console.warn('Gemini 1.5 Flash attempt failed:', err.message);
+    }
+  }
+
+  // 2B. TIER 2B: GROQ CLOUD INFERENCE (If GROQ_API_KEY is configured in env or passed)
+  const activeGroqKey = (customApiKey && customApiKey.startsWith('gsk_')) ? customApiKey : GROQ_API_KEY;
+  if (activeGroqKey && activeGroqKey.startsWith('gsk_')) {
     const groqModels = [
       'llama-3.3-70b-versatile',
       'llama-3.1-8b-instant',
@@ -334,7 +373,8 @@ router.post('/solve-doubt', postRateLimiter, async (req, res) => {
   }
 
   try {
-    const aiResult = await callAcademicAI(subject || 'General Engineering', question);
+    const apiKey = req.body.apiKey ? String(req.body.apiKey).trim() : (req.headers['x-api-key'] || null);
+    const aiResult = await callAcademicAI(subject || 'General Engineering', question, apiKey);
     const newDoubt = {
       id: 'f' + (doubts.length + 1),
       author: author.includes('Student') ? author : `${author} (Student)`,
