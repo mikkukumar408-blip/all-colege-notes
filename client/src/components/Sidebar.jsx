@@ -22,6 +22,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
+  Cpu,
+  Award,
+  Zap,
   X 
 } from 'lucide-react';
 
@@ -32,7 +35,11 @@ export default function Sidebar({
   isOpen, 
   setIsOpen,
   isCollapsed = false,
-  onToggleCollapse
+  onToggleCollapse,
+  onOpenDeepSearch,
+  onOpenCircuitSim,
+  onOpenExamQuiz,
+  onOpenFormulaHUD
 }) {
   /* -----------------------------------------------------------------------
      1. THE 6 MAIN SECTIONS (+ EXCLUSIVE 7TH SECTION FOR SUPER ADMIN)
@@ -148,6 +155,80 @@ export default function Sidebar({
               </button>
             );
           })}
+
+          {/* Interactive Tools & Simulators Quick Access (Crucial for Mobile Navigation) */}
+          <div style={{ marginTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px' }}>
+            <div style={{ fontSize: '0.70rem', textTransform: 'uppercase', color: 'var(--neon-cyan)', letterSpacing: '1px', padding: '0 8px 8px', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800 }}>
+              <span>⚡</span>
+              <span>{!isCollapsed ? 'Interactive Simulators & Tools' : 'Tools'}</span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {onOpenDeepSearch && (
+                <button
+                  className="nav-item"
+                  onClick={() => {
+                    onOpenDeepSearch();
+                    setIsOpen(false);
+                  }}
+                  style={{ color: 'var(--neon-cyan)', background: 'rgba(0, 240, 255, 0.04)' }}
+                  title="AI DeepSearch & 16:9 Slides (Alt+Space)"
+                >
+                  <Sparkles size={18} className="nav-icon" style={{ color: 'var(--neon-cyan)' }} />
+                  {!isCollapsed && <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>AI DeepSearch</span>}
+                  {!isCollapsed && <span className="badge-neon" style={{ padding: '2px 6px', fontSize: '0.62rem' }}>AI</span>}
+                </button>
+              )}
+
+              {onOpenCircuitSim && (
+                <button
+                  className="nav-item"
+                  onClick={() => {
+                    onOpenCircuitSim();
+                    setIsOpen(false);
+                  }}
+                  style={{ color: '#86efac', background: 'rgba(16, 185, 129, 0.04)' }}
+                  title="Circuit Sandbox (Alt+C)"
+                >
+                  <Cpu size={18} className="nav-icon" style={{ color: '#10b981' }} />
+                  {!isCollapsed && <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>Circuit Sandbox</span>}
+                  {!isCollapsed && <span style={{ background: 'rgba(16,185,129,0.2)', color: '#86efac', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '4px', padding: '2px 6px', fontSize: '0.62rem', fontWeight: 700 }}>SIM</span>}
+                </button>
+              )}
+
+              {onOpenExamQuiz && (
+                <button
+                  className="nav-item"
+                  onClick={() => {
+                    onOpenExamQuiz();
+                    setIsOpen(false);
+                  }}
+                  style={{ color: '#fef08a', background: 'rgba(234, 179, 8, 0.04)' }}
+                  title="University Mock Exam (Alt+Q)"
+                >
+                  <Award size={18} className="nav-icon" style={{ color: '#eab308' }} />
+                  {!isCollapsed && <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>Mock Exam Quiz</span>}
+                  {!isCollapsed && <span style={{ background: 'rgba(234,179,8,0.2)', color: '#fef08a', border: '1px solid rgba(234,179,8,0.3)', borderRadius: '4px', padding: '2px 6px', fontSize: '0.62rem', fontWeight: 700 }}>TEST</span>}
+                </button>
+              )}
+
+              {onOpenFormulaHUD && (
+                <button
+                  className="nav-item"
+                  onClick={() => {
+                    onOpenFormulaHUD();
+                    setIsOpen(false);
+                  }}
+                  style={{ color: '#d8b4fe', background: 'rgba(168, 85, 247, 0.04)' }}
+                  title="Formula & Constants HUD (Alt+F)"
+                >
+                  <Zap size={18} className="nav-icon" style={{ color: '#c084fc' }} />
+                  {!isCollapsed && <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>Formula Drawer</span>}
+                  {!isCollapsed && <span style={{ background: 'rgba(168,85,247,0.2)', color: '#d8b4fe', border: '1px solid rgba(168,85,247,0.3)', borderRadius: '4px', padding: '2px 6px', fontSize: '0.62rem', fontWeight: 700 }}>HUD</span>}
+                </button>
+              )}
+            </div>
+          </div>
         </nav>
 
         {/* -----------------------------------------------------------------

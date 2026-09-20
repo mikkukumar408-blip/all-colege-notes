@@ -25,7 +25,7 @@ import CircuitSimulatorModal from './components/CircuitSimulatorModal';
 import ExamQuizModal from './components/ExamQuizModal';
 import FormulaHUDModal from './components/FormulaHUDModal';
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot, Cpu, Award, Zap } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, ChevronDown, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot, Cpu, Award, Zap } from 'lucide-react';
 import { logSecurityEvent } from './utils/security';
 import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers } from './utils/cloudSync';
 import './App.css';
@@ -115,6 +115,7 @@ export default function App() {
   const [circuitSimInitialValues, setCircuitSimInitialValues] = useState({});
   const [examQuizOpen, setExamQuizOpen] = useState(false);
   const [formulaHUDOpen, setFormulaHUDOpen] = useState(false);
+  const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
 
   // Global Hotkey Listener: Alt + Space (DeepSearch), Alt + C (Circuit), Alt + Q (Mock Exam), Alt + F (Formulas)
   useEffect(() => {
@@ -303,6 +304,13 @@ export default function App() {
         setIsOpen={setSidebarOpen}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        onOpenDeepSearch={() => {
+          setDeepSearchInitialQuery('');
+          setDeepSearchOpen(true);
+        }}
+        onOpenCircuitSim={() => setCircuitSimOpen(true)}
+        onOpenExamQuiz={() => setExamQuizOpen(true)}
+        onOpenFormulaHUD={() => setFormulaHUDOpen(true)}
       />
 
       <div className={`main-viewport ${isSidebarCollapsed ? 'collapsed' : ''}`}>
@@ -385,7 +393,7 @@ export default function App() {
                 @{currentUser?.username}
               </span>
               {(currentUser?.username?.toLowerCase() === 'bhavya mishra' || currentUser?.role === 'superadmin') && (
-                <span style={{
+                <span className="admin-crown-badge" style={{
                   fontSize: '0.66rem',
                   fontWeight: 900,
                   letterSpacing: '0.5px',
@@ -399,8 +407,9 @@ export default function App() {
               )}
             </div>
 
+            {/* Desktop Action Buttons (Hidden on Mobile/Tablet via CSS) */}
             <button 
-              className="btn-secondary" 
+              className="btn-secondary desktop-nav-action" 
               style={{ 
                 padding: '6px 14px', 
                 fontSize: '0.82rem', 
@@ -425,7 +434,7 @@ export default function App() {
             </button>
 
             <button 
-              className="btn-secondary" 
+              className="btn-secondary desktop-nav-action" 
               style={{ 
                 padding: '6px 12px', 
                 fontSize: '0.82rem', 
@@ -446,7 +455,7 @@ export default function App() {
             </button>
 
             <button 
-              className="btn-secondary" 
+              className="btn-secondary desktop-nav-action" 
               style={{ 
                 padding: '6px 12px', 
                 fontSize: '0.82rem', 
@@ -467,7 +476,7 @@ export default function App() {
             </button>
 
             <button 
-              className="btn-secondary" 
+              className="btn-secondary desktop-nav-action" 
               style={{ 
                 padding: '6px 12px', 
                 fontSize: '0.82rem', 
@@ -488,7 +497,7 @@ export default function App() {
             </button>
 
             <button 
-              className="btn-secondary" 
+              className="btn-secondary desktop-nav-action" 
               style={{ padding: '6px 14px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px', borderColor: 'rgba(255, 75, 75, 0.4)', color: '#ff6b6b', background: 'rgba(255, 75, 75, 0.08)', cursor: 'pointer' }}
               onClick={() => {
                 if (currentUser && currentUser.username) {
@@ -504,13 +513,140 @@ export default function App() {
             >
               <LogOut size={15} /> Log Out
             </button>
+
+            {/* Mobile & Tablet Quick Tools Popover Toggle */}
+            <div className="mobile-tools-wrapper" style={{ position: 'relative' }}>
+              <button 
+                className="mobile-tools-trigger"
+                onClick={() => setToolsMenuOpen(prev => !prev)}
+                title="Open Tools & Simulators Menu"
+              >
+                <Sparkles size={14} color="var(--neon-cyan)" />
+                <span>Tools</span>
+                <ChevronDown size={13} style={{ transform: toolsMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+              </button>
+
+              {/* Mobile Overflow Menu Dropdown */}
+              {toolsMenuOpen && (
+                <>
+                  <div 
+                    className="mobile-tools-backdrop"
+                    onClick={() => setToolsMenuOpen(false)}
+                  />
+                  <div className="mobile-tools-dropdown-card">
+                    <div className="mobile-dropdown-header">
+                      <span>⚡ TOOLS & SIMULATORS</span>
+                      <button onClick={() => setToolsMenuOpen(false)} className="close-mini-btn" type="button">✕</button>
+                    </div>
+
+                    <button 
+                      className="mobile-dropdown-item"
+                      type="button"
+                      onClick={() => {
+                        setDeepSearchInitialQuery('');
+                        setDeepSearchOpen(true);
+                        setToolsMenuOpen(false);
+                      }}
+                    >
+                      <div className="mobile-dropdown-icon cyan">
+                        <Sparkles size={16} />
+                      </div>
+                      <div className="mobile-dropdown-text">
+                        <span className="title">AI DeepSearch</span>
+                        <span className="desc">16:9 Presentation Slides & Citations</span>
+                      </div>
+                    </button>
+
+                    <button 
+                      className="mobile-dropdown-item"
+                      type="button"
+                      onClick={() => {
+                        setCircuitSimOpen(true);
+                        setToolsMenuOpen(false);
+                      }}
+                    >
+                      <div className="mobile-dropdown-icon green">
+                        <Cpu size={16} />
+                      </div>
+                      <div className="mobile-dropdown-text">
+                        <span className="title">Circuit Simulator</span>
+                        <span className="desc">Thevenin, Norton & MPTT Sandbox</span>
+                      </div>
+                    </button>
+
+                    <button 
+                      className="mobile-dropdown-item"
+                      type="button"
+                      onClick={() => {
+                        setExamQuizOpen(true);
+                        setToolsMenuOpen(false);
+                      }}
+                    >
+                      <div className="mobile-dropdown-icon amber">
+                        <Award size={16} />
+                      </div>
+                      <div className="mobile-dropdown-text">
+                        <span className="title">Mock Exam Quiz</span>
+                        <span className="desc">Active-recall timed test engine</span>
+                      </div>
+                    </button>
+
+                    <button 
+                      className="mobile-dropdown-item"
+                      type="button"
+                      onClick={() => {
+                        setFormulaHUDOpen(true);
+                        setToolsMenuOpen(false);
+                      }}
+                    >
+                      <div className="mobile-dropdown-icon purple">
+                        <Zap size={16} />
+                      </div>
+                      <div className="mobile-dropdown-text">
+                        <span className="title">Formula & Constants HUD</span>
+                        <span className="desc">Physics constants & calculus identities</span>
+                      </div>
+                    </button>
+
+                    <div className="mobile-dropdown-divider" />
+
+                    <button 
+                      className="mobile-dropdown-item danger"
+                      type="button"
+                      onClick={() => {
+                        setToolsMenuOpen(false);
+                        if (currentUser && currentUser.username) {
+                          removeDeviceSession(currentUser.username).catch(() => {});
+                        }
+                        try {
+                          sessionStorage.removeItem('college_notes_auth_user');
+                          localStorage.removeItem('college_notes_auth_user');
+                        } catch (e) {}
+                        setCurrentUser(null);
+                      }}
+                    >
+                      <div className="mobile-dropdown-icon red">
+                        <LogOut size={16} />
+                      </div>
+                      <div className="mobile-dropdown-text">
+                        <span className="title" style={{ color: '#ff6b6b' }}>Sign Out</span>
+                        <span className="desc">Lock portal on this device</span>
+                      </div>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
             
             <button 
-              className="btn-primary" 
+              className="btn-primary main-download-btn" 
               style={{ padding: '8px 16px', fontSize: '0.85rem' }}
               onClick={() => setActiveTab('downloads-lab')}
+              title="Download Notes & Lab Manuals"
             >
-              <Download size={16} /> Download Notes
+              <Download size={16} />
+              <span className="download-text-desktop">Download Notes</span>
+              <span className="download-text-mobile">Notes</span>
             </button>
           </div>
         </header>
