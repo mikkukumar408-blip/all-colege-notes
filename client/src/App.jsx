@@ -324,31 +324,15 @@ export default function App() {
             <button 
               className="sidebar-toggle-btn"
               onClick={() => {
-                if (activeTab === 'notes-reader') {
-                  setIsUnitsCollapsed(!isUnitsCollapsed);
+                if (window.innerWidth <= 900) {
+                  setSidebarOpen(!sidebarOpen);
                 } else {
-                  if (window.innerWidth <= 900) {
-                    setSidebarOpen(!sidebarOpen);
-                  } else {
-                    setIsSidebarCollapsed(!isSidebarCollapsed);
-                  }
+                  setIsSidebarCollapsed(!isSidebarCollapsed);
                 }
               }}
-              title={
-                activeTab === 'notes-reader'
-                  ? (isUnitsCollapsed ? "Open Select Subject Section (>)" : "Close Select Subject Section (<)")
-                  : (isSidebarCollapsed ? "Expand Sidebar (>)" : "Collapse Sidebar (<)")
-              }
-              style={{
-                color: (activeTab === 'notes-reader' && isUnitsCollapsed) ? 'var(--neon-cyan)' : undefined,
-                borderColor: (activeTab === 'notes-reader' && isUnitsCollapsed) ? 'var(--neon-cyan)' : undefined,
-                background: (activeTab === 'notes-reader' && isUnitsCollapsed) ? 'rgba(0, 240, 255, 0.15)' : undefined
-              }}
+              title={isSidebarCollapsed ? "Expand Sidebar (>)" : "Collapse Sidebar (<)"}
             >
-              {activeTab === 'notes-reader'
-                ? (isUnitsCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />)
-                : (isSidebarCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />)
-              }
+              {isSidebarCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
             </button>
             <div className="nav-title-group">
               <h2>{getSectionTitle()}</h2>
@@ -408,126 +392,19 @@ export default function App() {
               )}
             </div>
 
-            {/* Desktop Action Buttons (Hidden on Laptops/Tablets <=1380px via CSS) */}
-            <button 
-              className="btn-secondary desktop-nav-action" 
-              style={{ 
-                padding: '6px 14px', 
-                fontSize: '0.82rem', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '6px', 
-                borderColor: 'rgba(0, 240, 255, 0.45)', 
-                color: 'var(--neon-cyan)', 
-                background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.12), rgba(112, 0, 255, 0.12))', 
-                cursor: 'pointer',
-                boxShadow: '0 0 12px rgba(0, 240, 255, 0.2)'
-              }}
-              onClick={() => {
-                setDeepSearchInitialQuery('');
-                setDeepSearchOpen(true);
-              }}
-              title="AI DeepSearch & 16:9 Presentation Slides (Alt + Space)"
-            >
-              <Sparkles size={14} color="var(--neon-cyan)" />
-              <span style={{ fontWeight: 800 }}>DeepSearch</span>
-              <span className="nav-kbd-badge" style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+Space</span>
-            </button>
-
-            <button 
-              className="btn-secondary desktop-nav-action" 
-              style={{ 
-                padding: '6px 12px', 
-                fontSize: '0.82rem', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '6px', 
-                borderColor: 'rgba(168, 185, 129, 0.45)', 
-                color: '#86efac', 
-                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(0, 240, 255, 0.08))', 
-                cursor: 'pointer'
-              }}
-              onClick={() => setCircuitSimOpen(true)}
-              title="Interactive Circuit & Mathematical Sandbox (Alt + C)"
-            >
-              <Cpu size={14} color="#10b981" />
-              <span style={{ fontWeight: 800 }}>Circuit Sim</span>
-              <span className="nav-kbd-badge" style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+C</span>
-            </button>
-
-            <button 
-              className="btn-secondary desktop-nav-action" 
-              style={{ 
-                padding: '6px 12px', 
-                fontSize: '0.82rem', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '6px', 
-                borderColor: 'rgba(234, 179, 8, 0.45)', 
-                color: '#fef08a', 
-                background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.12), rgba(245, 158, 11, 0.08))', 
-                cursor: 'pointer'
-              }}
-              onClick={() => setExamQuizOpen(true)}
-              title="Active-Recall University Mock Exam (Alt + Q)"
-            >
-              <Award size={14} color="#eab308" />
-              <span style={{ fontWeight: 800 }}>Mock Exam</span>
-              <span className="nav-kbd-badge" style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+Q</span>
-            </button>
-
-            <button 
-              className="btn-secondary desktop-nav-action" 
-              style={{ 
-                padding: '6px 12px', 
-                fontSize: '0.82rem', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '6px', 
-                borderColor: 'rgba(168, 85, 247, 0.45)', 
-                color: '#d8b4fe', 
-                background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(59, 130, 246, 0.08))', 
-                cursor: 'pointer'
-              }}
-              onClick={() => setFormulaHUDOpen(true)}
-              title="Formulas & Physical Constants Drawer (Alt + F)"
-            >
-              <Zap size={14} color="#c084fc" />
-              <span style={{ fontWeight: 800 }}>Formulas</span>
-              <span className="nav-kbd-badge" style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+F</span>
-            </button>
-
-            <button 
-              className="btn-secondary desktop-nav-action" 
-              style={{ padding: '6px 14px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px', borderColor: 'rgba(255, 75, 75, 0.4)', color: '#ff6b6b', background: 'rgba(255, 75, 75, 0.08)', cursor: 'pointer' }}
-              onClick={() => {
-                if (currentUser && currentUser.username) {
-                  removeDeviceSession(currentUser.username).catch(() => {});
-                }
-                try {
-                  sessionStorage.removeItem('college_notes_auth_user');
-                  localStorage.removeItem('college_notes_auth_user');
-                } catch (e) {}
-                setCurrentUser(null);
-              }}
-              title="Sign Out & Lock Portal"
-            >
-              <LogOut size={15} /> Log Out
-            </button>
-
-            {/* Mobile & Tablet Quick Tools Popover Toggle */}
-            <div className="mobile-tools-wrapper" style={{ position: 'relative' }}>
+            {/* Unified Tools & Simulators Dropdown (Alt+Space, Alt+C, Alt+Q, Alt+F) */}
+            <div className="nav-tools-wrapper" style={{ position: 'relative' }}>
               <button 
-                className="mobile-tools-trigger"
+                className="nav-tools-trigger"
                 onClick={() => setToolsMenuOpen(prev => !prev)}
                 title="Open Tools & Simulators Menu"
               >
                 <Sparkles size={14} color="var(--neon-cyan)" />
-                <span>Tools</span>
+                <span className="tools-btn-text">Tools</span>
                 <ChevronDown size={13} style={{ transform: toolsMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
               </button>
 
-              {/* Mobile Overflow Menu Dropdown */}
+              {/* Tools Dropdown Card */}
               {toolsMenuOpen && (
                 <>
                   <div 
@@ -556,6 +433,7 @@ export default function App() {
                         <span className="title">AI DeepSearch</span>
                         <span className="desc">16:9 Presentation Slides & Citations</span>
                       </div>
+                      <span className="nav-kbd-badge" style={{ fontSize: '0.62rem', opacity: 0.75, background: 'rgba(0,0,0,0.5)', padding: '2px 5px', borderRadius: '4px', color: 'var(--neon-cyan)', border: '1px solid rgba(0,240,255,0.3)', marginLeft: 'auto' }}>Alt+Space</span>
                     </button>
 
                     <button 
@@ -571,8 +449,9 @@ export default function App() {
                       </div>
                       <div className="mobile-dropdown-text">
                         <span className="title">Circuit Simulator</span>
-                        <span className="desc">Thevenin, Norton & MPTT Sandbox</span>
+                        <span className="desc">RLC, Thevenin & Sandbox</span>
                       </div>
+                      <span className="nav-kbd-badge" style={{ fontSize: '0.62rem', opacity: 0.75, background: 'rgba(0,0,0,0.5)', padding: '2px 5px', borderRadius: '4px', color: '#86efac', border: '1px solid rgba(16,185,129,0.3)', marginLeft: 'auto' }}>Alt+C</span>
                     </button>
 
                     <button 
@@ -587,9 +466,10 @@ export default function App() {
                         <Award size={16} />
                       </div>
                       <div className="mobile-dropdown-text">
-                        <span className="title">Mock Exam Quiz</span>
-                        <span className="desc">Active-recall timed test engine</span>
+                        <span className="title">University Mock Exam</span>
+                        <span className="desc">Timed Quiz & Scorecard</span>
                       </div>
+                      <span className="nav-kbd-badge" style={{ fontSize: '0.62rem', opacity: 0.75, background: 'rgba(0,0,0,0.5)', padding: '2px 5px', borderRadius: '4px', color: '#fef08a', border: '1px solid rgba(245,158,11,0.3)', marginLeft: 'auto' }}>Alt+Q</span>
                     </button>
 
                     <button 
@@ -605,8 +485,9 @@ export default function App() {
                       </div>
                       <div className="mobile-dropdown-text">
                         <span className="title">Formula & Constants HUD</span>
-                        <span className="desc">Physics constants & calculus identities</span>
+                        <span className="desc">Physics constants & identities</span>
                       </div>
+                      <span className="nav-kbd-badge" style={{ fontSize: '0.62rem', opacity: 0.75, background: 'rgba(0,0,0,0.5)', padding: '2px 5px', borderRadius: '4px', color: '#d8b4fe', border: '1px solid rgba(168,85,247,0.3)', marginLeft: 'auto' }}>Alt+F</span>
                     </button>
 
                     <div className="mobile-dropdown-divider" />
@@ -638,6 +519,26 @@ export default function App() {
                 </>
               )}
             </div>
+
+            {/* Dedicated Sign Out Button */}
+            <button 
+              className="btn-secondary nav-logout-btn" 
+              style={{ padding: '6px 14px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px', borderColor: 'rgba(255, 75, 75, 0.4)', color: '#ff6b6b', background: 'rgba(255, 75, 75, 0.08)', cursor: 'pointer' }}
+              onClick={() => {
+                if (currentUser && currentUser.username) {
+                  removeDeviceSession(currentUser.username).catch(() => {});
+                }
+                try {
+                  sessionStorage.removeItem('college_notes_auth_user');
+                  localStorage.removeItem('college_notes_auth_user');
+                } catch (e) {}
+                setCurrentUser(null);
+              }}
+              title="Sign Out & Lock Portal"
+            >
+              <LogOut size={15} />
+              <span className="logout-text-desktop">Log Out</span>
+            </button>
             
             <button 
               className="btn-primary main-download-btn" 
