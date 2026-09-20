@@ -29,7 +29,11 @@ import {
   Maximize2,
   Minimize2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Award,
+  ExternalLink
 } from 'lucide-react';
 import { initialSubjects } from '../data/mockData';
 import { beeeUnitsData, beeeSubjectDetails } from '../data/beeeNotesData';
@@ -488,6 +492,10 @@ function renderCodeEditor(rawCode, rawLang) {
           </svg>
           <span class="copy-text">Copy</span>
         </button>
+        <button class="code-tutor-btn" type="button" title="Open in Bhavya's AI Coding Tutor with Memory & Step-by-Step Tracing" style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.4);color:#d8b4fe;border-radius:6px;padding:3px 8px;font-size:0.72rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>AI Tutor</span>
+        </button>
       </div>
     </div>
     <div class="code-editor-body">
@@ -621,7 +629,7 @@ function simulateCodeExecution(code, langBadge = '') {
    Renders LaTeX math via KaTeX, colored callout cards (Traps, Mnemonics, Laws),
    headings (###, ####), and highlighters.
    ------------------------------------------------------------------------- */
-function formatNoteContent(content) {
+function formatNoteContent(content, activeRecallMode = false) {
   if (!content) return '';
 
   let html = content;
@@ -834,12 +842,22 @@ function formatNoteContent(content) {
       badgeLabel = '🔴 LEVEL 3: HARDEST ADVANCED';
     }
 
-    return `<div class="worked-example-box ${badgeClass}">
+    const maskOverlay = activeRecallMode ? `
+      <div class="active-recall-mask-curtain">
+        <span class="active-recall-pill">🔒 Click to Reveal Solution (Active Recall)</span>
+        <span style="font-size:0.75rem; color:#94a3b8; margin-top:6px;">Try solving on rough paper before looking!</span>
+      </div>` : '';
+
+    return `<div class="worked-example-box ${badgeClass} ${activeRecallMode ? 'active-recall-masked' : ''}">
       <div class="example-tag-header">
         <span class="difficulty-pill ${badgeClass}">${badgeLabel}</span>
         <span>📘 ${title}</span>
+        <button class="ask-ai-deep-btn" data-topic="${encodeURIComponent(title)}" type="button" title="Ask Bhavya's AI Assistant to explain this example" style="margin-left:auto;background:rgba(0,240,255,0.12);border:1px solid rgba(0,240,255,0.3);color:var(--neon-cyan);padding:2px 8px;border-radius:6px;font-size:0.7rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          🤖 Ask AI
+        </button>
       </div>
       ${body}
+      ${maskOverlay}
     </div>`;
   });
 
@@ -850,15 +868,25 @@ function formatNoteContent(content) {
     const title = titleMatch ? titleMatch[1] : 'ANALYTICAL MATHEMATICAL PROOF';
     const marks = marksMatch ? marksMatch[1] : '';
 
-    return `<div class="academic-derivation-box">
+    const maskOverlay = activeRecallMode ? `
+      <div class="active-recall-mask-curtain">
+        <span class="active-recall-pill">🔒 Click to Reveal Proof & Steps (Active Recall)</span>
+        <span style="font-size:0.75rem; color:#94a3b8; margin-top:6px;">Test your derivation memory before verifying!</span>
+      </div>` : '';
+
+    return `<div class="academic-derivation-box ${activeRecallMode ? 'active-recall-masked' : ''}">
       <div class="derivation-header">
         <span class="derivation-pill">📐 FORMAL UNIVERSITY DERIVATION</span>
         <span class="derivation-title">🎓 ${title}</span>
         ${marks ? `<span class="derivation-marks-pill">⭐ ${marks}</span>` : ''}
+        <button class="ask-ai-deep-btn" data-topic="${encodeURIComponent('Derivation of ' + title)}" type="button" title="Ask Bhavya's AI Assistant for intuitive derivation proof" style="margin-left:auto;background:rgba(0,240,255,0.12);border:1px solid rgba(0,240,255,0.3);color:var(--neon-cyan);padding:2px 8px;border-radius:6px;font-size:0.7rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          🤖 Ask AI
+        </button>
       </div>
       <div class="derivation-body">
         ${body}
       </div>
+      ${maskOverlay}
     </div>`;
   });
 
@@ -1011,11 +1039,51 @@ export default function SensoryLab({
   
   const [fontSize, setFontSize] = useState('normal'); // 'normal' | 'large'
   const [bookmarked, setBookmarked] = useState(false);
+  const [activeRecallMode, setActiveRecallMode] = useState(false);
+
+  const [masteryData, setMasteryData] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('college_notes_mastery') || '{}');
+    } catch (e) {
+      return {};
+    }
+  });
+
+  const currentUnitKey = `${currentSubjectId}_u${selectedUnitNum}`;
+  const currentUnitMastery = masteryData[currentUnitKey] || 'unread';
+
+  const toggleUnitMastery = () => {
+    const nextStatus = currentUnitMastery === 'mastered' 
+      ? 'revision' 
+      : currentUnitMastery === 'revision' 
+        ? 'unread' 
+        : 'mastered';
+
+    const updated = { ...masteryData, [currentUnitKey]: nextStatus };
+    setMasteryData(updated);
+    try {
+      localStorage.setItem('college_notes_mastery', JSON.stringify(updated));
+      window.dispatchEvent(new Event('mastery-updated'));
+    } catch (e) {}
+  };
+
+  const handleToggleRevealAll = (showAll) => {
+    if (notesPanelRef.current) {
+      const curtains = notesPanelRef.current.querySelectorAll('.active-recall-mask-curtain');
+      curtains.forEach(c => {
+        c.style.display = showAll ? 'none' : 'flex';
+      });
+    }
+  };
 
   useEffect(() => {
-    if (movieContext?.id && isSensorySubjectAllowed(movieContext.id) && movieContext.id !== currentSubjectId) {
-      setCurrentSubjectId(movieContext.id);
-      setSelectedUnitNum(1);
+    if (movieContext?.id && isSensorySubjectAllowed(movieContext.id)) {
+      if (movieContext.id !== currentSubjectId) {
+        setCurrentSubjectId(movieContext.id);
+      }
+      if (movieContext.targetUnitNum) {
+        setSelectedUnitNum(movieContext.targetUnitNum);
+      }
     }
   }, [movieContext]);
 
@@ -1084,23 +1152,53 @@ export default function SensoryLab({
 
       // 3. Copy Code Button
       const btn = e.target.closest('.code-copy-btn');
-      if (!btn) return;
-      const box = btn.closest('.code-editor-box');
-      if (!box) return;
-      const rawCode = decodeURIComponent(box.getAttribute('data-code') || '');
-      if (!rawCode) return;
-      navigator.clipboard.writeText(rawCode).then(() => {
-        btn.classList.add('copied');
-        const textSpan = btn.querySelector('.copy-text');
-        if (textSpan) textSpan.textContent = 'Copied!';
-        setTimeout(() => {
-          btn.classList.remove('copied');
-          if (textSpan) textSpan.textContent = 'Copy';
-        }, 2000);
-      }).catch(err => {
-        console.error('Clipboard copy failed:', err);
-      });
-    };
+      if (btn) {
+        const box = btn.closest('.code-editor-box');
+        if (box) {
+          const rawCode = decodeURIComponent(box.getAttribute('data-code') || '');
+          if (rawCode) {
+            navigator.clipboard.writeText(rawCode).then(() => {
+              btn.classList.add('copied');
+              const textSpan = btn.querySelector('.copy-text');
+              if (textSpan) textSpan.textContent = 'Copied!';
+              setTimeout(() => {
+                btn.classList.remove('copied');
+                if (textSpan) textSpan.textContent = 'Copy';
+              }, 2000);
+            }).catch(err => {
+              console.error('Clipboard copy failed:', err);
+            });
+          }
+        }
+        return;
+      }
+
+    // 4. Open in Bhavya's AI Coding Tutor (Cross-App Teleportation)
+    const tutorBtn = e.target.closest('.code-tutor-btn');
+    if (tutorBtn) {
+      const box = tutorBtn.closest('.code-editor-box');
+      if (box) {
+        const rawCode = decodeURIComponent(box.getAttribute('data-code') || '');
+        window.open(`https://ai-coding-tutor.vercel.app?code=${encodeURIComponent(rawCode)}`, '_blank');
+      }
+      return;
+    }
+
+    // 5. Ask Bhavya's AI Assistant Deep Link
+    const aiBtn = e.target.closest('.ask-ai-deep-btn');
+    if (aiBtn) {
+      const topic = decodeURIComponent(aiBtn.getAttribute('data-topic') || '');
+      window.open(`https://bhavyas-ai-assistant.vercel.app?q=${encodeURIComponent('Explain step-by-step with exam tips and proofs: ' + topic)}`, '_blank');
+      return;
+    }
+
+    // 6. Active Recall Mask Curtain Reveal
+    const maskCurtain = e.target.closest('.active-recall-mask-curtain');
+    if (maskCurtain) {
+      maskCurtain.style.display = 'none';
+      return;
+    }
+  };
 
     document.addEventListener('click', handleCodeBlockClick);
     return () => document.removeEventListener('click', handleCodeBlockClick);
@@ -1688,6 +1786,132 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
     }
   };
 
+  const handlePrintFormulaSheet = () => {
+    let formulas = [];
+    if (isBEEE) {
+      formulas = [
+        { name: "Ohm's Law & Power", eq: "V = I \\cdot R, \\quad P = V \\cdot I = I^2 R = \\frac{V^2}{R}" },
+        { name: "Kirchhoff's Current Law (KCL)", eq: "\\sum I_{\\text{enter}} = \\sum I_{\\text{leave}} \\implies \\sum_{k=1}^n I_k = 0" },
+        { name: "Kirchhoff's Voltage Law (KVL)", eq: "\\sum V_{\\text{drops}} = \\sum V_{\\text{sources}} \\implies \\sum_{k=1}^n V_k = 0" },
+        { name: "Thevenin's Equivalent Circuit", eq: "V_{th} = V_{oc}, \\quad R_{th} = \\frac{V_{oc}}{I_{sc}}, \\quad I_L = \\frac{V_{th}}{R_{th} + R_L}" },
+        { name: "Norton's Equivalent Circuit", eq: "I_N = I_{sc} = \\frac{V_{th}}{R_{th}}, \\quad R_N = R_{th}" },
+        { name: "Maximum Power Transfer Theorem (DC)", eq: "P_{\\max} = \\frac{V_{th}^2}{4 R_{th}} \\quad (\\text{at } R_L = R_{th}, \\; \\eta = 50\\%)" },
+        { name: "Delta to Star Conversion (\\Delta \\rightarrow Y)", eq: "R_A = \\frac{R_{AB} \\cdot R_{CA}}{R_{AB} + R_{BC} + R_{CA}}" },
+        { name: "Star to Delta Conversion (Y \\rightarrow \\Delta)", eq: "R_{AB} = R_A + R_B + \\frac{R_A R_B}{R_C}" },
+        { name: "AC Sinusoid RMS & Average Values", eq: "V_{rms} = \\frac{V_m}{\\sqrt{2}} \\approx 0.707 V_m, \\quad V_{avg} = \\frac{2 V_m}{\\pi} \\approx 0.637 V_m" },
+        { name: "AC Series RLC Resonance & Q-Factor", eq: "f_r = \\frac{1}{2\\pi \\sqrt{LC}}, \\quad Q = \\frac{1}{R}\\sqrt{\\frac{L}{C}}, \\quad \\text{BW} = \\frac{f_r}{Q}" }
+      ];
+    } else if (isPhysics) {
+      formulas = [
+        { name: "Stokes' Phase Reversal Condition", eq: "\\Delta = 2\\mu t \\cos r + \\frac{\\lambda}{2} = n\\lambda \\quad (\\text{Destructive Interference})" },
+        { name: "Newton's Rings (Dark Ring Diameter)", eq: "D_n^2 = 4n\\lambda R \\implies D_n = 2\\sqrt{n\\lambda R}" },
+        { name: "Newton's Rings (Bright Ring Diameter)", eq: "D_n^2 = 2(2n - 1)\\lambda R \\implies D_n = \\sqrt{2(2n-1)\\lambda R}" },
+        { name: "Fraunhofer Single-Slit Minima", eq: "a \\sin \\theta = m\\lambda \\quad (m = \\pm 1, \\pm 2, \\dots)" },
+        { name: "Maxwell I (Gauss's Law for Electrostatics)", eq: "\\nabla \\cdot \\mathbf{E} = \\frac{\\rho}{\\varepsilon_0}" },
+        { name: "Maxwell II (Gauss's Law for Magnetism)", eq: "\\nabla \\cdot \\mathbf{B} = 0" },
+        { name: "Maxwell III (Faraday's Law of Induction)", eq: "\\nabla \\times \\mathbf{E} = -\\frac{\\partial \\mathbf{B}}{\\partial t}" },
+        { name: "Maxwell IV (Ampere-Maxwell Law)", eq: "\\nabla \\times \\mathbf{B} = \\mu_0 \\mathbf{J} + \\mu_0 \\varepsilon_0 \\frac{\\partial \\mathbf{E}}{\\partial t}" },
+        { name: "Conductor Skin Depth (Penetration Depth)", eq: "\\delta = \\sqrt{\\frac{2}{\\omega \\mu \\sigma}} = \\frac{1}{\\sqrt{\\pi f \\mu \\sigma}}" },
+        { name: "1D Infinite Potential Well Quantized Energy", eq: "E_n = \\frac{n^2 h^2}{8mL^2} = \\frac{n^2 \\pi^2 \\hbar^2}{2mL^2}, \\quad \\psi_n(x) = \\sqrt{\\frac{2}{L}}\\sin\\left(\\frac{n\\pi x}{L}\\right)" }
+      ];
+    } else if (isMath1) {
+      formulas = [
+        { name: "Euler's Homogeneous Function Theorem", eq: "x \\frac{\\partial u}{\\partial x} + y \\frac{\\partial u}{\\partial y} = n \\cdot u" },
+        { name: "Euler's 2nd Order Derivative Form", eq: "x^2 \\frac{\\partial^2 u}{\\partial x^2} + 2xy \\frac{\\partial^2 u}{\\partial x\\partial y} + y^2 \\frac{\\partial^2 u}{\\partial y^2} = n(n-1)u" },
+        { name: "Taylor Series (1-Variable Power Expansion)", eq: "f(x) = \\sum_{n=0}^\\infty \\frac{f^{(n)}(a)}{n!} (x - a)^n" },
+        { name: "Maclaurin Series (Expansion about a = 0)", eq: "f(x) = \\sum_{n=0}^\\infty \\frac{f^{(n)}(0)}{n!} x^n" },
+        { name: "Jacobian Coordinate Transformation", eq: "J = \\frac{\\partial(x, y)}{\\partial(u, v)} = \\begin{vmatrix} \\frac{\\partial x}{\\partial u} & \\frac{\\partial x}{\\partial v} \\\\[4pt] \\frac{\\partial y}{\\partial u} & \\frac{\\partial y}{\\partial v} \\end{vmatrix}" },
+        { name: "Rolle's & Lagrange's Mean Value Theorem", eq: "f'(c) = \\frac{f(b) - f(a)}{b - a} \\quad \\text{for } c \\in (a, b)" },
+        { name: "Cayley-Hamilton Theorem Statement", eq: "p(A) = A^n + c_{n-1}A^{n-1} + \\dots + c_0 I = 0" },
+        { name: "Eigenvalues Sum & Determinant Relations", eq: "\\sum_{i=1}^n \\lambda_i = \\text{Trace}(A), \\quad \\prod_{i=1}^n \\lambda_i = \\det(A)" }
+      ];
+    } else if (isDSA) {
+      formulas = [
+        { name: "1D Array Element Address Calculation", eq: "\\text{Loc}(A[i]) = \\text{Base} + (i - \\text{LB}) \\times c" },
+        { name: "2D Array Row-Major Memory Mapping", eq: "\\text{Loc}(A[i][j]) = \\text{Base} + [ (i - \\text{LB}_r) \\cdot N + (j - \\text{LB}_c) ] \\times c" },
+        { name: "2D Array Column-Major Memory Mapping", eq: "\\text{Loc}(A[i][j]) = \\text{Base} + [ (j - \\text{LB}_c) \\cdot M + (i - \\text{LB}_r) ] \\times c" },
+        { name: "Circular Queue Full & Empty Conditions", eq: "\\text{Full}: (\\text{rear} + 1) \\% N = \\text{front}, \\quad \\text{Empty}: \\text{front} = -1" },
+        { name: "Binary Tree Structural Invariant", eq: "N_{\\max} = 2^h - 1, \\quad \\text{Leaves } L = I + 1" },
+        { name: "QuickSort Master Recurrence", eq: "T(n) = 2T(n/2) + O(n) \\implies O(n \\log n) \\text{ best/avg}, \\; O(n^2) \\text{ worst}" }
+      ];
+    } else {
+      formulas = [
+        { name: "Time Complexity Hierarchy", eq: "O(1) < O(\\log n) < O(n) < O(n \\log n) < O(n^2) < O(2^n)" },
+        { name: "Operator Evaluation Precedence", eq: "() \\rightarrow ** \\rightarrow (*, /, \\%) \\rightarrow (+, -) \\rightarrow \\text{Comparison} \\rightarrow \\text{Logical}" }
+      ];
+    }
+
+    const tableRows = formulas.map(f => {
+      let renderedEq = '';
+      try {
+        renderedEq = katex.renderToString(f.eq, { displayMode: true, throwOnError: false });
+      } catch (e) {
+        renderedEq = `<div style="font-family:monospace;font-weight:bold;">${f.eq}</div>`;
+      }
+      return `
+        <div style="border:1.5px solid #cbd5e1;border-radius:8px;padding:12px;background:#f8fafc;page-break-inside:avoid;break-inside:avoid;">
+          <div style="font-size:10pt;font-weight:800;color:#1e3a8a;margin-bottom:6px;border-bottom:1px solid #e2e8f0;padding-bottom:4px;">
+            📌 ${f.name}
+          </div>
+          <div style="padding:4px 0;overflow-x:auto;">
+            ${renderedEq}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const sheetHTML = `<!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8"/>
+      <title>${activeSubject.code} Formula Cheat-Sheet</title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"/>
+      <style>
+        @page { size: A4 portrait; margin: 10mm; }
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        body { font-family: 'Inter', -apple-system, sans-serif; margin: 0; padding: 0; color: #0f172a; }
+        .cheat-header { border-bottom: 2.5px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .cheat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      </style>
+    </head>
+    <body>
+      <div class="cheat-header">
+        <div>
+          <h1 style="font-size:15pt;margin:0;color:#0f172a;font-weight:900;">${activeSubject.name} (${activeSubject.code})</h1>
+          <div style="font-size:9pt;color:#2563eb;font-weight:700;margin-top:2px;">⚡ OFFICIAL UNIVERSITY EXAM FORMULA & THEOREM CHEAT-SHEET &bull; UNIT ${selectedUnitNum}</div>
+        </div>
+        <div style="text-align:right;font-size:8pt;color:#64748b;">
+          <div>100% University Exam Aligned</div>
+          <div>All College Notes Master Repository</div>
+        </div>
+      </div>
+      <div class="cheat-grid">
+        ${tableRows}
+      </div>
+      <div style="margin-top:14px;padding-top:6px;border-top:1px solid #cbd5e1;font-size:7.5pt;color:#64748b;display:flex;justify-content:space-between;">
+        <span>Generated for student quick revision &bull; Student: ${currentUser?.username || 'Verified Student'}</span>
+        <span>Verified MMEC Syllabus 2025-26</span>
+      </div>
+    </body>
+    </html>`;
+
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:0;pointer-events:none;';
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      try {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } finally {
+        setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 3000);
+      }
+    };
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write(sheetHTML);
+    iframeDoc.close();
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
       {/* -------------------------------------------------------------------
@@ -1994,6 +2218,93 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
               </a>
             </>
           )}
+
+          {/* ⚡ 1-Click Formula Cheat-Sheet Generator */}
+          <button 
+            type="button"
+            className="btn-outline" 
+            onClick={handlePrintFormulaSheet}
+            style={{
+              borderColor: '#f59e0b',
+              color: '#f59e0b',
+              background: 'rgba(245, 158, 11, 0.12)',
+              fontWeight: 800,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+            title="Generate & Print 1-Page Formula Cheat-Sheet for this Unit"
+          >
+            <Zap size={15} /> Formula Cheat-Sheet
+          </button>
+
+          {/* 🧠 Active Recall Blurting Mask Mode */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.04)', padding: '2px 6px', borderRadius: '8px', border: '1px solid var(--border-dim)' }}>
+            <button 
+              type="button"
+              className="btn-outline" 
+              onClick={() => setActiveRecallMode(!activeRecallMode)}
+              style={{
+                borderColor: activeRecallMode ? '#ec4899' : 'transparent',
+                color: activeRecallMode ? '#f472b6' : 'var(--text-muted)',
+                background: activeRecallMode ? 'rgba(236, 72, 153, 0.18)' : 'transparent',
+                fontWeight: 800,
+                fontSize: '0.8rem',
+                padding: '6px 12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+              title="Blur derivation steps and numerical answers to test active memory recall"
+            >
+              {activeRecallMode ? <EyeOff size={15} /> : <Eye size={15} />}
+              <span>{activeRecallMode ? 'Active Recall: ON' : 'Active Recall'}</span>
+            </button>
+
+            {activeRecallMode && (
+              <div style={{ display: 'flex', gap: '4px', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '4px' }}>
+                <button
+                  type="button"
+                  onClick={() => handleToggleRevealAll(true)}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--neon-cyan)', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', padding: '3px 6px' }}
+                  title="Reveal all masked derivations and solutions"
+                >
+                  Reveal All
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleToggleRevealAll(false)}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--text-dim)', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', padding: '3px 6px' }}
+                  title="Hide all derivations and solutions"
+                >
+                  Hide All
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* 🎯 Unit Exam Readiness Mastery Toggle */}
+          <button
+            type="button"
+            onClick={toggleUnitMastery}
+            style={{
+              padding: '7px 12px',
+              borderRadius: '8px',
+              border: currentUnitMastery === 'mastered' ? '1px solid #10b981' : currentUnitMastery === 'revision' ? '1px solid #f59e0b' : '1px solid var(--border-dim)',
+              background: currentUnitMastery === 'mastered' ? 'rgba(16, 185, 129, 0.16)' : currentUnitMastery === 'revision' ? 'rgba(245, 158, 11, 0.16)' : 'rgba(255, 255, 255, 0.04)',
+              color: currentUnitMastery === 'mastered' ? '#86efac' : currentUnitMastery === 'revision' ? '#fde68a' : 'var(--text-muted)',
+              fontSize: '0.8rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+            title="Click to cycle readiness: Mastered (Green) -> Needs Revision (Yellow) -> Unread"
+          >
+            <Award size={15} />
+            <span>{currentUnitMastery === 'mastered' ? '✅ Unit Mastered' : currentUnitMastery === 'revision' ? '⚠️ Needs Revision' : '⚪ Mark Status'}</span>
+          </button>
 
           <button 
             type="button"
@@ -2550,7 +2861,7 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
                     boxSizing: 'border-box'
                   }}
                   dangerouslySetInnerHTML={{
-                    __html: formatNoteContent(section.content)
+                    __html: formatNoteContent(section.content, activeRecallMode)
                   }}
                 />
 

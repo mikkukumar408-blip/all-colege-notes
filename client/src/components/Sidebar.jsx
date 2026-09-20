@@ -46,6 +46,28 @@ export default function Sidebar({
      ----------------------------------------------------------------------- */
   const isSuperAdmin = (currentUser?.username?.toLowerCase() === 'bhavya mishra') || (currentUser?.role === 'superadmin') || (currentUser?.isSuperAdmin === true);
 
+  const [readinessScore, setReadinessScore] = useState(0);
+
+  useEffect(() => {
+    const updateScore = () => {
+      try {
+        const saved = JSON.parse(localStorage.getItem('college_notes_mastery') || '{}');
+        const mastered = Object.values(saved).filter(v => v === 'mastered').length;
+        const percent = Math.min(100, Math.round((mastered / 32) * 100));
+        setReadinessScore(percent);
+      } catch (e) {
+        setReadinessScore(0);
+      }
+    };
+    updateScore();
+    window.addEventListener('storage', updateScore);
+    window.addEventListener('mastery-updated', updateScore);
+    return () => {
+      window.removeEventListener('storage', updateScore);
+      window.removeEventListener('mastery-updated', updateScore);
+    };
+  }, []);
+
   const navSections = [
     { id: 'subjects-notes', label: 'Semester Notes & Subjects', icon: BookOpen, badge: 'All Years' },
     { id: 'notes-reader', label: 'Interactive Notes Reader', icon: FileText, badge: 'Quick Read' },
@@ -230,6 +252,29 @@ export default function Sidebar({
             </div>
           </div>
         </nav>
+
+        {/* Exam Readiness Tracker Widget */}
+        {!isCollapsed && (
+          <div style={{ padding: '10px 14px', margin: '0 12px 10px', background: 'rgba(0, 240, 255, 0.04)', borderRadius: '10px', border: '1px solid rgba(0, 240, 255, 0.15)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', marginBottom: '6px' }}>
+              <span style={{ color: 'var(--text-muted)', fontWeight: 800, letterSpacing: '0.5px' }}>🎯 EXAM READINESS</span>
+              <span style={{ color: 'var(--neon-cyan)', fontWeight: 900 }}>{readinessScore}%</span>
+            </div>
+            <div style={{ height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div 
+                style={{ 
+                  width: `${readinessScore}%`, 
+                  height: '100%', 
+                  background: 'linear-gradient(90deg, #00f0ff, #10b981)', 
+                  transition: 'width 0.4s ease' 
+                }} 
+              />
+            </div>
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)', marginTop: '4px' }}>
+              {readinessScore > 0 ? `${Math.round((readinessScore / 100) * 32)} / 32 Units Mastered` : 'Mark units as Mastered to track score'}
+            </div>
+          </div>
+        )}
 
         {/* -----------------------------------------------------------------
            4. SIDEBAR FOOTER (Live System / Portal Status Indicator)

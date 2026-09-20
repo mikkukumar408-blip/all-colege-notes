@@ -10,7 +10,8 @@ import {
   Cpu, 
   Sparkles,
   ShieldCheck,
-  Calculator
+  Calculator,
+  Printer
 } from 'lucide-react';
 import katex from 'katex';
 
@@ -98,6 +99,89 @@ export default function FormulaHUDModal({ isOpen, onClose }) {
     });
   };
 
+  const handlePrintAllFormulas = () => {
+    const sectionsHtml = Object.entries(FORMULA_CATEGORIES).map(([catKey, cat]) => {
+      const itemsHtml = cat.items.map(item => {
+        let renderedMath = '';
+        try {
+          const raw = item.value.replace(/\$/g, '');
+          renderedMath = katex.renderToString(raw, { displayMode: true, throwOnError: false });
+        } catch (e) {
+          renderedMath = `<code>${item.value}</code>`;
+        }
+        return `
+          <div style="border:1.5px solid #cbd5e1;border-radius:8px;padding:10px;background:#f8fafc;page-break-inside:avoid;break-inside:avoid;">
+            <div style="font-weight:800;font-size:9pt;color:#1e3a8a;border-bottom:1px solid #e2e8f0;padding-bottom:3px;margin-bottom:4px;display:flex;justify-content:space-between;">
+              <span>${item.name}</span>
+              <span style="color:#0284c7;">${item.symbol}</span>
+            </div>
+            <div style="padding:4px 0;font-size:9pt;">${renderedMath}</div>
+            <div style="font-size:7.5pt;color:#64748b;margin-top:2px;">${item.note || ''}</div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div style="margin-bottom:16px;">
+          <h2 style="font-size:12pt;font-weight:900;color:#0f172a;border-bottom:2px solid #2563eb;padding-bottom:4px;margin-bottom:8px;">
+            ${cat.icon} ${cat.title}
+          </h2>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            ${itemsHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const printHTML = `<!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8"/>
+      <title>University Engineering Master Formula Card</title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"/>
+      <style>
+        @page { size: A4 portrait; margin: 10mm; }
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        body { font-family: 'Inter', -apple-system, sans-serif; margin: 0; padding: 0; color: #0f172a; }
+        .header { border-bottom: 2.5px solid #0f172a; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div>
+          <h1 style="font-size:16pt;margin:0;font-weight:900;">Engineering Formula & Constants Master Card</h1>
+          <div style="font-size:9pt;color:#2563eb;font-weight:700;">AUTHENTICATED CODATA CONSTANTS, NETWORK THEOREMS & CALCULUS IDENTITIES</div>
+        </div>
+        <div style="text-align:right;font-size:8pt;color:#64748b;">
+          <div>100% University Exam Aligned</div>
+          <div>All College Notes Master Repository</div>
+        </div>
+      </div>
+      ${sectionsHtml}
+      <div style="margin-top:12px;border-top:1px solid #cbd5e1;padding-top:6px;font-size:7.5pt;color:#64748b;display:flex;justify-content:space-between;">
+        <span>All College Notes Master Repository &bull; Quick Revision Card</span>
+        <span>Verified Syllabus 2025-26</span>
+      </div>
+    </body>
+    </html>`;
+
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:0;pointer-events:none;';
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      try {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } finally {
+        setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 3000);
+      }
+    };
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write(printHTML);
+    iframeDoc.close();
+  };
+
   return (
     <div 
       style={{
@@ -173,20 +257,44 @@ export default function FormulaHUDModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="btn-icon"
-            style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              color: 'var(--text-dim)',
-              cursor: 'pointer',
-              borderRadius: '8px',
-              padding: '8px'
-            }}
-          >
-            <X size={18} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <button
+              onClick={handlePrintAllFormulas}
+              className="btn-outline"
+              style={{
+                padding: '7px 14px',
+                fontSize: '0.8rem',
+                fontWeight: 800,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                color: '#fbbf24',
+                borderColor: '#f59e0b',
+                background: 'rgba(245, 158, 11, 0.12)',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}
+              title="Print All Categories Formula Master Card"
+            >
+              <Printer size={15} />
+              <span>Print Master Card</span>
+            </button>
+
+            <button
+              onClick={onClose}
+              className="btn-icon"
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: 'var(--text-dim)',
+                cursor: 'pointer',
+                borderRadius: '8px',
+                padding: '8px'
+              }}
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         {/* TABS & SEARCH BAR */}

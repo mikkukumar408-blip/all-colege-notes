@@ -1,76 +1,66 @@
-/* =========================================================================
-   COLLEGE NOTES HUB - HIGH PERFORMANCE SERVICE WORKER (sw.js)
-   Provides instant offline caching for study notes, KaTeX, and fonts.
-   ========================================================================= */
-
-const CACHE_NAME = 'college-notes-v2.1';
+// All College Notes - Offline PWA Service Worker (v1.0.0)
+const CACHE_NAME = 'all-college-notes-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css'
+  'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css',
+  'https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Inter:wght@400;500;600;700;800;900&display=swap'
 ];
 
-// 1. Install: Pre-cache core shell
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS).catch((err) => {
-        console.warn('[SW] Non-critical precache item skipped:', err);
+        console.warn('SW: Pre-caching partial failure:', err);
       });
-    }).then(() => self.skipWaiting())
+    })
   );
+  self.skipWaiting();
 });
 
-// 2. Activate: Purge obsolete caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then((keys) => {
       return Promise.all(
-        cacheNames.map((name) => {
-          if (name !== CACHE_NAME) {
-            return caches.delete(name);
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
           }
         })
       );
-    }).then(() => self.clients.claim())
+    })
   );
+  self.clients.claim();
 });
 
-// 3. Fetch: Stale-While-Revalidate for CSS/JS/Images, Network-first for dynamic API
 self.addEventListener('fetch', (event) => {
-  const req = event.request;
-  const url = new URL(req.url);
+  const { request } = event;
+  const url = new URL(request.url);
 
-  // Ignore non-GET, Chrome extension, or external analytics
-  if (req.method !== 'GET') return;
-  if (url.protocol === 'chrome-extension:') return;
-
-  // For API and dynamic data calls, use Network-First
-  if (url.pathname.startsWith('/api/') || url.pathname.includes('/auth') || url.pathname.includes('/cloud')) {
-    event.respondWith(
-      fetch(req).catch(() => {
-        return new Response(JSON.stringify({ error: 'Offline - Unable to connect to cloud' }), {
-          headers: { 'Content-Type': 'application/json' }
-        });
-      })
-    );
+  // Avoid intercepting large PDF downloads, range requests, or POST auth requests
+  if (request.method !== 'GET' || request.url.endsWith('.pdf') || request.headers.has('range')) {
     return;
   }
 
-  // Stale-While-Revalidate for static assets, scripts, stylesheets, and fonts
+  // Network-First with Cache Fallback for dynamic app assets
   event.respondWith(
-    caches.match(req).then((cachedResponse) => {
-      const fetchPromise = fetch(req).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const responseToCache = networkResponse.clone();
+    fetch(request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(req, responseToCache);
+            cache.put(request, responseClone);
           });
         }
         return networkResponse;
-      }).catch(() => cachedResponse);
-
-      return cachedResponse || fetchPromise;
-    })
+      })
+      .catch(() => {
+        return caches.match(request).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+          if (request.mode === 'navigate') {
+            return caches.match('/index.html');
+          }
+        });
+      })
   );
 });

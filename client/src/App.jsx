@@ -24,8 +24,9 @@ const DeepSearchModal = React.lazy(() => import('./components/DeepSearchModal'))
 const CircuitSimulatorModal = React.lazy(() => import('./components/CircuitSimulatorModal'));
 const ExamQuizModal = React.lazy(() => import('./components/ExamQuizModal'));
 const FormulaHUDModal = React.lazy(() => import('./components/FormulaHUDModal'));
+const QuickSearchPalette = React.lazy(() => import('./components/QuickSearchPalette'));
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, ChevronDown, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot, Cpu, Award, Zap } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, ChevronDown, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot, Cpu, Award, Zap, Search } from 'lucide-react';
 import { logSecurityEvent } from './utils/security';
 import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers } from './utils/cloudSync';
 import './App.css';
@@ -116,12 +117,16 @@ export default function App() {
   const [circuitSimInitialValues, setCircuitSimInitialValues] = useState({});
   const [examQuizOpen, setExamQuizOpen] = useState(false);
   const [formulaHUDOpen, setFormulaHUDOpen] = useState(false);
+  const [quickSearchOpen, setQuickSearchOpen] = useState(false);
   const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
 
-  // Global Hotkey Listener: Alt + Space (DeepSearch), Alt + C (Circuit), Alt + Q (Mock Exam), Alt + F (Formulas)
+  // Global Hotkey Listener: Ctrl+K (Quick Search), Alt + Space (DeepSearch), Alt + C (Circuit), Alt + Q (Mock Exam), Alt + F (Formulas)
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
-      if ((e.altKey && e.code === 'Space') || (e.ctrlKey && e.key.toLowerCase() === 'k')) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setQuickSearchOpen(prev => !prev);
+      } else if (e.altKey && e.code === 'Space') {
         e.preventDefault();
         setDeepSearchOpen(prev => !prev);
       } else if (e.altKey && e.key.toLowerCase() === 'c') {
@@ -205,6 +210,12 @@ export default function App() {
   const handleOpenNotesReader = (subject) => {
     if (!isSubjectValid(subject)) return;
     setSelectedSubject(subject);
+    setActiveTab('notes-reader');
+  };
+
+  const handleSelectSearchResult = ({ subjectId, unitNum, topicTitle }) => {
+    const matched = initialSubjects.find(s => s.id === subjectId || s.code?.toLowerCase() === subjectId?.toLowerCase()) || initialSubjects[0];
+    setSelectedSubject({ ...matched, targetUnitNum: unitNum, targetTopic: topicTitle });
     setActiveTab('notes-reader');
   };
 
@@ -392,6 +403,17 @@ export default function App() {
               )}
             </div>
 
+            {/* Universal Cross-Subject Quick Search Trigger (Ctrl+K) */}
+            <button 
+              className="nav-search-trigger"
+              onClick={() => setQuickSearchOpen(true)}
+              title="Search all subjects, theorems & formulas (Ctrl+K)"
+            >
+              <Search size={14} color="var(--neon-cyan)" />
+              <span className="search-text-desktop">Search</span>
+              <kbd className="nav-search-kbd">Ctrl+K</kbd>
+            </button>
+
             {/* Unified Tools & Simulators Dropdown (Alt+Space, Alt+C, Alt+Q, Alt+F) */}
             <div className="nav-tools-wrapper" style={{ position: 'relative' }}>
               <button 
@@ -416,6 +438,24 @@ export default function App() {
                       <span>⚡ TOOLS & SIMULATORS</span>
                       <button onClick={() => setToolsMenuOpen(false)} className="close-mini-btn" type="button">✕</button>
                     </div>
+
+                    <button 
+                      className="mobile-dropdown-item"
+                      type="button"
+                      onClick={() => {
+                        setQuickSearchOpen(true);
+                        setToolsMenuOpen(false);
+                      }}
+                    >
+                      <div className="mobile-dropdown-icon cyan">
+                        <Search size={16} />
+                      </div>
+                      <div className="mobile-dropdown-text">
+                        <span className="title">Cross-Subject Search</span>
+                        <span className="desc">Find theorems, formulas, syllabus</span>
+                      </div>
+                      <span className="nav-kbd-badge" style={{ fontSize: '0.62rem', opacity: 0.75, background: 'rgba(0,0,0,0.5)', padding: '2px 5px', borderRadius: '4px', color: 'var(--neon-cyan)', border: '1px solid rgba(0,240,255,0.3)', marginLeft: 'auto' }}>Ctrl+K</span>
+                    </button>
 
                     <button 
                       className="mobile-dropdown-item"
@@ -610,6 +650,16 @@ export default function App() {
           <FormulaHUDModal
             isOpen={formulaHUDOpen}
             onClose={() => setFormulaHUDOpen(false)}
+          />
+        )}
+
+        {/* Universal Cross-Subject Quick Search Palette (Ctrl+K) */}
+        {quickSearchOpen && (
+          <QuickSearchPalette
+            isOpen={quickSearchOpen}
+            onClose={() => setQuickSearchOpen(false)}
+            onSelectResult={handleSelectSearchResult}
+            subjects={initialSubjects}
           />
         )}
       </React.Suspense>
