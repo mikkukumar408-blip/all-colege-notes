@@ -228,14 +228,16 @@ async function callAcademicAI(subject, question, customApiKey = null) {
     };
   }
 
-  // 2A. TIER 2A: GOOGLE GEMINI 1.5 FLASH (Fast, High Token Limit, Code & Math Specialized)
-  const activeGeminiKey = (customApiKey && customApiKey.startsWith('AIza')) ? customApiKey : GEMINI_API_KEY;
+  // 2A. TIER 2A: GOOGLE GEMINI 2.5 FLASH (Ultra-fast, High Context, Advanced STEM Reasoning)
+  const activeGeminiKey = (customApiKey && customApiKey.length > 20 && !customApiKey.startsWith('gsk_')) 
+    ? customApiKey 
+    : (GEMINI_API_KEY || '');
   if (activeGeminiKey) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
+      const timeout = setTimeout(() => controller.abort(), 12000);
 
-      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeGeminiKey}`;
+      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${activeGeminiKey}`;
       const response = await fetch(geminiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -258,11 +260,14 @@ async function callAcademicAI(subject, question, customApiKey = null) {
         const json = await response.json();
         const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
         if (text && text.trim().length > 50) {
-          return { content: text.trim(), model: 'google/gemini-1.5-flash' };
+          return { content: text.trim(), model: 'google/gemini-2.5-flash' };
         }
+      } else {
+        const errBody = await response.text();
+        console.warn('Gemini 2.5 Flash response not ok:', response.status, errBody.slice(0, 200));
       }
     } catch (err) {
-      console.warn('Gemini 1.5 Flash attempt failed:', err.message);
+      console.warn('Gemini 2.5 Flash attempt failed:', err.message);
     }
   }
 

@@ -2640,6 +2640,104 @@ h1, h2, h3, .font-heading {
   border-color: #2ea043 !important;
 }
 
+.code-run-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 4px 10px !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  color: #22c55e !important;
+  background: rgba(34, 197, 94, 0.12) !important;
+  border: 1px solid rgba(34, 197, 94, 0.35) !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+.code-run-btn:hover {
+  background: rgba(34, 197, 94, 0.25) !important;
+  border-color: #22c55e !important;
+  color: #4ade80 !important;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3) !important;
+}
+
+.code-console-drawer {
+  background: #090d13 !important;
+  border-top: 1px solid #30363d !important;
+  animation: fadeIn 0.2s ease-in-out !important;
+}
+
+.code-console-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 8px 14px !important;
+  background: rgba(13, 17, 23, 0.8) !important;
+  border-bottom: 1px solid rgba(48, 54, 61, 0.6) !important;
+}
+
+.console-title-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.console-dot {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: #10b981 !important;
+  box-shadow: 0 0 6px #10b981 !important;
+}
+
+.console-title {
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  color: #c9d1d9 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.console-status-pill {
+  font-size: 0.68rem !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #10b981 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 600 !important;
+}
+
+.console-close-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #8b949e !important;
+  font-size: 0.85rem !important;
+  cursor: pointer !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  transition: all 0.15s ease !important;
+}
+.console-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #f85149 !important;
+}
+
+.code-console-body {
+  padding: 10px 14px !important;
+  max-height: 200px !important;
+  overflow-y: auto !important;
+}
+
+.code-console-pre {
+  margin: 0 !important;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: 0.8rem !important;
+  line-height: 1.5 !important;
+  color: #38bdf8 !important;
+  white-space: pre-wrap !important;
+}
+
 .code-editor-body {
   display: flex !important;
   background: #0d1117 !important;

@@ -22,8 +22,10 @@ import SuperAdminPanel from './components/SuperAdminPanel';
 import DeepSearchModal from './components/DeepSearchModal';
 import CampusAIChatbot from './components/CampusAIChatbot';
 import CircuitSimulatorModal from './components/CircuitSimulatorModal';
+import ExamQuizModal from './components/ExamQuizModal';
+import FormulaHUDModal from './components/FormulaHUDModal';
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot, Cpu } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot, Cpu, Award, Zap } from 'lucide-react';
 import { logSecurityEvent } from './utils/security';
 import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers } from './utils/cloudSync';
 import './App.css';
@@ -111,8 +113,10 @@ export default function App() {
   const [deepSearchInitialQuery, setDeepSearchInitialQuery] = useState('');
   const [circuitSimOpen, setCircuitSimOpen] = useState(false);
   const [circuitSimInitialValues, setCircuitSimInitialValues] = useState({});
+  const [examQuizOpen, setExamQuizOpen] = useState(false);
+  const [formulaHUDOpen, setFormulaHUDOpen] = useState(false);
 
-  // Global Hotkey Listener: Alt + Space (DeepSearch) and Alt + C (Circuit Sandbox)
+  // Global Hotkey Listener: Alt + Space (DeepSearch), Alt + C (Circuit), Alt + Q (Mock Exam), Alt + F (Formulas)
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if ((e.altKey && e.code === 'Space') || (e.ctrlKey && e.key.toLowerCase() === 'k')) {
@@ -121,6 +125,12 @@ export default function App() {
       } else if (e.altKey && e.key.toLowerCase() === 'c') {
         e.preventDefault();
         setCircuitSimOpen(prev => !prev);
+      } else if (e.altKey && e.key.toLowerCase() === 'q') {
+        e.preventDefault();
+        setExamQuizOpen(prev => !prev);
+      } else if (e.altKey && e.key.toLowerCase() === 'f') {
+        e.preventDefault();
+        setFormulaHUDOpen(prev => !prev);
       }
     };
 
@@ -138,6 +148,9 @@ export default function App() {
       setCircuitSimOpen(true);
     };
 
+    const handleOpenExamQuizEvent = () => setExamQuizOpen(true);
+    const handleOpenFormulaHUDEvent = () => setFormulaHUDOpen(true);
+
     // Cross-App Synapse Memory Bridge (Bhavya Ecosystem Sync)
     let synapseChannel = null;
     try {
@@ -154,11 +167,15 @@ export default function App() {
     window.addEventListener('keydown', handleGlobalKeyDown);
     window.addEventListener('open-deepsearch', handleOpenDeepSearchEvent);
     window.addEventListener('open-circuit-sim', handleOpenCircuitSimEvent);
+    window.addEventListener('open-exam-quiz', handleOpenExamQuizEvent);
+    window.addEventListener('open-formula-hud', handleOpenFormulaHUDEvent);
 
     return () => {
       window.removeEventListener('keydown', handleGlobalKeyDown);
       window.removeEventListener('open-deepsearch', handleOpenDeepSearchEvent);
       window.removeEventListener('open-circuit-sim', handleOpenCircuitSimEvent);
+      window.removeEventListener('open-exam-quiz', handleOpenExamQuizEvent);
+      window.removeEventListener('open-formula-hud', handleOpenFormulaHUDEvent);
       if (synapseChannel) synapseChannel.close();
     };
   }, []);
@@ -430,6 +447,48 @@ export default function App() {
 
             <button 
               className="btn-secondary" 
+              style={{ 
+                padding: '6px 12px', 
+                fontSize: '0.82rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '6px', 
+                borderColor: 'rgba(234, 179, 8, 0.45)', 
+                color: '#fef08a', 
+                background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.12), rgba(245, 158, 11, 0.08))', 
+                cursor: 'pointer'
+              }}
+              onClick={() => setExamQuizOpen(true)}
+              title="Active-Recall University Mock Exam (Alt + Q)"
+            >
+              <Award size={14} color="#eab308" />
+              <span style={{ fontWeight: 800 }}>Mock Exam</span>
+              <span style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+Q</span>
+            </button>
+
+            <button 
+              className="btn-secondary" 
+              style={{ 
+                padding: '6px 12px', 
+                fontSize: '0.82rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '6px', 
+                borderColor: 'rgba(168, 85, 247, 0.45)', 
+                color: '#d8b4fe', 
+                background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(59, 130, 246, 0.08))', 
+                cursor: 'pointer'
+              }}
+              onClick={() => setFormulaHUDOpen(true)}
+              title="Formulas & Physical Constants Drawer (Alt + F)"
+            >
+              <Zap size={14} color="#c084fc" />
+              <span style={{ fontWeight: 800 }}>Formulas</span>
+              <span style={{ fontSize: '0.66rem', opacity: 0.75, background: 'rgba(0,0,0,0.4)', padding: '1px 5px', borderRadius: '4px' }}>Alt+F</span>
+            </button>
+
+            <button 
+              className="btn-secondary" 
               style={{ padding: '6px 14px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px', borderColor: 'rgba(255, 75, 75, 0.4)', color: '#ff6b6b', background: 'rgba(255, 75, 75, 0.08)', cursor: 'pointer' }}
               onClick={() => {
                 if (currentUser && currentUser.username) {
@@ -485,6 +544,18 @@ export default function App() {
         isOpen={circuitSimOpen}
         onClose={() => setCircuitSimOpen(false)}
         initialValues={circuitSimInitialValues}
+      />
+
+      {/* Active-Recall University Exam Quiz Generator Modal */}
+      <ExamQuizModal
+        isOpen={examQuizOpen}
+        onClose={() => setExamQuizOpen(false)}
+      />
+
+      {/* Engineering Formula, Identities & Physical Constants Quick Drawer */}
+      <FormulaHUDModal
+        isOpen={formulaHUDOpen}
+        onClose={() => setFormulaHUDOpen(false)}
       />
     </div>
   );
