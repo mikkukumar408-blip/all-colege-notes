@@ -324,6 +324,108 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
   const [copiedCode, setCopiedCode] = useState(false);
   const [expSubView, setExpSubView] = useState('code'); // 'code' | 'algorithm' | 'both'
   const [capstoneSubView, setCapstoneSubView] = useState('code'); // 'code' | 'overview'
+  const [selectedLang, setSelectedLang] = useState('C'); // Language for code viewer
+
+  // ─── Multi-Language Code Translator ─────────────────────────────────────────
+  const translateCode = (rawCode, lang) => {
+    if (!rawCode || lang === 'C') return rawCode;
+    const c = typeof rawCode === 'string' ? rawCode : String(rawCode);
+    // Decode escaped sequences (same as formatDisplayCode)
+    const decode = (s) => s
+      .replace(/\\\\n/g, '__NL__').replace(/\\\\t/g, '__TAB__').replace(/\\\\"/g, '__DQ__').replace(/\\\\'/g, '__SQ__')
+      .replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\"/g, '"').replace(/\\'/g, "'")
+      .replace(/__NL__/g, '\\n').replace(/__TAB__/g, '\\t').replace(/__DQ__/g, '\\"').replace(/__SQ__/g, "\\'");
+    const src = decode(c);
+
+    if (lang === 'C++') {
+      return src
+        .replace(/#include <stdio\.h>/g, '#include <iostream>\nusing namespace std;')
+        .replace(/#include <stdlib\.h>/g, '#include <cstdlib>')
+        .replace(/#include <string\.h>/g, '#include <cstring>')
+        .replace(/#include <math\.h>/g, '#include <cmath>')
+        .replace(/printf\s*\(\s*"([^"]*)"\s*\)/g, (_, s) => `cout << "${s}"`)
+        .replace(/printf\s*\(\s*"([^"]*)",\s*([^)]+)\)/g, (_, fmt, args) => {
+          const parts = fmt.split(/%[\d.]*[diouxXeEfFgGs]/g);
+          const argList = args.split(',').map(a => a.trim());
+          let out = 'cout';
+          parts.forEach((p, i) => {
+            if (p) out += ` << "${p.replace(/\\n/g, '\\n')}"`;
+            if (i < argList.length) out += ` << ${argList[i]}`;
+          });
+          return out;
+        })
+        .replace(/scanf\s*\(\s*"([^"]*)",\s*&(\w+)\)/g, (_, _fmt, v) => `cin >> ${v}`)
+        .replace(/scanf\s*\(\s*"([^"]*)",\s*&(\w+),\s*&(\w+)\)/g, (_, _fmt, v1, v2) => `cin >> ${v1} >> ${v2}`)
+        .replace(/\bfloat\b/g, 'float').replace(/\bdouble\b/g, 'double');
+    }
+
+    if (lang === 'Java') {
+      const className = 'Main';
+      let body = src
+        .replace(/#include\s*<[^>]+>/g, '')
+        .replace(/\bprintf\s*\(\s*"([^"]*)"\s*\)/g, (_, s) => `System.out.print("${s}")`)
+        .replace(/\bprintf\s*\(\s*"([^"]*)",\s*([^)]+)\)/g, (_, fmt, args) => {
+          return `System.out.printf("${fmt}", ${args})`;
+        })
+        .replace(/\bscanf\s*\(\s*"[^"]*",\s*&(\w+)\)/g, (_, v) => `${v} = sc.nextDouble()`)
+        .replace(/\bscanf\s*\(\s*"[^"]*",\s*&(\w+),\s*&(\w+)\)/g, (_, v1, v2) => `${v1} = sc.nextDouble(); ${v2} = sc.nextDouble()`)
+        .replace(/\bdouble\b/g, 'double').replace(/\bfloat\b/g, 'float').replace(/\bchar\b op/g, 'char op')
+        .replace(/int main\s*\(\s*\)\s*\{/, `public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);`)
+        .replace(/return 0;/g, '');
+      return `import java.util.Scanner;\n\npublic class ${className} {\n${body}\n}`;
+    }
+
+    if (lang === 'JavaScript') {
+      return `// Run with Node.js\nconst readline = require('readline');\nconst rl = readline.createInterface({ input: process.stdin, output: process.stdout });\n\n` +
+        src
+          .replace(/#include\s*<[^>]+>/g, '')
+          .replace(/\bint main\s*\(\s*\)\s*\{/, 'async function main() {')
+          .replace(/\bprintf\s*\(\s*"([^"]*)"(,\s*[^)]+)?\)/g, (_, fmt, args) => {
+            if (!args) return `process.stdout.write(\`${fmt.replace(/%[\d.]*[diouxXeEfFgGs]/g, '${...}')}\`)`;
+            const argList = args.replace(/^,\s*/, '').split(',').map(a => a.trim().replace(/&/g, ''));
+            let i = 0;
+            const js = fmt.replace(/%[\d.]*[diouxXeEfFgGs]/g, () => `\${${argList[i++] || ''}}`);
+            return `process.stdout.write(\`${js}\`)`;
+          })
+          .replace(/\bscanf\s*\([^)]+\)/g, '// user input via readline')
+          .replace(/\bdouble\b|\bfloat\b/g, 'let').replace(/\bint\b/g, 'let')
+          .replace(/return 0;/g, '')
+          .replace(/\bprintf\b/g, 'console.log') + '\nmain();';
+    }
+
+    if (lang === 'Python') {
+      return src
+        .replace(/#include\s*<[^>]+>/g, '')
+        .replace(/int main\s*\(\s*\)\s*\{/, 'def main():')
+        .replace(/\bprintf\s*\(\s*"([^"]*)"\s*\)/g, (_, s) => {
+          const py = s.replace(/\\n/g, '').replace(/%[\d.]*[diouxXeEfFgGs]/g, '{}');
+          return `print("${py}")`;
+        })
+        .replace(/\bprintf\s*\(\s*"([^"]*)",\s*([^)]+)\)/g, (_, fmt, args) => {
+          const py = fmt.replace(/\\n/g, '').replace(/%[\d.]*[diouxXeEfFgGs]/g, '{}');
+          return `print(f"${py.replace(/\{\}/g, () => `{${args.split(',').shift()?.trim()}}`).replace(/\{([^}]+)\}/g, '{$1}')}")`;
+        })
+        .replace(/scanf\s*\(\s*"[^"]*",\s*&(\w+)\)/g, (_, v) => `${v} = float(input())`)
+        .replace(/scanf\s*\(\s*"[^"]*",\s*&(\w+),\s*&(\w+)\)/g, (_, v1, v2) => `${v1}, ${v2} = map(float, input().split())`)
+        .replace(/\b(double|float|int|char)\s+/g, '')
+        .replace(/return 0;/g, '')
+        .replace(/\{/g, '').replace(/\}/g, '')
+        .replace(/;$/gm, '')
+        .replace(/^\s*\n/gm, '')
+        .replace(/\bprintf\b/g, 'print')
+        + '\n\nmain()';
+    }
+
+    return rawCode;
+  };
+
+  const LANG_CONFIG = [
+    { id: 'C',          label: 'C',    color: '#38bdf8', ext: 'c'    },
+    { id: 'C++',        label: 'C++',  color: '#a78bfa', ext: 'cpp'  },
+    { id: 'Java',       label: 'Java', color: '#fb923c', ext: 'java' },
+    { id: 'JavaScript', label: 'JS',   color: '#fbbf24', ext: 'js'   },
+    { id: 'Python',     label: 'Py',   color: '#4ade80', ext: 'py'   },
+  ];
 
   const formatDisplayCode = (raw) => {
     if (!raw) return '';
@@ -1384,26 +1486,63 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                                 overflow: 'hidden',
                                 boxShadow: '0 8px 24px rgba(0,0,0,0.6)'
                               }}>
-                                {/* Window titlebar with filename & copy */}
+                                {/* Window titlebar: traffic lights + filename + language tabs + copy */}
                                 <div style={{
                                   background: 'rgba(15, 23, 42, 0.95)',
                                   borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                                  padding: '10px 16px',
+                                  padding: '8px 16px',
                                   display: 'flex',
+                                  flexWrap: 'wrap',
                                   justifyContent: 'space-between',
-                                  alignItems: 'center'
+                                  alignItems: 'center',
+                                  gap: '8px'
                                 }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  {/* Left: dots + filename */}
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
                                     <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
                                     <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
                                     <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }} />
                                     <span style={{ marginLeft: '8px', fontSize: '0.8rem', color: 'var(--neon-cyan)', fontFamily: 'monospace', fontWeight: 700 }}>
-                                      {codeFileName}
+                                      {(() => {
+                                        const activeLangCfg = LANG_CONFIG.find(l => l.id === selectedLang);
+                                        const base = codeFileName.replace(/\.\w+$/, '');
+                                        return `${base}.${activeLangCfg?.ext || 'c'}`;
+                                      })()}
                                     </span>
                                   </div>
 
+                                  {/* Center: Language switcher tabs */}
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                                    {LANG_CONFIG.map(lang => (
+                                      <button
+                                        key={lang.id}
+                                        onClick={() => setSelectedLang(lang.id)}
+                                        title={`View in ${lang.id}`}
+                                        style={{
+                                          padding: '3px 10px',
+                                          borderRadius: '5px',
+                                          fontSize: '0.72rem',
+                                          fontWeight: 800,
+                                          cursor: 'pointer',
+                                          border: selectedLang === lang.id
+                                            ? `1px solid ${lang.color}`
+                                            : '1px solid rgba(255,255,255,0.1)',
+                                          background: selectedLang === lang.id
+                                            ? `${lang.color}22`
+                                            : 'rgba(255,255,255,0.04)',
+                                          color: selectedLang === lang.id ? lang.color : '#64748b',
+                                          transition: 'all 0.15s',
+                                          letterSpacing: '0.02em'
+                                        }}
+                                      >
+                                        {lang.label}
+                                      </button>
+                                    ))}
+                                  </div>
+
+                                  {/* Right: Copy button */}
                                   <button
-                                    onClick={() => handleCopyCode(exp.code)}
+                                    onClick={() => handleCopyCode(translateCode(exp.code, selectedLang) || exp.code)}
                                     style={{
                                       display: 'flex',
                                       alignItems: 'center',
@@ -1415,11 +1554,12 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                                       borderRadius: '6px',
                                       fontSize: '0.78rem',
                                       fontWeight: 700,
-                                      cursor: 'pointer'
+                                      cursor: 'pointer',
+                                      flexShrink: 0
                                     }}
                                   >
                                     {copiedCode ? <CheckCheck size={14} /> : <Copy size={14} />}
-                                    {copiedCode ? 'Copied Code! ✨' : 'Copy Complete Code'}
+                                    {copiedCode ? 'Copied! ✨' : 'Copy Code'}
                                   </button>
                                 </div>
 
@@ -1433,14 +1573,14 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                                     overflowY: 'visible',
                                     fontFamily: 'Consolas, "Fira Code", monospace',
                                     fontSize: '0.86rem',
-                                    color: '#38bdf8',
+                                    color: LANG_CONFIG.find(l => l.id === selectedLang)?.color || '#38bdf8',
                                     lineHeight: 1.65,
                                     background: '#040711',
                                     whiteSpace: 'pre',
                                     tabSize: 4
                                   }}
                                 >
-                                  <code>{formatDisplayCode(exp.code)}</code>
+                                  <code>{formatDisplayCode(translateCode(exp.code, selectedLang) || exp.code)}</code>
                                 </pre>
                               </div>
 
