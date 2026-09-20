@@ -551,8 +551,8 @@ h1, h2, h3, .font-heading {
   position: relative !important;
   padding-top: 32px !important;
   padding-bottom: 48px !important;
-  padding-right: 36px !important;
-  padding-left: 64px !important;
+  padding-right: 28px !important;
+  padding-left: 54px !important;
 }
 
 /* Crisp Red Margin Line */
@@ -561,7 +561,7 @@ h1, h2, h3, .font-heading {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 42px;
+  left: 38px;
   width: 2px;
   background: #f87171;
   opacity: 0.75;
@@ -955,7 +955,7 @@ h1, h2, h3, .font-heading {
   grid-template-columns: minmax(0, 1fr);
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .study-deck-grid {
     grid-template-columns: minmax(0, 1fr) !important;
   }

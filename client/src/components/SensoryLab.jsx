@@ -1694,8 +1694,8 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
          PART A: READER HEADER & ADVANCED CONTROLS
          Theme Mode Selector, Bookmark, Print
          ------------------------------------------------------------------- */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-        <div>
+      <div className="glass-panel" style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '18px' }}>
+        <div style={{ flex: '1 1 320px', minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
             <span className="badge-neon font-display">
               {themeMode === 'cyber' ? '⚡ CYBER NEON NOTES' : themeMode === 'paper' ? '📝 REAL COLLEGE NOTEBOOK' : '📖 CLEAN DIGITAL READER'}
@@ -1704,16 +1704,16 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
               {activeSubject.code} • Semester {activeSubject.semester}
             </span>
           </div>
-          <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.2rem)', fontWeight: 900, color: '#fff', wordBreak: 'break-word' }}>
+          <h1 style={{ fontSize: 'clamp(1.4rem, 2.4vw, 1.95rem)', fontWeight: 900, color: '#fff', wordBreak: 'break-word', lineHeight: 1.25 }}>
             {activeSubject.name} Notes
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', maxWidth: '750px' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', maxWidth: '750px', marginTop: '4px', lineHeight: 1.4 }}>
             Exhaustive, high-yield university lecture notes with step-by-step proofs, hand-drawn vector circuits, and interactive simulation.
           </p>
         </div>
 
         {/* Action Controls & Multi-Theme Selector */}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', flexShrink: 0 }}>
           {/* 3 Theme Options */}
           <div style={{ 
             display: 'flex', 
@@ -2019,16 +2019,6 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
          ------------------------------------------------------------------- */}
       <div 
         className={`study-deck-grid ${isUnitsCollapsed ? 'units-collapsed' : ''}`}
-        style={{ 
-          display: 'grid', 
-          gridTemplateColumns: isUnitsCollapsed ? 'minmax(0, 1fr)' : 'minmax(240px, 280px) minmax(0, 1fr)', 
-          gap: '24px',
-          width: '100%',
-          maxWidth: '100%',
-          minWidth: 0,
-          boxSizing: 'border-box',
-          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
-        }}
       >
         
         {/* === COLUMN 1: LEFT NAVIGATOR (Collapsible) === */}
@@ -2419,9 +2409,12 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
             </div>
 
             <h2 className={themeMode !== 'clean' ? 'handwritten-heading' : ''} style={{ 
-              fontSize: '2.1rem', 
+              fontSize: 'clamp(1.35rem, 2.2vw, 1.95rem)', 
               fontWeight: 900, 
-              color: themeMode === 'clean' ? '#0f172a' : themeMode === 'paper' ? '#1e3a8a' : '#fef08a' 
+              color: themeMode === 'clean' ? '#0f172a' : themeMode === 'paper' ? '#1e3a8a' : '#fef08a',
+              overflowWrap: 'break-word',
+              wordBreak: 'break-word',
+              lineHeight: 1.25
             }}>
               {beeeUnit.title}
             </h2>
