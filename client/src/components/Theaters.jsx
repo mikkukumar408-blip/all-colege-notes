@@ -411,7 +411,7 @@ export default function Theaters({ currentUser }) {
                   href={item.isDead || item.code === 'CS301' ? undefined : item.pdfUrl}
                   target={item.isDead || item.code === 'CS301' ? undefined : "_blank"}
                   rel="noopener noreferrer"
-                  className="btn-secondary" 
+                  className={item.isDead || item.code === 'CS301' ? "btn-secondary" : "btn-review-glow"} 
                   style={{ 
                     flex: 1, 
                     justifyContent: 'center', 

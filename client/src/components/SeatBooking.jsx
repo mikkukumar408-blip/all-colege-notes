@@ -771,7 +771,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                       href={nb.isDead || nb.code === 'CS301' ? undefined : nb.pdfUrl}
                       target={nb.isDead || nb.code === 'CS301' ? undefined : "_blank"}
                       rel="noopener noreferrer"
-                      className="btn-secondary"
+                      className={nb.isDead || nb.code === 'CS301' ? "btn-secondary" : "btn-review-glow"}
                       onClick={(e) => {
                         if (nb.isDead || nb.code === 'CS301') {
                           e.preventDefault();

@@ -207,18 +207,97 @@ h1, h2, h3, .font-heading {
   background: rgba(0, 240, 255, 0.05);
 }
 
-/* Glass Card */
+/* =========================================================================
+   4DX GLOWING REVIEW BUTTON (.btn-review-glow)
+   ========================================================================= */
+.btn-review-glow {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.18) 0%, rgba(157, 78, 221, 0.28) 100%) !important;
+  color: #00f0ff !important;
+  border: 1.5px solid rgba(0, 240, 255, 0.7) !important;
+  font-family: var(--font-heading) !important;
+  font-weight: 800 !important;
+  border-radius: 8px !important;
+  letter-spacing: 0.3px !important;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 20px rgba(0, 240, 255, 0.4) !important;
+  box-shadow: 
+    0 0 16px rgba(0, 240, 255, 0.35),
+    inset 0 0 12px rgba(0, 240, 255, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.5) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  animation: reviewBtnPulse 3s infinite ease-in-out !important;
+  z-index: 1;
+}
+
+.btn-review-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.btn-review-glow:hover {
+  transform: translateY(-3px) scale(1.03) translateZ(10px) !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.35) 0%, rgba(157, 78, 221, 0.45) 100%) !important;
+  border-color: #00f0ff !important;
+  box-shadow: 
+    0 0 28px rgba(0, 240, 255, 0.8),
+    0 0 50px rgba(157, 78, 221, 0.5),
+    inset 0 0 16px rgba(0, 240, 255, 0.4) !important;
+  text-shadow: 0 0 14px #00f0ff, 0 0 30px #00f0ff !important;
+}
+
+.btn-review-glow:hover::before {
+  left: 100%;
+}
+
+@keyframes reviewBtnPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 14px rgba(0, 240, 255, 0.35),
+      inset 0 0 10px rgba(0, 240, 255, 0.15),
+      0 4px 12px rgba(0, 0, 0, 0.5);
+    border-color: rgba(0, 240, 255, 0.7);
+  }
+  50% {
+    box-shadow: 
+      0 0 24px rgba(0, 240, 255, 0.6),
+      0 0 36px rgba(157, 78, 221, 0.35),
+      inset 0 0 16px rgba(0, 240, 255, 0.3),
+      0 6px 16px rgba(0, 0, 0, 0.6);
+    border-color: #00f0ff;
+  }
+}
+
+
+/* Glass Card - 4DX Perspective & Pop-Out Depth */
 .glass-panel {
   background: var(--bg-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border-dim);
   border-radius: 14px;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              border-color 0.3s ease, 
+              box-shadow 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
+  perspective: 1000px;
 }
 
 .glass-panel:hover {
   border-color: var(--border-glow);
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.7),
+    0 0 25px rgba(0, 240, 255, 0.25),
+    0 0 45px rgba(157, 78, 221, 0.15);
 }
 
 /* Sensory FX Animations */
@@ -2667,4 +2746,128 @@ h1, h2, h3, .font-heading {
 .frac-den {
   padding-top: 2px !important;
   display: block !important;
-}
+}
+
+/* =========================================================================
+   4DX GLOWING FLUID & POP-OUT AMBIENT ANIMATIONS
+   ========================================================================= */
+
+.fluid-bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0.85;
+}
+
+/* Glowing Fluid Orbs */
+.fluid-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.fluid-orb-cyan {
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.28) 0%, rgba(0, 240, 255, 0.08) 50%, transparent 70%);
+  top: -10%;
+  left: -10%;
+  animation: fluidDrift1 22s infinite alternate;
+}
+
+.fluid-orb-purple {
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(157, 78, 221, 0.3) 0%, rgba(112, 0, 255, 0.08) 50%, transparent 70%);
+  top: 40%;
+  right: -15%;
+  animation: fluidDrift2 26s infinite alternate;
+}
+
+.fluid-orb-pink {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 42, 109, 0.22) 0%, rgba(255, 42, 109, 0.05) 50%, transparent 70%);
+  bottom: -15%;
+  left: 30%;
+  animation: fluidDrift3 20s infinite alternate;
+}
+
+.fluid-orb-amber {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 170, 0, 0.18) 0%, rgba(255, 170, 0, 0.03) 50%, transparent 70%);
+  top: 20%;
+  left: 45%;
+  animation: fluidPulseCenter 16s infinite alternate;
+}
+
+/* Fluid Drift Keyframes */
+@keyframes fluidDrift1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(140px, 80px, 40px) scale(1.15) rotate(90deg);
+  }
+  100% {
+    transform: translate3d(60px, 180px, 20px) scale(0.95) rotate(180deg);
+  }
+}
+
+@keyframes fluidDrift2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(-120px, -90px, 50px) scale(1.2) rotate(-90deg);
+  }
+  100% {
+    transform: translate3d(-180px, 60px, 30px) scale(0.9) rotate(-180deg);
+  }
+}
+
+@keyframes fluidDrift3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-80px, -110px, 30px) scale(1.18);
+  }
+  100% {
+    transform: translate3d(90px, -50px, 10px) scale(0.95);
+  }
+}
+
+@keyframes fluidPulseCenter {
+  0%, 100% {
+    transform: scale(0.9) translate3d(0, 0, 0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.25) translate3d(40px, -30px, 20px);
+    opacity: 0.85;
+  }
+}
+
+/* 4DX Subtle Floating Pop-Out on Viewport */
+.content-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* 4DX Button Pop Effect */
+.btn-primary:hover,
+.btn-secondary:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+

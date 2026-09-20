@@ -240,6 +240,14 @@ export default function App() {
 
   return (
     <div className="app-wrapper">
+      {/* 4DX Fluid Glowing Ambient Background */}
+      <div className="fluid-bg-container" aria-hidden="true">
+        <div className="fluid-orb fluid-orb-cyan"></div>
+        <div className="fluid-orb fluid-orb-purple"></div>
+        <div className="fluid-orb fluid-orb-pink"></div>
+        <div className="fluid-orb fluid-orb-amber"></div>
+      </div>
+
       {/* Collapsible Sidebar Navigation */}
       <Sidebar 
         currentUser={currentUser}
