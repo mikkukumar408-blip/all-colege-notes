@@ -8,7 +8,7 @@
    4. Update footer status message (e.g. "Semesters 1 through 8 Ready")
    ========================================================================= */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BookOpen, 
   FileText, 
