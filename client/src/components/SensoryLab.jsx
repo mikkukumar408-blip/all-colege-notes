@@ -47,6 +47,7 @@ import { dsaUnitsData, dsaSubjectDetails } from '../data/dsaNotesData';
 import HandwrittenDiagram from './HandwrittenDiagram';
 import InteractiveTheveninLab from './InteractiveTheveninLab';
 import { ForensicWatermark } from './SecurityShield';
+import CramAndRecallDeck from './CramAndRecallDeck';
 import katex from 'katex';
 
 /* -------------------------------------------------------------------------
@@ -1040,6 +1041,7 @@ export default function SensoryLab({
   const [fontSize, setFontSize] = useState('normal'); // 'normal' | 'large'
   const [bookmarked, setBookmarked] = useState(false);
   const [activeRecallMode, setActiveRecallMode] = useState(false);
+  const [cramMode, setCramMode] = useState(false);
 
   const [masteryData, setMasteryData] = useState(() => {
     try {
@@ -2238,6 +2240,29 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
             <Zap size={15} /> Formula Cheat-Sheet
           </button>
 
+          {/* ⚡ 15-Minute High-Yield Exam Cram Mode */}
+          <button 
+            type="button"
+            className="btn-outline" 
+            onClick={() => setCramMode(!cramMode)}
+            style={{
+              borderColor: cramMode ? '#ef4444' : 'rgba(239, 68, 68, 0.4)',
+              color: cramMode ? '#fee2e2' : '#f87171',
+              background: cramMode ? 'rgba(239, 68, 68, 0.25)' : 'rgba(239, 68, 68, 0.08)',
+              fontWeight: 800,
+              fontSize: '0.8rem',
+              padding: '6px 12px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer'
+            }}
+            title="15-Minute Exam Cram Mode: Strip narrative and focus only on formulas, derivations, traps, and recall drill"
+          >
+            <Zap size={15} />
+            <span>{cramMode ? '⚡ 15-Min Cram: ON' : '⚡ 15-Min Cram'}</span>
+          </button>
+
           {/* 🧠 Active Recall Blurting Mask Mode */}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.04)', padding: '2px 6px', borderRadius: '8px', border: '1px solid var(--border-dim)' }}>
             <button 
@@ -2826,6 +2851,18 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
               />
             </div>
           ) : null}
+
+          {/* ⚡ 15-Minute Exam Cram Mode & Active Recall Deck */}
+          {cramMode && (
+            <CramAndRecallDeck
+              subject={activeSubject}
+              unitNum={selectedUnitNum}
+              unitData={beeeUnit}
+              themeMode={themeMode}
+              onCloseCram={() => setCramMode(false)}
+              onMasteryUpdate={toggleUnitMastery}
+            />
+          )}
 
           {/* Sections Loop */}
           {beeeUnit.sections ? (
