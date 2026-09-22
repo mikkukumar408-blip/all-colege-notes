@@ -1026,7 +1026,6 @@ export default function SensoryLab({
       return 'paper';
     }
   });
-  const [paperViewMode, setPaperViewMode] = useState('notes'); // 'notes' | 'scanned-pdf'
   const [internalUnitsCollapsed, setInternalUnitsCollapsed] = useState(false);
 
   useEffect(() => {
@@ -1920,7 +1919,7 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
          PART A: READER HEADER & ADVANCED CONTROLS
          Theme Mode Selector, Bookmark, Print
          ------------------------------------------------------------------- */}
-      <div className="glass-panel" style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '18px' }}>
+      <div className="glass-panel" style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '18px', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
         <div style={{ flex: '1 1 320px', minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
             <span className="badge-neon font-display">
@@ -1939,7 +1938,7 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
         </div>
 
         {/* Action Controls & Multi-Theme Selector */}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', flex: '1 1 auto', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
           {/* 3 Theme Options */}
           <div style={{ 
             display: 'flex', 
@@ -1947,7 +1946,8 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
             borderRadius: '10px', 
             padding: '4px', 
             gap: '4px', 
-            border: '1px solid var(--border-dim)' 
+            border: '1px solid var(--border-dim)',
+            flexWrap: 'wrap'
           }}>
             <button 
               onClick={() => setThemeMode('cyber')}
@@ -2512,142 +2512,6 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
           {/* Forensic Dynamic Anti-Leak Watermark Layer */}
           <ForensicWatermark watermarkText="ACADEMIC LICENSE • STU-BEEE-8491 • CONFIDENTIAL DO NOT LEAK" />
 
-          {/* Real Notebook Mode Dedicated Handwritten PDF Banner */}
-          {themeMode === 'paper' && (
-            <div className="handwritten-pdf-banner" style={{
-              background: '#ffffff',
-              border: '1.5px solid #e2e8f0',
-              borderLeft: '5px solid #2563eb',
-              borderRadius: '12px',
-              padding: '16px 20px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: '16px',
-              flexWrap: 'wrap',
-              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.04)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ 
-                  width: '42px', 
-                  height: '42px', 
-                  borderRadius: '10px', 
-                  background: '#2563eb', 
-                  color: '#fff', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  flexShrink: 0 
-                }}>
-                  <PenTool size={22} />
-                </div>
-                <div>
-                  <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <span>Real Classroom Handwritten Notebook Attached</span>
-                    <div style={{ display: 'flex', gap: '6px', background: '#f8fafc', padding: '3px', borderRadius: '8px', border: '1px solid #e2e8f0', marginLeft: 'auto' }}>
-                      <button
-                        onClick={() => setPaperViewMode('notes')}
-                        style={{
-                          padding: '5px 12px',
-                          borderRadius: '6px',
-                          border: 'none',
-                          background: paperViewMode === 'notes' ? '#2563eb' : 'transparent',
-                          color: paperViewMode === 'notes' ? '#fff' : '#475569',
-                          fontWeight: 800,
-                          fontSize: '0.78rem',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px'
-                        }}
-                      >
-                        ✍️ Hand-Scripted Notes
-                      </button>
-                      {activePdfUrl && (
-                        <button
-                          onClick={() => setPaperViewMode('scanned-pdf')}
-                          style={{
-                            padding: '5px 12px',
-                            borderRadius: '6px',
-                            border: 'none',
-                            background: paperViewMode === 'scanned-pdf' ? '#1e40af' : 'transparent',
-                            color: paperViewMode === 'scanned-pdf' ? '#fff' : '#475569',
-                            fontWeight: 800,
-                            fontSize: '0.78rem',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}
-                        >
-                          📄 View Long Notes PDF ({activePdfPageBadge.split('•')[1]?.trim() || 'Complete'})
-                        </button>
-                      )}
-                    </div>
-                    <span style={{ fontSize: '0.72rem', background: '#e0f2fe', color: '#0369a1', border: '1px solid #bae6fd', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
-                      {activePdfPageBadge}
-                    </span>
-                  </div>
-                  <p style={{ margin: 0, fontSize: '0.84rem', color: '#475569' }}>
-                    {activePdfDescription}
-                  </p>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-                <a
-                  href={activePdfUrl || "#"}
-                  download={activePdfDownloadName}
-                  target={activePdfUrl ? "_blank" : undefined}
-                  rel="noopener noreferrer"
-                  onClick={(e) => {
-                    if (!activePdfUrl) {
-                      e.preventDefault();
-                      handlePrint();
-                    }
-                  }}
-                  style={{
-                    background: '#047857',
-                    color: '#ffffff',
-                    fontWeight: 800,
-                    fontSize: '0.85rem',
-                    padding: '10px 18px',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    boxShadow: '0 2px 8px rgba(4, 120, 87, 0.3)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <Download size={16} /> Download Long Notes PDF
-                </a>
-                {activePdfUrl && (
-                  <a
-                    href={activePdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      background: 'transparent',
-                      color: '#047857',
-                      border: '1px solid #047857',
-                      fontWeight: 700,
-                      fontSize: '0.82rem',
-                      padding: '9px 14px',
-                      borderRadius: '8px',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    <FileText size={14} /> Open Fullscreen PDF
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-
           {/* Quick Horizontal Unit Switcher Bar (Appears when units sidebar is collapsed) */}
           {isUnitsCollapsed && (
             <div style={{
@@ -2785,72 +2649,6 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
               {getTopperExamNote()}
             </p>
           </div>
-
-          {/* Real Notebook Embedded Scanned PDF Viewer */}
-          {themeMode === 'paper' && paperViewMode === 'scanned-pdf' && activePdfUrl ? (
-            <div style={{
-              borderRadius: '12px',
-              overflow: 'hidden',
-              border: '2px solid #b45309',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
-              background: '#ffffff',
-              margin: '12px 0'
-            }}>
-              <div style={{
-                padding: '12px 20px',
-                background: '#fef3c7',
-                borderBottom: '1.5px solid #fde68a',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '12px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <FileText size={20} color="#b45309" />
-                  <strong style={{ color: '#78350f', fontSize: '1rem', fontFamily: "'Kalam', cursive" }}>
-                    {activeSubject?.name} Official University Long Notes ({activePdfPageBadge})
-                  </strong>
-                </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button
-                    onClick={() => setPaperViewMode('notes')}
-                    className="btn-outline"
-                    style={{ borderColor: '#d97706', color: '#78350f', padding: '6px 14px', fontSize: '0.8rem', background: '#fff' }}
-                  >
-                    Switch to Hand-Scripted Text
-                  </button>
-                  <a
-                    href={activePdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-outline"
-                    style={{ borderColor: '#b45309', color: '#78350f', padding: '6px 14px', fontSize: '0.8rem', textDecoration: 'none' }}
-                  >
-                    <Maximize2 size={14} /> Fullscreen
-                  </a>
-                  <a
-                    href={activePdfUrl}
-                    download={activePdfDownloadName}
-                    className="btn-primary"
-                    style={{ background: '#b45309', color: '#fff', padding: '6px 16px', fontSize: '0.8rem', textDecoration: 'none' }}
-                  >
-                    <Download size={14} /> Download PDF
-                  </a>
-                </div>
-              </div>
-              <iframe
-                src={`${activePdfUrl}#view=FitH`}
-                title={`${activeSubject?.name} Official Long Notes PDF`}
-                style={{
-                  width: '100%',
-                  height: '920px',
-                  border: 'none',
-                  display: 'block'
-                }}
-              />
-            </div>
-          ) : null}
 
           {/* ⚡ 15-Minute Exam Cram Mode & Active Recall Deck */}
           {cramMode && (
