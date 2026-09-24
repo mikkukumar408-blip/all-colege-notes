@@ -1,14 +1,17 @@
 /* =========================================================================
-   SECTION 4: SHORT NOTES & EXAM REVISION SHEETS (Theaters.jsx)
+   SECTION 4: EXAM REVISION & SHORT NOTES HUB (Theaters.jsx)
    =========================================================================
    Features:
-   1. Filter high-yield exam short notes by Category (All, Mathematics, Core Engineering, Computer Science, AI)
-   2. Search notes by Subject Title, Course Code, or Topic keywords
-   3. Direct, high-speed PDF Review and Instant Download
-   4. High-yield syllabus bullet highlights with KaTeX formatting
+   1. "⚡ Exam Revision Notes (Balanced Length)" - The Golden Medium notes
+      (8-12 pages, high-yield, complete unit coverage, derivations, formulas,
+      and solved university exam questions with step-by-step model answers).
+   2. "📄 Ultra-Short Cheat Sheets" - 2-page KaTeX formula summaries for rapid 30-min cram.
+   3. Interactive in-app Exam Revision Reader Modal with unit tabs & print support.
+   4. Filter by Year (1st-4th) & Semester (1-8), plus instant keyword search.
    ========================================================================= */
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Download, 
   Search, 
@@ -18,14 +21,27 @@ import {
   Award,
   Eye,
   Zap,
-  BookOpen
+  BookOpen,
+  Printer,
+  X,
+  ChevronRight,
+  Layers,
+  HelpCircle,
+  AlertTriangle,
+  Copy,
+  CheckCheck,
+  Flame,
+  CheckCircle2,
+  Clock,
+  Compass,
+  FileCode2
 } from 'lucide-react';
 import { initialShortNotes } from '../data/mockData';
+import { examRevisionNotes } from '../data/examRevisionNotesData';
 import { logUserActivity } from '../utils/activityTracker';
 
 /* -------------------------------------------------------------------------
    ACADEMIC YEARS & SEMESTER CONFIGURATION
-   Each academic year consists of exactly two semesters.
    ------------------------------------------------------------------------- */
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'All Years'];
 
@@ -34,7 +50,7 @@ const YEAR_CONFIG = {
     label: '1st Year',
     semesters: [
       { id: 'Semester 1', num: 1, title: 'Semester 1', subtitle: 'Calculus, BEEE, C Programming, Web Tech & AI' },
-      { id: 'Semester 2', num: 2, title: 'Semester 2', subtitle: 'Applied Physics & Python Programming' }
+      { id: 'Semester 2', num: 2, title: 'Semester 2', subtitle: 'Applied Physics, Python & Data Structures' }
     ]
   },
   '2nd Year': {
@@ -48,37 +64,63 @@ const YEAR_CONFIG = {
     label: '3rd Year',
     semesters: [
       { id: 'Semester 5', num: 5, title: 'Semester 5', subtitle: 'Computer Networks & Full Stack Web Development' },
-      { id: 'Semester 6', num: 6, title: 'Semester 6', subtitle: 'Software Engineering & Cloud Computing' }
+      { id: 'Semester 6', num: 6, title: 'Semester 6', subtitle: 'Software Engineering & Artificial Intelligence' }
     ]
   },
   '4th Year': {
     label: '4th Year',
     semesters: [
-      { id: 'Semester 7', num: 7, title: 'Semester 7', subtitle: 'Compiler Design & Artificial Intelligence' },
-      { id: 'Semester 8', num: 8, title: 'Semester 8', subtitle: 'Deep Learning & Blockchain Technology' }
+      { id: 'Semester 7', num: 7, title: 'Semester 7', subtitle: 'Cloud Computing & Distributed Systems' },
+      { id: 'Semester 8', num: 8, title: 'Semester 8', subtitle: 'DevOps Engineering & CI/CD Pipelines' }
     ]
   }
 };
 
-export default function Theaters({ currentUser }) {
+export default function Theaters({ currentUser, initialSubject }) {
   /* -----------------------------------------------------------------------
      STATE MANAGEMENT
+     - activeTabMode: 'balanced' (Exam Revision Notes) | 'ultraShort' (2-Page Summaries)
      - searchQuery: Filter notes by typed query
      - selectedYear: Active Year filter ('1st Year', '2nd Year', '3rd Year', '4th Year', 'All Years')
      - selectedSemester: Active Semester filter ('All' or specific 'Semester X')
      ----------------------------------------------------------------------- */
+  const [activeTabMode, setActiveTabMode] = useState('balanced'); // 'balanced' | 'ultraShort'
   const [shortNotes] = useState(initialShortNotes);
+  const [revisionNotes] = useState(examRevisionNotes);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedYear, setSelectedYear] = useState('1st Year');
   const [selectedSemester, setSelectedSemester] = useState('All');
 
-  // Filter notes based on search text, selected year, and selected semester
-  const filteredNotes = shortNotes.filter(item => {
-    const matchesSearch = 
-      item.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.highlights && item.highlights.some(h => h.toLowerCase().includes(searchQuery.toLowerCase())));
+  // Interactive Reader Modal States
+  const [selectedRevisionNote, setSelectedRevisionNote] = useState(null);
+  const [activeModalUnit, setActiveModalUnit] = useState(1);
+  const [copiedFormula, setCopiedFormula] = useState(null);
+
+  React.useEffect(() => {
+    if (initialSubject) {
+      const codeOrTitle = (initialSubject.code || initialSubject.name || initialSubject.title || '').toLowerCase();
+      const matched = revisionNotes.find(n => 
+        (initialSubject.code && (n.code.toLowerCase().includes(initialSubject.code.toLowerCase()) || initialSubject.code.toLowerCase().includes(n.code.toLowerCase()))) ||
+        (initialSubject.name && (n.subject.toLowerCase().includes(initialSubject.name.toLowerCase()) || initialSubject.name.toLowerCase().includes(n.subject.toLowerCase()))) ||
+        (initialSubject.id && n.id === initialSubject.id)
+      );
+      if (matched) {
+        if (matched.year) setSelectedYear(matched.year);
+        if (matched.semester) setSelectedSemester(matched.semester);
+        setSelectedRevisionNote(matched);
+        setActiveModalUnit(1);
+      }
+    }
+  }, [initialSubject]);
+
+  // ─── Filter Balanced Exam Revision Notes ─────────────────────────────────
+  const filteredRevisionNotes = revisionNotes.filter(item => {
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch = !q ||
+      item.subject.toLowerCase().includes(q) ||
+      item.code.toLowerCase().includes(q) ||
+      item.summary.toLowerCase().includes(q) ||
+      (item.highlights && item.highlights.some(h => h.toLowerCase().includes(q)));
       
     // Year filter
     let matchesYear = true;
@@ -96,58 +138,169 @@ export default function Theaters({ currentUser }) {
     return matchesSearch && matchesYear && matchesSemester;
   });
 
-  const handleDownloadClick = (item) => {
+  // ─── Filter Ultra-Short 2-Page Sheets ────────────────────────────────────
+  const filteredShortNotes = shortNotes.filter(item => {
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch = !q ||
+      item.subject.toLowerCase().includes(q) ||
+      item.code.toLowerCase().includes(q) ||
+      item.type.toLowerCase().includes(q) ||
+      (item.highlights && item.highlights.some(h => h.toLowerCase().includes(q)));
+      
+    // Year filter
+    let matchesYear = true;
+    if (selectedYear !== 'All Years') {
+      const allowedSems = YEAR_CONFIG[selectedYear]?.semesters.map(s => s.id) || [];
+      matchesYear = allowedSems.includes(item.semester);
+    }
+
+    // Semester filter
+    let matchesSemester = true;
+    if (selectedSemester !== 'All') {
+      matchesSemester = item.semester === selectedSemester;
+    }
+
+    return matchesSearch && matchesYear && matchesSemester;
+  });
+
+  const handleDownloadClick = (item, isRevision = false) => {
     try {
       logUserActivity(
         currentUser?.username || 'student',
         'DOWNLOAD',
-        `${item.code}: ${item.subject} Short Notes`,
-        `Downloaded high-yield revision sheet (${item.fileSize})`
+        `${item.code}: ${item.subject} ${isRevision ? 'Exam Revision Notes' : 'Short Notes'}`,
+        `Downloaded ${isRevision ? item.pageEstimate : item.fileSize}`
       );
     } catch (e) {}
   };
 
+  const handleCopyFormula = (latex) => {
+    navigator.clipboard.writeText(latex);
+    setCopiedFormula(latex);
+    setTimeout(() => setCopiedFormula(null), 2000);
+  };
+
+  // Collect all solved questions for the active modal subject
+  const allSolvedQuestions = selectedRevisionNote?.units?.flatMap(u => 
+    (u.solvedQuestions || []).map(sq => ({ ...sq, unitNum: u.unitNum, unitTitle: u.title }))
+  ) || [];
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
       {/* -------------------------------------------------------------------
-         PART A: SHORT NOTES HEADER & SEARCH INPUT
+         PART A: EXAM REVISION & SHORT NOTES HEADER
          ------------------------------------------------------------------- */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <span className="badge-neon font-display">⚡ HIGH-YIELD REVISION ARCHIVE</span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>All Subjects • KaTeX Exam-Ready Short Notes</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+            <span className="badge-neon font-display">⚡ BALANCED FAST-TRACK HUB</span>
+            <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>
+              100% MMEC Syllabus • Not Too Long, Not Too Short
+            </span>
           </div>
-          <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff' }}>Short Notes &amp; Exam Revision Sheets</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.94rem', maxWidth: '750px' }}>
-            Fast-track, high-yield university exam revision sheets complete with core formula summaries, key derivations, memory architectures, and verified exam proofs.
+          <h1 style={{ fontSize: '2.1rem', fontWeight: 900, color: '#fff', margin: 0 }}>
+            Exam Revision &amp; Short Notes
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', maxWidth: '780px', marginTop: '6px', lineHeight: '1.5' }}>
+            Specially engineered university cram guides: balanced length covering complete syllabus units, core theories, step-by-step derivations, essential formulas, and verified university exam questions with model answers.
           </p>
         </div>
 
         {/* Search by Subject, Course Code or Topic */}
-        <div style={{ minWidth: '280px' }}>
-          <input
-            type="text"
-            placeholder="Search notes, codes, formulas..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '12px 18px',
-              borderRadius: '10px',
-              background: 'rgba(14, 18, 29, 0.9)',
-              border: '1px solid var(--border-dim)',
-              color: '#fff',
-              fontSize: '0.9rem',
-              outline: 'none'
-            }}
-          />
+        <div style={{ minWidth: '280px', flex: '1', maxWidth: '380px' }}>
+          <div style={{ position: 'relative' }}>
+            <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+            <input
+              type="text"
+              placeholder="Search subjects, codes, or exam topics..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px 18px 12px 40px',
+                borderRadius: '10px',
+                background: 'rgba(14, 18, 29, 0.9)',
+                border: '1px solid var(--border-dim)',
+                color: '#fff',
+                fontSize: '0.88rem',
+                outline: 'none'
+              }}
+            />
+          </div>
         </div>
       </div>
 
       {/* -------------------------------------------------------------------
-         PART B: YEAR SELECTOR BUTTONS (1st Year, 2nd Year, 3rd Year, 4th Year)
-         Replaces subject names with academic years as requested.
+         PART B: TOP VIEW SWITCHER (Balanced Exam Revision vs Ultra-Short)
+         ------------------------------------------------------------------- */}
+      <div 
+        className="glass-panel" 
+        style={{ 
+          padding: '6px', 
+          display: 'inline-flex', 
+          gap: '8px', 
+          borderRadius: '12px', 
+          background: 'rgba(11, 15, 25, 0.75)',
+          border: '1px solid rgba(0, 240, 255, 0.25)',
+          width: 'fit-content',
+          flexWrap: 'wrap'
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setActiveTabMode('balanced')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '9px 20px',
+            borderRadius: '8px',
+            fontSize: '0.88rem',
+            fontWeight: 800,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: activeTabMode === 'balanced' ? '1px solid var(--neon-cyan)' : 'none',
+            background: activeTabMode === 'balanced' ? 'rgba(0, 240, 255, 0.22)' : 'transparent',
+            color: activeTabMode === 'balanced' ? '#fff' : 'var(--text-dim)',
+            boxShadow: activeTabMode === 'balanced' ? '0 0 16px rgba(0, 240, 255, 0.35)' : 'none'
+          }}
+        >
+          <Sparkles size={16} color={activeTabMode === 'balanced' ? 'var(--neon-cyan)' : 'currentColor'} />
+          <span>⚡ Exam Revision Notes (Balanced Length • 8-12 Pages)</span>
+          <span style={{ fontSize: '0.75rem', padding: '2px 7px', borderRadius: '12px', background: 'rgba(0,240,255,0.2)', color: 'var(--neon-cyan)' }}>
+            {filteredRevisionNotes.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTabMode('ultraShort')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '9px 20px',
+            borderRadius: '8px',
+            fontSize: '0.88rem',
+            fontWeight: 800,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: activeTabMode === 'ultraShort' ? '1px solid #c084fc' : 'none',
+            background: activeTabMode === 'ultraShort' ? 'rgba(192, 132, 252, 0.22)' : 'transparent',
+            color: activeTabMode === 'ultraShort' ? '#fff' : 'var(--text-dim)',
+            boxShadow: activeTabMode === 'ultraShort' ? '0 0 16px rgba(192, 132, 252, 0.35)' : 'none'
+          }}
+        >
+          <FileText size={16} color={activeTabMode === 'ultraShort' ? '#c084fc' : 'currentColor'} />
+          <span>📄 Ultra-Short Cheat Sheets (2-Page Formulas)</span>
+          <span style={{ fontSize: '0.75rem', padding: '2px 7px', borderRadius: '12px', background: 'rgba(192,132,252,0.2)', color: '#c084fc' }}>
+            {filteredShortNotes.length}
+          </span>
+        </button>
+      </div>
+
+      {/* -------------------------------------------------------------------
+         PART C: YEAR SELECTOR BUTTONS (1st Year, 2nd Year, 3rd Year, 4th Year)
          ------------------------------------------------------------------- */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
@@ -164,15 +317,15 @@ export default function Theaters({ currentUser }) {
                   setSelectedSemester('All'); // Reset semester filter on year switch
                 }}
                 style={{
-                  padding: '10px 22px',
+                  padding: '9px 20px',
                   borderRadius: '10px',
-                  fontSize: '0.88rem',
+                  fontSize: '0.86rem',
                   fontWeight: 800,
                   cursor: 'pointer',
                   background: isSelected ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.05)',
                   color: isSelected ? '#07090e' : '#cbd5e1',
                   border: isSelected ? 'none' : '1px solid var(--border-dim)',
-                  boxShadow: isSelected ? '0 0 18px rgba(0, 240, 255, 0.35)' : 'none',
+                  boxShadow: isSelected ? '0 0 16px rgba(0, 240, 255, 0.3)' : 'none',
                   transition: 'all 0.2s ease',
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -185,26 +338,23 @@ export default function Theaters({ currentUser }) {
           })}
         </div>
 
-        {/* -----------------------------------------------------------------
-           SEMESTER BOXES: Exactly two boxes appear when any Year is clicked
-           ----------------------------------------------------------------- */}
+        {/* Semester Boxes: Appear when specific Year is clicked */}
         {selectedYear !== 'All Years' && YEAR_CONFIG[selectedYear] && (
           <div 
             style={{ 
               display: 'flex', 
               flexDirection: 'column', 
               gap: '14px',
-              padding: '20px 24px',
+              padding: '18px 22px',
               borderRadius: '14px',
               background: 'rgba(10, 15, 29, 0.7)',
-              border: '1px solid rgba(0, 240, 255, 0.25)',
-              marginTop: '4px'
+              border: '1px solid rgba(0, 240, 255, 0.25)'
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--neon-cyan)', fontSize: '0.92rem', fontWeight: 800 }}>⚡ {selectedYear} Semesters</span>
-                <span style={{ color: 'var(--text-dim)', fontSize: '0.82rem' }}>• Click a semester box below to filter revision sheets</span>
+                <span style={{ color: 'var(--neon-cyan)', fontSize: '0.9rem', fontWeight: 800 }}>⚡ {selectedYear} Semesters</span>
+                <span style={{ color: 'var(--text-dim)', fontSize: '0.8rem' }}>• Click a semester box to filter notes</span>
               </div>
               {selectedSemester !== 'All' && (
                 <button
@@ -227,99 +377,64 @@ export default function Theaters({ currentUser }) {
             </div>
 
             {/* The Two Distinct Semester Boxes */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
               {YEAR_CONFIG[selectedYear].semesters.map(sem => {
                 const isSelected = selectedSemester === sem.id;
-                const semNotes = shortNotes.filter(n => n.semester === sem.id);
-                const noteCount = semNotes.length;
+                const relevantCount = activeTabMode === 'balanced'
+                  ? revisionNotes.filter(n => n.semester === sem.id).length
+                  : shortNotes.filter(n => n.semester === sem.id).length;
 
                 return (
                   <div
                     key={sem.id}
-                    onClick={() => {
-                      setSelectedSemester(isSelected ? 'All' : sem.id);
-                    }}
+                    onClick={() => setSelectedSemester(isSelected ? 'All' : sem.id)}
                     role="button"
                     tabIndex={0}
                     style={{
-                      padding: '22px 24px',
+                      padding: '18px 20px',
                       borderRadius: '12px',
                       cursor: 'pointer',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '10px',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                      border: isSelected 
-                        ? '2px solid var(--neon-cyan)' 
-                        : '1px solid rgba(255, 255, 255, 0.12)',
-                      background: isSelected 
-                        ? 'linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(14, 165, 233, 0.15) 100%)' 
-                        : 'rgba(14, 18, 29, 0.85)',
-                      boxShadow: isSelected 
-                        ? '0 0 24px rgba(0, 240, 255, 0.25), inset 0 0 16px rgba(0, 240, 255, 0.1)' 
-                        : '0 4px 14px rgba(0, 0, 0, 0.3)',
-                      transform: isSelected ? 'translateY(-2px)' : 'none',
-                      userSelect: 'none'
+                      gap: '8px',
+                      background: isSelected ? 'rgba(0, 240, 255, 0.12)' : 'rgba(15, 23, 42, 0.55)',
+                      border: isSelected ? '1.5px solid var(--neon-cyan)' : '1px solid rgba(255, 255, 255, 0.08)',
+                      boxShadow: isSelected ? '0 0 16px rgba(0, 240, 255, 0.2)' : 'none',
+                      transition: 'all 0.2s ease'
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div 
-                          style={{
-                            width: '12px',
-                            height: '12px',
-                            borderRadius: '50%',
-                            background: isSelected ? 'var(--neon-cyan)' : 'var(--text-dim)',
-                            boxShadow: isSelected ? '0 0 10px var(--neon-cyan)' : 'none'
-                          }} 
-                        />
-                        <h3 style={{ 
-                          margin: 0, 
-                          fontSize: '1.35rem', 
-                          fontWeight: 900, 
-                          color: isSelected ? '#fff' : '#f1f5f9' 
-                        }}>
-                          {sem.title}
-                        </h3>
-                      </div>
-                      <span 
-                        className="badge-neon" 
-                        style={{ 
-                          fontSize: '0.78rem',
-                          padding: '4px 10px',
-                          background: isSelected ? 'var(--neon-cyan)' : 'rgba(0, 240, 255, 0.12)',
-                          color: isSelected ? '#07090e' : 'var(--neon-cyan)',
-                          fontWeight: 800
-                        }}
-                      >
-                        {noteCount} {noteCount === 1 ? 'Exam Sheet' : 'Exam Sheets'}
+                      <span style={{ fontSize: '1.05rem', fontWeight: 800, color: isSelected ? 'var(--neon-cyan)' : '#fff' }}>
+                        {sem.title}
+                      </span>
+                      <span style={{ 
+                        fontSize: '0.74rem', 
+                        fontWeight: 700, 
+                        padding: '3px 9px', 
+                        borderRadius: '20px', 
+                        background: isSelected ? 'rgba(0, 240, 255, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                        color: isSelected ? 'var(--neon-cyan)' : 'var(--text-muted)'
+                      }}>
+                        {relevantCount} Subjects
                       </span>
                     </div>
 
-                    <p style={{ 
-                      margin: 0, 
-                      fontSize: '0.85rem', 
-                      color: isSelected ? '#cbd5e1' : 'var(--text-muted)',
-                      lineHeight: 1.45
-                    }}>
+                    <p style={{ margin: 0, fontSize: '0.82rem', color: isSelected ? '#cbd5e1' : 'var(--text-muted)', lineHeight: 1.4 }}>
                       {sem.subtitle}
                     </p>
 
                     <div style={{ 
-                      marginTop: '4px',
-                      paddingTop: '10px',
-                      borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                      fontSize: '0.8rem', 
-                      color: isSelected ? 'var(--neon-cyan)' : 'var(--text-dim)',
-                      fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between'
+                      marginTop: '2px', 
+                      paddingTop: '8px', 
+                      borderTop: '1px solid rgba(255, 255, 255, 0.06)', 
+                      fontSize: '0.76rem', 
+                      color: isSelected ? 'var(--neon-cyan)' : 'var(--text-dim)', 
+                      fontWeight: 700, 
+                      display: 'flex', 
+                      justifyContent: 'space-between' 
                     }}>
-                      <span>{isSelected ? '✓ Filter Active (Click to show both semesters)' : 'Click to filter semester notes'}</span>
-                      <span style={{ fontSize: '1rem' }}>{isSelected ? '●' : '→'}</span>
+                      <span>{isSelected ? '✓ Filter Active' : 'Click to filter'}</span>
+                      <span>{isSelected ? '●' : '→'}</span>
                     </div>
                   </div>
                 );
@@ -330,140 +445,792 @@ export default function Theaters({ currentUser }) {
       </div>
 
       {/* -------------------------------------------------------------------
-         PART C: SHORT NOTES GRID
+         PART D: BALANCED EXAM REVISION NOTES GRID (GOLDEN MEDIUM)
          ------------------------------------------------------------------- */}
-      {filteredNotes.length === 0 ? (
-        <div className="glass-panel" style={{ padding: '48px 24px', textAlign: 'center' }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', marginBottom: '16px' }}>
-            No exam revision sheets found matching your selected filters.
-          </p>
-          <button 
-            onClick={() => { setSelectedYear('1st Year'); setSelectedSemester('All'); setSearchQuery(''); }}
-            className="btn-primary" 
-            style={{ padding: '10px 22px', fontSize: '0.88rem' }}
-          >
-            Reset Filters
-          </button>
-        </div>
-      ) : (
-        <div className="short-notes-cards-grid">
-          {filteredNotes.map(item => (
-            <div 
-              key={item.id} 
-              className="glass-panel" 
-              style={{ 
-                padding: '24px', 
-                display: 'flex', 
-                flexDirection: 'column', 
-                gap: '16px',
-                border: '1px solid rgba(0, 240, 255, 0.25)',
-                background: 'linear-gradient(135deg, rgba(7, 15, 30, 0.85) 0%, rgba(10, 20, 45, 0.7) 100%)'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <span className="badge-neon" style={{ marginBottom: '6px' }}>
-                    {item.category} • {item.pages}
-                  </span>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', marginTop: '6px' }}>
-                    {item.subject}
-                  </h3>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--neon-cyan)', marginTop: '2px', fontWeight: 600 }}>
-                    {item.code} • {item.semester}
+      {activeTabMode === 'balanced' && (
+        <div>
+          {filteredRevisionNotes.length === 0 ? (
+            <div className="glass-panel" style={{ padding: '48px 24px', textAlign: 'center' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', marginBottom: '16px' }}>
+                No exam revision notes found matching "{searchQuery}".
+              </p>
+              <button 
+                onClick={() => { setSelectedYear('1st Year'); setSelectedSemester('All'); setSearchQuery(''); }}
+                className="btn-primary" 
+                style={{ padding: '10px 22px', fontSize: '0.88rem' }}
+              >
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '22px' }}>
+              {filteredRevisionNotes.map(item => (
+                <div 
+                  key={item.id} 
+                  className="glass-panel" 
+                  style={{ 
+                    padding: '24px', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'space-between',
+                    gap: '16px',
+                    border: '1.5px solid rgba(0, 240, 255, 0.3)',
+                    background: 'linear-gradient(135deg, rgba(7, 15, 30, 0.85) 0%, rgba(10, 22, 48, 0.7) 100%)',
+                    transition: 'all 0.25s ease'
+                  }}
+                >
+                  <div>
+                    {/* Header Badges */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <span style={{ 
+                          fontSize: '0.72rem', 
+                          fontWeight: 800, 
+                          padding: '2px 8px', 
+                          borderRadius: '4px', 
+                          background: 'rgba(0, 240, 255, 0.15)', 
+                          color: 'var(--neon-cyan)',
+                          border: '1px solid rgba(0, 240, 255, 0.35)'
+                        }}>
+                          {item.code}
+                        </span>
+                        <span className="badge-neon" style={{ fontSize: '0.72rem' }}>
+                          {item.semester} • {item.year}
+                        </span>
+                      </div>
+                      <span className="badge-neon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid #10b981', fontSize: '0.72rem' }}>
+                        {item.pageEstimate}
+                      </span>
+                    </div>
+
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', margin: '4px 0 8px 0', lineHeight: '1.3' }}>
+                      {item.subject}
+                    </h3>
+
+                    <p style={{ fontSize: '0.84rem', color: '#94a3b8', lineHeight: '1.45', margin: '0 0 14px 0' }}>
+                      {item.summary}
+                    </p>
+
+                    {/* Syllabus Highlights */}
+                    <div style={{
+                      background: 'rgba(7, 9, 14, 0.7)',
+                      padding: '12px 14px',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      border: '1px solid var(--border-dim)'
+                    }}>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--neon-cyan)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Zap size={14} /> <span>HIGH-YIELD REVISION CONTENTS:</span>
+                      </div>
+                      {item.highlights && item.highlights.map((point, idx) => (
+                        <div key={idx} style={{ fontSize: '0.79rem', color: '#d0d8e8', display: 'flex', alignItems: 'flex-start', gap: '7px', lineHeight: 1.35 }}>
+                          <CheckCircle2 size={13} color="var(--neon-green)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                          <span>{point}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Actions: In-App Interactive Reader & Download */}
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      onClick={() => {
+                        setSelectedRevisionNote(item);
+                        setActiveModalUnit(item.units && item.units.length > 0 ? item.units[0].unitNum : 'overview');
+                      }}
+                      style={{ 
+                        flex: 1.3, 
+                        justifyContent: 'center', 
+                        padding: '10px 14px', 
+                        fontSize: '0.84rem', 
+                        gap: '6px' 
+                      }}
+                    >
+                      <BookOpen size={16} /> 📖 Read Exam Revision Notes
+                    </button>
+
+                    <a
+                      href={item.pdfUrl === '#' ? undefined : item.pdfUrl}
+                      target={item.pdfUrl === '#' ? undefined : "_blank"}
+                      download={item.pdfUrl === '#' ? undefined : item.downloadName}
+                      className="btn-outline"
+                      onClick={() => {
+                        if (item.pdfUrl === '#') {
+                          setSelectedRevisionNote(item);
+                          setActiveModalUnit(item.units && item.units.length > 0 ? item.units[0].unitNum : 'overview');
+                        } else {
+                          handleDownloadClick(item, true);
+                        }
+                      }}
+                      style={{ 
+                        flex: 1, 
+                        justifyContent: 'center', 
+                        padding: '10px 14px', 
+                        fontSize: '0.84rem', 
+                        gap: '6px',
+                        textDecoration: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center'
+                      }}
+                      title="Download PDF Package or Read Online"
+                    >
+                      <Download size={15} /> Download PDF
+                    </a>
                   </div>
                 </div>
-                <span className="badge-amber">{item.fileSize}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* -------------------------------------------------------------------
+         PART E: ULTRA-SHORT 2-PAGE CHEAT SHEETS (FORMULA REVISION)
+         ------------------------------------------------------------------- */}
+      {activeTabMode === 'ultraShort' && (
+        <div>
+          {filteredShortNotes.length === 0 ? (
+            <div className="glass-panel" style={{ padding: '48px 24px', textAlign: 'center' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', marginBottom: '16px' }}>
+                No ultra-short formula sheets found matching your selected filters.
+              </p>
+              <button 
+                onClick={() => { setSelectedYear('1st Year'); setSelectedSemester('All'); setSearchQuery(''); }}
+                className="btn-primary" 
+                style={{ padding: '10px 22px', fontSize: '0.88rem' }}
+              >
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            <div className="short-notes-cards-grid">
+              {filteredShortNotes.map(item => (
+                <div 
+                  key={item.id} 
+                  className="glass-panel" 
+                  style={{ 
+                    padding: '24px', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '16px',
+                    border: '1px solid rgba(192, 132, 252, 0.3)',
+                    background: 'linear-gradient(135deg, rgba(7, 15, 30, 0.85) 0%, rgba(20, 10, 45, 0.7) 100%)'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <span className="badge-neon" style={{ marginBottom: '6px', background: 'rgba(192, 132, 252, 0.15)', color: '#c084fc', border: '1px solid #c084fc' }}>
+                        {item.category} • {item.pages}
+                      </span>
+                      <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', marginTop: '6px' }}>
+                        {item.subject}
+                      </h3>
+                      <div style={{ fontSize: '0.8rem', color: '#c084fc', marginTop: '2px', fontWeight: 600 }}>
+                        {item.code} • {item.semester}
+                      </div>
+                    </div>
+                    <span className="badge-amber">{item.fileSize}</span>
+                  </div>
+
+                  <div style={{
+                    background: 'rgba(7, 9, 14, 0.65)',
+                    padding: '14px',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    border: '1px solid var(--border-dim)'
+                  }}>
+                    <div style={{ fontSize: '0.84rem', color: '#38bdf8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Zap size={15} color="#c084fc" />
+                      <span>Format: {item.type}</span>
+                    </div>
+
+                    {/* Syllabus Highlights */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '2px' }}>
+                      {item.highlights && item.highlights.map((point, idx) => (
+                        <div key={idx} style={{ fontSize: '0.8rem', color: '#d0d8e8', display: 'flex', alignItems: 'flex-start', gap: '8px', lineHeight: 1.4 }}>
+                          <CheckCircle size={14} color="var(--neon-green)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                          <span>{point}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                      <Award size={14} color="var(--neon-amber)" />
+                      <span>Verified Downloads: <strong style={{ color: '#fff' }}>{item.downloads.toLocaleString()} Students</strong></span>
+                    </div>
+                  </div>
+
+                  {/* Direct Open & Download Actions */}
+                  <div className="short-note-card-actions">
+                    <a 
+                      href={item.isDead || item.code === 'CS301' ? undefined : item.pdfUrl}
+                      target={item.isDead || item.code === 'CS301' ? undefined : "_blank"}
+                      rel="noopener noreferrer"
+                      className={item.isDead || item.code === 'CS301' ? "btn-secondary" : "btn-review-glow"} 
+                      style={{ 
+                        flex: 1, 
+                        justifyContent: 'center', 
+                        textDecoration: 'none', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '6px',
+                        fontSize: '0.84rem',
+                        padding: '10px 12px',
+                        opacity: item.isDead || item.code === 'CS301' ? 0.35 : 1,
+                        cursor: item.isDead || item.code === 'CS301' ? 'not-allowed' : 'pointer'
+                      }}
+                      title={item.isDead || item.code === 'CS301' ? 'Under Preparation' : 'Open & Review PDF'}
+                    >
+                      <Eye size={16} /> Open &amp; Review PDF
+                    </a>
+                    <a 
+                      href={item.isDead || item.code === 'CS301' ? undefined : item.pdfUrl}
+                      download={item.isDead || item.code === 'CS301' ? undefined : item.downloadName}
+                      onClick={(e) => {
+                        if (item.isDead || item.code === 'CS301') {
+                          e.preventDefault();
+                          return;
+                        }
+                        handleDownloadClick(item);
+                      }}
+                      className={item.isDead || item.code === 'CS301' ? "btn-secondary" : "btn-primary"} 
+                      style={{ 
+                        flex: 1.2, 
+                        justifyContent: 'center', 
+                        textDecoration: 'none', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '6px',
+                        fontSize: '0.84rem',
+                        padding: '10px 12px',
+                        opacity: item.isDead || item.code === 'CS301' ? 0.35 : 1,
+                        cursor: item.isDead || item.code === 'CS301' ? 'not-allowed' : 'pointer'
+                      }}
+                      title={item.isDead || item.code === 'CS301' ? 'Under Preparation' : 'Download Short Notes'}
+                    >
+                      <Download size={16} /> Download Short Notes
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* -------------------------------------------------------------------
+         PART F: INTERACTIVE IN-APP EXAM REVISION READER MODAL (FULL EXPERIENCE)
+         ------------------------------------------------------------------- */}
+      {selectedRevisionNote && createPortal(
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 999999,
+            background: 'rgba(4, 7, 13, 0.94)',
+            backdropFilter: 'blur(16px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+          onClick={() => setSelectedRevisionNote(null)}
+        >
+          <div 
+            className="glass-panel"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '960px',
+              height: '90vh',
+              maxHeight: '920px',
+              display: 'flex',
+              flexDirection: 'column',
+              borderRadius: '16px',
+              border: '1.5px solid var(--neon-cyan)',
+              background: '#090e17',
+              boxShadow: '0 0 50px rgba(0, 240, 255, 0.25)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: '16px 22px',
+              background: 'linear-gradient(90deg, rgba(7, 15, 30, 0.95) 0%, rgba(10, 25, 55, 0.9) 100%)',
+              borderBottom: '1px solid rgba(0, 240, 255, 0.25)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '12px'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ 
+                    fontSize: '0.72rem', 
+                    fontWeight: 800, 
+                    padding: '2px 8px', 
+                    borderRadius: '4px', 
+                    background: 'rgba(0, 240, 255, 0.15)', 
+                    color: 'var(--neon-cyan)',
+                    border: '1px solid rgba(0, 240, 255, 0.35)'
+                  }}>
+                    {selectedRevisionNote.code}
+                  </span>
+                  <span className="badge-neon" style={{ fontSize: '0.72rem' }}>
+                    {selectedRevisionNote.semester} • {selectedRevisionNote.year}
+                  </span>
+                  <span style={{ fontSize: '0.76rem', color: '#10b981', fontWeight: 700 }}>
+                    {selectedRevisionNote.pageEstimate}
+                  </span>
+                </div>
+                <h2 style={{ fontSize: '1.3rem', fontWeight: 900, color: '#fff', margin: '4px 0 0 0' }}>
+                  {selectedRevisionNote.subject} — Exam Revision Master
+                </h2>
               </div>
 
-              <div style={{
-                background: 'rgba(7, 9, 14, 0.65)',
-                padding: '14px',
-                borderRadius: '10px',
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    color: '#cbd5e1',
+                    padding: '6px 14px',
+                    borderRadius: '8px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                  title="Print or Save as PDF"
+                >
+                  <Printer size={15} /> Print / Save PDF
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedRevisionNote(null)}
+                  style={{
+                    background: 'rgba(255, 42, 109, 0.15)',
+                    border: '1px solid rgba(255, 42, 109, 0.4)',
+                    color: '#ff2a6d',
+                    padding: '6px 10px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  title="Close Reader"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Navigation Tabs Bar (Units + Solved Questions) */}
+            <div style={{
+              display: 'flex',
+              gap: '6px',
+              padding: '10px 18px',
+              background: 'rgba(11, 15, 25, 0.9)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+              overflowX: 'auto',
+              flexShrink: 0
+            }}>
+              {selectedRevisionNote.units && selectedRevisionNote.units.length > 0 ? (
+                <>
+                  {selectedRevisionNote.units.map(unit => {
+                    const isTabActive = activeModalUnit === unit.unitNum;
+                    return (
+                      <button
+                        key={unit.unitNum}
+                        type="button"
+                        onClick={() => setActiveModalUnit(unit.unitNum)}
+                        style={{
+                          padding: '7px 16px',
+                          borderRadius: '8px',
+                          fontSize: '0.82rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          transition: 'all 0.2s ease',
+                          border: isTabActive ? '1px solid var(--neon-cyan)' : '1px solid rgba(255, 255, 255, 0.08)',
+                          background: isTabActive ? 'rgba(0, 240, 255, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                          color: isTabActive ? '#fff' : 'var(--text-dim)',
+                          boxShadow: isTabActive ? '0 0 12px rgba(0, 240, 255, 0.3)' : 'none'
+                        }}
+                      >
+                        Unit {unit.unitNum}: {unit.title.split('&')[0].trim()}
+                      </button>
+                    );
+                  })}
+
+                  {allSolvedQuestions.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveModalUnit('questions')}
+                      style={{
+                        padding: '7px 16px',
+                        borderRadius: '8px',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        transition: 'all 0.2s ease',
+                        border: activeModalUnit === 'questions' ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.08)',
+                        background: activeModalUnit === 'questions' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                        color: activeModalUnit === 'questions' ? '#fff' : 'var(--text-dim)',
+                        boxShadow: activeModalUnit === 'questions' ? '0 0 12px rgba(16, 185, 129, 0.3)' : 'none'
+                      }}
+                    >
+                      🏆 Solved University Exam Questions ({allSolvedQuestions.length})
+                    </button>
+                  )}
+                </>
+              ) : (
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>
+                  Comprehensive Revision Notes Loaded
+                </div>
+              )}
+            </div>
+
+            {/* Modal Body / Scrollable Content */}
+            <div 
+              className="custom-scroll" 
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                padding: '24px 28px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '10px',
-                border: '1px solid var(--border-dim)'
-              }}>
-                <div style={{ fontSize: '0.84rem', color: '#38bdf8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Zap size={15} color="var(--neon-cyan)" />
-                  <span>Format: {item.type}</span>
-                </div>
+                gap: '24px'
+              }}
+            >
+              {activeModalUnit === 'questions' ? (
+                /* Solved University Questions View */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div style={{
+                    padding: '16px 20px',
+                    borderRadius: '10px',
+                    background: 'rgba(16, 185, 129, 0.1)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}>
+                    <Award size={24} color="#10b981" />
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: '1rem', color: '#fff', fontWeight: 800 }}>
+                        High-Weightage University Solved Questions &amp; Scoring Keys
+                      </h4>
+                      <p style={{ margin: '2px 0 0 0', fontSize: '0.82rem', color: '#94a3b8' }}>
+                        Step-by-step model solutions for recurring examination problems (8-10 Marks weightage)
+                      </p>
+                    </div>
+                  </div>
 
-                {/* Syllabus Highlights */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '2px' }}>
-                  {item.highlights && item.highlights.map((point, idx) => (
-                    <div key={idx} style={{ fontSize: '0.8rem', color: '#d0d8e8', display: 'flex', alignItems: 'flex-start', gap: '8px', lineHeight: 1.4 }}>
-                      <CheckCircle size={14} color="var(--neon-green)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                      <span>{point}</span>
+                  {allSolvedQuestions.map((q, idx) => (
+                    <div 
+                      key={idx}
+                      className="glass-panel"
+                      style={{
+                        padding: '20px',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        background: 'rgba(11, 15, 25, 0.8)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <span style={{ 
+                            fontSize: '0.75rem', 
+                            fontWeight: 800, 
+                            padding: '3px 9px', 
+                            borderRadius: '4px', 
+                            background: 'rgba(0, 240, 255, 0.15)', 
+                            color: 'var(--neon-cyan)' 
+                          }}>
+                            Q{idx + 1} • Unit {q.unitNum}
+                          </span>
+                          <span className="badge-amber" style={{ fontSize: '0.72rem' }}>{q.marks}</span>
+                        </div>
+                      </div>
+
+                      <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.4 }}>
+                        {q.question}
+                      </h4>
+
+                      <div style={{
+                        padding: '14px 16px',
+                        borderRadius: '8px',
+                        background: 'rgba(7, 9, 14, 0.8)',
+                        border: '1px solid rgba(0, 240, 255, 0.2)',
+                        fontSize: '0.86rem',
+                        color: '#cbd5e1',
+                        lineHeight: 1.55,
+                        whiteSpace: 'pre-line'
+                      }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--neon-green)', marginBottom: '6px' }}>
+                          MODEL STEP-BY-STEP SOLUTION:
+                        </div>
+                        {q.solution}
+                      </div>
+
+                      {q.keyPoints && q.keyPoints.length > 0 && (
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '2px' }}>
+                          {q.keyPoints.map((kp, kpidx) => (
+                            <span 
+                              key={kpidx}
+                              style={{
+                                fontSize: '0.75rem',
+                                color: '#a7f3d0',
+                                background: 'rgba(16, 185, 129, 0.12)',
+                                border: '1px solid rgba(16, 185, 129, 0.25)',
+                                padding: '3px 8px',
+                                borderRadius: '4px'
+                              }}
+                            >
+                              ✓ {kp}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
+              ) : (
+                /* Specific Unit View */
+                (() => {
+                  const currentUnit = selectedRevisionNote.units?.find(u => u.unitNum === activeModalUnit) || selectedRevisionNote.units?.[0];
+                  
+                  if (!currentUnit) {
+                    return (
+                      <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-dim)' }}>
+                        <p>Complete fast-track notes summary ready for this subject.</p>
+                      </div>
+                    );
+                  }
 
-                <div style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                  <Award size={14} color="var(--neon-amber)" />
-                  <span>Verified Downloads: <strong style={{ color: '#fff' }}>{item.downloads.toLocaleString()} Students</strong></span>
-                </div>
-              </div>
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
+                      {/* Unit Banner */}
+                      <div style={{
+                        padding: '16px 20px',
+                        borderRadius: '10px',
+                        background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(10, 25, 55, 0.4) 100%)',
+                        border: '1px solid rgba(0, 240, 255, 0.25)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '10px'
+                      }}>
+                        <div>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--neon-cyan)', textTransform: 'uppercase' }}>
+                            UNIT {currentUnit.unitNum} SYLLABUS CRAM
+                          </span>
+                          <h3 style={{ margin: '2px 0 0 0', fontSize: '1.2rem', color: '#fff', fontWeight: 800 }}>
+                            {currentUnit.title}
+                          </h3>
+                          <p style={{ margin: '4px 0 0 0', fontSize: '0.84rem', color: '#94a3b8' }}>
+                            {currentUnit.summary}
+                          </p>
+                        </div>
+                        <span className="badge-amber" style={{ fontSize: '0.78rem' }}>
+                          Weightage: {currentUnit.weightage}
+                        </span>
+                      </div>
 
-              {/* Direct Open & Download Actions */}
-              <div className="short-note-card-actions">
-                <a 
-                  href={item.isDead || item.code === 'CS301' ? undefined : item.pdfUrl}
-                  target={item.isDead || item.code === 'CS301' ? undefined : "_blank"}
-                  rel="noopener noreferrer"
-                  className={item.isDead || item.code === 'CS301' ? "btn-secondary" : "btn-review-glow"} 
-                  style={{ 
-                    flex: 1, 
-                    justifyContent: 'center', 
-                    textDecoration: 'none', 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    gap: '6px',
-                    fontSize: '0.84rem',
-                    padding: '10px 12px',
-                    opacity: item.isDead || item.code === 'CS301' ? 0.35 : 1,
-                    cursor: item.isDead || item.code === 'CS301' ? 'not-allowed' : 'pointer'
-                  }}
-                  onClick={(e) => {
-                    if (item.isDead || item.code === 'CS301') {
-                      e.preventDefault();
-                    }
-                  }}
-                  title={item.isDead || item.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Open & Review PDF'}
-                >
-                  <Eye size={16} /> Open &amp; Review PDF
-                </a>
-                <a 
-                  href={item.isDead || item.code === 'CS301' ? undefined : item.pdfUrl}
-                  download={item.isDead || item.code === 'CS301' ? undefined : item.downloadName}
-                  onClick={(e) => {
-                    if (item.isDead || item.code === 'CS301') {
-                      e.preventDefault();
-                      return;
-                    }
-                    handleDownloadClick(item);
-                  }}
-                  className={item.isDead || item.code === 'CS301' ? "btn-secondary" : "btn-primary"} 
-                  style={{ 
-                    flex: 1.2, 
-                    justifyContent: 'center', 
-                    textDecoration: 'none', 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    gap: '6px',
-                    fontSize: '0.84rem',
-                    padding: '10px 12px',
-                    opacity: item.isDead || item.code === 'CS301' ? 0.35 : 1,
-                    cursor: item.isDead || item.code === 'CS301' ? 'not-allowed' : 'pointer'
-                  }}
-                  title={item.isDead || item.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Download Short Notes'}
-                >
-                  <Download size={16} /> Download Short Notes
-                </a>
-              </div>
+                      {/* 1. Core Theories & High-Yield Definitions */}
+                      {currentUnit.keyTheories && currentUnit.keyTheories.length > 0 && (
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                            <FileText size={18} color="var(--neon-cyan)" />
+                            <h4 style={{ margin: 0, fontSize: '1.05rem', color: '#fff', fontWeight: 800 }}>
+                              📌 Core Theories &amp; Precise Definitions
+                            </h4>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
+                            {currentUnit.keyTheories.map((theory, tidx) => (
+                              <div 
+                                key={tidx}
+                                style={{
+                                  padding: '16px',
+                                  borderRadius: '10px',
+                                  background: 'rgba(15, 23, 42, 0.6)',
+                                  border: '1px solid rgba(255, 255, 255, 0.08)'
+                                }}
+                              >
+                                <h5 style={{ margin: '0 0 6px 0', fontSize: '0.96rem', color: 'var(--neon-cyan)', fontWeight: 800 }}>
+                                  {theory.term}
+                                </h5>
+                                <p style={{ margin: '0 0 8px 0', fontSize: '0.86rem', color: '#e2e8f0', lineHeight: 1.5 }}>
+                                  {theory.definition}
+                                </p>
+                                {theory.bulletPoints && (
+                                  <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.82rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                                    {theory.bulletPoints.map((bp, bidx) => (
+                                      <li key={bidx} style={{ marginBottom: '4px' }}>{bp}</li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 2. Step-by-Step Exam Derivations */}
+                      {currentUnit.derivations && currentUnit.derivations.length > 0 && (
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                            <Layers size={18} color="#38bdf8" />
+                            <h4 style={{ margin: 0, fontSize: '1.05rem', color: '#fff', fontWeight: 800 }}>
+                              📐 Must-Know University Derivations
+                            </h4>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                            {currentUnit.derivations.map((d, didx) => (
+                              <div 
+                                key={didx}
+                                style={{
+                                  padding: '18px',
+                                  borderRadius: '10px',
+                                  background: 'rgba(7, 15, 30, 0.8)',
+                                  border: '1.5px solid rgba(56, 189, 248, 0.3)'
+                                }}
+                              >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                                  <span style={{ fontSize: '0.98rem', fontWeight: 800, color: '#fff' }}>
+                                    🎓 {d.title}
+                                  </span>
+                                  <span style={{ fontSize: '0.72rem', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.15)', padding: '2px 8px', borderRadius: '4px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                                    {d.examFrequency}
+                                  </span>
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
+                                  {d.steps.map((st, sidx) => (
+                                    <div key={sidx} style={{ fontSize: '0.84rem', color: '#cbd5e1', lineHeight: 1.45 }}>
+                                      {st}
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {d.finalFormula && (
+                                  <div style={{
+                                    padding: '10px 14px',
+                                    borderRadius: '6px',
+                                    background: 'rgba(0, 240, 255, 0.1)',
+                                    border: '1px solid var(--neon-cyan)',
+                                    color: 'var(--neon-cyan)',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 800,
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
+                                  }}>
+                                    <span>FINAL BOXED FORMULA: {d.finalFormula}</span>
+                                    <button 
+                                      type="button"
+                                      onClick={() => handleCopyFormula(d.finalFormula)}
+                                      style={{ background: 'transparent', border: 'none', color: 'var(--neon-cyan)', cursor: 'pointer' }}
+                                      title="Copy Formula"
+                                    >
+                                      {copiedFormula === d.finalFormula ? <CheckCheck size={16} /> : <Copy size={16} />}
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 3. Essential Exam Formulas */}
+                      {currentUnit.formulas && currentUnit.formulas.length > 0 && (
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                            <Flame size={18} color="var(--neon-amber)" />
+                            <h4 style={{ margin: 0, fontSize: '1.05rem', color: '#fff', fontWeight: 800 }}>
+                              ⚡ Essential Formulas Cheat Sheet
+                            </h4>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
+                            {currentUnit.formulas.map((f, fidx) => (
+                              <div 
+                                key={fidx}
+                                style={{
+                                  padding: '12px 14px',
+                                  borderRadius: '8px',
+                                  background: 'rgba(15, 23, 42, 0.7)',
+                                  border: '1px solid rgba(255, 170, 0, 0.25)',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '6px'
+                                }}
+                              >
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 700 }}>
+                                  {f.name}
+                                </div>
+                                <div style={{ fontSize: '0.92rem', color: '#ffaa00', fontWeight: 800, fontFamily: 'monospace' }}>
+                                  {f.formula}
+                                </div>
+                                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                                  Usage: {f.whereUsed}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 4. Examiner Warnings & Pitfalls */}
+                      {currentUnit.examinerTips && (
+                        <div style={{
+                          padding: '14px 18px',
+                          borderRadius: '8px',
+                          background: 'rgba(255, 42, 109, 0.1)',
+                          border: '1px solid rgba(255, 42, 109, 0.3)',
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '10px'
+                        }}>
+                          <AlertTriangle size={18} color="#ff2a6d" style={{ flexShrink: 0, marginTop: '2px' }} />
+                          <div>
+                            <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#ff2a6d', textTransform: 'uppercase' }}>
+                              ⚠️ TOPPER EXAM WARNING &amp; COMMON TRAP:
+                            </span>
+                            <p style={{ margin: '3px 0 0 0', fontSize: '0.84rem', color: '#fecdd3', lineHeight: 1.45 }}>
+                              {currentUnit.examinerTips}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()
+              )}
             </div>
-          ))}
-        </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -265,12 +265,17 @@ export default function App() {
             movieContext={selectedSubject} 
             isUnitsCollapsed={isUnitsCollapsed}
             setIsUnitsCollapsed={setIsUnitsCollapsed}
+            onNavigateTab={(tab, sub) => {
+              if (sub) setSelectedSubject(sub);
+              setActiveTab(tab);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         );
       case 'syllabus':
         return <TechGuide />;
       case 'short-notes':
-        return <Theaters currentUser={currentUser} />;
+        return <Theaters currentUser={currentUser} initialSubject={selectedSubject} />;
       case 'downloads-lab':
         return <SeatBooking currentUser={currentUser} preselectedMovie={selectedSubject} />;
       case 'doubt-forum':
@@ -295,7 +300,7 @@ export default function App() {
       case 'subjects-notes': return 'Semester Notes & Subjects';
       case 'notes-reader': return 'Interactive Notes Reader';
       case 'syllabus': return 'Syllabus & Curriculum';
-      case 'short-notes': return 'Short Notes & Exam Revision Sheets';
+      case 'short-notes': return 'Exam Revision & Short Notes';
       case 'downloads-lab': return 'Practical Lab Manuals & Codes';
       case 'doubt-forum': return 'Student Doubt Forum';
       case 'admin-panel': return 'Super Admin Control Center';

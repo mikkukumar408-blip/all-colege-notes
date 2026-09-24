@@ -73,7 +73,7 @@ export default function Sidebar({
     { id: 'subjects-notes', label: 'Semester Notes & Subjects', icon: BookOpen, badge: 'All Years' },
     { id: 'notes-reader', label: 'Interactive Notes Reader', icon: FileText, badge: 'Quick Read' },
     { id: 'syllabus', label: 'Syllabus & Curriculum', icon: GraduationCap },
-    { id: 'short-notes', label: 'Short Notes & Exam Notes', icon: Sparkles, badge: 'High Yield' },
+    { id: 'short-notes', label: 'Exam Revision & Short Notes', icon: Sparkles, badge: 'Exam Ready' },
     { id: 'downloads-lab', label: 'Lab Manuals & Practical Codes', icon: Code2, badge: 'Codes & Labs' },
     { id: 'doubt-forum', label: 'Student Doubt Forum', icon: MessageSquare },
     ...(isSuperAdmin ? [

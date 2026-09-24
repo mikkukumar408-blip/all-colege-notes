@@ -995,7 +995,8 @@ export default function SensoryLab({
   currentUser,
   movieContext, 
   isUnitsCollapsed: controlledIsUnitsCollapsed, 
-  setIsUnitsCollapsed: controlledSetIsUnitsCollapsed 
+  setIsUnitsCollapsed: controlledSetIsUnitsCollapsed,
+  onNavigateTab
 }) {
   // Combine Physics, Python, DSA, C, Web Tech, BEEE, AIML, and Math 1 with other subjects
   const allSubjects = [
@@ -2037,6 +2038,34 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
             style={{ borderColor: bookmarked ? 'var(--neon-green)' : undefined, color: bookmarked ? 'var(--neon-green)' : undefined }}
           >
             <Bookmark size={16} /> {bookmarked ? 'Saved' : 'Bookmark'}
+          </button>
+
+          {/* Quick Switch to Balanced Exam Revision Notes */}
+          <button
+            onClick={() => {
+              if (onNavigateTab) {
+                onNavigateTab('short-notes', activeSubject);
+              } else {
+                window.location.hash = '#short-notes';
+              }
+            }}
+            style={{
+              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+              color: '#000',
+              fontWeight: 800,
+              fontSize: '0.8rem',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 2px 10px rgba(245, 158, 11, 0.35)'
+            }}
+            title="Switch from exhaustive long notes to high-yield balanced Exam Revision Notes (8-12 pages with solved questions)"
+          >
+            <Sparkles size={15} /> ⚡ Switch to Exam Revision Notes
           </button>
 
           {isAIML && (
