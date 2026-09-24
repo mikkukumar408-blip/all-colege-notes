@@ -17,6 +17,7 @@ import CampusAIChatbot from './components/CampusAIChatbot';
 const SensoryLab = React.lazy(() => import('./components/SensoryLab'));
 const TechGuide = React.lazy(() => import('./components/TechGuide'));
 const Theaters = React.lazy(() => import('./components/Theaters'));
+const ExpectedQuestionPapers = React.lazy(() => import('./components/ExpectedQuestionPapers'));
 const SeatBooking = React.lazy(() => import('./components/SeatBooking'));
 const FanReviews = React.lazy(() => import('./components/FanReviews'));
 const SuperAdminPanel = React.lazy(() => import('./components/SuperAdminPanel'));
@@ -276,6 +277,8 @@ export default function App() {
         return <TechGuide />;
       case 'short-notes':
         return <Theaters currentUser={currentUser} initialSubject={selectedSubject} />;
+      case 'question-papers':
+        return <ExpectedQuestionPapers currentUser={currentUser} />;
       case 'downloads-lab':
         return <SeatBooking currentUser={currentUser} preselectedMovie={selectedSubject} />;
       case 'doubt-forum':
@@ -301,6 +304,7 @@ export default function App() {
       case 'notes-reader': return 'Interactive Notes Reader';
       case 'syllabus': return 'Syllabus & Curriculum';
       case 'short-notes': return 'Exam Revision & Short Notes';
+      case 'question-papers': return 'Expected University Question Papers';
       case 'downloads-lab': return 'Practical Lab Manuals & Codes';
       case 'doubt-forum': return 'Student Doubt Forum';
       case 'admin-panel': return 'Super Admin Control Center';

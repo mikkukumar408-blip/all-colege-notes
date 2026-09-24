@@ -3143,4 +3143,29 @@ button,
 .btn-secondary:hover {
   transform: translateY(-3px) scale(1.02);
 }
+
+/* =========================================================================
+   EXPECTED QUESTION PAPERS UNIVERSITY PRINT STYLING
+   ========================================================================= */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .paper-scroll-area {
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .paper-scroll-area * {
+    color: #000000 !important;
+    border-color: #94a3b8 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
 

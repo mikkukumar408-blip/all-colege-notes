@@ -26,6 +26,7 @@ import {
   Award,
   Zap,
   Code2,
+  ClipboardCheck,
   X 
 } from 'lucide-react';
 
@@ -43,7 +44,7 @@ export default function Sidebar({
   onOpenFormulaHUD
 }) {
   /* -----------------------------------------------------------------------
-     1. THE 6 MAIN SECTIONS (+ EXCLUSIVE 7TH SECTION FOR SUPER ADMIN)
+     1. THE 7 MAIN SECTIONS (+ EXCLUSIVE SUPER ADMIN SECTION)
      ----------------------------------------------------------------------- */
   const isSuperAdmin = (currentUser?.username?.toLowerCase() === 'bhavya mishra') || (currentUser?.role === 'superadmin') || (currentUser?.isSuperAdmin === true);
 
@@ -74,6 +75,7 @@ export default function Sidebar({
     { id: 'notes-reader', label: 'Interactive Notes Reader', icon: FileText, badge: 'Quick Read' },
     { id: 'syllabus', label: 'Syllabus & Curriculum', icon: GraduationCap },
     { id: 'short-notes', label: 'Exam Revision & Short Notes', icon: Sparkles, badge: 'Exam Ready' },
+    { id: 'question-papers', label: 'Expected Question Papers', icon: ClipboardCheck, badge: '2026 Pattern' },
     { id: 'downloads-lab', label: 'Lab Manuals & Practical Codes', icon: Code2, badge: 'Codes & Labs' },
     { id: 'doubt-forum', label: 'Student Doubt Forum', icon: MessageSquare },
     ...(isSuperAdmin ? [
