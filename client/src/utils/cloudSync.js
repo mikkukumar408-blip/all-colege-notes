@@ -5,11 +5,31 @@
    Syncs accounts, password updates, and user deletions in real-time.
    ========================================================================= */
 
-export const getApiBase = () => {
+export const VERCEL_PROD_ORIGIN = 'https://all-colege-notes.vercel.app';
+export const USERS_BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0ae98a56225a3';
+export const TELEMETRY_BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0d35e5ced077a';
+export const CONTROLS_BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0d35e9d47077b';
+
+export const getApiUrl = (endpointPath) => {
+  const path = endpointPath.startsWith('/') ? endpointPath : '/' + endpointPath;
   if (typeof window !== 'undefined') {
-    return '/api/users';
+    const isNativePlatform = 
+      Boolean(window.Capacitor?.isNativePlatform?.()) ||
+      window.location.protocol === 'capacitor:' ||
+      window.location.protocol === 'file:' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+
+    if (isNativePlatform) {
+      return `${VERCEL_PROD_ORIGIN}${path}`;
+    }
+    return path;
   }
-  return 'https://all-college-notes.vercel.app/api/users';
+  return `${VERCEL_PROD_ORIGIN}${path}`;
+};
+
+export const getApiBase = () => {
+  return getApiUrl('/api/users');
 };
 
 const STORAGE_KEY_USERS = 'college_notes_registered_users';
@@ -168,7 +188,7 @@ export async function pullCloudUsers() {
   let serverUsers = null;
   let backupUsers = null;
 
-
+  // 1. Try Vercel Serverless API
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3500);
@@ -180,9 +200,21 @@ export async function pullCloudUsers() {
         serverUsers = json.users;
       }
     }
-  } catch (err) {
-    // fallback
-  }
+  } catch (err) {}
+
+  // 2. Dual fallback: Direct KV Cloud Store
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch(USERS_BACKUP_URL, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.data && Array.isArray(json.data.users) && json.data.users.length > 0) {
+        backupUsers = json.data.users;
+      }
+    }
+  } catch (err) {}
 
   let combinedCloud = [];
   if (serverUsers && backupUsers) {
@@ -212,15 +244,21 @@ export async function pushCloudUsers(usersList) {
     }
   };
 
-  try {
-    await Promise.allSettled([
-      fetch(getApiBase() + '/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ users: usersList })
-      })
-    ]);
-  } catch (e) {}
+  await Promise.allSettled([
+    // Primary sync to Vercel API
+    fetch(getApiUrl('/api/users/sync'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ users: usersList })
+    }).catch(() => {}),
+
+    // Dual-redundancy direct sync to KV Backup
+    fetch(USERS_BACKUP_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(() => {})
+  ]);
 }
 
 export async function syncNewUserToCloud(newUser) {

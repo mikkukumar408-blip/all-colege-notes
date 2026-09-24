@@ -10,7 +10,18 @@
    ========================================================================= */
 
 import { hashPasswordPBKDF2 } from './security';
-import { pushCloudUsers, pullCloudUsers, getLocalUsers, saveLocalUsers, broadcastUsers, getApiBase, mergeUsers, getDeviceName } from './cloudSync';
+import { 
+  pushCloudUsers, 
+  pullCloudUsers, 
+  getLocalUsers, 
+  saveLocalUsers, 
+  broadcastUsers, 
+  getApiBase, 
+  getApiUrl,
+  TELEMETRY_BACKUP_URL,
+  mergeUsers, 
+  getDeviceName 
+} from './cloudSync';
 
 const STORAGE_KEY_ACTIVITIES = 'college_notes_user_activities';
 const STORAGE_KEY_USERS = 'college_notes_registered_users';
@@ -168,7 +179,7 @@ export function getUserActivities() {
   return INITIAL_ACTIVITIES;
 }
 
-// Log a new user action with device detection
+// Log a new user action with device detection and live cloud streaming
 export function logUserActivity(username, action, resource, details = '', metadata = {}) {
   try {
     const activities = getUserActivities();
@@ -196,10 +207,86 @@ export function logUserActivity(username, action, resource, details = '', metada
 
     const updated = [newActivity, ...activities].slice(0, 250);
     localStorage.setItem(STORAGE_KEY_ACTIVITIES, JSON.stringify(updated));
+
+    // Live Cloud Telemetry Stream Push (fire-and-forget, works on mobile & web)
+    fetch(getApiUrl('/api/telemetry'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newActivity)
+    }).catch(() => {});
+
     return newActivity;
   } catch (e) {
     console.error('Failed to log activity:', e);
   }
+}
+
+// Fetch live telemetry stream from cloud and merge with local
+export async function fetchCloudTelemetry() {
+  let cloudEvents = [];
+
+  // 1. Try Vercel Serverless API
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch(getApiUrl('/api/telemetry'), { signal: controller.signal });
+    clearTimeout(timeout);
+    if (res.ok) {
+      const json = await res.json();
+      if (json && Array.isArray(json.events)) {
+        cloudEvents = json.events;
+      }
+    }
+  } catch (e) {}
+
+  // 2. Dual fallback: Direct KV Cloud Store
+  if (cloudEvents.length === 0) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3500);
+      const res = await fetch(TELEMETRY_BACKUP_URL, { signal: controller.signal });
+      clearTimeout(timeout);
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.data && Array.isArray(json.data.events)) {
+          cloudEvents = json.data.events;
+        }
+      }
+    } catch (e) {}
+  }
+
+  // Merge with local activities avoiding duplicate IDs
+  const local = getUserActivities();
+  const map = new Map();
+
+  for (const c of cloudEvents) {
+    if (c && c.id) map.set(c.id, c);
+  }
+  for (const l of local) {
+    if (l && l.id) {
+      if (!map.has(l.id)) {
+        map.set(l.id, l);
+      }
+    }
+  }
+
+  const merged = Array.from(map.values()).sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  ).slice(0, 250);
+
+  try {
+    localStorage.setItem(STORAGE_KEY_ACTIVITIES, JSON.stringify(merged));
+  } catch (e) {}
+
+  return merged;
+}
+
+// Clear live telemetry stream from cloud and local storage
+export async function clearCloudTelemetry() {
+  try {
+    localStorage.setItem(STORAGE_KEY_ACTIVITIES, JSON.stringify([]));
+    await fetch(getApiUrl('/api/telemetry/clear'), { method: 'POST' });
+  } catch (e) {}
 }
 
 // Get deleted users blacklist
@@ -409,21 +496,36 @@ export async function adminChangeUserPassword(username, newPassword) {
 
     // 4. Send directly to Vercel Serverless API (supporting both parameter variants)
     try {
-      const apiBase = getApiBase();
-      await fetch(`${apiBase}/change-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: cleanUsername,
-          newPassword: cleanPass,
-          password: cleanPass,
-          salt,
-          hash,
-          newSalt: salt,
-          newHash: hash,
-          passwordHash: hash
+      await Promise.allSettled([
+        fetch(getApiUrl('/api/users/change-password'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: cleanUsername,
+            newPassword: cleanPass,
+            password: cleanPass,
+            salt,
+            hash,
+            newSalt: salt,
+            newHash: hash,
+            passwordHash: hash
+          })
+        }),
+        fetch(getApiUrl('/api/change-password'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: cleanUsername,
+            newPassword: cleanPass,
+            password: cleanPass,
+            salt,
+            hash,
+            newSalt: salt,
+            newHash: hash,
+            passwordHash: hash
+          })
         })
-      });
+      ]);
     } catch (e) {}
 
     // 5. Await push to cloud so cloud database is immediately synchronized
@@ -433,7 +535,7 @@ export async function adminChangeUserPassword(username, newPassword) {
 
     logUserActivity(
       'Bhavya Mishra',
-      'ADMIN_ACTION',
+      'AUTH',
       `Password Changed for @${cleanUsername}`,
       `Super Admin reset password for @${cleanUsername} using PBKDF2-100k encryption`
     );
@@ -488,10 +590,14 @@ export async function adminDeleteUser(username) {
 
     // 3. Delete from Vercel API
     try {
-      const apiBase = getApiBase();
-      await fetch(`${apiBase}/${encodeURIComponent(username.trim())}`, {
-        method: 'DELETE'
-      });
+      await Promise.allSettled([
+        fetch(getApiUrl(`/api/users/${encodeURIComponent(username.trim())}`), {
+          method: 'DELETE'
+        }),
+        fetch(getApiUrl(`/${encodeURIComponent(username.trim())}`), {
+          method: 'DELETE'
+        })
+      ]);
     } catch (e) {}
 
     try { 

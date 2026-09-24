@@ -407,9 +407,12 @@ router.post('/solve-doubt', postRateLimiter, async (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 // 4. CLOUD USER ACCOUNT MANAGEMENT & CROSS-DEVICE AUTH SYNCHRONIZER
 // ---------------------------------------------------------------------------
-const BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0ae98a56225a3';
+const USERS_BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0ae98a56225a3';
+const TELEMETRY_BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0d35e5ced077a';
+const CONTROLS_BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0d35e9d47077b';
 
 let registeredUsers = [
   {
@@ -430,12 +433,20 @@ let registeredUsers = [
   { username: 'mikumandal', password: 'password123', role: 'student', createdAt: '2026-02-15T00:00:00.000Z' }
 ];
 
+let telemetryEvents = [];
+let systemControls = {
+  announcement: '',
+  announcementActive: false,
+  maintenanceMode: false,
+  updatedAt: new Date().toISOString()
+};
+
 // Helper to load persistent users from backup KV
 async function fetchBackupUsers() {
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 2500);
-    const res = await fetch(BACKUP_URL, { signal: controller.signal });
+    const timer = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch(USERS_BACKUP_URL, { signal: controller.signal });
     clearTimeout(timer);
     if (res.ok) {
       const json = await res.json();
@@ -451,8 +462,8 @@ async function fetchBackupUsers() {
 async function pushBackupUsers(users) {
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 2500);
-    await fetch(BACKUP_URL, {
+    const timer = setTimeout(() => controller.abort(), 4000);
+    await fetch(USERS_BACKUP_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -461,6 +472,82 @@ async function pushBackupUsers(users) {
           system: 'All College Notes Cloud Account Synchronizer',
           updatedAt: new Date().toISOString(),
           users
+        }
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timer);
+  } catch (e) {}
+}
+
+// Helper to load persistent telemetry stream
+async function fetchBackupTelemetry() {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch(TELEMETRY_BACKUP_URL, { signal: controller.signal });
+    clearTimeout(timer);
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.data && Array.isArray(json.data.events)) {
+        return json.data.events;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+// Helper to save persistent telemetry stream
+async function pushBackupTelemetry(events) {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    await fetch(TELEMETRY_BACKUP_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'college_notes_telemetry_stream_v1',
+        data: {
+          updatedAt: new Date().toISOString(),
+          events: events.slice(0, 250)
+        }
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timer);
+  } catch (e) {}
+}
+
+// Helper to load system controls
+async function fetchBackupControls() {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(CONTROLS_BACKUP_URL, { signal: controller.signal });
+    clearTimeout(timer);
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.data) {
+        return json.data;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+// Helper to save system controls
+async function pushBackupControls(controls) {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3500);
+    await fetch(CONTROLS_BACKUP_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'college_notes_system_controls_v1',
+        data: {
+          ...controls,
+          updatedAt: new Date().toISOString()
         }
       }),
       signal: controller.signal
@@ -489,6 +576,28 @@ function mergeIncomingUsers(targetList, incomingList) {
   }
 }
 
+// Helper to append server-side telemetry
+async function recordServerTelemetry(action, username, resource, details = '', metadata = {}) {
+  const newEvt = {
+    id: 'evt-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+    username: username || 'System',
+    action: action.toUpperCase(),
+    resource: resource || 'Academic Portal',
+    details: details || '',
+    device: metadata.device || 'Cloud Server',
+    timestamp: new Date().toISOString(),
+    badgeColor: action === 'DOWNLOAD' ? '#f59e0b' : action === 'AUTH' ? '#22c55e' : action === 'AI_QUERY' ? '#a855f7' : '#00f0ff',
+    ...metadata
+  };
+
+  telemetryEvents = [newEvt, ...telemetryEvents].slice(0, 250);
+  await pushBackupTelemetry(telemetryEvents);
+  return newEvt;
+}
+
+// ---------------------------------------------------------------------------
+// USER ACCOUNT ROUTES
+// ---------------------------------------------------------------------------
 router.get('/users', async (req, res) => {
   const backup = await fetchBackupUsers();
   if (backup) {
@@ -508,6 +617,11 @@ router.post('/users', async (req, res) => {
     return res.status(400).json({ error: 'Username is required' });
   }
 
+  const backup = await fetchBackupUsers();
+  if (backup) {
+    mergeIncomingUsers(registeredUsers, backup);
+  }
+
   const clean = user.username.trim();
   const idx = registeredUsers.findIndex(u => u.username.toLowerCase() === clean.toLowerCase());
   const now = new Date().toISOString();
@@ -523,16 +637,33 @@ router.post('/users', async (req, res) => {
     });
   }
 
-  pushBackupUsers(registeredUsers).catch(() => {});
+  await pushBackupUsers(registeredUsers);
 
-  res.json({ success: true, user: registeredUsers.find(u => u.username.toLowerCase() === clean.toLowerCase()), users: registeredUsers });
+  // Auto-record telemetry event
+  recordServerTelemetry(
+    'AUTH',
+    clean,
+    'Account Registration',
+    `New student account registered with PBKDF2-100k encryption & Cloud Sync`,
+    { device: user.device || 'Web / Mobile Device' }
+  ).catch(() => {});
+
+  res.json({ 
+    success: true, 
+    user: registeredUsers.find(u => u.username.toLowerCase() === clean.toLowerCase()), 
+    users: registeredUsers 
+  });
 });
 
 router.post('/users/sync', async (req, res) => {
   const incoming = req.body.users;
+  const backup = await fetchBackupUsers();
+  if (backup) {
+    mergeIncomingUsers(registeredUsers, backup);
+  }
   if (Array.isArray(incoming)) {
     mergeIncomingUsers(registeredUsers, incoming);
-    pushBackupUsers(registeredUsers).catch(() => {});
+    await pushBackupUsers(registeredUsers);
   }
   res.json({ success: true, count: registeredUsers.length, users: registeredUsers });
 });
@@ -549,8 +680,14 @@ const handleChangePassword = async (req, res) => {
 
   const clean = username.trim();
   if (clean.toLowerCase() === 'bhavya mishra') {
-    return res.status(403).json({ error: 'Cannot change password for Master Super Admin account' });
+    return res.status(403).json({ error: 'Cannot change password for Master Super Admin root account' });
   }
+
+  const backup = await fetchBackupUsers();
+  if (backup) {
+    mergeIncomingUsers(registeredUsers, backup);
+  }
+
   const idx = registeredUsers.findIndex(u => u.username.toLowerCase() === clean.toLowerCase());
   const now = new Date().toISOString();
 
@@ -565,17 +702,30 @@ const handleChangePassword = async (req, res) => {
       password: newPassword,
       passwordHash: newHash,
       salt: newSalt,
-      role: clean.toLowerCase() === 'bhavya mishra' ? 'superadmin' : 'student',
+      role: 'student',
       createdAt: now,
       updatedAt: now
     };
     registeredUsers.push(newUser);
   }
 
-  pushBackupUsers(registeredUsers).catch(() => {});
+  await pushBackupUsers(registeredUsers);
+
+  // Auto-record telemetry event
+  await recordServerTelemetry(
+    'AUTH',
+    'Bhavya Mishra',
+    `Password Changed for @${clean}`,
+    `Super Admin reset password for @${clean} using PBKDF2-100k encryption`
+  ).catch(() => {});
 
   const updatedUser = registeredUsers.find(u => u.username.toLowerCase() === clean.toLowerCase());
-  return res.json({ success: true, message: `Password for @${clean} updated successfully!`, user: updatedUser });
+  return res.json({ 
+    success: true, 
+    message: `Password for @${clean} updated successfully in cloud database!`, 
+    user: updatedUser,
+    users: registeredUsers 
+  });
 };
 
 router.post('/users/change-password', handleChangePassword);
@@ -589,9 +739,118 @@ router.delete(['/users/:username', '/:username'], async (req, res) => {
     return res.status(403).json({ error: 'Cannot delete Super Admin account' });
   }
 
+  const backup = await fetchBackupUsers();
+  if (backup) {
+    mergeIncomingUsers(registeredUsers, backup);
+  }
+
   registeredUsers = registeredUsers.filter(u => u.username.toLowerCase() !== username.toLowerCase());
-  pushBackupUsers(registeredUsers).catch(() => {});
-  res.json({ success: true, message: `User @${username} deleted successfully`, count: registeredUsers.length });
+  await pushBackupUsers(registeredUsers);
+
+  await recordServerTelemetry(
+    'AUTH',
+    'Bhavya Mishra',
+    `Account Deleted: @${username}`,
+    `Super Admin permanently expunged user account from portal`
+  ).catch(() => {});
+
+  res.json({ success: true, message: `User @${username} deleted successfully`, count: registeredUsers.length, users: registeredUsers });
+});
+
+// ---------------------------------------------------------------------------
+// 5. LIVE SYSTEM TELEMETRY STREAM ROUTES
+// ---------------------------------------------------------------------------
+router.get('/telemetry', async (req, res) => {
+  const backup = await fetchBackupTelemetry();
+  if (backup && Array.isArray(backup) && backup.length > 0) {
+    // Merge backup with in-memory avoiding duplicate ids
+    const map = new Map();
+    for (const evt of backup) {
+      if (evt && evt.id) map.set(evt.id, evt);
+    }
+    for (const evt of telemetryEvents) {
+      if (evt && evt.id) map.set(evt.id, evt);
+    }
+    telemetryEvents = Array.from(map.values()).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 250);
+  }
+
+  res.json({
+    success: true,
+    count: telemetryEvents.length,
+    events: telemetryEvents,
+    timestamp: new Date().toISOString()
+  });
+});
+
+router.post('/telemetry', async (req, res) => {
+  const { username, action, resource, details, device, metadata, badgeColor } = req.body;
+  if (!action) {
+    return res.status(400).json({ error: 'Action is required' });
+  }
+
+  const cleanAction = sanitizeInput(String(action)).toUpperCase();
+  const cleanUsername = sanitizeInput(String(username || 'Guest'));
+  const cleanResource = sanitizeInput(String(resource || 'Academic Portal'));
+  const cleanDetails = sanitizeInput(String(details || ''));
+  const cleanDevice = sanitizeInput(String(device || 'Device'));
+
+  const newEvt = {
+    id: 'evt-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+    username: cleanUsername,
+    action: cleanAction,
+    resource: cleanResource,
+    details: cleanDetails,
+    device: cleanDevice,
+    timestamp: new Date().toISOString(),
+    badgeColor: badgeColor || (cleanAction === 'DOWNLOAD' ? '#f59e0b' : cleanAction === 'AUTH' ? '#22c55e' : cleanAction === 'AI_QUERY' ? '#a855f7' : '#00f0ff'),
+    ...(metadata && typeof metadata === 'object' ? metadata : {})
+  };
+
+  telemetryEvents = [newEvt, ...telemetryEvents].slice(0, 250);
+  await pushBackupTelemetry(telemetryEvents);
+
+  res.status(201).json({ success: true, event: newEvt, count: telemetryEvents.length });
+});
+
+router.post('/telemetry/clear', async (req, res) => {
+  telemetryEvents = [];
+  await pushBackupTelemetry([]);
+  res.json({ success: true, message: 'Telemetry stream cleared', count: 0 });
+});
+
+// ---------------------------------------------------------------------------
+// 6. PORTAL MASTER SYSTEM CONTROLS & BROADCAST
+// ---------------------------------------------------------------------------
+router.get('/controls', async (req, res) => {
+  const backup = await fetchBackupControls();
+  if (backup) {
+    systemControls = { ...systemControls, ...backup };
+  }
+  res.json({
+    success: true,
+    controls: systemControls,
+    timestamp: new Date().toISOString()
+  });
+});
+
+router.post('/controls', async (req, res) => {
+  const { announcement, announcementActive, maintenanceMode } = req.body;
+
+  if (typeof announcement === 'string') systemControls.announcement = sanitizeInput(announcement);
+  if (typeof announcementActive === 'boolean') systemControls.announcementActive = announcementActive;
+  if (typeof maintenanceMode === 'boolean') systemControls.maintenanceMode = maintenanceMode;
+  systemControls.updatedAt = new Date().toISOString();
+
+  await pushBackupControls(systemControls);
+
+  recordServerTelemetry(
+    'ADMIN_ACTION',
+    'Bhavya Mishra',
+    'Portal System Controls Updated',
+    `Announcement: ${systemControls.announcementActive ? 'ACTIVE' : 'OFF'} | Maintenance: ${systemControls.maintenanceMode ? 'ENABLED' : 'DISABLED'}`
+  ).catch(() => {});
+
+  res.json({ success: true, controls: systemControls });
 });
 
 app.use('/api', router);

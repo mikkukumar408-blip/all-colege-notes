@@ -44,7 +44,11 @@ import {
   Copy,
   Check,
   Terminal,
-  Cpu
+  Cpu,
+  Radio,
+  Megaphone,
+  Bell,
+  Power
 } from 'lucide-react';
 import { 
   getAllAccountsWithStats, 
@@ -52,9 +56,11 @@ import {
   getAccountFullAudit,
   adminChangeUserPassword, 
   adminDeleteUser,
-  resetActivityLogs 
+  resetActivityLogs,
+  fetchCloudTelemetry,
+  clearCloudTelemetry
 } from '../utils/activityTracker';
-import { pullCloudUsers, authBroadcastChannel } from '../utils/cloudSync';
+import { pullCloudUsers, authBroadcastChannel, getApiUrl } from '../utils/cloudSync';
 
 export default function SuperAdminPanel() {
   const [accounts, setAccounts] = useState([]);
@@ -63,6 +69,15 @@ export default function SuperAdminPanel() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState({ type: '', text: '' });
+
+  // Master System Controls (Broadcast Announcement & Maintenance)
+  const [controls, setControls] = useState({
+    announcement: '',
+    announcementActive: false,
+    maintenanceMode: false
+  });
+  const [announcementText, setAnnouncementText] = useState('');
+  const [isUpdatingControls, setIsUpdatingControls] = useState(false);
 
   // Modal State for Changing Password
   const [passwordModalUser, setPasswordModalUser] = useState(null);
@@ -82,16 +97,29 @@ export default function SuperAdminPanel() {
   const loadTelemetry = async (showToast = false) => {
     setIsRefreshing(true);
     try {
-      const freshCloudUsers = await pullCloudUsers().catch(() => null);
+      const [freshCloudUsers, freshCloudActivities, controlsRes] = await Promise.all([
+        pullCloudUsers().catch(() => null),
+        fetchCloudTelemetry().catch(() => null),
+        fetch(getApiUrl('/api/controls')).then(r => r.json()).catch(() => null)
+      ]);
+
       const accs = getAllAccountsWithStats(freshCloudUsers);
-      const acts = getUserActivities();
+      const acts = Array.isArray(freshCloudActivities) && freshCloudActivities.length > 0 
+        ? freshCloudActivities 
+        : getUserActivities();
+
       setAccounts(accs);
       setActivities(acts);
+
+      if (controlsRes?.controls) {
+        setControls(controlsRes.controls);
+        setAnnouncementText(prev => prev || controlsRes.controls.announcement || '');
+      }
 
       if (showToast) {
         setFeedbackMsg({
           type: 'success',
-          text: `⚡ Live Cloud Refreshed! Synced ${accs.length} accounts across all devices & sessions.`
+          text: `⚡ Live Cloud Refreshed! Synced ${accs.length} accounts & ${acts.length} live stream events.`
         });
         setTimeout(() => setFeedbackMsg({ type: '', text: '' }), 4000);
       }
@@ -119,15 +147,112 @@ export default function SuperAdminPanel() {
 
     authBroadcastChannel.addEventListener('message', handleBroadcast);
 
+    // Live continuous sync polling every 3 seconds
     const interval = setInterval(() => {
       loadTelemetry(false);
-    }, 5000);
+    }, 3000);
 
     return () => {
       authBroadcastChannel.removeEventListener('message', handleBroadcast);
       clearInterval(interval);
     };
   }, []);
+
+  // System Controls Actions
+  const handleSaveAnnouncement = async (e) => {
+    e.preventDefault();
+    if (!announcementText.trim()) return;
+    setIsUpdatingControls(true);
+    try {
+      const res = await fetch(getApiUrl('/api/controls'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          announcement: announcementText.trim(),
+          announcementActive: true,
+          maintenanceMode: controls.maintenanceMode
+        })
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setControls(json.controls);
+        setFeedbackMsg({ type: 'success', text: '📢 Global campus announcement published live to Website & Mobile App!' });
+        await loadTelemetry(false);
+      }
+    } catch (err) {
+      setFeedbackMsg({ type: 'error', text: 'Failed to publish announcement: ' + err.message });
+    } finally {
+      setIsUpdatingControls(false);
+      setTimeout(() => setFeedbackMsg({ type: '', text: '' }), 4000);
+    }
+  };
+
+  const handleDisableAnnouncement = async () => {
+    setIsUpdatingControls(true);
+    try {
+      const res = await fetch(getApiUrl('/api/controls'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          announcement: announcementText,
+          announcementActive: false,
+          maintenanceMode: controls.maintenanceMode
+        })
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setControls(json.controls);
+        setFeedbackMsg({ type: 'success', text: 'Announcement banner deactivated on all devices.' });
+        await loadTelemetry(false);
+      }
+    } catch (err) {
+      setFeedbackMsg({ type: 'error', text: 'Failed to deactivate announcement.' });
+    } finally {
+      setIsUpdatingControls(false);
+      setTimeout(() => setFeedbackMsg({ type: '', text: '' }), 4000);
+    }
+  };
+
+  const handleToggleMaintenance = async () => {
+    const nextMode = !controls.maintenanceMode;
+    setIsUpdatingControls(true);
+    try {
+      const res = await fetch(getApiUrl('/api/controls'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          announcement: controls.announcement,
+          announcementActive: controls.announcementActive,
+          maintenanceMode: nextMode
+        })
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setControls(json.controls);
+        setFeedbackMsg({
+          type: 'success',
+          text: nextMode ? '🛑 Emergency Maintenance Mode ENGAGED on all devices.' : '✅ Normal operational mode restored.'
+        });
+        await loadTelemetry(false);
+      }
+    } catch (err) {
+      setFeedbackMsg({ type: 'error', text: 'Failed to toggle maintenance mode.' });
+    } finally {
+      setIsUpdatingControls(false);
+      setTimeout(() => setFeedbackMsg({ type: '', text: '' }), 4000);
+    }
+  };
+
+  const handleClearTelemetryStream = async () => {
+    if (!window.confirm('Clear all live telemetry events from the cloud stream?')) return;
+    try {
+      await clearCloudTelemetry();
+      setActivities([]);
+      setFeedbackMsg({ type: 'success', text: 'Live telemetry stream cleared across all devices.' });
+      setTimeout(() => setFeedbackMsg({ type: '', text: '' }), 3000);
+      await loadTelemetry(false);
+    } catch (e) {}
+  };
 
   // Filter activities based on tab and search query
   const filteredActivities = activities.filter(item => {
@@ -422,6 +547,151 @@ export default function SuperAdminPanel() {
         </div>
       </div>
 
+      {/* ===================================================================
+         PORTAL MASTER CONTROLS & LIVE CAMPUS BROADCAST (FULL CONTROL)
+         =================================================================== */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(30, 27, 75, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)',
+        border: '1.5px solid rgba(139, 92, 246, 0.4)',
+        borderRadius: '14px',
+        padding: '18px 20px',
+        marginBottom: '26px',
+        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.4)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff'
+            }}>
+              <Megaphone size={18} />
+            </div>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Portal Master Control & Live Campus Broadcast
+              </h3>
+              <span style={{ fontSize: '0.74rem', color: '#cbd5e1' }}>
+                Broadcast live announcements and manage global controls across Website & Android Mobile App
+              </span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            {/* Live Indicator */}
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 10px',
+              borderRadius: '20px',
+              background: 'rgba(34, 197, 94, 0.15)',
+              border: '1px solid rgba(34, 197, 94, 0.4)',
+              color: '#86efac',
+              fontSize: '0.74rem',
+              fontWeight: 700
+            }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#22c55e', animation: 'pulse 1.2s infinite' }} />
+              Real-Time Sync Active (3s)
+            </div>
+
+            {/* Emergency Maintenance Mode Toggle */}
+            <button
+              onClick={handleToggleMaintenance}
+              disabled={isUpdatingControls}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '8px',
+                border: controls.maintenanceMode ? '1.5px solid #ef4444' : '1px solid rgba(255, 255, 255, 0.15)',
+                background: controls.maintenanceMode ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+                color: controls.maintenanceMode ? '#fca5a5' : '#cbd5e1',
+                fontSize: '0.76rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.2s ease'
+              }}
+              title="Toggle emergency lockdown / maintenance mode across all devices"
+            >
+              <Power size={13} color={controls.maintenanceMode ? '#ef4444' : '#94a3b8'} />
+              Maintenance: {controls.maintenanceMode ? 'LOCKED' : 'OFF'}
+            </button>
+          </div>
+        </div>
+
+        {/* Global Announcement Broadcaster Form */}
+        <form onSubmit={handleSaveAnnouncement} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 320px', position: 'relative' }}>
+            <Bell size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#a78bfa' }} />
+            <input
+              type="text"
+              placeholder="Type live announcement for all students (e.g., '📢 Mid-Sem Notes & Lab Viva Guides uploaded!')..."
+              value={announcementText}
+              onChange={(e) => setAnnouncementText(e.target.value)}
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                background: 'rgba(15, 23, 42, 0.85)',
+                border: '1px solid rgba(139, 92, 246, 0.35)',
+                borderRadius: '8px',
+                padding: '10px 12px 10px 36px',
+                color: '#fff',
+                fontSize: '0.84rem'
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <button
+              type="submit"
+              disabled={isUpdatingControls || !announcementText.trim()}
+              className="btn-primary"
+              style={{ padding: '9px 16px', fontSize: '0.8rem', gap: '6px' }}
+            >
+              <Megaphone size={14} /> {isUpdatingControls ? 'Publishing...' : 'Publish Live Announcement'}
+            </button>
+
+            {controls.announcementActive && (
+              <button
+                type="button"
+                onClick={handleDisableAnnouncement}
+                disabled={isUpdatingControls}
+                className="btn-outline"
+                style={{ padding: '9px 14px', fontSize: '0.8rem', color: '#fca5a5', borderColor: '#ef4444' }}
+              >
+                Disable Banner
+              </button>
+            )}
+          </div>
+        </form>
+
+        {/* Live Preview if announcement active */}
+        {controls.announcementActive && controls.announcement && (
+          <div style={{
+            marginTop: '12px',
+            background: 'rgba(124, 58, 237, 0.15)',
+            border: '1px dashed #8b5cf6',
+            borderRadius: '8px',
+            padding: '8px 12px',
+            fontSize: '0.78rem',
+            color: '#e9d5ff',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span style={{ fontWeight: 800, color: '#c084fc' }}>LIVE ON APP & WEB:</span>
+            <span>{controls.announcement}</span>
+          </div>
+        )}
+      </div>
+
       {/* Accounts Directory with Deep-Dive Inspector Trigger */}
       <div style={{ marginBottom: '26px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
@@ -668,36 +938,76 @@ export default function SuperAdminPanel() {
           gap: '12px',
           marginBottom: '12px'
         }}>
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fef08a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Activity size={18} color="#00f0ff" /> Live System Telemetry Stream ({filteredActivities.length} Events)
-          </h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fef08a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Activity size={18} color="#00f0ff" /> Live System Telemetry Stream ({filteredActivities.length} Events)
+            </h3>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              fontSize: '0.72rem',
+              color: '#86efac',
+              background: 'rgba(34, 197, 94, 0.12)',
+              border: '1px solid rgba(34, 197, 94, 0.3)',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              fontWeight: 700
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', animation: 'pulse 1.2s infinite' }} />
+              LIVE REAL-TIME STREAM
+            </span>
+          </div>
 
-          {/* Filter tabs */}
-          <div style={{ display: 'flex', gap: '6px', background: 'rgba(255, 255, 255, 0.05)', padding: '3px', borderRadius: '8px', flexWrap: 'wrap' }}>
-            {[
-              { id: 'ALL', label: 'All' },
-              { id: 'AI_QUERY', label: '🤖 AI Doubts' },
-              { id: 'DOWNLOAD', label: '📥 Downloads' },
-              { id: 'VIEW', label: '👁️ Views' },
-              { id: 'AUTH', label: '🔑 Logins' }
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setFilterType(tab.id)}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: filterType === tab.id ? '#f59e0b' : 'transparent',
-                  color: filterType === tab.id ? '#000' : '#94a3b8',
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                  cursor: 'pointer'
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            {/* Filter tabs */}
+            <div style={{ display: 'flex', gap: '6px', background: 'rgba(255, 255, 255, 0.05)', padding: '3px', borderRadius: '8px', flexWrap: 'wrap' }}>
+              {[
+                { id: 'ALL', label: 'All' },
+                { id: 'AI_QUERY', label: '🤖 AI Doubts' },
+                { id: 'DOWNLOAD', label: '📥 Downloads' },
+                { id: 'VIEW', label: '👁️ Views' },
+                { id: 'AUTH', label: '🔑 Logins' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setFilterType(tab.id)}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    background: filterType === tab.id ? '#f59e0b' : 'transparent',
+                    color: filterType === tab.id ? '#000' : '#94a3b8',
+                    fontSize: '0.75rem',
+                    fontWeight: 800,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Clear Stream Button */}
+            <button
+              onClick={handleClearTelemetryStream}
+              style={{
+                background: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                color: '#fca5a5',
+                borderRadius: '8px',
+                padding: '4px 10px',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+              title="Clear live telemetry event stream"
+            >
+              <Trash2 size={12} /> Clear Stream
+            </button>
           </div>
         </div>
 

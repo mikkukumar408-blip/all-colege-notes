@@ -28,7 +28,7 @@ const QuickSearchPalette = React.lazy(() => import('./components/QuickSearchPale
 import { initialSubjects } from './data/mockData';
 import { Menu, ChevronLeft, ChevronRight, ChevronDown, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot, Cpu, Award, Zap, Search } from 'lucide-react';
 import { logSecurityEvent } from './utils/security';
-import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers } from './utils/cloudSync';
+import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers, getApiUrl } from './utils/cloudSync';
 import './App.css';
 
 export default function App() {
@@ -94,6 +94,35 @@ export default function App() {
       activityEvents.forEach((evt) => window.removeEventListener(evt, resetActivity));
     };
   }, [currentUser]);
+
+  // Live Portal Announcement & System Controls from Super Admin
+  const [systemControls, setSystemControls] = useState({
+    announcement: '',
+    announcementActive: false,
+    maintenanceMode: false
+  });
+
+  useEffect(() => {
+    // Pull latest user accounts on launch
+    pullCloudUsers().catch(() => {});
+
+    const fetchControls = async () => {
+      try {
+        const res = await fetch(getApiUrl('/api/controls'));
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.controls) {
+            setSystemControls(json.controls);
+          }
+        }
+      } catch (e) {}
+    };
+
+    fetchControls();
+    const interval = setInterval(fetchControls, 8000);
+    return () => clearInterval(interval);
+  }, []);
+
   /* -----------------------------------------------------------------------
      1. ACTIVE TAB STATE
      Available values:
@@ -326,6 +355,28 @@ export default function App() {
       />
 
       <div className={`main-viewport ${isSidebarCollapsed ? 'collapsed' : ''}`}>
+        {/* Live Super Admin Global Campus Announcement Banner */}
+        {systemControls.announcementActive && systemControls.announcement && (
+          <div style={{
+            background: 'linear-gradient(90deg, #7c3aed 0%, #2563eb 50%, #06b6d4 100%)',
+            color: '#ffffff',
+            padding: '7px 18px',
+            fontSize: '0.84rem',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            textAlign: 'center',
+            boxShadow: '0 2px 12px rgba(124, 58, 237, 0.4)',
+            position: 'relative',
+            zIndex: 10
+          }}>
+            <Sparkles size={14} style={{ flexShrink: 0, animation: 'pulse 1.5s infinite' }} />
+            <span>{systemControls.announcement}</span>
+          </div>
+        )}
+
         {/* -----------------------------------------------------------------
            5. TOP STICKY NAVBAR
            Contains sidebar collapse toggle, section title, and quick download
