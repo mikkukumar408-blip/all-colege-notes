@@ -866,8 +866,8 @@ Ask me any academic question or pick a quick prompt below!`,
       document.body.removeChild(link);
     } else if (action.type === 'navigate' && action.tab && onNavigate) {
       onNavigate(action.tab);
-    } else if (action.type === 'slides' && onOpenDeepSearch) {
-      onOpenDeepSearch(action.query || '');
+    } else if (action.type === 'slides' && onNavigate) {
+      onNavigate('notes-reader');
     } else if (action.type === 'prompt' && action.text) {
       handleSendMessage(action.text);
     }
@@ -879,6 +879,7 @@ Ask me any academic question or pick a quick prompt below!`,
           1. FLOATING TRIGGER BUTTON (Bottom-Right)
           ------------------------------------------------------------------- */}
       <div 
+        className="campus-ai-floating-widget"
         style={{
           position: 'fixed',
           bottom: '24px',
@@ -993,6 +994,7 @@ Ask me any academic question or pick a quick prompt below!`,
           ------------------------------------------------------------------- */}
       {isOpen && (
         <div 
+          className="campus-ai-floating-panel"
           style={{
             position: 'fixed',
             bottom: isMinimized ? '88px' : '90px',
@@ -1066,29 +1068,6 @@ Ask me any academic question or pick a quick prompt below!`,
 
             {/* Header Control Buttons */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {/* DeepSearch 16:9 Slides Shortcut */}
-              <button
-                onClick={() => {
-                  if (onOpenDeepSearch) onOpenDeepSearch('');
-                }}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'rgba(255,255,255,0.7)',
-                  padding: '6px',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  transition: 'background 0.2s'
-                }}
-                title="Open 16:9 Presentation Slides (Alt+Space)"
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-              >
-                <Layers size={16} />
-              </button>
-
               {/* Clear History */}
               <button
                 onClick={handleClearHistory}

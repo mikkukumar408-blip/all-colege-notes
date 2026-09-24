@@ -19,15 +19,10 @@ const TechGuide = React.lazy(() => import('./components/TechGuide'));
 const Theaters = React.lazy(() => import('./components/Theaters'));
 const ExpectedQuestionPapers = React.lazy(() => import('./components/ExpectedQuestionPapers'));
 const SeatBooking = React.lazy(() => import('./components/SeatBooking'));
-const FanReviews = React.lazy(() => import('./components/FanReviews'));
 const SuperAdminPanel = React.lazy(() => import('./components/SuperAdminPanel'));
-const DeepSearchModal = React.lazy(() => import('./components/DeepSearchModal'));
-const CircuitSimulatorModal = React.lazy(() => import('./components/CircuitSimulatorModal'));
-const ExamQuizModal = React.lazy(() => import('./components/ExamQuizModal'));
-const FormulaHUDModal = React.lazy(() => import('./components/FormulaHUDModal'));
 const QuickSearchPalette = React.lazy(() => import('./components/QuickSearchPalette'));
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, ChevronDown, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot, Cpu, Award, Zap, Search } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, FileText, User, LogOut, Sparkles, Code2, ClipboardCheck, Search } from 'lucide-react';
 import { logSecurityEvent } from './utils/security';
 import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers, getApiUrl, pullCloudControls } from './utils/cloudSync';
 import './App.css';
@@ -137,80 +132,21 @@ export default function App() {
   const [isUnitsCollapsed, setIsUnitsCollapsed] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState(null);
 
-  // AI DeepSearch Assistant & 16:9 Presentation Slides State
-  const [deepSearchOpen, setDeepSearchOpen] = useState(false);
-  const [deepSearchInitialQuery, setDeepSearchInitialQuery] = useState('');
-  const [circuitSimOpen, setCircuitSimOpen] = useState(false);
-  const [circuitSimInitialValues, setCircuitSimInitialValues] = useState({});
-  const [examQuizOpen, setExamQuizOpen] = useState(false);
-  const [formulaHUDOpen, setFormulaHUDOpen] = useState(false);
+  // Cross-Subject Universal Quick Search Palette (Ctrl+K)
   const [quickSearchOpen, setQuickSearchOpen] = useState(false);
-  const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
 
-  // Global Hotkey Listener: Ctrl+K (Quick Search), Alt + Space (DeepSearch), Alt + C (Circuit), Alt + Q (Mock Exam), Alt + F (Formulas)
+  // Global Hotkey Listener: Ctrl+K (Quick Search)
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setQuickSearchOpen(prev => !prev);
-      } else if (e.altKey && e.code === 'Space') {
-        e.preventDefault();
-        setDeepSearchOpen(prev => !prev);
-      } else if (e.altKey && e.key.toLowerCase() === 'c') {
-        e.preventDefault();
-        setCircuitSimOpen(prev => !prev);
-      } else if (e.altKey && e.key.toLowerCase() === 'q') {
-        e.preventDefault();
-        setExamQuizOpen(prev => !prev);
-      } else if (e.altKey && e.key.toLowerCase() === 'f') {
-        e.preventDefault();
-        setFormulaHUDOpen(prev => !prev);
       }
     };
-
-    const handleOpenDeepSearchEvent = (e) => {
-      if (e.detail?.query) {
-        setDeepSearchInitialQuery(e.detail.query);
-      }
-      setDeepSearchOpen(true);
-    };
-
-    const handleOpenCircuitSimEvent = (e) => {
-      if (e.detail) {
-        setCircuitSimInitialValues(e.detail);
-      }
-      setCircuitSimOpen(true);
-    };
-
-    const handleOpenExamQuizEvent = () => setExamQuizOpen(true);
-    const handleOpenFormulaHUDEvent = () => setFormulaHUDOpen(true);
-
-    // Cross-App Synapse Memory Bridge (Bhavya Ecosystem Sync)
-    let synapseChannel = null;
-    try {
-      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-        synapseChannel = new BroadcastChannel('bhavya_ecosystem_synapse');
-        synapseChannel.onmessage = (msg) => {
-          if (msg.data?.type === 'ECOSYSTEM_QUERY_SYNC' && msg.data?.query) {
-            setDeepSearchInitialQuery(msg.data.query);
-          }
-        };
-      }
-    } catch (err) {}
 
     window.addEventListener('keydown', handleGlobalKeyDown);
-    window.addEventListener('open-deepsearch', handleOpenDeepSearchEvent);
-    window.addEventListener('open-circuit-sim', handleOpenCircuitSimEvent);
-    window.addEventListener('open-exam-quiz', handleOpenExamQuizEvent);
-    window.addEventListener('open-formula-hud', handleOpenFormulaHUDEvent);
-
     return () => {
       window.removeEventListener('keydown', handleGlobalKeyDown);
-      window.removeEventListener('open-deepsearch', handleOpenDeepSearchEvent);
-      window.removeEventListener('open-circuit-sim', handleOpenCircuitSimEvent);
-      window.removeEventListener('open-exam-quiz', handleOpenExamQuizEvent);
-      window.removeEventListener('open-formula-hud', handleOpenFormulaHUDEvent);
-      if (synapseChannel) synapseChannel.close();
     };
   }, []);
 
@@ -281,8 +217,6 @@ export default function App() {
         return <ExpectedQuestionPapers currentUser={currentUser} />;
       case 'downloads-lab':
         return <SeatBooking currentUser={currentUser} preselectedMovie={selectedSubject} />;
-      case 'doubt-forum':
-        return <FanReviews currentUser={currentUser} />;
       case 'admin-panel':
         return <SuperAdminPanel />;
       default:
@@ -306,7 +240,6 @@ export default function App() {
       case 'short-notes': return 'Exam Revision & Short Notes';
       case 'question-papers': return 'Expected University Question Papers';
       case 'downloads-lab': return 'Practical Lab Manuals & Codes';
-      case 'doubt-forum': return 'Student Doubt Forum';
       case 'admin-panel': return 'Super Admin Control Center';
       default: return 'College Academic Portal';
     }
@@ -351,13 +284,6 @@ export default function App() {
         setIsOpen={setSidebarOpen}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        onOpenDeepSearch={() => {
-          setDeepSearchInitialQuery('');
-          setDeepSearchOpen(true);
-        }}
-        onOpenCircuitSim={() => setCircuitSimOpen(true)}
-        onOpenExamQuiz={() => setExamQuizOpen(true)}
-        onOpenFormulaHUD={() => setFormulaHUDOpen(true)}
       />
 
       <div className={`main-viewport ${isSidebarCollapsed ? 'collapsed' : ''}`}>
@@ -472,151 +398,7 @@ export default function App() {
               <kbd className="nav-search-kbd">Ctrl+K</kbd>
             </button>
 
-            {/* Unified Tools & Simulators Dropdown (Alt+Space, Alt+C, Alt+Q, Alt+F) */}
-            <div className="nav-tools-wrapper" style={{ position: 'relative' }}>
-              <button 
-                className="nav-tools-trigger"
-                onClick={() => setToolsMenuOpen(prev => !prev)}
-                title="Open Tools & Simulators Menu"
-              >
-                <Sparkles size={14} color="var(--neon-cyan)" />
-                <span className="tools-btn-text">Tools</span>
-                <ChevronDown size={13} style={{ transform: toolsMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-              </button>
 
-              {/* Tools Dropdown Card */}
-              {toolsMenuOpen && (
-                <>
-                  <div 
-                    className="mobile-tools-backdrop"
-                    onClick={() => setToolsMenuOpen(false)}
-                  />
-                  <div className="mobile-tools-dropdown-card">
-                    <div className="mobile-dropdown-header">
-                      <span>⚡ TOOLS & SIMULATORS</span>
-                      <button onClick={() => setToolsMenuOpen(false)} className="close-mini-btn" type="button">✕</button>
-                    </div>
-
-                    <button 
-                      className="mobile-dropdown-item"
-                      type="button"
-                      onClick={() => {
-                        setQuickSearchOpen(true);
-                        setToolsMenuOpen(false);
-                      }}
-                    >
-                      <div className="mobile-dropdown-icon cyan">
-                        <Search size={16} />
-                      </div>
-                      <div className="mobile-dropdown-text">
-                        <span className="title">Cross-Subject Search</span>
-                        <span className="desc">Find theorems, formulas, syllabus</span>
-                      </div>
-                      <span className="nav-kbd-badge" style={{ fontSize: '0.62rem', opacity: 0.75, background: 'rgba(0,0,0,0.5)', padding: '2px 5px', borderRadius: '4px', color: 'var(--neon-cyan)', border: '1px solid rgba(0,240,255,0.3)', marginLeft: 'auto' }}>Ctrl+K</span>
-                    </button>
-
-                    <button 
-                      className="mobile-dropdown-item"
-                      type="button"
-                      onClick={() => {
-                        setDeepSearchInitialQuery('');
-                        setDeepSearchOpen(true);
-                        setToolsMenuOpen(false);
-                      }}
-                    >
-                      <div className="mobile-dropdown-icon cyan">
-                        <Sparkles size={16} />
-                      </div>
-                      <div className="mobile-dropdown-text">
-                        <span className="title">AI DeepSearch</span>
-                        <span className="desc">16:9 Presentation Slides & Citations</span>
-                      </div>
-                      <span className="nav-kbd-badge" style={{ fontSize: '0.62rem', opacity: 0.75, background: 'rgba(0,0,0,0.5)', padding: '2px 5px', borderRadius: '4px', color: 'var(--neon-cyan)', border: '1px solid rgba(0,240,255,0.3)', marginLeft: 'auto' }}>Alt+Space</span>
-                    </button>
-
-                    <button 
-                      className="mobile-dropdown-item"
-                      type="button"
-                      onClick={() => {
-                        setCircuitSimOpen(true);
-                        setToolsMenuOpen(false);
-                      }}
-                    >
-                      <div className="mobile-dropdown-icon green">
-                        <Cpu size={16} />
-                      </div>
-                      <div className="mobile-dropdown-text">
-                        <span className="title">Circuit Simulator</span>
-                        <span className="desc">RLC, Thevenin & Sandbox</span>
-                      </div>
-                      <span className="nav-kbd-badge" style={{ fontSize: '0.62rem', opacity: 0.75, background: 'rgba(0,0,0,0.5)', padding: '2px 5px', borderRadius: '4px', color: '#86efac', border: '1px solid rgba(16,185,129,0.3)', marginLeft: 'auto' }}>Alt+C</span>
-                    </button>
-
-                    <button 
-                      className="mobile-dropdown-item"
-                      type="button"
-                      onClick={() => {
-                        setExamQuizOpen(true);
-                        setToolsMenuOpen(false);
-                      }}
-                    >
-                      <div className="mobile-dropdown-icon amber">
-                        <Award size={16} />
-                      </div>
-                      <div className="mobile-dropdown-text">
-                        <span className="title">University Mock Exam</span>
-                        <span className="desc">Timed Quiz & Scorecard</span>
-                      </div>
-                      <span className="nav-kbd-badge" style={{ fontSize: '0.62rem', opacity: 0.75, background: 'rgba(0,0,0,0.5)', padding: '2px 5px', borderRadius: '4px', color: '#fef08a', border: '1px solid rgba(245,158,11,0.3)', marginLeft: 'auto' }}>Alt+Q</span>
-                    </button>
-
-                    <button 
-                      className="mobile-dropdown-item"
-                      type="button"
-                      onClick={() => {
-                        setFormulaHUDOpen(true);
-                        setToolsMenuOpen(false);
-                      }}
-                    >
-                      <div className="mobile-dropdown-icon purple">
-                        <Zap size={16} />
-                      </div>
-                      <div className="mobile-dropdown-text">
-                        <span className="title">Formula & Constants HUD</span>
-                        <span className="desc">Physics constants & identities</span>
-                      </div>
-                      <span className="nav-kbd-badge" style={{ fontSize: '0.62rem', opacity: 0.75, background: 'rgba(0,0,0,0.5)', padding: '2px 5px', borderRadius: '4px', color: '#d8b4fe', border: '1px solid rgba(168,85,247,0.3)', marginLeft: 'auto' }}>Alt+F</span>
-                    </button>
-
-                    <div className="mobile-dropdown-divider" />
-
-                    <button 
-                      className="mobile-dropdown-item danger"
-                      type="button"
-                      onClick={() => {
-                        setToolsMenuOpen(false);
-                        if (currentUser && currentUser.username) {
-                          removeDeviceSession(currentUser.username).catch(() => {});
-                        }
-                        try {
-                          sessionStorage.removeItem('college_notes_auth_user');
-                          localStorage.removeItem('college_notes_auth_user');
-                        } catch (e) {}
-                        setCurrentUser(null);
-                      }}
-                    >
-                      <div className="mobile-dropdown-icon red">
-                        <LogOut size={16} />
-                      </div>
-                      <div className="mobile-dropdown-text">
-                        <span className="title" style={{ color: '#ff6b6b' }}>Sign Out</span>
-                        <span className="desc">Lock portal on this device</span>
-                      </div>
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
 
             {/* Dedicated Sign Out Button */}
             <button 
@@ -668,50 +450,45 @@ export default function App() {
       <CampusAIChatbot
         onOpenNotesReader={handleOpenNotesReader}
         onNavigate={setActiveTab}
-        onOpenDeepSearch={(query) => {
-          setDeepSearchInitialQuery(query || '');
-          setDeepSearchOpen(true);
-        }}
         subjects={initialSubjects}
       />
 
-      {/* Code-Split Lazy Loaded Heavy Modals wrapped in Suspense */}
+      {/* -----------------------------------------------------------------
+         6. MOBILE BOTTOM NAVIGATION DOCK (Phones & Small Tablets <= 768px)
+         Streamlined 5-tab core navigation: Subjects, Reader, Revision, Papers, Labs
+         ----------------------------------------------------------------- */}
+      <nav className="mobile-bottom-nav" aria-label="Mobile Navigation">
+        {[
+          { id: 'subjects-notes', label: 'Subjects', icon: BookOpen },
+          { id: 'notes-reader', label: 'Reader', icon: FileText },
+          { id: 'short-notes', label: 'Revision', icon: Sparkles },
+          { id: 'question-papers', label: 'Papers', icon: ClipboardCheck },
+          { id: 'downloads-lab', label: 'Labs', icon: Code2 },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              className={`mobile-bottom-nav-item ${isActive ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab(tab.id);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              type="button"
+            >
+              <div className="bottom-nav-icon-wrap">
+                <Icon size={19} />
+              </div>
+              <span>{tab.label}</span>
+              {isActive && <div className="bottom-nav-glow-pill" />}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Code-Split Lazy Loaded Quick Search Palette (Ctrl+K) */}
       <React.Suspense fallback={null}>
-        {/* Global AI DeepSearch & 16:9 Presentation Slides Modal */}
-        {deepSearchOpen && (
-          <DeepSearchModal 
-            isOpen={deepSearchOpen} 
-            onClose={() => setDeepSearchOpen(false)} 
-            initialQuery={deepSearchInitialQuery} 
-          />
-        )}
-
-        {/* Interactive Deterministic Circuit Simulator & Mathematical Sandbox Modal */}
-        {circuitSimOpen && (
-          <CircuitSimulatorModal
-            isOpen={circuitSimOpen}
-            onClose={() => setCircuitSimOpen(false)}
-            initialValues={circuitSimInitialValues}
-          />
-        )}
-
-        {/* Active-Recall University Exam Quiz Generator Modal */}
-        {examQuizOpen && (
-          <ExamQuizModal
-            isOpen={examQuizOpen}
-            onClose={() => setExamQuizOpen(false)}
-          />
-        )}
-
-        {/* Engineering Formula, Identities & Physical Constants Quick Drawer */}
-        {formulaHUDOpen && (
-          <FormulaHUDModal
-            isOpen={formulaHUDOpen}
-            onClose={() => setFormulaHUDOpen(false)}
-          />
-        )}
-
-        {/* Universal Cross-Subject Quick Search Palette (Ctrl+K) */}
         {quickSearchOpen && (
           <QuickSearchPalette
             isOpen={quickSearchOpen}

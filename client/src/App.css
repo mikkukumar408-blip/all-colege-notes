@@ -551,9 +551,18 @@
   }
 }
 
+.mobile-bottom-nav {
+  display: none;
+}
+
 @media (max-width: 768px) {
-  /* Hide redundant logout button in navbar on mobile (already available in Tools menu and Sidebar) */
+  /* Show compact logout button on mobile navbar */
   .nav-logout-btn {
+    padding: 6px 9px !important;
+    min-width: 32px !important;
+    justify-content: center !important;
+  }
+  .logout-text-desktop {
     display: none !important;
   }
   .search-text-desktop,
@@ -565,13 +574,6 @@
     min-width: 32px !important;
     justify-content: center !important;
   }
-  .tools-btn-text {
-    display: none !important;
-  }
-  .nav-tools-trigger {
-    padding: 6px 9px !important;
-    min-width: 32px !important;
-  }
   .nav-user-pill {
     padding: 4px 8px !important;
     max-width: 120px !important;
@@ -581,6 +583,97 @@
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
+  }
+
+  /* Sleek Fixed Mobile Bottom Navigation Dock */
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(56px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: rgba(10, 15, 29, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0, 240, 255, 0.2);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 240, 255, 0.08);
+    z-index: 999;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .mobile-bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 5px 0;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-bottom-nav-item span {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: inherit;
+    transition: color 0.2s ease;
+  }
+
+  .bottom-nav-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-bottom-nav-item.active {
+    color: var(--neon-cyan);
+  }
+
+  .mobile-bottom-nav-item.active .bottom-nav-icon-wrap {
+    background: rgba(0, 240, 255, 0.15);
+    color: var(--neon-cyan);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+  }
+
+  .bottom-nav-glow-pill {
+    position: absolute;
+    top: 0;
+    width: 24px;
+    height: 2.5px;
+    background: var(--neon-cyan);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--neon-cyan);
+  }
+
+  /* Ensure content doesn't get covered by bottom nav */
+  .content-container {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* Position floating chatbot above bottom nav */
+  .campus-ai-floating-widget {
+    bottom: calc(66px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 16px !important;
+  }
+
+  .campus-ai-floating-panel {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 12px !important;
+    max-height: calc(100vh - 140px) !important;
   }
 }
 

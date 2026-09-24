@@ -8,23 +8,17 @@
    4. Update footer status message (e.g. "Semesters 1 through 8 Ready")
    ========================================================================= */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { 
   BookOpen, 
   FileText, 
   GraduationCap, 
-  CheckSquare, 
-  DownloadCloud, 
-  MessageSquare, 
   Crown,
   Layers,
   Menu,
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  Cpu,
-  Award,
-  Zap,
   Code2,
   ClipboardCheck,
   X 
@@ -37,38 +31,12 @@ export default function Sidebar({
   isOpen, 
   setIsOpen,
   isCollapsed = false,
-  onToggleCollapse,
-  onOpenDeepSearch,
-  onOpenCircuitSim,
-  onOpenExamQuiz,
-  onOpenFormulaHUD
+  onToggleCollapse
 }) {
   /* -----------------------------------------------------------------------
-     1. THE 7 MAIN SECTIONS (+ EXCLUSIVE SUPER ADMIN SECTION)
+     1. THE CORE ACADEMIC SECTIONS (+ EXCLUSIVE SUPER ADMIN SECTION)
      ----------------------------------------------------------------------- */
   const isSuperAdmin = (currentUser?.username?.toLowerCase() === 'bhavya mishra') || (currentUser?.role === 'superadmin') || (currentUser?.isSuperAdmin === true);
-
-  const [readinessScore, setReadinessScore] = useState(0);
-
-  useEffect(() => {
-    const updateScore = () => {
-      try {
-        const saved = JSON.parse(localStorage.getItem('college_notes_mastery') || '{}');
-        const mastered = Object.values(saved).filter(v => v === 'mastered').length;
-        const percent = Math.min(100, Math.round((mastered / 32) * 100));
-        setReadinessScore(percent);
-      } catch (e) {
-        setReadinessScore(0);
-      }
-    };
-    updateScore();
-    window.addEventListener('storage', updateScore);
-    window.addEventListener('mastery-updated', updateScore);
-    return () => {
-      window.removeEventListener('storage', updateScore);
-      window.removeEventListener('mastery-updated', updateScore);
-    };
-  }, []);
 
   const navSections = [
     { id: 'subjects-notes', label: 'Semester Notes & Subjects', icon: BookOpen, badge: 'All Years' },
@@ -77,7 +45,6 @@ export default function Sidebar({
     { id: 'short-notes', label: 'Exam Revision & Short Notes', icon: Sparkles, badge: 'Exam Ready' },
     { id: 'question-papers', label: 'Expected Question Papers', icon: ClipboardCheck, badge: '2026 Pattern' },
     { id: 'downloads-lab', label: 'Lab Manuals & Practical Codes', icon: Code2, badge: 'Codes & Labs' },
-    { id: 'doubt-forum', label: 'Student Doubt Forum', icon: MessageSquare },
     ...(isSuperAdmin ? [
       { id: 'admin-panel', label: 'Super Admin Panel', icon: Crown, badge: 'ADMIN' }
     ] : [])
@@ -181,103 +148,7 @@ export default function Sidebar({
             );
           })}
 
-          {/* Interactive Tools & Simulators Quick Access (Crucial for Mobile Navigation) */}
-          <div style={{ marginTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px' }}>
-            <div style={{ fontSize: '0.70rem', textTransform: 'uppercase', color: 'var(--neon-cyan)', letterSpacing: '1px', padding: '0 8px 8px', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800 }}>
-              <span>⚡</span>
-              <span>{!isCollapsed ? 'Interactive Simulators & Tools' : 'Tools'}</span>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              {onOpenDeepSearch && (
-                <button
-                  className="nav-item"
-                  onClick={() => {
-                    onOpenDeepSearch();
-                    setIsOpen(false);
-                  }}
-                  style={{ color: 'var(--neon-cyan)', background: 'rgba(0, 240, 255, 0.04)' }}
-                  title="AI DeepSearch & 16:9 Slides (Alt+Space)"
-                >
-                  <Sparkles size={18} className="nav-icon" style={{ color: 'var(--neon-cyan)' }} />
-                  {!isCollapsed && <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>AI DeepSearch</span>}
-                  {!isCollapsed && <span className="badge-neon" style={{ padding: '2px 6px', fontSize: '0.62rem' }}>AI</span>}
-                </button>
-              )}
-
-              {onOpenCircuitSim && (
-                <button
-                  className="nav-item"
-                  onClick={() => {
-                    onOpenCircuitSim();
-                    setIsOpen(false);
-                  }}
-                  style={{ color: '#86efac', background: 'rgba(16, 185, 129, 0.04)' }}
-                  title="Circuit Sandbox (Alt+C)"
-                >
-                  <Cpu size={18} className="nav-icon" style={{ color: '#10b981' }} />
-                  {!isCollapsed && <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>Circuit Sandbox</span>}
-                  {!isCollapsed && <span style={{ background: 'rgba(16,185,129,0.2)', color: '#86efac', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '4px', padding: '2px 6px', fontSize: '0.62rem', fontWeight: 700 }}>SIM</span>}
-                </button>
-              )}
-
-              {onOpenExamQuiz && (
-                <button
-                  className="nav-item"
-                  onClick={() => {
-                    onOpenExamQuiz();
-                    setIsOpen(false);
-                  }}
-                  style={{ color: '#fef08a', background: 'rgba(234, 179, 8, 0.04)' }}
-                  title="University Mock Exam (Alt+Q)"
-                >
-                  <Award size={18} className="nav-icon" style={{ color: '#eab308' }} />
-                  {!isCollapsed && <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>Mock Exam Quiz</span>}
-                  {!isCollapsed && <span style={{ background: 'rgba(234,179,8,0.2)', color: '#fef08a', border: '1px solid rgba(234,179,8,0.3)', borderRadius: '4px', padding: '2px 6px', fontSize: '0.62rem', fontWeight: 700 }}>TEST</span>}
-                </button>
-              )}
-
-              {onOpenFormulaHUD && (
-                <button
-                  className="nav-item"
-                  onClick={() => {
-                    onOpenFormulaHUD();
-                    setIsOpen(false);
-                  }}
-                  style={{ color: '#d8b4fe', background: 'rgba(168, 85, 247, 0.04)' }}
-                  title="Formula & Constants HUD (Alt+F)"
-                >
-                  <Zap size={18} className="nav-icon" style={{ color: '#c084fc' }} />
-                  {!isCollapsed && <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600 }}>Formula Drawer</span>}
-                  {!isCollapsed && <span style={{ background: 'rgba(168,85,247,0.2)', color: '#d8b4fe', border: '1px solid rgba(168,85,247,0.3)', borderRadius: '4px', padding: '2px 6px', fontSize: '0.62rem', fontWeight: 700 }}>HUD</span>}
-                </button>
-              )}
-            </div>
-          </div>
         </nav>
-
-        {/* Exam Readiness Tracker Widget */}
-        {!isCollapsed && (
-          <div style={{ padding: '10px 14px', margin: '0 12px 10px', background: 'rgba(0, 240, 255, 0.04)', borderRadius: '10px', border: '1px solid rgba(0, 240, 255, 0.15)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', marginBottom: '6px' }}>
-              <span style={{ color: 'var(--text-muted)', fontWeight: 800, letterSpacing: '0.5px' }}>🎯 EXAM READINESS</span>
-              <span style={{ color: 'var(--neon-cyan)', fontWeight: 900 }}>{readinessScore}%</span>
-            </div>
-            <div style={{ height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div 
-                style={{ 
-                  width: `${readinessScore}%`, 
-                  height: '100%', 
-                  background: 'linear-gradient(90deg, #00f0ff, #10b981)', 
-                  transition: 'width 0.4s ease' 
-                }} 
-              />
-            </div>
-            <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)', marginTop: '4px' }}>
-              {readinessScore > 0 ? `${Math.round((readinessScore / 100) * 32)} / 32 Units Mastered` : 'Mark units as Mastered to track score'}
-            </div>
-          </div>
-        )}
 
         {/* -----------------------------------------------------------------
            4. SIDEBAR FOOTER (Live System / Portal Status Indicator)
