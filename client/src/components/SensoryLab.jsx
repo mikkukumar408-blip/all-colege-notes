@@ -10,6 +10,7 @@ import { logUserActivity } from '../utils/activityTracker';
    ========================================================================= */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   BookOpen,
   Download, 
@@ -17,7 +18,7 @@ import {
   CheckCircle2, 
   Bookmark, 
   Share2, 
-  Lightbulb,
+  Lightbulb, 
   Code,
   PenTool,
   Printer,
@@ -33,7 +34,8 @@ import {
   Eye,
   EyeOff,
   Award,
-  ExternalLink
+  ExternalLink,
+  X 
 } from 'lucide-react';
 import { initialSubjects } from '../data/mockData';
 import { beeeUnitsData, beeeSubjectDetails } from '../data/beeeNotesData';
@@ -1040,8 +1042,7 @@ export default function SensoryLab({
   
   const [fontSize, setFontSize] = useState('normal'); // 'normal' | 'large'
   const [bookmarked, setBookmarked] = useState(false);
-  const [activeRecallMode, setActiveRecallMode] = useState(false);
-  const [cramMode, setCramMode] = useState(false);
+  const [showFormulaSheet, setShowFormulaSheet] = useState(false);
 
   const [masteryData, setMasteryData] = useState(() => {
     try {
@@ -1481,383 +1482,115 @@ export default function SensoryLab({
 
   const handlePrint = () => {
     setIsPrinting(true);
-    try {
-      const notesEl = notesPanelRef.current;
-      if (!notesEl) { setIsPrinting(false); return; }
-
-      // Remove stale print frame
-      const oldFrame = document.getElementById('academic-print-frame');
-      if (oldFrame) oldFrame.remove();
-
-      // Clone only the notes panel
-      const contentClone = notesEl.cloneNode(true);
-
-      // Strip UI chrome, watermarks, and the PDF download banner
-      contentClone.querySelectorAll(
-        '.forensic-watermark-overlay, .sticky-margin-note, button, a[href*=".pdf"], ' +
-        '[title*="PDF"], [title*="Subject"], .handwritten-pdf-banner, .notes-reader-banner, ' +
-        '.pdf-banner, .paper-mode-banner'
-      ).forEach(el => el.remove());
-
-      // Extra safeguard: remove any element containing "Real Classroom Handwritten Notebook Attached"
-      contentClone.querySelectorAll('div').forEach(el => {
-        if (el.textContent && el.textContent.includes('Real Classroom Handwritten Notebook Attached') && el.querySelector('button, a')) {
-          el.remove();
-        }
-      });
-
-      // Fix SVG height="auto"
-      contentClone.querySelectorAll('svg').forEach(svg => {
-        const h = svg.getAttribute('height');
-        if (h === 'auto' || h === '') {
-          const vb = svg.getAttribute('viewBox');
-          if (vb) {
-            const parts = vb.trim().split(/[\s,]+/);
-            if (parts.length === 4) {
-              const ratio = parseFloat(parts[3]) / parseFloat(parts[2]);
-              svg.setAttribute('height', String(Math.round(ratio * 680)));
-            } else {
-              svg.removeAttribute('height');
-            }
-          } else {
-            svg.removeAttribute('height');
-          }
-        }
-      });
-
-      // Collect ALL inline CSS from living stylesheets
-      let inlineCSS = '';
+    setTimeout(() => {
       try {
-        Array.from(document.styleSheets).forEach(sheet => {
-          try {
-            Array.from(sheet.cssRules || []).forEach(r => { inlineCSS += r.cssText + '\n'; });
-          } catch (_) { /* skip cross-origin */ }
-        });
-      } catch (_) {}
-
-      const isPaperMode = themeMode === 'paper';
-
-      const printHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<title>${activeSubject.code || ''} \u2013 Unit ${selectedUnitNum} Notes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous"/>
-<style>
-${inlineCSS}
-
-@page { 
-  size: A4 portrait; 
-  margin: 14mm 12mm 14mm 12mm; 
-}
-*, *::before, *::after { 
-  box-sizing: border-box !important; 
-  -webkit-print-color-adjust: exact !important; 
-  print-color-adjust: exact !important; 
-  text-shadow: none !important; 
-}
-html, body { 
-  background: #ffffff !important; 
-  margin: 0 !important; 
-  padding: 0 !important; 
-}
-
-/* Base resets */
-.notes-reader-panel, .glass-panel { 
-  background: #ffffff !important; 
-  border: none !important; 
-  box-shadow: none !important; 
-  overflow: visible !important; 
-  padding: 0 !important; 
-}
-.notes-html-content { 
-  line-height: 1.65 !important; 
-  white-space: normal !important; 
-}
-.yellow-highlighter { 
-  background: rgba(254, 240, 138, 0.5) !important; 
-  color: #854d0e !important; 
-  font-weight: 700 !important; 
-  padding: 0 4px !important;
-  border-radius: 3px !important;
-}
-
-/* =========================================================================
-   THEME-AWARE PRINT STYLING
-   ========================================================================= */
-${isPaperMode ? `
-body, body.theme-paper, .theme-paper, .notes-reader-panel.theme-paper {
-  font-family: 'Caveat', 'Patrick Hand', cursive !important;
-  color: #1e3a8a !important; /* Authentic ballpoint royal blue ink */
-  font-size: 13.5pt !important;
-  line-height: 1.55 !important;
-}
-
-#print-root {
-  border-left: 2.5px solid #f87171 !important; /* Classic notebook red margin line */
-  padding-left: 20px !important;
-  margin-left: 6px !important;
-}
-
-.theme-paper h1, .theme-paper h2, .theme-paper h3, .theme-paper h4, .theme-paper h5,
-.theme-paper .handwritten-heading, .theme-paper .note-h3, .theme-paper .note-h4, .theme-paper .note-h5 {
-  font-family: 'Patrick Hand', 'Caveat', cursive !important;
-  color: #0f2b5c !important; /* Rich deep blue heading ink */
-  font-weight: 700 !important;
-  page-break-after: avoid !important;
-  break-after: avoid !important;
-}
-
-.theme-paper .notes-html-content,
-.theme-paper .notes-html-content p,
-.theme-paper .notes-html-content li,
-.theme-paper .notes-html-content span:not(.katex *):not(.pill-badge):not(.code-editor-box *):not(.inline-code-badge):not(pre *):not(code *),
-.theme-paper .handwritten-list-item span {
-  font-family: 'Caveat', 'Patrick Hand', cursive !important;
-  color: #1e3a8a !important;
-  font-size: 13.5pt !important;
-}
-
-.code-editor-box,
-.code-editor-box *,
-.inline-code-badge {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace !important;
-}
-
-.theme-paper .handwritten-bullet,
-.theme-paper .handwritten-num {
-  font-family: 'Patrick Hand', cursive !important;
-  color: #dc2626 !important; /* Red pen margin bullets */
-  font-weight: bold !important;
-}
-
-.theme-paper .circuit-diagram-card {
-  background: #ffffff !important;
-  border: 1.5px solid #cbd5e1 !important;
-  border-left: 4px solid #3b82f6 !important;
-}
-.theme-paper .circuit-diagram-card .schematic-wire { stroke: #1e3a8a !important; }
-.theme-paper .circuit-diagram-card .schematic-resistor { stroke: #b45309 !important; }
-.theme-paper .circuit-diagram-card .schematic-title { fill: #1e40af !important; }
-` : `
-body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  color: #0f172a !important;
-  font-size: 11pt !important;
-  line-height: 1.65 !important;
-}
-
-.theme-clean h1, .theme-clean h2, .theme-clean h3, .theme-clean h4, .theme-clean h5,
-.theme-clean .handwritten-heading, .theme-clean .note-h3, .theme-clean .note-h4, .theme-clean .note-h5 {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  color: #0f172a !important;
-  font-weight: 800 !important;
-  page-break-after: avoid !important;
-  break-after: avoid !important;
-}
-
-.theme-clean .notes-html-content,
-.theme-clean .notes-html-content p,
-.theme-clean .notes-html-content li {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  color: #0f172a !important;
-}
-`}
-
-/* Circuit diagrams across all print modes */
-.circuit-diagram-card {
-  background: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  box-shadow: none !important;
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-  margin: 16px 0 !important;
-  padding: 12px !important;
-}
-.circuit-diagram-card svg {
-  max-width: 100% !important;
-  width: 100% !important;
-  height: auto !important;
-  display: block !important;
-}
-.circuit-diagram-caption {
-  color: #1e3a8a !important;
-  font-weight: 800 !important;
-  font-size: 9pt !important;
-  margin-top: 6px !important;
-}
-.circuit-diagram-card .schematic-bg { fill: #ffffff !important; stroke: #cbd5e1 !important; }
-.circuit-diagram-card text[fill="#e2e8f0"], .circuit-diagram-card text[fill="#94a3b8"], .circuit-diagram-card text[fill="#38bdf8"] { fill: #0f172a !important; }
-.circuit-diagram-card text[fill="#fbbf24"], .circuit-diagram-card text[fill="#fef08a"] { fill: #92400e !important; }
-.circuit-diagram-card text[fill="#10b981"], .circuit-diagram-card text[fill="#34d399"] { fill: #065f46 !important; }
-.circuit-diagram-card rect[fill*="rgba(15,23,42"], .circuit-diagram-card rect[fill*="rgba(10,15,29"] { fill: #f8fafc !important; }
-
-/* Callout boxes */
-.worked-example-box, .academic-derivation-box, .exam-trap-box, .topper-mnemonic-box,
-.green-law-box, .blue-analogy-box, .cyan-keytakeaway-box, .orange-warning-box,
-.purple-exam-goal-box, .custom-table-wrap, .katex-display-box, .analytical-derivation-box,
-.ascii-diagram-box {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-  box-shadow: none !important;
-  margin: 14px 0 !important;
-}
-.exam-trap-box { background: #fff1f2 !important; border-left: 4px solid #e11d48 !important; color: #881337 !important; }
-.topper-mnemonic-box { background: #faf5ff !important; border-left: 4px solid #9333ea !important; color: #581c87 !important; }
-.green-law-box { background: #f0fdf4 !important; border-left: 4px solid #16a34a !important; color: #14532d !important; }
-.blue-analogy-box { background: #eff6ff !important; border-left: 4px solid #2563eb !important; color: #1e3a8a !important; }
-.cyan-keytakeaway-box { background: #ecfeff !important; border-left: 4px solid #0891b2 !important; color: #164e63 !important; }
-.orange-warning-box { background: #fffbeb !important; border-left: 4px solid #d97706 !important; color: #78350f !important; }
-.purple-exam-goal-box { background: #f5f3ff !important; border-left: 4px solid #7c3aed !important; color: #4c1d95 !important; }
-
-.custom-table-wrap table { border-collapse: collapse !important; width: 100% !important; }
-.custom-table-wrap th { background: #f1f5f9 !important; color: #0f172a !important; border: 1px solid #cbd5e1 !important; padding: 6px 10px !important; }
-.custom-table-wrap td { border: 1px solid #e2e8f0 !important; color: #1e293b !important; padding: 6px 10px !important; }
-
-/* Print academic banner & footer */
-.print-academic-banner {
-  border-bottom: 2.5px solid #0f172a;
-  padding-bottom: 12px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-.print-academic-banner h1 { font-size: 18pt !important; font-weight: 900 !important; color: #0f172a !important; margin: 0 0 4px !important; }
-.print-academic-banner h2 { font-size: 13pt !important; font-weight: 800 !important; color: #1e3a8a !important; margin: 0 0 6px !important; }
-.print-academic-banner p  { font-size: 9.5pt !important; color: #475569 !important; margin: 0 !important; }
-.print-doc-footer {
-  margin-top: 30px;
-  border-top: 1px solid #cbd5e1;
-  padding-top: 8px;
-  font-size: 8pt;
-  color: #64748b;
-  display: flex;
-  justify-content: space-between;
-}
-</style>
-</head>
-<body class="theme-${themeMode}">
-<div class="print-academic-banner">
-  <div>
-    <h1>${activeSubject.name || ''} (${activeSubject.code || ''})</h1>
-    <h2>Unit ${selectedUnitNum}: ${beeeUnit.title || ''}</h2>
-    <p>Semester ${activeSubject.semester || '1'} &bull; ${isPaperMode ? 'Handwritten Classroom Notebook Study Material' : 'Official University Exam Study Notes'} &bull; Verified Syllabus</p>
-  </div>
-  <div style="text-align:right;font-size:9pt;color:#64748b">
-    <strong>Theme:</strong> ${isPaperMode ? 'Handwritten Notebook' : 'Clean Digital'}<br/>
-    <strong>Print Date:</strong> ${new Date().toLocaleDateString('en-GB')}<br/>
-    <strong>Status:</strong> Exam Verified &#10003;
-  </div>
-</div>
-<div id="print-root" class="notes-reader-panel theme-${themeMode}">${contentClone.innerHTML}</div>
-<div class="print-doc-footer">
-  <span>Academic Study Portal &bull; Authorized Single-Student Study License</span>
-  <span>Student: ${currentUser?.username || 'Verified Student'}</span>
-</div>
-</body>
-</html>`;
-
-      // Create iframe, print on load
-      const iframe = document.createElement('iframe');
-      iframe.id = 'academic-print-frame';
-      iframe.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:0;pointer-events:none;';
-      document.body.appendChild(iframe);
-
-      iframe.onload = () => {
-        try {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-        } finally {
-          setIsPrinting(false);
-          setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 3000);
-        }
-      };
-
-      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-      iframeDoc.open();
-      iframeDoc.write(printHTML);
-      iframeDoc.close();
-
-    } catch (err) {
-      console.warn('Print error:', err);
-      setIsPrinting(false);
-    }
+        window.print();
+      } finally {
+        setIsPrinting(false);
+      }
+    }, 150);
   };
 
-  const handlePrintFormulaSheet = () => {
-    let formulas = [];
+  const getSubjectFormulas = () => {
     if (isBEEE) {
-      formulas = [
-        { name: "Ohm's Law & Power", eq: "V = I \\cdot R, \\quad P = V \\cdot I = I^2 R = \\frac{V^2}{R}" },
-        { name: "Kirchhoff's Current Law (KCL)", eq: "\\sum I_{\\text{enter}} = \\sum I_{\\text{leave}} \\implies \\sum_{k=1}^n I_k = 0" },
-        { name: "Kirchhoff's Voltage Law (KVL)", eq: "\\sum V_{\\text{drops}} = \\sum V_{\\text{sources}} \\implies \\sum_{k=1}^n V_k = 0" },
-        { name: "Thevenin's Equivalent Circuit", eq: "V_{th} = V_{oc}, \\quad R_{th} = \\frac{V_{oc}}{I_{sc}}, \\quad I_L = \\frac{V_{th}}{R_{th} + R_L}" },
-        { name: "Norton's Equivalent Circuit", eq: "I_N = I_{sc} = \\frac{V_{th}}{R_{th}}, \\quad R_N = R_{th}" },
-        { name: "Maximum Power Transfer Theorem (DC)", eq: "P_{\\max} = \\frac{V_{th}^2}{4 R_{th}} \\quad (\\text{at } R_L = R_{th}, \\; \\eta = 50\\%)" },
-        { name: "Delta to Star Conversion (\\Delta \\rightarrow Y)", eq: "R_A = \\frac{R_{AB} \\cdot R_{CA}}{R_{AB} + R_{BC} + R_{CA}}" },
-        { name: "Star to Delta Conversion (Y \\rightarrow \\Delta)", eq: "R_{AB} = R_A + R_B + \\frac{R_A R_B}{R_C}" },
-        { name: "AC Sinusoid RMS & Average Values", eq: "V_{rms} = \\frac{V_m}{\\sqrt{2}} \\approx 0.707 V_m, \\quad V_{avg} = \\frac{2 V_m}{\\pi} \\approx 0.637 V_m" },
-        { name: "AC Series RLC Resonance & Q-Factor", eq: "f_r = \\frac{1}{2\\pi \\sqrt{LC}}, \\quad Q = \\frac{1}{R}\\sqrt{\\frac{L}{C}}, \\quad \\text{BW} = \\frac{f_r}{Q}" }
-      ];
-    } else if (isPhysics) {
-      formulas = [
-        { name: "Stokes' Phase Reversal Condition", eq: "\\Delta = 2\\mu t \\cos r + \\frac{\\lambda}{2} = n\\lambda \\quad (\\text{Destructive Interference})" },
-        { name: "Newton's Rings (Dark Ring Diameter)", eq: "D_n^2 = 4n\\lambda R \\implies D_n = 2\\sqrt{n\\lambda R}" },
-        { name: "Newton's Rings (Bright Ring Diameter)", eq: "D_n^2 = 2(2n - 1)\\lambda R \\implies D_n = \\sqrt{2(2n-1)\\lambda R}" },
-        { name: "Fraunhofer Single-Slit Minima", eq: "a \\sin \\theta = m\\lambda \\quad (m = \\pm 1, \\pm 2, \\dots)" },
-        { name: "Maxwell I (Gauss's Law for Electrostatics)", eq: "\\nabla \\cdot \\mathbf{E} = \\frac{\\rho}{\\varepsilon_0}" },
-        { name: "Maxwell II (Gauss's Law for Magnetism)", eq: "\\nabla \\cdot \\mathbf{B} = 0" },
-        { name: "Maxwell III (Faraday's Law of Induction)", eq: "\\nabla \\times \\mathbf{E} = -\\frac{\\partial \\mathbf{B}}{\\partial t}" },
-        { name: "Maxwell IV (Ampere-Maxwell Law)", eq: "\\nabla \\times \\mathbf{B} = \\mu_0 \\mathbf{J} + \\mu_0 \\varepsilon_0 \\frac{\\partial \\mathbf{E}}{\\partial t}" },
-        { name: "Conductor Skin Depth (Penetration Depth)", eq: "\\delta = \\sqrt{\\frac{2}{\\omega \\mu \\sigma}} = \\frac{1}{\\sqrt{\\pi f \\mu \\sigma}}" },
-        { name: "1D Infinite Potential Well Quantized Energy", eq: "E_n = \\frac{n^2 h^2}{8mL^2} = \\frac{n^2 \\pi^2 \\hbar^2}{2mL^2}, \\quad \\psi_n(x) = \\sqrt{\\frac{2}{L}}\\sin\\left(\\frac{n\\pi x}{L}\\right)" }
-      ];
-    } else if (isMath1) {
-      formulas = [
-        { name: "Euler's Homogeneous Function Theorem", eq: "x \\frac{\\partial u}{\\partial x} + y \\frac{\\partial u}{\\partial y} = n \\cdot u" },
-        { name: "Euler's 2nd Order Derivative Form", eq: "x^2 \\frac{\\partial^2 u}{\\partial x^2} + 2xy \\frac{\\partial^2 u}{\\partial x\\partial y} + y^2 \\frac{\\partial^2 u}{\\partial y^2} = n(n-1)u" },
-        { name: "Taylor Series (1-Variable Power Expansion)", eq: "f(x) = \\sum_{n=0}^\\infty \\frac{f^{(n)}(a)}{n!} (x - a)^n" },
-        { name: "Maclaurin Series (Expansion about a = 0)", eq: "f(x) = \\sum_{n=0}^\\infty \\frac{f^{(n)}(0)}{n!} x^n" },
-        { name: "Jacobian Coordinate Transformation", eq: "J = \\frac{\\partial(x, y)}{\\partial(u, v)} = \\begin{vmatrix} \\frac{\\partial x}{\\partial u} & \\frac{\\partial x}{\\partial v} \\\\[4pt] \\frac{\\partial y}{\\partial u} & \\frac{\\partial y}{\\partial v} \\end{vmatrix}" },
-        { name: "Rolle's & Lagrange's Mean Value Theorem", eq: "f'(c) = \\frac{f(b) - f(a)}{b - a} \\quad \\text{for } c \\in (a, b)" },
-        { name: "Cayley-Hamilton Theorem Statement", eq: "p(A) = A^n + c_{n-1}A^{n-1} + \\dots + c_0 I = 0" },
-        { name: "Eigenvalues Sum & Determinant Relations", eq: "\\sum_{i=1}^n \\lambda_i = \\text{Trace}(A), \\quad \\prod_{i=1}^n \\lambda_i = \\det(A)" }
-      ];
-    } else if (isDSA) {
-      formulas = [
-        { name: "1D Array Element Address Calculation", eq: "\\text{Loc}(A[i]) = \\text{Base} + (i - \\text{LB}) \\times c" },
-        { name: "2D Array Row-Major Memory Mapping", eq: "\\text{Loc}(A[i][j]) = \\text{Base} + [ (i - \\text{LB}_r) \\cdot N + (j - \\text{LB}_c) ] \\times c" },
-        { name: "2D Array Column-Major Memory Mapping", eq: "\\text{Loc}(A[i][j]) = \\text{Base} + [ (j - \\text{LB}_c) \\cdot M + (i - \\text{LB}_r) ] \\times c" },
-        { name: "Circular Queue Full & Empty Conditions", eq: "\\text{Full}: (\\text{rear} + 1) \\% N = \\text{front}, \\quad \\text{Empty}: \\text{front} = -1" },
-        { name: "Binary Tree Structural Invariant", eq: "N_{\\max} = 2^h - 1, \\quad \\text{Leaves } L = I + 1" },
-        { name: "QuickSort Master Recurrence", eq: "T(n) = 2T(n/2) + O(n) \\implies O(n \\log n) \\text{ best/avg}, \\; O(n^2) \\text{ worst}" }
-      ];
-    } else {
-      formulas = [
-        { name: "Time Complexity Hierarchy", eq: "O(1) < O(\\log n) < O(n) < O(n \\log n) < O(n^2) < O(2^n)" },
-        { name: "Operator Evaluation Precedence", eq: "() \\rightarrow ** \\rightarrow (*, /, \\%) \\rightarrow (+, -) \\rightarrow \\text{Comparison} \\rightarrow \\text{Logical}" }
+      return [
+        { name: "Ohm's Law & Power", eq: "V = I \\cdot R, \\quad P = V \\cdot I = I^2 R = \\frac{V^2}{R}", tip: "Essential for DC and AC network calculations" },
+        { name: "Kirchhoff's Current Law (KCL)", eq: "\\sum I_{\\text{enter}} = \\sum I_{\\text{leave}} \\implies \\sum_{k=1}^n I_k = 0", tip: "Based on Conservation of Electric Charge" },
+        { name: "Kirchhoff's Voltage Law (KVL)", eq: "\\sum V_{\\text{drops}} = \\sum V_{\\text{sources}} \\implies \\sum_{k=1}^n V_k = 0", tip: "Based on Conservation of Energy" },
+        { name: "Thevenin's Equivalent Circuit", eq: "V_{th} = V_{oc}, \\quad R_{th} = \\frac{V_{oc}}{I_{sc}}, \\quad I_L = \\frac{V_{th}}{R_{th} + R_L}", tip: "Deactivate independent sources (V: short, I: open)" },
+        { name: "Norton's Equivalent Circuit", eq: "I_N = I_{sc} = \\frac{V_{th}}{R_{th}}, \\quad R_N = R_{th}", tip: "Dual of Thevenin's theorem" },
+        { name: "Maximum Power Transfer Theorem (DC)", eq: "P_{\\max} = \\frac{V_{th}^2}{4 R_{th}} \\quad (\\text{when } R_L = R_{th}, \\; \\eta = 50\\%)", tip: "Efficiency is strictly 50% at maximum power transfer" },
+        { name: "Delta to Star Conversion (Δ → Y)", eq: "R_A = \\frac{R_{AB} \\cdot R_{CA}}{R_{AB} + R_{BC} + R_{CA}}", tip: "Product of adjacent arms / sum of all three arms" },
+        { name: "Star to Delta Conversion (Y → Δ)", eq: "R_{AB} = R_A + R_B + \\frac{R_A R_B}{R_C}", tip: "Sum of two arms + product / opposite arm" },
+        { name: "AC Sinusoid RMS & Average Values", eq: "V_{rms} = \\frac{V_m}{\\sqrt{2}} \\approx 0.707 V_m, \\quad V_{avg} = \\frac{2 V_m}{\\pi} \\approx 0.637 V_m", tip: "Form factor = 1.11, Peak factor = 1.414" },
+        { name: "AC Series RLC Resonance & Q-Factor", eq: "f_r = \\frac{1}{2\\pi \\sqrt{LC}}, \\quad Q = \\frac{1}{R}\\sqrt{\\frac{L}{C}}, \\quad \\text{BW} = \\frac{f_r}{Q}", tip: "At resonance: Z = R (minimum), I = V/R (maximum)" }
       ];
     }
+    if (isPhysics) {
+      return [
+        { name: "Stokes' Phase Reversal Condition", eq: "\\Delta = 2\\mu t \\cos r + \\frac{\\lambda}{2} = n\\lambda \\quad (\\text{Destructive Interference})", tip: "Reflection at denser medium adds λ/2 path difference" },
+        { name: "Newton's Rings (Dark Ring Diameter)", eq: "D_n^2 = 4n\\lambda R \\implies D_n = 2\\sqrt{n\\lambda R}", tip: "Dark ring diameter proportional to square root of integers" },
+        { name: "Newton's Rings (Bright Ring Diameter)", eq: "D_n^2 = 2(2n - 1)\\lambda R \\implies D_n = \\sqrt{2(2n-1)\\lambda R}", tip: "Bright ring diameter proportional to square root of odd numbers" },
+        { name: "Fraunhofer Single-Slit Minima", eq: "a \\sin \\theta = m\\lambda \\quad (m = \\pm 1, \\pm 2, \\dots)", tip: "Central maximum width is 2λ/a" },
+        { name: "Maxwell I (Gauss's Law for Electrostatics)", eq: "\\nabla \\cdot \\mathbf{E} = \\frac{\\rho}{\\varepsilon_0}", tip: "Integral: ∮ E·dA = Q_enc / ε₀" },
+        { name: "Maxwell II (Gauss's Law for Magnetism)", eq: "\\nabla \\cdot \\mathbf{B} = 0", tip: "Absence of isolated magnetic monopoles" },
+        { name: "Maxwell III (Faraday's Law of Induction)", eq: "\\nabla \\times \\mathbf{E} = -\\frac{\\partial \\mathbf{B}}{\\partial t}", tip: "Time-varying B-field induces circulating E-field" },
+        { name: "Maxwell IV (Ampere-Maxwell Law)", eq: "\\nabla \\times \\mathbf{B} = \\mu_0 \\mathbf{J} + \\mu_0 \\varepsilon_0 \\frac{\\partial \\mathbf{E}}{\\partial t}", tip: "Displacement current J_d = ε₀ ∂E/∂t" },
+        { name: "Conductor Skin Depth (Penetration Depth)", eq: "\\delta = \\sqrt{\\frac{2}{\\omega \\mu \\sigma}} = \\frac{1}{\\sqrt{\\pi f \\mu \\sigma}}", tip: "Depth where EM wave amplitude drops to 1/e (37%)" },
+        { name: "1D Infinite Potential Well Quantized Energy", eq: "E_n = \\frac{n^2 h^2}{8mL^2} = \\frac{n^2 \\pi^2 \\hbar^2}{2mL^2}, \\quad \\psi_n(x) = \\sqrt{\\frac{2}{L}}\\sin\\left(\\frac{n\\pi x}{L}\\right)", tip: "Ground state energy E₁ > 0 (zero-point energy)" }
+      ];
+    }
+    if (isMath1) {
+      return [
+        { name: "Euler's Homogeneous Function Theorem", eq: "x \\frac{\\partial u}{\\partial x} + y \\frac{\\partial u}{\\partial y} = n \\cdot u", tip: "For function of degree n homogeneous in x and y" },
+        { name: "Euler's 2nd Order Derivative Form", eq: "x^2 \\frac{\\partial^2 u}{\\partial x^2} + 2xy \\frac{\\partial^2 u}{\\partial x\\partial y} + y^2 \\frac{\\partial^2 u}{\\partial y^2} = n(n-1)u", tip: "Frequent university 6-mark problem" },
+        { name: "Taylor Series (1-Variable Power Expansion)", eq: "f(x) = \\sum_{n=0}^\\infty \\frac{f^{(n)}(a)}{n!} (x - a)^n", tip: "Power series expansion about point x = a" },
+        { name: "Maclaurin Series (Expansion about a = 0)", eq: "f(x) = \\sum_{n=0}^\\infty \\frac{f^{(n)}(0)}{n!} x^n", tip: "Special case of Taylor series when a = 0" },
+        { name: "Jacobian Coordinate Transformation", eq: "J = \\frac{\\partial(x, y)}{\\partial(u, v)} = \\begin{vmatrix} \\frac{\\partial x}{\\partial u} & \\frac{\\partial x}{\\partial v} \\\\[4pt] \\frac{\\partial y}{\\partial u} & \\frac{\\partial y}{\\partial v} \\end{vmatrix}, \\quad J \\cdot J' = 1", tip: "Coordinate substitution multiplier in multiple integrals" },
+        { name: "Lagrange's Mean Value Theorem (LMVT)", eq: "f'(c) = \\frac{f(b) - f(a)}{b - a} \\quad \\text{for } c \\in (a, b)", tip: "f must be continuous in [a,b] and differentiable in (a,b)" },
+        { name: "Cayley-Hamilton Theorem Statement", eq: "p(A) = A^n + c_{n-1}A^{n-1} + \\dots + c_0 I = 0", tip: "Every square matrix satisfies its own characteristic polynomial" },
+        { name: "Eigenvalues Sum & Determinant Relations", eq: "\\sum_{i=1}^n \\lambda_i = \\text{Trace}(A), \\quad \\prod_{i=1}^n \\lambda_i = \\det(A)", tip: "Quickest check for eigenvalue calculations" }
+      ];
+    }
+    if (isDSA) {
+      return [
+        { name: "1D Array Element Address Calculation", eq: "\\text{Loc}(A[i]) = \\text{Base} + (i - \\text{LB}) \\times c", tip: "c = element size in bytes" },
+        { name: "2D Array Row-Major Memory Mapping", eq: "\\text{Loc}(A[i][j]) = \\text{Base} + [ (i - \\text{LB}_r) \\cdot N + (j - \\text{LB}_c) ] \\times c", tip: "N = total number of columns" },
+        { name: "2D Array Column-Major Memory Mapping", eq: "\\text{Loc}(A[i][j]) = \\text{Base} + [ (j - \\text{LB}_c) \\cdot M + (i - \\text{LB}_r) ] \\times c", tip: "M = total number of rows" },
+        { name: "Circular Queue Full & Empty Conditions", eq: "\\text{Full}: (\\text{rear} + 1) \\% N = \\text{front}, \\quad \\text{Empty}: \\text{front} = -1", tip: "Eliminates false queue-overflow memory waste" },
+        { name: "Binary Tree Structural Invariant", eq: "N_{\\max} = 2^h - 1, \\quad \\text{Leaves } L = I + 1", tip: "Height h tree contains at most 2^h - 1 nodes" },
+        { name: "QuickSort Master Recurrence", eq: "T(n) = 2T(n/2) + O(n) \\implies O(n \\log n) \\text{ best/avg}, \\; O(n^2) \\text{ worst}", tip: "Worst case occurs with already sorted array" }
+      ];
+    }
+    if (isC) {
+      return [
+        { name: "1D Array Address Formula", eq: "\\text{Address}(A[i]) = \\text{Base} + i \\times \\text{sizeof}(\\text{type})", tip: "Zero-based indexing in C" },
+        { name: "2D Array Row-Major Offset", eq: "\\text{Address}(A[i][j]) = \\text{Base} + (i \\cdot \\text{Cols} + j) \\times \\text{sizeof}(\\text{type})", tip: "Stored consecutively row by row in RAM" },
+        { name: "Pointer Arithmetic Relation", eq: "*(p + i) \\equiv p[i], \\quad \\&p[i] \\equiv (p + i)", tip: "p + 1 advances by sizeof(*p) bytes" },
+        { name: "Dynamic Memory Allocation", eq: "p = (\\text{int*})\\text{calloc}(n, \\text{sizeof}(\\text{int})), \\quad \\text{free}(p); \\; p = \\text{NULL};", tip: "calloc zeroes memory; always free and null pointer" }
+      ];
+    }
+    if (isAIML) {
+      return [
+        { name: "Bayes' Theorem & Posterior Probability", eq: "P(A|B) = \\frac{P(B|A) \\cdot P(A)}{P(B)}", tip: "Posterior = (Likelihood * Prior) / Evidence" },
+        { name: "A* Search Evaluation Function", eq: "f(n) = g(n) + h(n), \\quad h(n) \\le h^*(n) \\text{ (Admissible)}", tip: "Guarantees optimal path when h is admissible" },
+        { name: "Minimax Decision Value", eq: "V(s) = \\max_{a \\in \\text{Actions}(s)} \\min_{s' \\in \\text{Result}(s,a)} V(s')", tip: "Optimal adversarial zero-sum game tree search" },
+        { name: "Classification Precision, Recall & F1", eq: "\\text{Prec} = \\frac{TP}{TP + FP}, \\quad \\text{Rec} = \\frac{TP}{TP + FN}, \\quad F_1 = 2\\frac{\\text{Prec} \\cdot \\text{Rec}}{\\text{Prec} + \\text{Rec}}", tip: "F1 is harmonic mean of precision and recall" }
+      ];
+    }
+    if (isPython) {
+      return [
+        { name: "Sequence Slicing Rule", eq: "\\text{seq}[\\text{start} : \\text{stop} : \\text{step}]", tip: "Negative step reverses sequence: seq[::-1]" },
+        { name: "Dictionary Lookup Complexity", eq: "\\text{Average: } \\mathcal{O}(1), \\quad \\text{Worst Case: } \\mathcal{O}(n)", tip: "Uses hash table bucket lookup" },
+        { name: "List Comprehension Generator", eq: "[f(x) \\text{ for } x \\text{ in } S \\text{ if } P(x)]", tip: "More efficient and readable than map/filter" }
+      ];
+    }
+    // WebTech & General
+    return [
+      { name: "CSS Box Model Total Width", eq: "\\text{Total Width} = \\text{content} + 2(\\text{padding}) + 2(\\text{border}) + 2(\\text{margin})", tip: "box-sizing: border-box includes padding & border" },
+      { name: "Viewport Relative Sizing", eq: "1\\text{vw} = 1\\% \\text{ of viewport width}, \\quad 1\\text{rem} = \\text{root font size}", tip: "Ensures fluid responsive typography" },
+      { name: "HTTP Status Code Taxonomy", eq: "2xx \\text{ Success}, \\; 3xx \\text{ Redirect}, \\; 4xx \\text{ Client Err}, \\; 5xx \\text{ Server Err}", tip: "200 OK, 301 Moved, 400 Bad Req, 404 Not Found, 500 Server Error" }
+    ];
+  };
 
-    const tableRows = formulas.map(f => {
-      let renderedEq = '';
+  const handlePrintFormulaSheetWindow = () => {
+    const formulas = getSubjectFormulas();
+    const rows = formulas.map(f => {
+      let eqHtml = '';
       try {
-        renderedEq = katex.renderToString(f.eq, { displayMode: true, throwOnError: false });
+        eqHtml = katex.renderToString(f.eq, { displayMode: true, throwOnError: false });
       } catch (e) {
-        renderedEq = `<div style="font-family:monospace;font-weight:bold;">${f.eq}</div>`;
+        eqHtml = `<div style="font-family:monospace;font-weight:bold;text-align:center;">${f.eq}</div>`;
       }
       return `
         <div style="border:1.5px solid #cbd5e1;border-radius:8px;padding:12px;background:#f8fafc;page-break-inside:avoid;break-inside:avoid;">
           <div style="font-size:10pt;font-weight:800;color:#1e3a8a;margin-bottom:6px;border-bottom:1px solid #e2e8f0;padding-bottom:4px;">
             📌 ${f.name}
           </div>
-          <div style="padding:4px 0;overflow-x:auto;">
-            ${renderedEq}
+          <div style="padding:6px 0;overflow-x:auto;">
+            ${eqHtml}
           </div>
+          ${f.tip ? `<div style="font-size:8pt;color:#64748b;margin-top:4px;">💡 ${f.tip}</div>` : ''}
         </div>
       `;
     }).join('');
@@ -1888,7 +1621,7 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
         </div>
       </div>
       <div class="cheat-grid">
-        ${tableRows}
+        ${rows}
       </div>
       <div style="margin-top:14px;padding-top:6px;border-top:1px solid #cbd5e1;font-size:7.5pt;color:#64748b;display:flex;justify-content:space-between;">
         <span>Generated for student quick revision &bull; Student: ${currentUser?.username || 'Verified Student'}</span>
@@ -1897,21 +1630,20 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
     </body>
     </html>`;
 
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:0;pointer-events:none;';
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      try {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-      } finally {
-        setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 3000);
-      }
-    };
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    iframeDoc.open();
-    iframeDoc.write(sheetHTML);
-    iframeDoc.close();
+    const printWin = window.open('', '_blank');
+    if (printWin) {
+      printWin.document.open();
+      printWin.document.write(sheetHTML);
+      printWin.document.close();
+      printWin.focus();
+      setTimeout(() => {
+        try {
+          printWin.print();
+        } catch (e) {}
+      }, 350);
+    } else {
+      window.print();
+    }
   };
 
   return (
@@ -2250,116 +1982,30 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
             </>
           )}
 
-          {/* ⚡ 1-Click Formula Cheat-Sheet Generator */}
+          {/* ⚡ 1-Click Formula & Theorem Cheat-Sheet Modal */}
           <button 
             type="button"
             className="btn-outline" 
-            onClick={handlePrintFormulaSheet}
+            onClick={() => setShowFormulaSheet(true)}
             style={{
               borderColor: '#f59e0b',
               color: '#f59e0b',
-              background: 'rgba(245, 158, 11, 0.12)',
+              background: 'rgba(245, 158, 11, 0.14)',
               fontWeight: 800,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-            title="Generate & Print 1-Page Formula Cheat-Sheet for this Unit"
-          >
-            <Zap size={15} /> Formula Cheat-Sheet
-          </button>
-
-          {/* ⚡ 15-Minute High-Yield Exam Cram Mode */}
-          <button 
-            type="button"
-            className="btn-outline" 
-            onClick={() => setCramMode(!cramMode)}
-            style={{
-              borderColor: cramMode ? '#ef4444' : 'rgba(239, 68, 68, 0.4)',
-              color: cramMode ? '#fee2e2' : '#f87171',
-              background: cramMode ? 'rgba(239, 68, 68, 0.25)' : 'rgba(239, 68, 68, 0.08)',
-              fontWeight: 800,
-              fontSize: '0.8rem',
-              padding: '6px 12px',
+              fontSize: '0.82rem',
+              padding: '7px 14px',
+              borderRadius: '8px',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
               cursor: 'pointer'
             }}
-            title="15-Minute Exam Cram Mode: Strip narrative and focus only on formulas, derivations, traps, and recall drill"
+            title="Open Interactive 1-Page Formula & Theorem Cheat-Sheet for this Unit"
           >
-            <Zap size={15} />
-            <span>{cramMode ? '⚡ 15-Min Cram: ON' : '⚡ 15-Min Cram'}</span>
+            <Zap size={15} /> Formula Cheat-Sheet
           </button>
 
-          {/* 🧠 Active Recall Blurting Mask Mode */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.04)', padding: '2px 6px', borderRadius: '8px', border: '1px solid var(--border-dim)' }}>
-            <button 
-              type="button"
-              className="btn-outline" 
-              onClick={() => setActiveRecallMode(!activeRecallMode)}
-              style={{
-                borderColor: activeRecallMode ? '#ec4899' : 'transparent',
-                color: activeRecallMode ? '#f472b6' : 'var(--text-muted)',
-                background: activeRecallMode ? 'rgba(236, 72, 153, 0.18)' : 'transparent',
-                fontWeight: 800,
-                fontSize: '0.8rem',
-                padding: '6px 12px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-              title="Blur derivation steps and numerical answers to test active memory recall"
-            >
-              {activeRecallMode ? <EyeOff size={15} /> : <Eye size={15} />}
-              <span>{activeRecallMode ? 'Active Recall: ON' : 'Active Recall'}</span>
-            </button>
-
-            {activeRecallMode && (
-              <div style={{ display: 'flex', gap: '4px', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '4px' }}>
-                <button
-                  type="button"
-                  onClick={() => handleToggleRevealAll(true)}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--neon-cyan)', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', padding: '3px 6px' }}
-                  title="Reveal all masked derivations and solutions"
-                >
-                  Reveal All
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleToggleRevealAll(false)}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--text-dim)', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', padding: '3px 6px' }}
-                  title="Hide all derivations and solutions"
-                >
-                  Hide All
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* 🎯 Unit Exam Readiness Mastery Toggle */}
-          <button
-            type="button"
-            onClick={toggleUnitMastery}
-            style={{
-              padding: '7px 12px',
-              borderRadius: '8px',
-              border: currentUnitMastery === 'mastered' ? '1px solid #10b981' : currentUnitMastery === 'revision' ? '1px solid #f59e0b' : '1px solid var(--border-dim)',
-              background: currentUnitMastery === 'mastered' ? 'rgba(16, 185, 129, 0.16)' : currentUnitMastery === 'revision' ? 'rgba(245, 158, 11, 0.16)' : 'rgba(255, 255, 255, 0.04)',
-              color: currentUnitMastery === 'mastered' ? '#86efac' : currentUnitMastery === 'revision' ? '#fde68a' : 'var(--text-muted)',
-              fontSize: '0.8rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-            title="Click to cycle readiness: Mastered (Green) -> Needs Revision (Yellow) -> Unread"
-          >
-            <Award size={15} />
-            <span>{currentUnitMastery === 'mastered' ? '✅ Unit Mastered' : currentUnitMastery === 'revision' ? '⚠️ Needs Revision' : '⚪ Mark Status'}</span>
-          </button>
-
+          {/* 🖨️ Clean University Print / Save as PDF */}
           <button 
             type="button"
             className="btn-outline" 
@@ -2368,13 +2014,20 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
             style={{
               cursor: isPrinting ? 'wait' : 'pointer',
               opacity: isPrinting ? 0.75 : 1,
-              borderColor: isPrinting ? 'var(--neon-cyan)' : undefined,
-              color: isPrinting ? 'var(--neon-cyan)' : undefined,
-              fontWeight: 800
+              borderColor: 'var(--neon-cyan)',
+              color: 'var(--neon-cyan)',
+              background: 'rgba(0, 240, 255, 0.1)',
+              fontWeight: 800,
+              fontSize: '0.82rem',
+              padding: '7px 14px',
+              borderRadius: '8px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
             }}
-            title="Print or Save as PDF"
+            title="Print Full Unit Notes or Save as PDF"
           >
-            <Printer size={16} /> {isPrinting ? 'Preparing Print...' : 'Print Notes'}
+            <Printer size={16} /> {isPrinting ? 'Opening Print Dialog...' : 'Print Notes'}
           </button>
         </div>
       </div>
@@ -2679,18 +2332,6 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
             </p>
           </div>
 
-          {/* ⚡ 15-Minute Exam Cram Mode & Active Recall Deck */}
-          {cramMode && (
-            <CramAndRecallDeck
-              subject={activeSubject}
-              unitNum={selectedUnitNum}
-              unitData={beeeUnit}
-              themeMode={themeMode}
-              onCloseCram={() => setCramMode(false)}
-              onMasteryUpdate={toggleUnitMastery}
-            />
-          )}
-
           {/* Sections Loop */}
           {beeeUnit.sections ? (
             beeeUnit.sections.map(section => (
@@ -2725,7 +2366,7 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
                     boxSizing: 'border-box'
                   }}
                   dangerouslySetInnerHTML={{
-                    __html: formatNoteContent(section.content, activeRecallMode)
+                    __html: formatNoteContent(section.content, false)
                   }}
                 />
 
@@ -3155,6 +2796,186 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
           </div>
         </div>
       </div>
+
+      {/* -------------------------------------------------------------------
+         INTERACTIVE 1-PAGE FORMULA & THEOREM CHEAT-SHEET MODAL
+         ------------------------------------------------------------------- */}
+      {showFormulaSheet && createPortal(
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 999999,
+            background: 'rgba(3, 6, 12, 0.94)',
+            backdropFilter: 'blur(16px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+          onClick={() => setShowFormulaSheet(false)}
+        >
+          <div 
+            className="glass-panel"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '920px',
+              height: '88vh',
+              maxHeight: '900px',
+              display: 'flex',
+              flexDirection: 'column',
+              borderRadius: '16px',
+              border: '2px solid #f59e0b',
+              background: '#090e17',
+              boxShadow: '0 0 50px rgba(245, 158, 11, 0.25)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Header Bar */}
+            <div style={{
+              padding: '16px 22px',
+              background: 'linear-gradient(90deg, #0f172a 0%, #1e1b4b 100%)',
+              borderBottom: '1px solid rgba(245, 158, 11, 0.3)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '12px'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <span style={{
+                    fontSize: '0.74rem',
+                    fontWeight: 800,
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    background: 'rgba(245, 158, 11, 0.15)',
+                    color: '#f59e0b',
+                    border: '1px solid rgba(245, 158, 11, 0.35)'
+                  }}>
+                    {activeSubject.code}
+                  </span>
+                  <span className="badge-neon" style={{ fontSize: '0.72rem' }}>
+                    Unit {selectedUnitNum} Official Cheat-Sheet
+                  </span>
+                </div>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#fff', margin: 0 }}>
+                  {activeSubject.name} — High-Yield Formulae &amp; Laws
+                </h2>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={handlePrintFormulaSheetWindow}
+                  className="btn-review-glow"
+                  style={{
+                    fontSize: '0.8rem',
+                    padding: '7px 14px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    borderRadius: '8px'
+                  }}
+                  title="Print Formula Sheet or Save as PDF"
+                >
+                  <Printer size={14} /> Print / Save PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowFormulaSheet(false)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '8px',
+                    padding: '6px',
+                    color: '#cbd5e1',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  title="Close Cheat-Sheet"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Formula Cards Grid */}
+            <div style={{
+              flex: 1,
+              overflowY: 'auto',
+              padding: '22px 26px',
+              background: '#070b13',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+              gap: '16px',
+              alignContent: 'start'
+            }}>
+              {getSubjectFormulas().map((item, idx) => {
+                let mathHtml = '';
+                try {
+                  mathHtml = katex.renderToString(item.eq, { displayMode: true, throwOnError: false });
+                } catch (e) {
+                  mathHtml = `<div style="font-family:monospace;font-weight:bold;color:#f59e0b;">${item.eq}</div>`;
+                }
+
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.55)',
+                      border: '1px solid rgba(245, 158, 11, 0.25)',
+                      borderRadius: '10px',
+                      padding: '14px 16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: '10px'
+                    }}
+                  >
+                    <div>
+                      <div style={{
+                        fontSize: '0.86rem',
+                        fontWeight: 800,
+                        color: '#f59e0b',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                        paddingBottom: '6px'
+                      }}>
+                        <span>📌</span>
+                        <span>{item.name}</span>
+                      </div>
+                      <div 
+                        style={{ padding: '8px 0', overflowX: 'auto', color: '#fff' }}
+                        dangerouslySetInnerHTML={{ __html: mathHtml }}
+                      />
+                    </div>
+
+                    {item.tip && (
+                      <div style={{
+                        fontSize: '0.76rem',
+                        color: '#94a3b8',
+                        background: 'rgba(0, 0, 0, 0.3)',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        borderLeft: '2px solid #10b981'
+                      }}>
+                        💡 {item.tip}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
