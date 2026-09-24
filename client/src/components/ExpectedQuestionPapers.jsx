@@ -79,6 +79,161 @@ const YEAR_CONFIG = {
   }
 };
 
+// =========================================================================
+// EXAMINATION BLUEPRINT CONFIGURATION (SESSIONAL-I, SESSIONAL-II, END-SEM)
+// =========================================================================
+export const EXAM_TYPES = {
+  'sessional-1': {
+    id: 'sessional-1',
+    name: 'Sessional Exam - I',
+    shortTitle: 'Sessional-I (Mid-Term)',
+    paperTitle: 'B.Tech. SESSIONAL EXAMINATION - I (MID-TERM), 2026',
+    dateBadge: '🔥 Happening This 28th–30th',
+    syllabusTag: 'Unit - I & Unit - II Only',
+    unitsAllowed: ['Unit 1', 'Unit 2', 'UNIT I', 'UNIT II'],
+    allowedUnitNumbers: ['UNIT I', 'UNIT II'],
+    timeAllowed: '1 Hour 30 Minutes',
+    timerSeconds: 90 * 60, // 5400s
+    maxMarks: 30,
+    passingMarks: 12,
+    secAMarks: 10,
+    secBMarks: 20,
+    color: '#f59e0b',
+    border: 'rgba(245, 158, 11, 0.45)',
+    bg: 'rgba(245, 158, 11, 0.12)',
+    description: 'Scheduled on Sept 28th – 30th. Strictly covers Unit-I & Unit-II syllabus.'
+  },
+  'sessional-2': {
+    id: 'sessional-2',
+    name: 'Sessional Exam - II',
+    shortTitle: 'Sessional-II (Mid-Term)',
+    paperTitle: 'B.Tech. SESSIONAL EXAMINATION - II (MID-TERM), 2026',
+    dateBadge: '📘 Mid-Term 2',
+    syllabusTag: 'Unit - III & Unit - IV Only',
+    unitsAllowed: ['Unit 3', 'Unit 4', 'UNIT III', 'UNIT IV'],
+    allowedUnitNumbers: ['UNIT III', 'UNIT IV'],
+    timeAllowed: '1 Hour 30 Minutes',
+    timerSeconds: 90 * 60, // 5400s
+    maxMarks: 30,
+    passingMarks: 12,
+    secAMarks: 10,
+    secBMarks: 20,
+    color: '#a78bfa',
+    border: 'rgba(167, 139, 250, 0.45)',
+    bg: 'rgba(167, 139, 250, 0.12)',
+    description: 'Upcoming mid-term evaluation. Strictly covers Unit-III & Unit-IV syllabus.'
+  },
+  'end-sem': {
+    id: 'end-sem',
+    name: 'End-Semester Examination',
+    shortTitle: 'End-Semester (Finals)',
+    paperTitle: 'B.Tech. END-SEMESTER UNIVERSITY EXAMINATION, 2026',
+    dateBadge: '🏛️ University Finals',
+    syllabusTag: 'Complete Syllabus (Units I, II, III & IV)',
+    unitsAllowed: ['Unit 1', 'Unit 2', 'Unit 3', 'Unit 4', 'UNIT I', 'UNIT II', 'UNIT III', 'UNIT IV'],
+    allowedUnitNumbers: ['UNIT I', 'UNIT II', 'UNIT III', 'UNIT IV'],
+    timeAllowed: '3 Hours',
+    timerSeconds: 180 * 60, // 10800s
+    maxMarks: 60,
+    passingMarks: 24,
+    secAMarks: 20,
+    secBMarks: 40,
+    color: '#00f0ff',
+    border: 'rgba(0, 240, 255, 0.45)',
+    bg: 'rgba(0, 240, 255, 0.12)',
+    description: 'Official university final examination covering 100% syllabus (all 4 units).'
+  }
+};
+
+// Pure function to generate an exam-specific paper based on selected exam type
+export function getExamPaperForType(rawPaper, examType = 'sessional-1') {
+  if (!rawPaper) return null;
+  const config = EXAM_TYPES[examType] || EXAM_TYPES['sessional-1'];
+
+  if (examType === 'end-sem') {
+    return {
+      ...rawPaper,
+      examType,
+      examConfig: config,
+      examTitle: config.paperTitle,
+      examShortTitle: config.name,
+      syllabusTag: config.syllabusTag,
+      dateBadge: config.dateBadge,
+      timeAllowed: config.timeAllowed,
+      maxMarks: config.maxMarks,
+      passingMarks: config.passingMarks,
+      timerSeconds: config.timerSeconds,
+      instructions: rawPaper.instructions,
+      sectionA: rawPaper.sectionA,
+      sectionB: rawPaper.sectionB
+    };
+  }
+
+  // Sessional-I (Unit 1 & 2) or Sessional-II (Unit 3 & 4)
+  const isSessional1 = examType === 'sessional-1';
+  const targetUnits = isSessional1 ? ['unit 1', 'unit 2'] : ['unit 3', 'unit 4'];
+  const targetBUnits = isSessional1 ? ['UNIT I', 'UNIT II'] : ['UNIT III', 'UNIT IV'];
+
+  // Filter Section A questions for target units
+  const secAFiltered = (rawPaper.sectionA?.questions || []).filter(q => {
+    const u = (q.unit || '').toLowerCase();
+    return targetUnits.some(tu => u.includes(tu));
+  });
+
+  const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+  const formattedSecA = secAFiltered.map((q, idx) => ({
+    ...q,
+    qNum: `Q1 (${letters[idx] || (idx + 1)})`,
+    marks: 2
+  }));
+
+  const secAMarks = formattedSecA.length * 2;
+
+  // Filter Section B units
+  const secBUnitsFiltered = (rawPaper.sectionB?.units || []).filter(u => {
+    const un = (u.unitNumber || '').toUpperCase();
+    return targetBUnits.some(tu => un.includes(tu));
+  });
+
+  const secBMarks = secBUnitsFiltered.length * 10;
+  const totalMarks = secAMarks + secBMarks;
+
+  const instructions = [
+    `Question No. 1 in Section A is COMPULSORY and carries ${secAMarks} marks (${config.syllabusTag}).`,
+    `Attempt any TWO questions from Section B, selecting ONE question from each Unit (10 marks each).`,
+    'Assume suitable missing data if any and state it clearly.',
+    'Use of non-programmable scientific calculators is permitted.',
+    'Neat, labeled circuit/block diagrams and step-by-step mathematical steps carry significant weightage.'
+  ];
+
+  return {
+    ...rawPaper,
+    examType,
+    examConfig: config,
+    examTitle: config.paperTitle,
+    examShortTitle: config.name,
+    syllabusTag: config.syllabusTag,
+    dateBadge: config.dateBadge,
+    timeAllowed: config.timeAllowed,
+    maxMarks: totalMarks || config.maxMarks,
+    passingMarks: Math.round((totalMarks || config.maxMarks) * 0.4),
+    timerSeconds: config.timerSeconds,
+    instructions,
+    sectionA: {
+      title: `SECTION A (COMPULSORY - ${config.syllabusTag.toUpperCase()})`,
+      marks: secAMarks,
+      note: `Answer ALL ${formattedSecA.length} questions from ${config.syllabusTag}. Each question carries 2 marks.`,
+      questions: formattedSecA
+    },
+    sectionB: {
+      title: `SECTION B (UNIT-WISE LONG QUESTIONS)`,
+      marks: secBMarks,
+      note: `Attempt ONE question from EACH Unit below. Each question carries 10 marks.`,
+      units: secBUnitsFiltered
+    }
+  };
+}
+
 export default function ExpectedQuestionPapers({ currentUser }) {
   const [selectedYear, setSelectedYear] = useState('All Years');
   const [selectedSemester, setSelectedSemester] = useState('All');
@@ -87,8 +242,27 @@ export default function ExpectedQuestionPapers({ currentUser }) {
   const [viewMode, setViewMode] = useState('solutions'); // 'questions-only' | 'solutions'
   const [revealedAnswers, setRevealedAnswers] = useState({});
 
-  // 3-Hour Exam Timer State
-  const [timerSeconds, setTimerSeconds] = useState(3 * 3600);
+  // Active Exam Type State (defaults to sessional-1 since it's happening on 28-30!)
+  const [selectedExamType, setSelectedExamType] = useState(() => {
+    try {
+      return localStorage.getItem('acn_selected_exam_type') || 'sessional-1';
+    } catch (e) {
+      return 'sessional-1';
+    }
+  });
+
+  // Initial Exam Selection Modal Dialog (opens first if user hasn't explicitly chosen yet)
+  const [showExamModal, setShowExamModal] = useState(() => {
+    try {
+      return !localStorage.getItem('acn_has_picked_exam_v2');
+    } catch (e) {
+      return true;
+    }
+  });
+
+  // Live Exam Simulation Timer State
+  const activeExamConfig = EXAM_TYPES[selectedExamType] || EXAM_TYPES['sessional-1'];
+  const [timerSeconds, setTimerSeconds] = useState(activeExamConfig.timerSeconds);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const timerRef = useRef(null);
 
@@ -99,7 +273,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
           if (prev <= 1) {
             clearInterval(timerRef.current);
             setIsTimerRunning(false);
-            alert("⏰ TIME IS UP! 3-Hour University Examination simulation has completed. Please review your answers against the marking scheme.");
+            alert(`⏰ TIME IS UP! ${activePaper?.examShortTitle || activeExamConfig.name} simulation has completed. Please review your answers against the marking scheme.`);
             return 0;
           }
           return prev - 1;
@@ -111,7 +285,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isTimerRunning]);
+  }, [isTimerRunning, activePaper, activeExamConfig]);
 
   const formatTimer = (totalSeconds) => {
     const hrs = Math.floor(totalSeconds / 3600);
@@ -120,13 +294,37 @@ export default function ExpectedQuestionPapers({ currentUser }) {
     return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  const handleOpenPaper = (paper, mode = 'solutions') => {
-    setActivePaper(paper);
+  const handleSelectExamType = (type) => {
+    setSelectedExamType(type);
+    setShowExamModal(false);
+    try {
+      localStorage.setItem('acn_selected_exam_type', type);
+      localStorage.setItem('acn_has_picked_exam_v2', 'true');
+    } catch (e) {}
+    if (activePaper) {
+      const orig = expectedQuestionPapers.find(p => p.id === activePaper.id);
+      if (orig) {
+        const formatted = getExamPaperForType(orig, type);
+        setActivePaper(formatted);
+        setTimerSeconds(formatted.timerSeconds);
+        setIsTimerRunning(false);
+      }
+    }
+  };
+
+  const handleOpenPaper = (rawPaper, mode = 'solutions') => {
+    const formatted = getExamPaperForType(rawPaper, selectedExamType);
+    setActivePaper(formatted);
     setViewMode(mode);
     setRevealedAnswers({});
-    setTimerSeconds(3 * 3600);
+    setTimerSeconds(formatted.timerSeconds);
     setIsTimerRunning(false);
-    logUserActivity(currentUser?.username || 'Guest', 'VIEW_QUESTION_PAPER', `${paper.code} - ${paper.subject}`);
+    logUserActivity(currentUser?.username || 'Guest', 'VIEW_QUESTION_PAPER', `${formatted.code} - ${formatted.subject} (${formatted.examShortTitle})`);
+  };
+
+  const handleResetTimer = () => {
+    setIsTimerRunning(false);
+    setTimerSeconds(activePaper?.timerSeconds || activeExamConfig.timerSeconds);
   };
 
   const handlePrint = () => {
@@ -140,18 +338,20 @@ export default function ExpectedQuestionPapers({ currentUser }) {
     }));
   };
 
-  // Filter Papers
-  const filteredPapers = expectedQuestionPapers.filter(paper => {
-    const matchesYear = selectedYear === 'All Years' || paper.year === selectedYear;
-    const matchesSemester = selectedSemester === 'All' || paper.semester === selectedSemester;
-    const query = searchQuery.toLowerCase().trim();
-    const matchesSearch = !query || 
-      paper.subject.toLowerCase().includes(query) ||
-      paper.code.toLowerCase().includes(query) ||
-      paper.course.toLowerCase().includes(query) ||
-      paper.instructions.some(i => i.toLowerCase().includes(query));
-    return matchesYear && matchesSemester && matchesSearch;
-  });
+  // Filter Papers according to Year, Semester, and Search, and map with selected exam type
+  const filteredPapers = expectedQuestionPapers
+    .filter(paper => {
+      const matchesYear = selectedYear === 'All Years' || paper.year === selectedYear;
+      const matchesSemester = selectedSemester === 'All' || paper.semester === selectedSemester;
+      const query = searchQuery.toLowerCase().trim();
+      const matchesSearch = !query || 
+        paper.subject.toLowerCase().includes(query) ||
+        paper.code.toLowerCase().includes(query) ||
+        paper.course.toLowerCase().includes(query) ||
+        paper.instructions.some(i => i.toLowerCase().includes(query));
+      return matchesYear && matchesSemester && matchesSearch;
+    })
+    .map(paper => getExamPaperForType(paper, selectedExamType));
 
   return (
     <div className="section-container animate-fade-in" style={{ paddingBottom: '80px' }}>
@@ -161,19 +361,30 @@ export default function ExpectedQuestionPapers({ currentUser }) {
       <div 
         className="glass-panel" 
         style={{ 
-          padding: '30px 24px', 
-          marginBottom: '26px',
+          padding: '28px 24px', 
+          marginBottom: '22px',
           background: 'linear-gradient(135deg, rgba(7, 15, 30, 0.95) 0%, rgba(13, 27, 62, 0.85) 100%)',
-          border: '1.5px solid rgba(0, 240, 255, 0.35)',
-          boxShadow: '0 8px 32px rgba(0, 240, 255, 0.12)'
+          border: `1.5px solid ${activeExamConfig.border}`,
+          boxShadow: `0 8px 32px ${activeExamConfig.bg}`
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
               <span className="badge-neon" style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 <ClipboardCheck size={13} style={{ marginRight: '4px' }} />
                 2026 Examination Blueprint
+              </span>
+              <span style={{ 
+                fontSize: '0.75rem', 
+                background: activeExamConfig.bg, 
+                color: activeExamConfig.color, 
+                border: `1px solid ${activeExamConfig.border}`, 
+                padding: '2px 8px', 
+                borderRadius: '6px', 
+                fontWeight: 800 
+              }}>
+                {activeExamConfig.dateBadge}
               </span>
               <span style={{ 
                 fontSize: '0.75rem', 
@@ -184,66 +395,72 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                 borderRadius: '6px', 
                 fontWeight: 700 
               }}>
-                100% Syllabus-Mapped
-              </span>
-              <span style={{ 
-                fontSize: '0.75rem', 
-                background: 'rgba(245, 158, 11, 0.15)', 
-                color: '#f59e0b', 
-                border: '1px solid #f59e0b', 
-                padding: '2px 8px', 
-                borderRadius: '6px', 
-                fontWeight: 700 
-              }}>
-                Exact MMDU Pattern
+                {activeExamConfig.syllabusTag}
               </span>
             </div>
 
             <h1 style={{ fontSize: '1.9rem', fontWeight: 900, color: '#fff', margin: '4px 0 10px 0', letterSpacing: '-0.02em' }}>
               Expected University Question Papers
             </h1>
-            <p style={{ color: '#94a3b8', fontSize: '0.96rem', maxWidth: '820px', lineHeight: 1.6, margin: 0 }}>
-              Practice end-semester examinations with strictly syllabus-based predicted papers. Every paper follows the exact university format: 
-              <strong style={{ color: '#38bdf8' }}> Section A (10 × 2 = 20M Compulsory)</strong> and 
-              <strong style={{ color: '#38bdf8' }}> Section B (4 Units × 10M = 40M Choice)</strong> with step-by-step model answers, derivations, and official marking rubrics.
+            <p style={{ color: '#cbd5e1', fontSize: '0.94rem', maxWidth: '820px', lineHeight: 1.6, margin: 0 }}>
+              Currently preparing for: <strong style={{ color: activeExamConfig.color }}>{activeExamConfig.name} ({activeExamConfig.syllabusTag})</strong>.
+              All papers follow the exact university marks pattern: 
+              <strong style={{ color: '#38bdf8' }}> Section A ({activeExamConfig.secAMarks}M Compulsory)</strong> and 
+              <strong style={{ color: '#38bdf8' }}> Section B ({activeExamConfig.secBMarks}M Choice)</strong> with model answers and official marking schemes.
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{
               background: 'rgba(0, 240, 255, 0.08)',
               border: '1px solid rgba(0, 240, 255, 0.25)',
-              padding: '12px 18px',
+              padding: '10px 16px',
               borderRadius: '12px',
               textAlign: 'center'
             }}>
-              <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--neon-cyan)' }}>
-                {expectedQuestionPapers.length}
+              <div style={{ fontSize: '1.35rem', fontWeight: 900, color: 'var(--neon-cyan)' }}>
+                {filteredPapers.length}
               </div>
-              <div style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Full Papers Ready
+              <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Papers Ready
               </div>
             </div>
             <div style={{
-              background: 'rgba(16, 185, 129, 0.08)',
-              border: '1px solid rgba(16, 185, 129, 0.25)',
-              padding: '12px 18px',
+              background: activeExamConfig.bg,
+              border: `1px solid ${activeExamConfig.border}`,
+              padding: '10px 16px',
               borderRadius: '12px',
               textAlign: 'center'
             }}>
-              <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#10b981' }}>
-                60 M
+              <div style={{ fontSize: '1.35rem', fontWeight: 900, color: activeExamConfig.color }}>
+                {activeExamConfig.maxMarks} M
               </div>
-              <div style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Total Marks
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setShowExamModal(true)}
+              className="btn-secondary"
+              style={{
+                padding: '10px 14px',
+                fontSize: '0.82rem',
+                gap: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                cursor: 'pointer'
+              }}
+              title="Change your active examination"
+            >
+              <RotateCcw size={14} /> Switch Exam
+            </button>
           </div>
         </div>
 
         {/* Feature Highlights Banner */}
         <div style={{ 
-          marginTop: '20px', 
+          marginTop: '18px', 
           paddingTop: '16px', 
           borderTop: '1px solid rgba(255, 255, 255, 0.08)', 
           display: 'grid', 
@@ -257,10 +474,10 @@ export default function ExpectedQuestionPapers({ currentUser }) {
             <span><strong>Dual Mode:</strong> Hall Exam vs Answer Key</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#cbd5e1' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'rgba(16, 185, 129, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: activeExamConfig.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: activeExamConfig.color }}>
               ⏱️
             </div>
-            <span><strong>3-Hour Live Timer:</strong> Realistic countdown clock</span>
+            <span><strong>{activeExamConfig.timeAllowed} Timer:</strong> Realistic countdown clock</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#cbd5e1' }}>
             <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
@@ -274,6 +491,76 @@ export default function ExpectedQuestionPapers({ currentUser }) {
             </div>
             <span><strong>Print &amp; PDF:</strong> Clean print-formatted papers</span>
           </div>
+        </div>
+      </div>
+
+      {/* -------------------------------------------------------------------
+         STEP 1: EXAMINATION BLUEPRINT SELECTOR (PROMINENT 3-CARD CHOOSER)
+         ------------------------------------------------------------------- */}
+      <div style={{ marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+          <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Step 1: Select Examination to Practice
+          </span>
+          <span style={{ fontSize: '0.78rem', color: activeExamConfig.color, fontWeight: 700 }}>
+            Currently Showing: {activeExamConfig.name} ({activeExamConfig.syllabusTag})
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '14px' }}>
+          {Object.values(EXAM_TYPES).map(et => {
+            const isSelected = selectedExamType === et.id;
+            return (
+              <button
+                key={et.id}
+                type="button"
+                onClick={() => handleSelectExamType(et.id)}
+                style={{
+                  background: isSelected ? 'rgba(15, 23, 42, 0.95)' : 'rgba(8, 12, 22, 0.7)',
+                  border: isSelected ? `2px solid ${et.color}` : '1px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: isSelected ? `0 0 24px ${et.border}` : 'none',
+                  borderRadius: '12px',
+                  padding: '16px 18px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    background: et.bg,
+                    color: et.color,
+                    border: `1px solid ${et.border}`
+                  }}>
+                    {et.dateBadge}
+                  </span>
+                  {isSelected && (
+                    <span style={{ fontSize: '0.74rem', color: et.color, fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <CheckCircle2 size={14} /> Active
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
+                  {et.name}
+                </div>
+                <div style={{ fontSize: '0.82rem', color: et.color, fontWeight: 700 }}>
+                  📌 Syllabus: {et.syllabusTag}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#94a3b8', display: 'flex', gap: '12px' }}>
+                  <span>⏱️ {et.timeAllowed}</span>
+                  <span>📊 {et.maxMarks} Marks</span>
+                  <span>🎯 Pass: {et.passingMarks} M</span>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -426,8 +713,27 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                   </span>
                 </div>
 
+                {/* Exam Blueprint Tag */}
+                <div style={{
+                  marginTop: '10px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: paper.examConfig?.bg || 'rgba(0, 240, 255, 0.1)',
+                  border: `1px solid ${paper.examConfig?.border || 'rgba(0, 240, 255, 0.3)'}`,
+                  color: paper.examConfig?.color || 'var(--neon-cyan)',
+                  padding: '3px 10px',
+                  borderRadius: '6px',
+                  fontSize: '0.73rem',
+                  fontWeight: 800
+                }}>
+                  <span>{paper.examShortTitle || 'Exam Paper'}</span>
+                  <span>•</span>
+                  <span>{paper.syllabusTag}</span>
+                </div>
+
                 {/* Subject Title */}
-                <h3 style={{ fontSize: '1.24rem', fontWeight: 800, color: '#fff', marginTop: '12px', marginBottom: '4px', lineHeight: 1.35 }}>
+                <h3 style={{ fontSize: '1.24rem', fontWeight: 800, color: '#fff', marginTop: '10px', marginBottom: '4px', lineHeight: 1.35 }}>
                   {paper.subject}
                 </h3>
                 <div style={{ fontSize: '0.8rem', color: '#94a3b8', marginBottom: '14px' }}>
@@ -446,16 +752,16 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#cbd5e1' }}>
                     <span>⏱️ Time: <strong style={{ color: '#fff' }}>{paper.timeAllowed}</strong></span>
-                    <span>📊 Total: <strong style={{ color: 'var(--neon-cyan)' }}>{paper.maxMarks} Marks</strong></span>
+                    <span>📊 Total: <strong style={{ color: paper.examConfig?.color || 'var(--neon-cyan)' }}>{paper.maxMarks} Marks</strong></span>
                     <span>🎯 Passing: <strong style={{ color: '#10b981' }}>{paper.passingMarks} M (40%)</strong></span>
                   </div>
                   <div style={{ fontSize: '0.78rem', color: '#94a3b8', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <CheckCircle size={13} color="#10b981" />
-                    <span><strong>Section A:</strong> 10 Compulsory Short Qs (20M)</span>
+                    <span><strong>Section A:</strong> {paper.sectionA?.questions?.length || 0} Compulsory Qs ({paper.sectionA?.marks || 0}M)</span>
                   </div>
                   <div style={{ fontSize: '0.78rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <CheckCircle size={13} color="#10b981" />
-                    <span><strong>Section B:</strong> 4 Units with Internal Choice (40M)</span>
+                    <span><strong>Section B:</strong> {paper.sectionB?.units?.length || 0} Units with Choice ({paper.sectionB?.marks || 0}M)</span>
                   </div>
                 </div>
               </div>
@@ -463,6 +769,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button
+                  type="button"
                   onClick={() => handleOpenPaper(paper, 'solutions')}
                   className="btn-review-glow"
                   style={{
@@ -477,9 +784,10 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                     fontWeight: 700
                   }}
                 >
-                  <Eye size={15} /> Model Answers
+                  <Eye size={15} /> Model Answers ({paper.maxMarks}M)
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleOpenPaper(paper, 'questions-only')}
                   className="btn-secondary"
                   style={{
@@ -493,7 +801,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                     borderRadius: '8px'
                   }}
                 >
-                  <Clock size={15} /> Hall Mode
+                  <Clock size={15} /> {paper.timeAllowed?.includes('1') ? '1.5-Hr Hall Mode' : '3-Hr Hall Mode'}
                 </button>
               </div>
             </div>
@@ -594,7 +902,35 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                 </button>
               </div>
 
-              {/* Middle: 3-Hour Exam Timer */}
+              {/* In-Modal Exam Type Switcher */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(0,0,0,0.5)', padding: '3px 8px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 700, paddingRight: '4px' }}>Exam:</span>
+                {Object.values(EXAM_TYPES).map(et => {
+                  const isAct = (activePaper.examType || selectedExamType) === et.id;
+                  return (
+                    <button
+                      key={et.id}
+                      type="button"
+                      onClick={() => handleSelectExamType(et.id)}
+                      style={{
+                        background: isAct ? et.bg : 'transparent',
+                        color: isAct ? et.color : '#94a3b8',
+                        border: isAct ? `1px solid ${et.border}` : '1px solid transparent',
+                        padding: '3px 8px',
+                        borderRadius: '5px',
+                        fontSize: '0.72rem',
+                        fontWeight: isAct ? 800 : 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s'
+                      }}
+                    >
+                      {et.shortTitle}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Middle: Live Exam Timer */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -609,7 +945,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                   fontFamily: 'monospace', 
                   fontSize: '0.94rem', 
                   fontWeight: 800, 
-                  color: timerSeconds < 900 ? '#ef4444' : 'var(--neon-cyan)',
+                  color: timerSeconds < 600 ? '#ef4444' : 'var(--neon-cyan)',
                   letterSpacing: '0.05em' 
                 }}>
                   {formatTimer(timerSeconds)}
@@ -624,16 +960,13 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                     cursor: 'pointer',
                     padding: '2px 4px'
                   }}
-                  title={isTimerRunning ? 'Pause Timer' : 'Start 3-Hour Exam Clock'}
+                  title={isTimerRunning ? 'Pause Timer' : `Start ${activePaper.timeAllowed} Countdown`}
                 >
                   {isTimerRunning ? <Pause size={14} /> : <Play size={14} />}
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsTimerRunning(false);
-                    setTimerSeconds(3 * 3600);
-                  }}
+                  onClick={handleResetTimer}
                   style={{
                     background: 'none',
                     border: 'none',
@@ -641,7 +974,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                     cursor: 'pointer',
                     padding: '2px 4px'
                   }}
-                  title="Reset Timer to 03:00:00"
+                  title={`Reset Timer to ${activePaper.timeAllowed}`}
                 >
                   <RotateCcw size={13} />
                 </button>
@@ -741,9 +1074,23 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                   {activePaper.university}
                 </div>
                 <h2 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#fff', margin: '4px 0', letterSpacing: '0.02em' }}>
-                  B.Tech. END-SEMESTER EXAMINATION, 2026
+                  {activePaper.examTitle || 'B.Tech. EXAMINATION, 2026'}
                 </h2>
-                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--neon-cyan)', marginTop: '4px' }}>
+                <div style={{
+                  display: 'inline-block',
+                  margin: '4px auto 8px auto',
+                  padding: '3px 12px',
+                  borderRadius: '20px',
+                  background: activePaper.examConfig?.bg || 'rgba(0, 240, 255, 0.15)',
+                  color: activePaper.examConfig?.color || 'var(--neon-cyan)',
+                  border: `1px solid ${activePaper.examConfig?.border || 'rgba(0, 240, 255, 0.4)'}`,
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.04em'
+                }}>
+                  ⚡ SYLLABUS: {activePaper.syllabusTag?.toUpperCase()} {activePaper.examType === 'sessional-1' ? '• DATES: 28th – 30th' : ''}
+                </div>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--neon-cyan)', marginTop: '2px' }}>
                   {activePaper.code} : {activePaper.subject.toUpperCase()}
                 </div>
                 <div style={{ fontSize: '0.82rem', color: '#94a3b8', marginTop: '2px' }}>
@@ -761,10 +1108,12 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                   border: '1px solid rgba(255, 255, 255, 0.08)',
                   borderRadius: '6px',
                   fontSize: '0.88rem',
-                  fontWeight: 700
+                  fontWeight: 700,
+                  flexWrap: 'wrap',
+                  gap: '8px'
                 }}>
                   <span>Time Allowed: <strong style={{ color: '#fff' }}>{activePaper.timeAllowed}</strong></span>
-                  <span>Maximum Marks: <strong style={{ color: 'var(--neon-cyan)' }}>{activePaper.maxMarks}</strong></span>
+                  <span>Maximum Marks: <strong style={{ color: activePaper.examConfig?.color || 'var(--neon-cyan)' }}>{activePaper.maxMarks}</strong></span>
                   <span>Passing Marks: <strong style={{ color: '#10b981' }}>{activePaper.passingMarks} (40%)</strong></span>
                 </div>
               </div>
@@ -1142,6 +1491,175 @@ export default function ExpectedQuestionPapers({ currentUser }) {
               }}>
                 *** END OF QUESTION PAPER — ALL THE BEST ***
               </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* -------------------------------------------------------------------
+         INITIAL / ON-DEMAND EXAM SELECTION MODAL
+         ------------------------------------------------------------------- */}
+      {showExamModal && createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Select Examination Blueprint"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1000000,
+            background: 'rgba(3, 7, 18, 0.88)',
+            backdropFilter: 'blur(14px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            animation: 'fadeIn 0.2s ease-out'
+          }}
+          onClick={() => setShowExamModal(false)}
+        >
+          <div
+            style={{
+              background: '#090e17',
+              border: '2px solid rgba(0, 240, 255, 0.45)',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(0, 240, 255, 0.25)',
+              borderRadius: '18px',
+              maxWidth: '680px',
+              width: '100%',
+              padding: '28px 24px',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setShowExamModal(false)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: '#fff',
+                borderRadius: '8px',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+              title="Close Dialog"
+            >
+              <X size={16} />
+            </button>
+
+            <div style={{ textAlign: 'center', marginBottom: '22px' }}>
+              <div style={{
+                width: '54px',
+                height: '54px',
+                borderRadius: '50%',
+                background: 'rgba(245, 158, 11, 0.15)',
+                border: '1.5px solid rgba(245, 158, 11, 0.45)',
+                color: '#f59e0b',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 12px'
+              }}>
+                <ClipboardCheck size={28} />
+              </div>
+              <h2 style={{ fontSize: '1.45rem', fontWeight: 900, color: '#fff', margin: '0 0 6px 0' }}>
+                Select Examination to Practice
+              </h2>
+              <p style={{ color: '#94a3b8', fontSize: '0.88rem', margin: 0 }}>
+                Choose your upcoming exam to automatically load the exact syllabus-mapped papers, question format, and simulation timer.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {Object.values(EXAM_TYPES).map(et => {
+                const isSelected = selectedExamType === et.id;
+                return (
+                  <button
+                    key={et.id}
+                    type="button"
+                    onClick={() => handleSelectExamType(et.id)}
+                    style={{
+                      background: isSelected ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.03)',
+                      border: isSelected ? `2px solid ${et.color}` : '1px solid rgba(255, 255, 255, 0.1)',
+                      boxShadow: isSelected ? `0 0 20px ${et.border}` : 'none',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '12px',
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                        <span style={{
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          background: et.bg,
+                          color: et.color,
+                          border: `1px solid ${et.border}`
+                        }}>
+                          {et.dateBadge}
+                        </span>
+                        <span style={{ fontSize: '1.02rem', fontWeight: 800, color: '#fff' }}>
+                          {et.name}
+                        </span>
+                        {et.id === 'sessional-1' && (
+                          <span style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>
+                            ★ Active This Week
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '0.84rem', color: et.color, fontWeight: 700 }}>
+                        Syllabus: {et.syllabusTag}
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '3px' }}>
+                        {et.timeAllowed} • {et.maxMarks} Marks ({et.secAMarks}M Section A + {et.secBMarks}M Section B)
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                      {isSelected ? (
+                        <span style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          color: et.color,
+                          fontWeight: 800,
+                          fontSize: '0.8rem'
+                        }}>
+                          <CheckCircle2 size={16} /> Selected
+                        </span>
+                      ) : (
+                        <ChevronRight size={18} color="#64748b" />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              <button
+                type="button"
+                onClick={() => setShowExamModal(false)}
+                className="btn-primary"
+                style={{ width: '100%', padding: '10px', fontSize: '0.88rem' }}
+              >
+                Continue to Question Papers
+              </button>
             </div>
           </div>
         </div>,
