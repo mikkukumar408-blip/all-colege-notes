@@ -80,7 +80,6 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
   const [selectedSem, setSelectedSem] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [subjects] = useState(initialSubjects);
-  const [hoveredSubId, setHoveredSubId] = useState(null);
   const [featuredSubject, setFeaturedSubject] = useState(
     initialSubjects.find(s => s.id === 'sub-beee') || initialSubjects[0]
   ); // Defaults to BEEE (BELE-001) Flagship Subject
@@ -356,7 +355,6 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '22px' }}>
           {filteredSubjects.map(sub => {
-            const isHovered = hoveredSubId === sub.id;
             const isFeatured = featuredSubject?.id === sub.id;
             const isCardActive = isSubjectCardActive(sub);
             const isDead = !isCardActive;
@@ -364,31 +362,7 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
             return (
               <div 
                 key={sub.id}
-                className="glass-panel"
-                style={{
-                  overflow: 'hidden',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  cursor: isDead ? 'not-allowed' : 'pointer',
-                  opacity: isDead ? 0.45 : 1,
-                  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                  transform: (!isDead && isHovered) ? 'translateY(-4px)' : 'translateY(0)',
-                  border: (!isDead && isHovered)
-                    ? '1px solid var(--neon-cyan)'
-                    : isDead
-                      ? '1px solid rgba(255, 255, 255, 0.05)'
-                      : '1px solid rgba(255, 255, 255, 0.08)',
-                  boxShadow: (!isDead && isHovered)
-                    ? '0 8px 24px rgba(0, 240, 255, 0.22)'
-                    : undefined,
-                  userSelect: 'none'
-                }}
-                onMouseEnter={() => {
-                  if (!isDead) setHoveredSubId(sub.id);
-                }}
-                onMouseLeave={() => {
-                  if (!isDead) setHoveredSubId(null);
-                }}
+                className={`glass-panel subject-catalog-card ${isDead ? 'dead' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

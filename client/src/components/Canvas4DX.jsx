@@ -31,8 +31,10 @@ export default function Canvas4DX({ stormMode = false, lightningTrigger = false 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
 
-    // Particle System
-    const particleCount = Math.min(85, Math.floor((width * height) / 14000));
+    // Particle System (Optimized for 60fps high responsiveness)
+    const isMobile = width < 768;
+    const maxParticles = isMobile ? 18 : 38;
+    const particleCount = Math.min(maxParticles, Math.max(12, Math.floor((width * height) / 28000)));
     const colors = ['#00f0ff', '#ff2a6d', '#8b5cf6', '#38bdf8', '#ffffff'];
     const particles = [];
 
@@ -40,9 +42,9 @@ export default function Canvas4DX({ stormMode = false, lightningTrigger = false 
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * (stormMode ? 3.5 : 1.2),
-        vy: (Math.random() - 0.5) * (stormMode ? 3.5 : 1.2),
-        size: Math.random() * 2.8 + 1,
+        vx: (Math.random() - 0.5) * (stormMode ? 3.0 : 1.0),
+        vy: (Math.random() - 0.5) * (stormMode ? 3.0 : 1.0),
+        size: Math.random() * 2.2 + 1,
         color: colors[Math.floor(Math.random() * colors.length)],
         baseAlpha: Math.random() * 0.6 + 0.2,
         pulseSpeed: Math.random() * 0.04 + 0.01,
@@ -51,16 +53,16 @@ export default function Canvas4DX({ stormMode = false, lightningTrigger = false 
     }
 
     // Wind Streamers
-    const windCount = stormMode ? 28 : 12;
+    const windCount = stormMode ? (isMobile ? 8 : 16) : (isMobile ? 4 : 8);
     const windLines = [];
     for (let i = 0; i < windCount; i++) {
       windLines.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        length: Math.random() * 180 + 80,
-        speed: Math.random() * 14 + 10 * (stormMode ? 2 : 1),
-        opacity: Math.random() * 0.35 + 0.1,
-        width: Math.random() * 2 + 0.8
+        length: Math.random() * 140 + 60,
+        speed: Math.random() * 12 + 8 * (stormMode ? 1.8 : 1),
+        opacity: Math.random() * 0.3 + 0.08,
+        width: Math.random() * 1.5 + 0.6
       });
     }
 
@@ -170,34 +172,35 @@ export default function Canvas4DX({ stormMode = false, lightningTrigger = false 
           }
         }
 
-        // Draw particle
+        // Draw particle (High performance direct render without expensive shadowBlur)
         const currentAlpha = p.baseAlpha + Math.sin(p.angle) * 0.25;
         ctx.save();
         ctx.fillStyle = p.color;
         ctx.globalAlpha = Math.max(0.1, Math.min(1, currentAlpha));
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 12;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
 
-        // Connect nearby particles
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        // Connect nearby particles (Skipped on mobile to save battery and GPU cycles)
+        if (!isMobile) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const distSq = dx * dx + dy * dy;
 
-          if (dist < 110) {
-            const lineAlpha = (1 - dist / 110) * 0.25;
-            ctx.strokeStyle = p.color;
-            ctx.globalAlpha = lineAlpha;
-            ctx.lineWidth = 0.8;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
+            if (distSq < 10000) { // 100px max distance
+              const dist = Math.sqrt(distSq);
+              const lineAlpha = (1 - dist / 100) * 0.22;
+              ctx.strokeStyle = p.color;
+              ctx.globalAlpha = lineAlpha;
+              ctx.lineWidth = 0.8;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
           }
         }
 

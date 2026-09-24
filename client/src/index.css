@@ -1,8 +1,8 @@
 :root {
   --bg-primary: #07090e;
   --bg-secondary: #0e121d;
-  --bg-card: rgba(18, 23, 37, 0.75);
-  --bg-card-hover: rgba(28, 35, 56, 0.9);
+  --bg-card: rgba(13, 18, 30, 0.92);
+  --bg-card-hover: rgba(24, 31, 50, 0.95);
   --border-glow: rgba(0, 240, 255, 0.25);
   --border-dim: rgba(255, 255, 255, 0.08);
   
@@ -282,27 +282,62 @@ h1, h2, h3, .font-heading {
 }
 
 
-/* Glass Card - 4DX Perspective & Pop-Out Depth */
+/* Glass Card - High Performance Hardware Accelerated */
 .glass-panel {
   background: var(--bg-card);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border-dim);
   border-radius: 14px;
-  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-              border-color 0.3s ease, 
-              box-shadow 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transform-style: preserve-3d;
-  perspective: 1000px;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.2s ease, 
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+@supports (backdrop-filter: blur(8px)) {
+  @media (min-width: 901px) {
+    .glass-panel {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+  }
 }
 
 .glass-panel:hover {
   border-color: var(--border-glow);
-  transform: translateY(-6px) scale(1.015);
+  transform: translateY(-4px);
   box-shadow: 
-    0 20px 40px -10px rgba(0, 0, 0, 0.7),
-    0 0 25px rgba(0, 240, 255, 0.25),
-    0 0 45px rgba(157, 78, 221, 0.15);
+    0 12px 28px -6px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(0, 240, 255, 0.18);
+}
+
+/* Subject Catalog Card Styles (Pure CSS Hover - Zero React Re-render Lag) */
+.subject-catalog-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  opacity: 1;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.22s ease;
+  user-select: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.subject-catalog-card:not(.dead):hover {
+  transform: translateY(-4px);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 8px 24px rgba(0, 240, 255, 0.22);
+}
+
+.subject-catalog-card.dead {
+  cursor: not-allowed;
+  opacity: 0.45;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.subject-catalog-card.dead:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: none;
 }
 
 /* Sensory FX Animations */
@@ -1926,7 +1961,7 @@ h1, h2, h3, .font-heading {
   border-radius: 24px;
   padding: 2px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 50px rgba(0, 240, 255, 0.25);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 240, 255, 0.2);
   transition: transform 0.15s ease-out, box-shadow 0.3s ease;
 }
 
@@ -1945,15 +1980,23 @@ h1, h2, h3, .font-heading {
     rgba(0, 240, 255, 0.8),
     transparent 70%
   );
-  animation: rotateBorderSpin 6s linear infinite;
+  animation: rotateBorderSpin 8s linear infinite;
   z-index: 0;
+  will-change: transform;
+}
+
+@media (max-width: 900px) {
+  .card-4dx-glow-wrap::before {
+    animation: none;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.5), rgba(157, 78, 221, 0.5));
+  }
 }
 
 .card-4dx-content {
   position: relative;
   background: rgba(7, 12, 26, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 22px;
   z-index: 1;
   overflow: hidden;
@@ -2039,11 +2082,6 @@ h1, h2, h3, .font-heading {
 }
 
 /* Cyber Perspective Grid Floor */
-@keyframes gridFloorMove {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 50px; }
-}
-
 .cyber-grid-floor {
   position: absolute;
   bottom: 0;
@@ -2058,7 +2096,6 @@ h1, h2, h3, .font-heading {
   transform-origin: bottom center;
   mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
   -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
-  animation: gridFloorMove 2s linear infinite;
   pointer-events: none;
   z-index: 1;
 }
@@ -2855,6 +2892,7 @@ h1, h2, h3, .font-heading {
    4DX GLOWING FLUID & POP-OUT AMBIENT ANIMATIONS
    ========================================================================= */
 
+/* High-Performance GPU Ambient Background (Eliminates continuous 80px blur animation lag) */
 .fluid-bg-container {
   position: fixed;
   top: 0;
@@ -2865,101 +2903,19 @@ h1, h2, h3, .font-heading {
   z-index: 0;
   overflow: hidden;
   opacity: 0.85;
+  background: 
+    radial-gradient(circle at 12% 14%, rgba(0, 240, 255, 0.16) 0%, transparent 45%),
+    radial-gradient(circle at 88% 42%, rgba(157, 78, 221, 0.18) 0%, transparent 48%),
+    radial-gradient(circle at 35% 88%, rgba(255, 42, 109, 0.13) 0%, transparent 45%),
+    radial-gradient(circle at 62% 24%, rgba(255, 170, 0, 0.09) 0%, transparent 40%);
+  background-attachment: fixed;
+  transform: translateZ(0);
+  will-change: auto;
 }
 
-/* Glowing Fluid Orbs */
+/* Hide continuous multi-pass Gaussian blur orb elements */
 .fluid-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  mix-blend-mode: screen;
-  will-change: transform, opacity;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
-}
-
-.fluid-orb-cyan {
-  width: 550px;
-  height: 550px;
-  background: radial-gradient(circle, rgba(0, 240, 255, 0.28) 0%, rgba(0, 240, 255, 0.08) 50%, transparent 70%);
-  top: -10%;
-  left: -10%;
-  animation: fluidDrift1 22s infinite alternate;
-}
-
-.fluid-orb-purple {
-  width: 650px;
-  height: 650px;
-  background: radial-gradient(circle, rgba(157, 78, 221, 0.3) 0%, rgba(112, 0, 255, 0.08) 50%, transparent 70%);
-  top: 40%;
-  right: -15%;
-  animation: fluidDrift2 26s infinite alternate;
-}
-
-.fluid-orb-pink {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(255, 42, 109, 0.22) 0%, rgba(255, 42, 109, 0.05) 50%, transparent 70%);
-  bottom: -15%;
-  left: 30%;
-  animation: fluidDrift3 20s infinite alternate;
-}
-
-.fluid-orb-amber {
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(255, 170, 0, 0.18) 0%, rgba(255, 170, 0, 0.03) 50%, transparent 70%);
-  top: 20%;
-  left: 45%;
-  animation: fluidPulseCenter 16s infinite alternate;
-}
-
-/* Fluid Drift Keyframes */
-@keyframes fluidDrift1 {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(140px, 80px, 40px) scale(1.15) rotate(90deg);
-  }
-  100% {
-    transform: translate3d(60px, 180px, 20px) scale(0.95) rotate(180deg);
-  }
-}
-
-@keyframes fluidDrift2 {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(-120px, -90px, 50px) scale(1.2) rotate(-90deg);
-  }
-  100% {
-    transform: translate3d(-180px, 60px, 30px) scale(0.9) rotate(-180deg);
-  }
-}
-
-@keyframes fluidDrift3 {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(-80px, -110px, 30px) scale(1.18);
-  }
-  100% {
-    transform: translate3d(90px, -50px, 10px) scale(0.95);
-  }
-}
-
-@keyframes fluidPulseCenter {
-  0%, 100% {
-    transform: scale(0.9) translate3d(0, 0, 0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1.25) translate3d(40px, -30px, 20px);
-    opacity: 0.85;
-  }
+  display: none !important;
 }
 
 /* 4DX Subtle Floating Pop-Out on Viewport */
