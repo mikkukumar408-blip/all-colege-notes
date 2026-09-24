@@ -568,7 +568,7 @@ export const examRevisionNotes = [
   },
 
   // =========================================================================
-  // SEMESTER 1 - FUNDAMENTALS OF AI & ML
+  // SEMESTER 1 - FUNDAMENTALS OF AI & ML (BCSE-011) - MMEC SYLLABUS ALIGNED
   // =========================================================================
   {
     id: 'rev-aiml',
@@ -578,105 +578,312 @@ export const examRevisionNotes = [
     semNumber: 1,
     year: '1st Year',
     category: 'Artificial Intelligence',
-    pageEstimate: '9 Pages Fast-Track Master',
-    readTime: '25 Mins Cram',
-    examWeightage: '100 Marks (Units 1-4)',
+    pageEstimate: '12 Pages Fast-Track Master',
+    readTime: '30 Mins Cram',
+    examWeightage: '60 Marks (Units 1-4) • 30M Sessional-I (Units 1-2)',
     pdfUrl: '/AIML_Short_Notes_Exam_Ready.pdf',
     downloadName: 'BCSE-011_AIML_Exam_Revision_Notes.pdf',
-    fileSize: '3.4 MB',
-    summary: 'Comprehensive exam cram covering PEAS agent architecture, State Space Search, A* search and heuristic admissibility proofs, Propositional Logic & Resolution Refutation, Decision Trees ID3 (Entropy & Information Gain), and Apriori association mining.',
+    fileSize: '3.8 MB',
+    summary: '100% MMEC syllabus aligned fast-track revision notes covering all 4 units: Foundations of AI & Industry Applications, Searching Algorithms & Knowledge Representation Schemes, Expert Systems Architecture & Knowledge Acquisition, and Machine Learning Workflow with Supervised & Unsupervised Algorithms.',
     highlights: [
-      'PEAS Framework for Autonomous Driving, Medical Diagnosis & Vacuum Cleaner',
-      'A* Evaluation Function f(n) = g(n) + h(n) & Admissibility Theorem (h(n) <= h*(n))',
-      'Propositional Logic to Conjunctive Normal Form (CNF) & Resolution Proof',
-      'Information Gain Calculation using Shannon Entropy: H(S) = -Σ p_i log₂(p_i)'
+      'Unit 1: Evolution of AI, Types (Narrow/General/Super), Key Domains (NLP, CV, ES), AI vs ML vs DL, Healthcare & Smart Cities',
+      'Unit 2: BFS vs DFS, Data-Driven vs Goal-Driven Search, A* Heuristic Search, Propositional/Predicate Logic, Resolution Refutation, Semantic Nets & Frames',
+      'Unit 3: Expert Systems Architecture, Human Elements, MYCIN/DENDRAL Applications, Feigenbaum Knowledge Acquisition Bottleneck',
+      'Unit 4: Supervised/Unsupervised/Reinforcement, ML Lifecycle, ID3 Decision Tree Entropy/Gain, K-Means Clustering & Apriori Mining'
     ],
     units: [
       {
         unitNum: 1,
-        title: 'Agents & Search Algorithms (A*, BFS, DFS)',
-        weightage: '26 Marks',
-        summary: 'Rational agents, PEAS classification, uninformed vs informed search, BFS/DFS, A* search, and heuristic admissibility.',
+        title: 'Foundations of Artificial Intelligence',
+        weightage: '15 Marks (30M Sessional-I)',
+        summary: 'Evolution and definition of AI, Turing Test, Types of AI (ANI, AGI, ASI; Reactive, Limited Memory, Theory of Mind, Self-Aware), Key domains (NLP, Computer Vision, Expert Systems), AI vs ML vs Deep Learning, Characteristics of intelligent systems, Industry applications (Healthcare, Agriculture, Finance, Smart Cities), and Use Cases (Virtual Assistants, Autonomous Systems, Chatbots).',
         keyTheories: [
           {
-            term: "PEAS Framework",
-            definition: "Standardized specification for an intelligent agent's environment: Performance measure, Environment, Actuators, and Sensors.",
+            term: "Evolution & Definition of AI",
+            definition: "Artificial Intelligence is the branch of computer science dedicated to creating computational systems capable of performing cognitive tasks typically requiring human intelligence—including learning, reasoning, visual perception, decision-making, and natural language communication.",
             bulletPoints: [
-              "Automated Taxi: P = Safe, fast, legal, comfortable trip; E = Roads, traffic, pedestrians, weather; A = Steering, accelerator, brakes, horn; S = Cameras, sonar, GPS, speedometer.",
-              "Medical Diagnosis System: P = Healthy patient, minimized costs; E = Patient, hospital; A = Screen display, prescriptions; S = Symptoms, lab findings."
+              "Genesis & Turing Test (1950): Alan Turing proposed the Imitation Game to evaluate machine intelligence via natural conversation.",
+              "Dartmouth Conference (1956): John McCarthy, Marvin Minsky, Nathaniel Rochester, and Claude Shannon coined the term 'Artificial Intelligence'.",
+              "Golden Era to AI Winters (1970s–1980s): Early symbolic AI (Logic Theorist, GPS) met computational limits; Lighthill report triggered funding freeze; revival via commercial Expert Systems (XCON).",
+              "Deep Learning Era (2012–Present): Modern renaissance powered by big data, massive GPU parallelism, and deep neural architectures."
             ]
           },
           {
-            term: "A* Search Algorithm",
-            definition: "Best-first graph search algorithm that finds the least-cost path from start node to goal node using evaluation function f(n) = g(n) + h(n).",
+            term: "Classification & Types of Artificial Intelligence",
+            definition: "AI systems are categorized along two primary dimensions: by capability/scope and by functional mechanisms.",
             bulletPoints: [
-              "g(n): Exact cost incurred so far from start node to current node n.",
-              "h(n): Estimated heuristic cost from current node n to goal node.",
-              "Admissible Heuristic: A heuristic is admissible if it NEVER overestimates the true cost to reach the goal: h(n) ≤ h*(n) for all n.",
-              "Optimality: A* using tree search is optimal if h(n) is admissible. Using graph search, A* is optimal if h(n) is consistent (monotonic)."
+              "1. By Capability Scope:\n  • Artificial Narrow Intelligence (ANI / Weak AI): Specialized for one specific task (e.g. Siri, AlphaGo, Tesla Autopilot). 100% of current real-world AI is ANI.\n  • Artificial General Intelligence (AGI / Strong AI): Human-level cognitive capability to understand, learn, and generalize across any intellectual task.\n  • Artificial Super Intelligence (ASI): Theoretical future AI surpassing human intellectual capability across all domains.",
+              "2. By Functional Architecture:\n  • Reactive Machines: No memory; react purely to present inputs (e.g. IBM Deep Blue).\n  • Limited Memory: Uses past observations to make near-future decisions (e.g. Self-driving cars tracking lane markers and surrounding vehicles).\n  • Theory of Mind: Understands emotions, beliefs, and intentions of other agents (active research).\n  • Self-Aware AI: Possesses conscious self-hood (theoretical)."
+            ]
+          },
+          {
+            term: "Difference Between AI, Machine Learning, and Deep Learning",
+            definition: "A hierarchical, concentric relationship where AI is the overarching discipline, ML is its statistical subset, and DL is specialized deep neural representation learning.",
+            bulletPoints: [
+              "Artificial Intelligence (Broadest Circle): The entire umbrella science of synthesizing intelligent machines (includes symbolic logic, search algorithms, expert systems, and ML).",
+              "Machine Learning (Middle Circle): Computational algorithms that learn predictive patterns from historical data without being explicitly hand-coded with rigid rules (e.g. Decision Trees, SVM, Linear Regression).",
+              "Deep Learning (Innermost Circle): A subfield of ML utilizing multi-layered Artificial Neural Networks (ANNs, CNNs, Transformers) that automatically extract hierarchical feature representations directly from raw data."
+            ]
+          },
+          {
+            term: "Key Domains & Industry Applications",
+            definition: "Core foundational domains of AI and their high-impact real-world deployment across global sectors.",
+            bulletPoints: [
+              "Key Domains: Natural Language Processing (NLP: sentiment analysis, translation), Computer Vision (CV: image recognition, medical imaging, face unlock), Expert Systems (rule-based diagnostic and configuration engines).",
+              "Healthcare: AI-driven diagnostic imaging (detecting tumors in X-rays/MRIs), predictive patient vitals monitoring, personalized drug discovery.",
+              "Agriculture: Precision farming, drone crop-health monitoring, automated soil nutrient and irrigation management.",
+              "Finance: Algorithmic high-frequency trading, automated credit scoring, real-time transaction fraud detection.",
+              "Smart Cities: Intelligent traffic signal synchronization, energy grid load balancing, automated waste management.",
+              "Core Use Cases: Virtual Assistants (Apple Siri, Google Assistant, Amazon Alexa), Autonomous Systems (Waymo Robotaxis, industrial drones), Chatbots (Customer service bots, ChatGPT)."
             ]
           }
         ],
         derivations: [
           {
-            title: "Proof of Optimality of A* Search under Admissible Heuristic",
+            title: "Turing Test Behavioral Indistinguishability Criterion",
             steps: [
-              "1. Let G₂ be a suboptimal goal node on the OPEN list, so g(G₂) = f(G₂) > C* (optimal cost).",
-              "2. Let G* be an optimal goal node with true cost C*.",
-              "3. Since the optimal path exists, there must be some node n on the optimal path currently in OPEN.",
-              "4. By definition: f(n) = g(n) + h(n).",
-              "5. Since h is admissible, h(n) ≤ h*(n)  ⇒  f(n) ≤ g(n) + h*(n) = C*.",
-              "6. Therefore: f(n) ≤ C* < f(G₂).",
-              "7. Since A* always selects the node with the lowest f-value from OPEN, node n will always be expanded before suboptimal goal G₂.",
-              "8. This guarantees A* will terminate with the optimal path before expanding any suboptimal goal."
+              "1. An interrogator C communicates with player A (computer) and player B (human) via teletype terminals.",
+              "2. C asks unconstrained questions across natural language, philosophy, arithmetic, and ethics.",
+              "3. C's objective is to correctly identify which participant is the machine.",
+              "4. Alan Turing's Empirical Metric: The machine passes if the interrogator makes no more than 70% correct identifications after 5 minutes of questioning.",
+              "5. If judge identification accuracy approaches random guessing probability p = 0.50, the machine exhibits behavioral intelligence indistinguishable from a human."
             ],
-            finalFormula: "h(n) \\le h^*(n) \\implies f(n) \\le C^* < f(G_2)",
-            examFrequency: "Appears in 85% of semester exams (8 Marks)"
+            finalFormula: "P(\\text{Correct Identification}) \\approx 0.50 \\implies \\text{Turing Test Passed}",
+            examFrequency: "Frequently asked 2M & 4M theory question"
           }
         ],
         formulas: [
-          { name: "A* Evaluation Function", formula: "f(n) = g(n) + h(n)", whereUsed: "Node expansion priority" }
+          { name: "Hierarchical Relationship", formula: "\\text{Deep Learning} \\subset \\text{Machine Learning} \\subset \\text{Artificial Intelligence}", whereUsed: "Venn diagram classification" }
         ],
         solvedQuestions: [
           {
-            question: "Given a state space with Start S, intermediate nodes A, B, and Goal G. Edge costs: S->A: 2, S->B: 4, A->G: 5, B->G: 2. Heuristics: h(S)=6, h(A)=4, h(B)=2, h(G)=0. Show step-by-step A* search trace.",
-            marks: "10 Marks",
-            solution: "1. Start: Open = {S(f=0+6=6)}. Expand S. 2. Successors of S: A with g=2, f=2+4=6; B with g=4, f=4+2=6. Open = {A(6), B(6)}. 3. Expand A (tie-break): Successor G via A: g=2+5=7, f=7+0=7. Open = {B(6), G_from_A(7)}. 4. Expand B (lowest f=6): Successor G via B: g=4+2=6, f=6+0=6. Open = {G_from_B(6), G_from_A(7)}. 5. Expand G_from_B (f=6): Goal reached! Optimal path is S -> B -> G with total cost = 6.",
-            keyPoints: ["Tabulate OPEN and CLOSED lists at every iteration", "State optimal path: S -> B -> G, cost = 6"]
+            question: "Differentiate between Artificial Intelligence (AI), Machine Learning (ML), and Deep Learning (DL) with an illustrative diagram and real-world examples.",
+            marks: "6 Marks",
+            solution: "1. Definition & Scope: AI is the broad superset of intelligent machines; ML uses statistical algorithms to learn from data; DL uses deep multi-layer neural networks for automatic feature extraction.\\n2. Feature Extraction: In classical ML (e.g. SVM), human engineers must manually extract features; in DL (e.g. CNN), the network learns hierarchical features directly from raw pixels.\\n3. Data Dependency: ML performs well on smaller tabular datasets; DL requires massive data scales to prevent overfitting.\\n4. Real-World Mapping:\\n- Rule-based Chess Engine = Pure AI.\\n- Spam Email Classifier with Naive Bayes = Classical ML.\\n- Autonomous vehicle pedestrian detection with YOLO/CNN = Deep Learning.",
+            keyPoints: ["Draw concentric circle Venn diagram", "Highlight manual feature engineering (ML) vs automated representation learning (DL)"]
+          },
+          {
+            question: "Discuss the characteristics of an Intelligent System and outline four real-world use cases across Healthcare, Agriculture, Finance, and Smart Cities.",
+            marks: "4 Marks",
+            solution: "1. Characteristics: Perception (sensing inputs), Reasoning (inferring conclusions), Learning (improving from experience), Adaptability (handling dynamic changes), and Communication (interacting in human modalities).\\n2. Applications:\\n- Healthcare: AI detection of diabetic retinopathy and early oncology screening.\\n- Agriculture: Autonomous drone spraying targeting only weed-infected crop zones.\\n- Finance: Real-time credit card fraud detection anomaly models.\\n- Smart Cities: Real-time adaptive traffic light scheduling reducing intersection congestion.",
+            keyPoints: ["State at least 4 intelligent characteristics", "Provide concrete industry impact examples"]
           }
         ],
-        examinerTips: "Always show the state of the OPEN list (priority queue) and CLOSED list at each step of A* trace."
+        examinerTips: "Always draw the 3 concentric circles for AI-ML-DL and mention the Dartmouth 1956 conference and John McCarthy for history questions."
       },
       {
         unitNum: 2,
-        title: 'Machine Learning: Decision Trees & Apriori',
-        weightage: '24 Marks',
-        summary: 'Supervised vs unsupervised learning, Decision Tree induction (ID3), Shannon entropy, Information Gain, and Apriori association rule mining.',
+        title: 'Searching Algorithms & Knowledge Representation',
+        weightage: '15 Marks (30M Sessional-I)',
+        summary: 'Searching for solutions, Uninformed search strategies: Breadth-First Search (BFS) and Depth-First Search (DFS), Data-driven (Forward chaining) vs Goal-driven (Backward chaining) search, Heuristic search (A* search algorithm), and Knowledge Representation schemes: Logical (Propositional & Predicate calculus, Unification, Resolution Refutation), Procedural (Production systems), Network (Semantic networks, Conceptual graphs), and Structured (Scripts, Frames, Objects).',
         keyTheories: [
           {
-            term: "Shannon Entropy & Information Gain (ID3)",
-            definition: "Entropy measures the impurity or disorder of a dataset S. Information Gain measures the reduction in entropy achieved by partitioning on attribute A.",
+            term: "Searching for Solutions & Uninformed Search (BFS vs DFS)",
+            definition: "State space search formalizes a problem as: Initial State, Actions/Operators, Transition Model, Goal State Test, and Path Cost. Uninformed (blind) search explores without domain heuristic guidance.",
             bulletPoints: [
-              "Entropy: H(S) = -Σ p_i log₂(p_i). For pure binary set (all yes or all no), H(S) = 0. For maximum uncertainty (50-50), H(S) = 1.0.",
-              "Information Gain: Gain(S, A) = H(S) - Σ [ (|S_v| / |S|) · H(S_v) ].",
-              "ID3 chooses the attribute with the HIGHEST Information Gain as the decision node."
+              "Breadth-First Search (BFS): Explores nodes level-by-level using a FIFO queue. Properties: Complete (if branching factor b is finite), Optimal for uniform step cost, Time Complexity O(b^d), Space Complexity O(b^d) (severe memory bottleneck).",
+              "Depth-First Search (DFS): Explores deepest unvisited child first using a LIFO stack. Properties: Incomplete (can trap in infinite loops), Not Optimal, Time Complexity O(b^m), Space Complexity O(b · m) (highly memory efficient, linear).",
+              "Data-Driven Search (Forward Chaining): Starts from known initial facts/assertions and applies inference rules forward to deduce new facts until the goal is proved (bottom-up).",
+              "Goal-Driven Search (Backward Chaining): Starts from the goal hypothesis and works backward to find supporting subgoals and matching axioms (top-down, ideal for diagnosis)."
+            ]
+          },
+          {
+            term: "Heuristic Search & The A* Algorithm",
+            definition: "Informed search uses heuristic evaluation function h(n) estimating the cost from current state n to the goal state.",
+            bulletPoints: [
+              "Evaluation Function: f(n) = g(n) + h(n), where g(n) is exact cost from start to n, and h(n) is heuristic estimate to goal.",
+              "Admissibility Condition: A heuristic is admissible if it NEVER overestimates the true minimal cost to reach the goal: 0 ≤ h(n) ≤ h*(n) for all n.",
+              "Optimality Theorem: A* tree search is optimal if h(n) is admissible. A* graph search is optimal if h(n) is consistent (monotonic: h(n) ≤ c(n, a, n') + h(n')).",
+              "Data Structures: OPEN list (priority queue sorted by lowest f(n)) and CLOSED list (visited set)."
+            ]
+          },
+          {
+            term: "Knowledge Representation: Four Core Schemes",
+            definition: "Formal mechanisms to store and reason over knowledge in symbolic AI:",
+            bulletPoints: [
+              "1. Logical Representation Scheme:\n  • Propositional Calculus: Boolean propositions connected via AND, OR, NOT, IMPLIES, EQUIVALENT. Simple but lacks entity-relation quantification.\n  • Predicate Calculus (FOPC): Adds predicates, variables, constants, and quantifiers (∀, ∃). Enables expressive statements like ∀x [Human(x) ⇒ Mortal(x)].\n  • Unification & Resolution Refutation: Algorithmic proof technique converting premises to Conjunctive Normal Form (CNF) and deriving the empty clause (contradiction) from negated goal.",
+              "2. Procedural Representation Scheme:\n  • Production Systems: Consist of Rule Base (IF premise THEN action), Working Memory (active facts), and Inference Engine (Match-Resolve-Act cycle).",
+              "3. Network Representation Scheme:\n  • Semantic Networks: Directed graphs where nodes represent concepts/objects and labeled edges represent relationships (e.g. 'is-a', 'has-a') with property inheritance.\n  • Conceptual Graphs: Bipartite graph representations of natural language assertions (concept nodes and relation nodes).",
+              "4. Structured Representation Scheme:\n  • Frames: Record-like structures with named attributes ('slots') and values ('fillers'), default values, and procedural attachments ('demons').\n  • Scripts: Schema for stereotypic sequence of events in a known context (e.g. Restaurant Script: Entry, Ordering, Eating, Paying, Exiting) containing Props, Roles, Entry Conditions, and Scenes."
+            ]
+          }
+        ],
+        derivations: [
+          {
+            title: "Resolution Refutation in Propositional Logic",
+            steps: [
+              "1. Convert all given KB premises into Conjunctive Normal Form (CNF clauses).",
+              "2. Negate the goal theorem: to prove α, add ¬α to the set of clauses.",
+              "3. Identify two clauses containing complementary literals (e.g. P and ¬P).",
+              "4. Resolve them by generating the resolvent clause without the complementary pair.",
+              "5. Repeat until the Empty Clause (Contradiction / □) is derived, proving KB ⊨ α."
+            ],
+            finalFormula: "(P \\lor Q) \\land (\\neg P \\lor Q) \\land \\neg Q \\implies \\square \\text{ (Contradiction)}",
+            examFrequency: "Guaranteed 4M or 6M question in Section C/D"
+          }
+        ],
+        formulas: [
+          { name: "A* Evaluation Function", formula: "f(n) = g(n) + h(n)", whereUsed: "Best-first node selection" },
+          { name: "Admissibility Constraint", formula: "0 \\le h(n) \\le h^*(n)", whereUsed: "Guaranteeing A* optimality" }
+        ],
+        solvedQuestions: [
+          {
+            question: "Compare BFS and DFS across Completeness, Time Complexity, Space Complexity, and Optimality. When is Heuristic search preferred?",
+            marks: "6 Marks",
+            solution: "| Metric | Breadth-First Search (BFS) | Depth-First Search (DFS) |\\n| :--- | :--- | :--- |\\n| Completeness | Yes (if branching b is finite) | No (can loop in infinite paths) |\\n| Time Complexity | O(b^d) | O(b^m) |\\n| Space Complexity | O(b^d) (Exponential!) | O(b · m) (Linear!) |\\n| Optimality | Yes (for unit step costs) | No |\\nHeuristic search (like A*) is preferred when the state space is too vast for blind search (e.g. chess, shortest path on large maps), because the heuristic function h(n) prunes unpromising search branches and guides the search directly towards the goal.",
+            keyPoints: ["Provide complete 4-metric comparison table", "Explain heuristic pruning advantage"]
+          },
+          {
+            question: "Explain Knowledge Representation using Semantic Networks and Frames with an illustrative example of property inheritance.",
+            marks: "4 Marks",
+            solution: "1. Semantic Network: A graph where nodes represent objects/classes (e.g. Animal, Bird, Canary) and directed edges represent relations ('is-a', 'can-fly', 'color').\\n2. Inheritance: Properties at higher nodes are automatically inherited by lower nodes. Example: Animal has property 'alive=True'; Bird is-a Animal (inherits 'alive=True' and adds 'can-fly=True'); Canary is-a Bird (inherits 'alive=True', 'can-fly=True' and adds 'color=Yellow').\\n3. Exception Handling: If Penguin is-a Bird, the inherited property 'can-fly=True' is overridden locally with 'can-fly=False'.\\n4. Frames: Represent the same structure using slots and fillers (e.g. Frame: Bird; Slot: can-fly; Value: True).",
+            keyPoints: ["Define both representation schemes", "Show inheritance hierarchy and exception overriding"]
+          }
+        ],
+        examinerTips: "In A* search numericals, always write down the OPEN and CLOSED lists explicitly at every single step to score full marks."
+      },
+      {
+        unitNum: 3,
+        title: 'Expert Systems & Knowledge Engineering',
+        weightage: '15 Marks (30M Sessional-II)',
+        summary: 'Introduction and structure of expert systems, The human element in expert systems (Domain Expert, Knowledge Engineer, System Engineer, End User), Architecture of expert systems (Knowledge Base, Inference Engine, Explanation Facility, User Interface, Working Memory), Problem areas addressed, Success factors, Types of expert systems, Knowledge Engineering: scope of knowledge, difficulties in knowledge acquisition (Feigenbaum\'s bottleneck), and methods of knowledge acquisition.',
+        keyTheories: [
+          {
+            term: "Introduction & Architecture of Expert Systems",
+            definition: "An Expert System (ES) is an interactive, domain-specific AI program that emulates the decision-making and problem-solving capability of a human domain expert using heuristic knowledge and formal inference.",
+            bulletPoints: [
+              "1. Knowledge Base (KB): Contains domain-specific heuristics and factual rules in the form of IF <condition/antecedent> THEN <action/consequent>.",
+              "2. Working Memory (Fact Base): Dynamic global database storing observations, user responses, and deduced intermediate assertions for the active session.",
+              "3. Inference Engine: The reasoning brain executing the Match-Resolve-Act cycle: matches rule premises against working memory facts, resolves rule conflicts via strategies (specificity, recency, priority), and fires the chosen rule.",
+              "4. Explanation Facility: Answers user transparency queries: 'WHY is this question being asked?' (explains current active rule) and 'HOW was this conclusion derived?' (shows deductive inference rule chain).",
+              "5. User Interface: Provides natural, friendly interaction between the non-expert user and the consultation engine."
+            ]
+          },
+          {
+            term: "The Human Element in Expert Systems",
+            definition: "The four key human stakeholders involved in the conception, development, and operational lifecycle of an expert system:",
+            bulletPoints: [
+              "1. Domain Expert: The human specialist possessing deep, tacit knowledge, experience, heuristics, and problem-solving skills in the specialized field (e.g. senior oncologist).",
+              "2. Knowledge Engineer: The AI professional who interviews the domain expert, translates unstructured human rules of thumb into formal structured representations (rules/frames), and encodes them into the knowledge base.",
+              "3. System Engineer / Builder: The software developer who designs the inference algorithms, working memory architecture, and user interface.",
+              "4. End User: The practitioner, technician, or student who consults the system to obtain expert advice, diagnosis, or recommendations."
+            ]
+          },
+          {
+            term: "Problem Areas Addressed & Types of Expert Systems",
+            definition: "Major application categories and structural paradigms of expert systems:",
+            bulletPoints: [
+              "Problem Areas Addressed:\n  • Interpretation: Analyzing raw sensor data to infer meaning (e.g. DENDRAL for chemical spectroscopy).\n  • Prediction: Forecasting future outcomes from current trends (e.g. financial forecasting).\n  • Diagnosis: Inferring system malfunctions or diseases from observed symptoms (e.g. MYCIN for bacterial blood infections).\n  • Design & Configuration: Synthesizing system configurations that satisfy constraints (e.g. DEC's XCON/R1 for VAX computer systems).\n  • Planning, Monitoring, Instruction & Control.",
+              "Types of Expert Systems:\n  • Rule-Based Expert Systems: Most common; knowledge represented as IF-THEN rules.\n  • Frame-Based Expert Systems: Knowledge organized in hierarchical frame records.\n  • Fuzzy Expert Systems: Uses fuzzy logic membership functions to reason under vagueness and linguistic ambiguity.\n  • Neural / Hybrid Expert Systems: Combines connectionist neural pattern recognition with symbolic rule explanation."
+            ]
+          },
+          {
+            term: "Knowledge Engineering & Knowledge Acquisition",
+            definition: "The process of extracting, structuring, and formalizing knowledge from human experts and empirical sources into a machine-executable knowledge base.",
+            bulletPoints: [
+              "Scope of Knowledge: Declarative (facts, concepts), Procedural (rules, action sequences), and Heuristic (practical rules of thumb and expert intuition).",
+              "The Knowledge Acquisition Bottleneck (Feigenbaum's Bottleneck): The most difficult, time-consuming phase of ES development because human experts rely on tacit, subconscious intuition that is difficult to articulate verbally in discrete rules.",
+              "Methods of Knowledge Acquisition:\n  • Structured & Semi-Structured Interviews: Knowledge engineer systematically questions the expert.\n  • Protocol Analysis (Think-Aloud Protocols): Expert speaks their entire thought process aloud while solving a real diagnostic case.\n  • Automated Knowledge Acquisition: Machine learning and rule induction algorithms extracting rules directly from historical case databases."
             ]
           }
         ],
         derivations: [],
         formulas: [
-          { name: "Shannon Entropy", formula: "H(S) = -\\sum_{i=1}^c p_i \\log_2(p_i)", whereUsed: "Decision tree impurity metric" },
-          { name: "Association Rule Confidence", formula: "\\text{Confidence}(A \\to B) = \\frac{\\text{Support}(A \\cup B)}{\\text{Support}(A)}", whereUsed: "Apriori market basket analysis" }
+          { name: "Production Rule Formulation", formula: "\\text{IF } \\langle \\text{Antecedent}_1 \\land \\dots \\land \\text{Antecedent}_n \\rangle \\implies \\text{THEN } \\langle \\text{Consequent Action} \\rangle", whereUsed: "Knowledge base rule encoding" }
         ],
         solvedQuestions: [
           {
-            question: "A dataset has 9 positive (Yes) and 5 negative (No) examples. Calculate the total Shannon Entropy H(S).",
+            question: "Draw the architectural block diagram of an Expert System. Explain the role of the Knowledge Base, Inference Engine, and Explanation Facility.",
             marks: "6 Marks",
-            solution: "1. Total N = 9 + 5 = 14. 2. p_+ = 9/14 = 0.643; p_- = 5/14 = 0.357. 3. H(S) = - [ (9/14) log₂(9/14) + (5/14) log₂(5/14) ]. 4. log₂(0.643) = -0.637; log₂(0.357) = -1.486. 5. H(S) = - [ 0.643 × (-0.637) + 0.357 × (-1.486) ] = - [ -0.410 - 0.530 ] = 0.940 bits.",
-            keyPoints: ["Show log base 2 conversions", "Box final answer: H(S) = 0.940 bits"]
+            solution: "1. Block Diagram: User <-> User Interface <-> Inference Engine & Explanation Facility <-> Working Memory & Knowledge Base. Knowledge Engineer <-> Knowledge Base via Acquisition module.\\n2. Knowledge Base: Encodes domain expertise as production rules (IF-THEN).\\n3. Inference Engine: Executes the Match-Resolve-Act reasoning cycle to infer new facts from known working memory assertions.\\n4. Explanation Facility: Provides explainability by tracing rule firings to answer 'WHY' a question is needed and 'HOW' a conclusion was reached, building user trust.",
+            keyPoints: ["Draw clear block diagram with data flow arrows", "Explain Match-Resolve-Act cycle", "Explain WHY and HOW explanation facilities"]
+          },
+          {
+            question: "Explain the role of the Knowledge Engineer and discuss why Knowledge Acquisition is considered the major bottleneck in Expert System development.",
+            marks: "4 Marks",
+            solution: "1. Role of Knowledge Engineer: Acts as the conceptual bridge between the domain expert and the computer system—eliciting, structuring, verifying, and encoding expert heuristic knowledge.\\n2. Why it is a Bottleneck: Human experts often use subconscious tacit knowledge that is difficult to articulate in formal terms; experts may disagree; domain rules often have exceptions; and translating spoken jargon into consistent formal production rules requires hundreds of hours of iterative interviews.",
+            keyPoints: ["Define Knowledge Engineer's bridge role", "Explain Feigenbaum's tacit knowledge articulacy problem"]
           }
         ],
-        examinerTips: "Remember that log₂(x) = ln(x) / ln(2) = ln(x) / 0.6931 on non-programming scientific calculators."
+        examinerTips: "Remember classic expert systems names: MYCIN (medical diagnosis), DENDRAL (molecular structure), and XCON/R1 (computer hardware configuration)."
+      },
+      {
+        unitNum: 4,
+        title: 'Introduction to Machine Learning Concepts',
+        weightage: '15 Marks (30M Sessional-II)',
+        summary: 'Overview of Machine Learning and its significance, Categories of learning: Supervised, Unsupervised, and Reinforcement Learning, ML application areas (Recommendation systems, Automation, Smart devices), Machine Learning workflow and model development lifecycle, Supervised Machine Learning: Classification algorithms & Regression algorithms, Unsupervised Machine Learning: Clustering algorithms and Association algorithms.',
+        keyTheories: [
+          {
+            term: "Overview & Three Paradigms of Machine Learning",
+            definition: "Machine Learning (Arthur Samuel, 1959) is the field of study that gives computers the ability to learn without being explicitly programmed, optimizing a performance metric P using experience E over task T.",
+            bulletPoints: [
+              "1. Supervised Learning: Model learns from labeled dataset D = {(x_i, y_i)}. Objective is to learn a mapping function f: X -> Y that generalizes accurately to unseen test data. Tasks: Classification (discrete classes) and Regression (continuous values).",
+              "2. Unsupervised Learning: Model learns from unlabelled data D = {x_i}. Objective is to discover latent patterns, clusters, density distributions, or association rules without ground truth supervision. Tasks: Clustering, Dimensionality Reduction, and Association Rule Mining.",
+              "3. Reinforcement Learning: An autonomous agent learns an optimal policy π(s) -> a through trial-and-error interaction with a dynamic environment, receiving scalar rewards or penalties to maximize cumulative long-term return."
+            ]
+          },
+          {
+            term: "Machine Learning Workflow & Model Development Lifecycle",
+            definition: "The standardized 7-stage engineering pipeline for developing and deploying production ML systems:",
+            bulletPoints: [
+              "1. Problem Definition: Formulating business objective as an ML task (Classification, Regression, Clustering).",
+              "2. Data Collection: Sourcing representative training and validation datasets.",
+              "3. Data Preprocessing & Cleaning: Handling missing values, outlier removal, categorical encoding (One-Hot), feature scaling (Min-Max normalization, Standardization).",
+              "4. Feature Engineering & Selection: Creating domain features and selecting most predictive subset.",
+              "5. Model Selection & Training: Splitting data into Train/Validation/Test sets (e.g. 70/15/15) and fitting parameters.",
+              "6. Model Evaluation: Evaluating generalization using appropriate metrics (Accuracy, Precision, Recall, F1-Score, ROC-AUC for classification; MSE, RMSE, R² for regression).",
+              "7. Deployment & Continuous Monitoring: Serving model via REST APIs, tracking concept drift and data drift over time."
+            ]
+          },
+          {
+            term: "Supervised Learning: Classification vs Regression",
+            definition: "The two foundational branches of supervised machine learning:",
+            bulletPoints: [
+              "Classification: Predicting categorical class labels.\n  • Decision Trees (ID3): Recursively partitions data using Shannon Entropy H(S) = -Σ p_i log₂(p_i) and Information Gain IG(S, A) = H(S) - Σ (|S_v|/|S|) H(S_v). The attribute maximizing Information Gain becomes the split node.\n  • Logistic Regression: Uses the Sigmoid activation function σ(z) = 1 / (1 + e^-z) to map linear inputs into probability scores between 0 and 1 for binary classification.\n  • Support Vector Machines (SVM): Finds the optimal separating hyperplane maximizing the geometric margin M = 2 / ||w|| between classes.\n  • Naive Bayes: Probabilistic classifier applying Bayes' Theorem with strong class-conditional feature independence assumptions.",
+              "Regression: Predicting continuous numeric outcomes.\n  • Linear Regression: Fits line/hyperplane y = w^T x + b to minimize Mean Squared Error (MSE) loss L = (1/2N) Σ (y_i - ŷ_i)² via Gradient Descent."
+            ]
+          },
+          {
+            term: "Unsupervised Learning: Clustering & Association Mining",
+            definition: "Key algorithms for discovering structure in unlabeled data:",
+            bulletPoints: [
+              "Clustering (K-Means):\n  • Partitions N data points into K clusters. Steps: (1) Randomly initialize K centroids; (2) Assign each point to the closest centroid (Euclidean distance); (3) Recalculate centroids as the mean of assigned points; (4) Repeat until centroids converge.\n  • Elbow Method: Plots Within-Cluster Sum of Squares (WCSS) against K. The 'elbow' bend indicates the optimal balance between compactness and simplicity.",
+              "Association Rule Mining (Apriori Algorithm):\n  • Discovers interesting correlations in transactional databases (Market Basket Analysis: 'If customer buys Bread, they also buy Butter with 80% confidence').\n  • Support(A => B) = P(A ∪ B) = (Count of transactions with A and B) / (Total transactions).\n  • Confidence(A => B) = P(B | A) = Support(A ∪ B) / Support(A).\n  • Apriori Downward Closure Property: Any subset of a frequent itemset must also be frequent. If an itemset is infrequent, all of its supersets are immediately pruned!"
+            ]
+          }
+        ],
+        derivations: [
+          {
+            title: "Shannon Entropy & Information Gain Formulation",
+            steps: [
+              "1. Total Dataset Entropy: H(S) = - \\sum_{i=1}^c p_i \\log_2(p_i), where p_i is probability of class i.",
+              "2. Expected Entropy of Attribute A: E(S, A) = \\sum_{v \\in \\text{Values}(A)} \\frac{|S_v|}{|S|} H(S_v).",
+              "3. Information Gain: IG(S, A) = H(S) - E(S, A).",
+              "4. The ID3 decision tree selects the attribute A* that yields maximum Information Gain: A* = \\arg\\max_A IG(S, A)."
+            ],
+            finalFormula: "IG(S, A) = H(S) - \\sum_{v} \\frac{|S_v|}{|S|} H(S_v)",
+            examFrequency: "Appears in every semester exam numerical (6 Marks)"
+          }
+        ],
+        formulas: [
+          { name: "Sigmoid Function", formula: "\\sigma(z) = \\frac{1}{1 + e^{-z}}", whereUsed: "Logistic regression probability squashing" },
+          { name: "Association Confidence", formula: "\\text{Confidence}(A \\to B) = \\frac{\\text{Support}(A \\cup B)}{\\text{Support}(A)}", whereUsed: "Apriori market basket analysis" }
+        ],
+        solvedQuestions: [
+          {
+            question: "A training dataset has 14 examples: 9 Yes and 5 No. Calculate the total Shannon Entropy H(S). An attribute 'Wind' splits the dataset into Weak (6 Yes, 2 No) and Strong (3 Yes, 3 No). Calculate the Information Gain of Wind.",
+            marks: "6 Marks",
+            solution: "1. Total Entropy H(S):\\np_+ = 9/14 = 0.643, p_- = 5/14 = 0.357.\\nH(S) = - [ 0.643 \\log_2(0.643) + 0.357 \\log_2(0.357) ] = - [ 0.643(-0.637) + 0.357(-1.486) ] = 0.410 + 0.530 = 0.940 bits.\\n2. Subset Entropies:\\n- Weak (8 samples: 6+, 2-): H(S_{weak}) = - [ (6/8)\\log_2(6/8) + (2/8)\\log_2(2/8) ] = - [ 0.75(-0.415) + 0.25(-2.0) ] = 0.311 + 0.500 = 0.811 bits.\\n- Strong (6 samples: 3+, 3-): Equal split \\implies H(S_{strong}) = 1.000 bits.\\n3. Expected Entropy E(S, Wind):\\nE(S, Wind) = (8/14)(0.811) + (6/14)(1.000) = 0.463 + 0.429 = 0.892 bits.\\n4. Information Gain IG(S, Wind):\\nIG(S, Wind) = H(S) - E(S, Wind) = 0.940 - 0.892 = 0.048 bits.",
+            keyPoints: ["Show step-by-step log base 2 calculations", "Box H(S) = 0.940 bits and Gain = 0.048 bits"]
+          },
+          {
+            question: "Describe the K-Means Clustering algorithm with its objective function. Explain how the Elbow Method is used to determine the optimal number of clusters K.",
+            marks: "4 Marks",
+            solution: "1. Objective Function: Minimize Within-Cluster Sum of Squares (WCSS): J = \\sum_{j=1}^K \\sum_{i \\in S_j} \\|x_i - \\mu_j\\|^2.\\n2. Steps: (a) Initialize K centroids randomly; (b) Assign each point x_i to closest centroid \\mu_j; (c) Recalculate centroids as the arithmetic mean of assigned points: \\mu_j = \\frac{1}{|S_j|} \\sum x_i; (d) Repeat until centroid coordinates stabilize.\\n3. Elbow Method: Plot WCSS against K (K=1, 2, 3...). As K increases, WCSS decreases monotonically. The point where the curve abruptly bends like an elbow indicates diminishing returns, defining the optimal K.",
+            keyPoints: ["State WCSS formula", "List 4-step convergence loop", "Sketch and explain Elbow Method plot"]
+          }
+        ],
+        examinerTips: "In numericals, write log₂(x) = ln(x) / ln(2) = ln(x) / 0.6931 on non-programming scientific calculators."
       }
     ]
   },
