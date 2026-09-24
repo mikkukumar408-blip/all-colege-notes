@@ -267,6 +267,17 @@ export default function ExpectedQuestionPapers({ currentUser }) {
   const timerRef = useRef(null);
 
   useEffect(() => {
+    if (activePaper) {
+      document.body.classList.add('exam-paper-modal-active');
+    } else {
+      document.body.classList.remove('exam-paper-modal-active');
+    }
+    return () => {
+      document.body.classList.remove('exam-paper-modal-active');
+    };
+  }, [activePaper]);
+
+  useEffect(() => {
     if (isTimerRunning) {
       timerRef.current = setInterval(() => {
         setTimerSeconds(prev => {
@@ -814,6 +825,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
          ------------------------------------------------------------------- */}
       {activePaper && createPortal(
         <div 
+          className="exam-paper-portal-overlay"
           style={{
             position: 'fixed',
             inset: 0,
@@ -828,7 +840,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
           onClick={() => setActivePaper(null)}
         >
           <div
-            className="glass-panel"
+            className="glass-panel exam-paper-modal-panel"
             onClick={(e) => e.stopPropagation()}
             style={{
               width: '100%',

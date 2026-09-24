@@ -97,6 +97,17 @@ export default function Theaters({ currentUser, initialSubject }) {
   const [copiedFormula, setCopiedFormula] = useState(null);
 
   React.useEffect(() => {
+    if (selectedRevisionNote) {
+      document.body.classList.add('revision-modal-active');
+    } else {
+      document.body.classList.remove('revision-modal-active');
+    }
+    return () => {
+      document.body.classList.remove('revision-modal-active');
+    };
+  }, [selectedRevisionNote]);
+
+  React.useEffect(() => {
     if (initialSubject) {
       const codeOrTitle = (initialSubject.code || initialSubject.name || initialSubject.title || '').toLowerCase();
       const matched = revisionNotes.find(n => 
@@ -729,6 +740,7 @@ export default function Theaters({ currentUser, initialSubject }) {
          ------------------------------------------------------------------- */}
       {selectedRevisionNote && createPortal(
         <div 
+          className="revision-portal-overlay"
           style={{
             position: 'fixed',
             inset: 0,
@@ -743,7 +755,7 @@ export default function Theaters({ currentUser, initialSubject }) {
           onClick={() => setSelectedRevisionNote(null)}
         >
           <div 
-            className="glass-panel"
+            className="glass-panel revision-modal-panel"
             onClick={(e) => e.stopPropagation()}
             style={{
               width: '100%',
@@ -759,7 +771,9 @@ export default function Theaters({ currentUser, initialSubject }) {
               overflow: 'hidden'
             }}
           >
-            {/* Modal Header */}
+            {/* Interactive Screen UI (hidden during print) */}
+            <div className="revision-screen-content" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+              {/* Modal Header */}
             <div style={{
               padding: '16px 22px',
               background: 'linear-gradient(90deg, rgba(7, 15, 30, 0.95) 0%, rgba(10, 25, 55, 0.9) 100%)',
@@ -1227,6 +1241,168 @@ export default function Theaters({ currentUser, initialSubject }) {
                   );
                 })()
               )}
+            </div>
+          </div>
+          {/* End revision-screen-content */}
+
+            {/* =============================================================
+               DEDICATED FULL PRINT DOCUMENT (Visible ONLY during window.print)
+               Renders all Units (1-4), Solved Questions, Formulas & Traps sequentially
+               ============================================================= */}
+            <div className="revision-print-document">
+              {/* Document Master Header */}
+              <div style={{ textAlign: 'center', borderBottom: '2px solid #0f172a', paddingBottom: '14px', marginBottom: '20px' }}>
+                <div style={{ fontSize: '0.85rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#475569' }}>
+                  MMEC TECHNICAL UNIVERSITY EXAMINATION ARCHIVE • FAST-TRACK REVISION MASTER
+                </div>
+                <h1 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#0f172a', margin: '6px 0 2px 0' }}>
+                  {selectedRevisionNote.subject} ({selectedRevisionNote.code})
+                </h1>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#2563eb' }}>
+                  {selectedRevisionNote.semester} • {selectedRevisionNote.year} • Official Syllabus Aligned Handbook
+                </div>
+                {selectedRevisionNote.summary && (
+                  <p style={{ margin: '8px auto 0 auto', maxWidth: '800px', fontSize: '0.85rem', color: '#334155', fontStyle: 'italic', lineHeight: 1.4 }}>
+                    {selectedRevisionNote.summary}
+                  </p>
+                )}
+              </div>
+
+              {/* Units 1 to 4 Section */}
+              {selectedRevisionNote.units && selectedRevisionNote.units.map(unit => (
+                <div key={unit.unitNum} className="rev-print-unit-block" style={{ marginBottom: '26px', paddingBottom: '20px', borderBottom: '1.5px solid #cbd5e1' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f1f5f9', padding: '8px 14px', borderRadius: '6px', borderLeft: '5px solid #0284c7', marginBottom: '14px' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                      UNIT {unit.unitNum}: {unit.title}
+                    </div>
+                    {unit.weightage && (
+                      <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0369a1', background: '#e0f2fe', padding: '2px 8px', borderRadius: '4px' }}>
+                        Weightage: {unit.weightage}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Core Concepts */}
+                  {unit.coreConcepts && unit.coreConcepts.length > 0 && (
+                    <div style={{ marginBottom: '16px' }}>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px' }}>
+                        📖 High-Yield Core Concepts
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {unit.coreConcepts.map((c, cIdx) => (
+                          <div key={cIdx} className="rev-print-avoid-break" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px 14px' }}>
+                            <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1e293b' }}>
+                              {typeof c === 'string' ? c : c.title}
+                            </div>
+                            {typeof c === 'object' && c.desc && (
+                              <div style={{ fontSize: '0.85rem', color: '#334155', marginTop: '4px', lineHeight: 1.5 }}>
+                                {c.desc}
+                              </div>
+                            )}
+                            {typeof c === 'object' && c.takeaway && (
+                              <div style={{ fontSize: '0.8rem', color: '#0369a1', fontWeight: 700, marginTop: '4px' }}>
+                                💡 Key Takeaway: {c.takeaway}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Cheat Sheet Bullet Points */}
+                  {unit.cheatSheet && unit.cheatSheet.length > 0 && (
+                    <div className="rev-print-avoid-break" style={{ marginBottom: '16px', background: '#fefce8', border: '1px solid #fef08a', borderRadius: '6px', padding: '10px 14px' }}>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#854d0e', textTransform: 'uppercase', marginBottom: '6px' }}>
+                        ⚡ High-Yield Cheat Sheet &amp; Rapid Facts
+                      </div>
+                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.84rem', color: '#713f12', lineHeight: 1.5 }}>
+                        {unit.cheatSheet.map((pt, pIdx) => (
+                          <li key={pIdx} style={{ marginBottom: '4px' }}>{pt}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Formulas & Equations */}
+                  {unit.formulas && unit.formulas.length > 0 && (
+                    <div className="rev-print-avoid-break" style={{ marginBottom: '16px' }}>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '8px' }}>
+                        📐 Essential Formulas, Equations &amp; Relations
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '8px' }}>
+                        {unit.formulas.map((f, fIdx) => (
+                          <div key={fIdx} style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '8px 12px' }}>
+                            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>{f.name}</div>
+                            <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#b45309', fontFamily: 'monospace', margin: '3px 0' }}>{f.formula}</div>
+                            {f.whereUsed && <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Usage: {f.whereUsed}</div>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Examiner Tips */}
+                  {unit.examinerTips && (
+                    <div className="rev-print-avoid-break" style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '6px', padding: '10px 14px' }}>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#be123c', textTransform: 'uppercase' }}>
+                        ⚠️ Top Ranker Exam Warning &amp; Pitfall:
+                      </span>
+                      <p style={{ margin: '4px 0 0 0', fontSize: '0.84rem', color: '#9f1239', lineHeight: 1.45 }}>
+                        {unit.examinerTips}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* Solved Questions Section */}
+              {allSolvedQuestions && allSolvedQuestions.length > 0 && (
+                <div style={{ marginTop: '28px', pageBreakBefore: 'auto' }}>
+                  <div style={{ textAlign: 'center', background: '#0f172a', color: '#fff', padding: '10px 16px', borderRadius: '6px', marginBottom: '18px' }}>
+                    <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, letterSpacing: '0.04em' }}>
+                      SOLVED UNIVERSITY EXAM QUESTIONS &amp; OFFICIAL MARKING SCHEMES
+                    </h2>
+                    <div style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '2px' }}>
+                      Step-by-step model solutions curated from previous MMEC &amp; university examination papers
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {allSolvedQuestions.map((q, qIdx) => (
+                      <div key={qIdx} className="rev-print-avoid-break" style={{ border: '1.5px solid #cbd5e1', borderRadius: '8px', padding: '14px 18px', background: '#fff' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px', marginBottom: '10px' }}>
+                          <div>
+                            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0369a1', background: '#e0f2fe', padding: '2px 8px', borderRadius: '4px', marginRight: '8px' }}>
+                              Unit {q.unitNum}
+                            </span>
+                            <span style={{ fontSize: '0.94rem', fontWeight: 800, color: '#0f172a' }}>
+                              Q{qIdx + 1}. {q.q}
+                            </span>
+                          </div>
+                          <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0f172a', background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', whiteSpace: 'nowrap' }}>
+                            [{q.marks} Marks • {q.year}]
+                          </span>
+                        </div>
+
+                        <div style={{ fontSize: '0.86rem', color: '#1e293b', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
+                          {q.solution}
+                        </div>
+
+                        {q.keyPoint && (
+                          <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed #cbd5e1', fontSize: '0.8rem', fontWeight: 700, color: '#059669' }}>
+                            🎯 Key Examiner Criterion: {q.keyPoint}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div style={{ textAlign: 'center', margin: '30px 0 10px 0', paddingTop: '14px', borderTop: '1px solid #cbd5e1', color: '#64748b', fontSize: '0.78rem' }}>
+                *** END OF EXAM REVISION HANDBOOK — ALL THE BEST FOR YOUR EXAMINATIONS ***
+              </div>
             </div>
           </div>
         </div>,
