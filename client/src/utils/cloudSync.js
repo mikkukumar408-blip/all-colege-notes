@@ -59,6 +59,63 @@ export const SUPER_ADMIN_ACCOUNT = {
   createdAt: '2026-01-01T00:00:00.000Z'
 };
 
+// Global System Controls Cloud Synchronizer (Dual Redundancy)
+export async function pullCloudControls() {
+  // 1. Try Vercel Serverless API
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(getApiUrl('/api/controls'), { signal: controller.signal });
+    clearTimeout(timeout);
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.controls) return json.controls;
+    }
+  } catch (e) {}
+
+  // 2. Direct Cloud KV Store
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(CONTROLS_BACKUP_URL, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.data) return json.data;
+    }
+  } catch (e) {}
+
+  return null;
+}
+
+export async function pushCloudControls(controls) {
+  const updatedControls = {
+    ...controls,
+    updatedAt: new Date().toISOString()
+  };
+
+  await Promise.allSettled([
+    // Primary sync to Vercel API
+    fetch(getApiUrl('/api/controls'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedControls)
+    }).catch(() => {}),
+
+    // Dual-redundancy direct sync to KV Backup
+    fetch(CONTROLS_BACKUP_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'college_notes_system_controls_v1',
+        data: updatedControls
+      })
+    }).catch(() => {})
+  ]);
+
+  return updatedControls;
+}
+
 export const SEED_ACCOUNTS = [
   SUPER_ADMIN_ACCOUNT,
   {

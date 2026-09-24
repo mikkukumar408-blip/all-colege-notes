@@ -28,7 +28,7 @@ const QuickSearchPalette = React.lazy(() => import('./components/QuickSearchPale
 import { initialSubjects } from './data/mockData';
 import { Menu, ChevronLeft, ChevronRight, ChevronDown, GraduationCap, ShieldCheck, Download, BookOpen, User, LogOut, Sparkles, Bot, Cpu, Award, Zap, Search } from 'lucide-react';
 import { logSecurityEvent } from './utils/security';
-import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers, getApiUrl } from './utils/cloudSync';
+import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers, getApiUrl, pullCloudControls } from './utils/cloudSync';
 import './App.css';
 
 export default function App() {
@@ -108,12 +108,9 @@ export default function App() {
 
     const fetchControls = async () => {
       try {
-        const res = await fetch(getApiUrl('/api/controls'));
-        if (res.ok) {
-          const json = await res.json();
-          if (json && json.controls) {
-            setSystemControls(json.controls);
-          }
+        const controls = await pullCloudControls();
+        if (controls) {
+          setSystemControls(controls);
         }
       } catch (e) {}
     };

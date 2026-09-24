@@ -60,7 +60,7 @@ import {
   fetchCloudTelemetry,
   clearCloudTelemetry
 } from '../utils/activityTracker';
-import { pullCloudUsers, authBroadcastChannel, getApiUrl } from '../utils/cloudSync';
+import { pullCloudUsers, authBroadcastChannel, getApiUrl, pullCloudControls, pushCloudControls } from '../utils/cloudSync';
 
 export default function SuperAdminPanel() {
   const [accounts, setAccounts] = useState([]);
@@ -97,10 +97,10 @@ export default function SuperAdminPanel() {
   const loadTelemetry = async (showToast = false) => {
     setIsRefreshing(true);
     try {
-      const [freshCloudUsers, freshCloudActivities, controlsRes] = await Promise.all([
+      const [freshCloudUsers, freshCloudActivities, cloudControls] = await Promise.all([
         pullCloudUsers().catch(() => null),
         fetchCloudTelemetry().catch(() => null),
-        fetch(getApiUrl('/api/controls')).then(r => r.json()).catch(() => null)
+        pullCloudControls().catch(() => null)
       ]);
 
       const accs = getAllAccountsWithStats(freshCloudUsers);
@@ -111,9 +111,9 @@ export default function SuperAdminPanel() {
       setAccounts(accs);
       setActivities(acts);
 
-      if (controlsRes?.controls) {
-        setControls(controlsRes.controls);
-        setAnnouncementText(prev => prev || controlsRes.controls.announcement || '');
+      if (cloudControls) {
+        setControls(cloudControls);
+        setAnnouncementText(prev => prev || cloudControls.announcement || '');
       }
 
       if (showToast) {
@@ -164,21 +164,14 @@ export default function SuperAdminPanel() {
     if (!announcementText.trim()) return;
     setIsUpdatingControls(true);
     try {
-      const res = await fetch(getApiUrl('/api/controls'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          announcement: announcementText.trim(),
-          announcementActive: true,
-          maintenanceMode: controls.maintenanceMode
-        })
+      const updated = await pushCloudControls({
+        ...controls,
+        announcement: announcementText.trim(),
+        announcementActive: true
       });
-      if (res.ok) {
-        const json = await res.json();
-        setControls(json.controls);
-        setFeedbackMsg({ type: 'success', text: '📢 Global campus announcement published live to Website & Mobile App!' });
-        await loadTelemetry(false);
-      }
+      setControls(updated);
+      setFeedbackMsg({ type: 'success', text: '📢 Global campus announcement published live to Website & Mobile App!' });
+      await loadTelemetry(false);
     } catch (err) {
       setFeedbackMsg({ type: 'error', text: 'Failed to publish announcement: ' + err.message });
     } finally {
@@ -190,21 +183,13 @@ export default function SuperAdminPanel() {
   const handleDisableAnnouncement = async () => {
     setIsUpdatingControls(true);
     try {
-      const res = await fetch(getApiUrl('/api/controls'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          announcement: announcementText,
-          announcementActive: false,
-          maintenanceMode: controls.maintenanceMode
-        })
+      const updated = await pushCloudControls({
+        ...controls,
+        announcementActive: false
       });
-      if (res.ok) {
-        const json = await res.json();
-        setControls(json.controls);
-        setFeedbackMsg({ type: 'success', text: 'Announcement banner deactivated on all devices.' });
-        await loadTelemetry(false);
-      }
+      setControls(updated);
+      setFeedbackMsg({ type: 'success', text: 'Announcement banner deactivated on all devices.' });
+      await loadTelemetry(false);
     } catch (err) {
       setFeedbackMsg({ type: 'error', text: 'Failed to deactivate announcement.' });
     } finally {
@@ -217,24 +202,16 @@ export default function SuperAdminPanel() {
     const nextMode = !controls.maintenanceMode;
     setIsUpdatingControls(true);
     try {
-      const res = await fetch(getApiUrl('/api/controls'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          announcement: controls.announcement,
-          announcementActive: controls.announcementActive,
-          maintenanceMode: nextMode
-        })
+      const updated = await pushCloudControls({
+        ...controls,
+        maintenanceMode: nextMode
       });
-      if (res.ok) {
-        const json = await res.json();
-        setControls(json.controls);
-        setFeedbackMsg({
-          type: 'success',
-          text: nextMode ? '🛑 Emergency Maintenance Mode ENGAGED on all devices.' : '✅ Normal operational mode restored.'
-        });
-        await loadTelemetry(false);
-      }
+      setControls(updated);
+      setFeedbackMsg({
+        type: 'success',
+        text: nextMode ? '🛑 Emergency Maintenance Mode ENGAGED on all devices.' : '✅ Normal operational mode restored.'
+      });
+      await loadTelemetry(false);
     } catch (err) {
       setFeedbackMsg({ type: 'error', text: 'Failed to toggle maintenance mode.' });
     } finally {

@@ -208,12 +208,25 @@ export function logUserActivity(username, action, resource, details = '', metada
     const updated = [newActivity, ...activities].slice(0, 250);
     localStorage.setItem(STORAGE_KEY_ACTIVITIES, JSON.stringify(updated));
 
-    // Live Cloud Telemetry Stream Push (fire-and-forget, works on mobile & web)
-    fetch(getApiUrl('/api/telemetry'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newActivity)
-    }).catch(() => {});
+    // Live Cloud Telemetry Stream Push (Dual Redundancy: Vercel API + Cloud KV Store)
+    Promise.allSettled([
+      fetch(getApiUrl('/api/telemetry'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newActivity)
+      }).catch(() => {}),
+      fetch(TELEMETRY_BACKUP_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'college_notes_telemetry_stream_v1',
+          data: {
+            updatedAt: new Date().toISOString(),
+            events: updated
+          }
+        })
+      }).catch(() => {})
+    ]);
 
     return newActivity;
   } catch (e) {
@@ -285,7 +298,20 @@ export async function fetchCloudTelemetry() {
 export async function clearCloudTelemetry() {
   try {
     localStorage.setItem(STORAGE_KEY_ACTIVITIES, JSON.stringify([]));
-    await fetch(getApiUrl('/api/telemetry/clear'), { method: 'POST' });
+    await Promise.allSettled([
+      fetch(getApiUrl('/api/telemetry/clear'), { method: 'POST' }).catch(() => {}),
+      fetch(TELEMETRY_BACKUP_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'college_notes_telemetry_stream_v1',
+          data: {
+            updatedAt: new Date().toISOString(),
+            events: []
+          }
+        })
+      }).catch(() => {})
+    ]);
   } catch (e) {}
 }
 
