@@ -45,6 +45,7 @@ import {
 } from 'lucide-react';
 import { expectedQuestionPapers } from '../data/questionPapersData';
 import { logUserActivity } from '../utils/activityTracker';
+import { MathText, MathFormula } from '../utils/mathRenderer';
 
 const YEARS = ['All Years', '1st Year', '2nd Year', '3rd Year', '4th Year'];
 
@@ -1204,7 +1205,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                             </span>
                             <div style={{ flex: 1 }}>
                               <div style={{ fontSize: '0.92rem', color: '#f1f5f9', fontWeight: 600, lineHeight: 1.5 }}>
-                                {q.question}
+                                <MathText text={q.question} as="span" />
                               </div>
                               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px', flexWrap: 'wrap' }}>
                                 <span style={{ fontSize: '0.72rem', background: 'rgba(255, 255, 255, 0.06)', padding: '2px 6px', borderRadius: '4px', color: '#94a3b8' }}>
@@ -1261,8 +1262,8 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                               <CheckCircle2 size={13} color="#10b981" />
                               <span>Model Answer &amp; Key Points:</span>
                             </div>
-                            <div style={{ fontSize: '0.86rem', color: '#e2e8f0', whiteSpace: 'pre-line', lineHeight: 1.55 }}>
-                              {q.modelAnswer}
+                            <div style={{ fontSize: '0.86rem', color: '#e2e8f0', lineHeight: 1.55 }}>
+                              <MathText text={q.modelAnswer || q.solution} />
                             </div>
 
                             {/* Marking Scheme Points */}
@@ -1415,7 +1416,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                                           <div style={{ flex: 1 }}>
                                             <div style={{ fontSize: '0.9rem', color: '#f1f5f9', fontWeight: 600, lineHeight: 1.5 }}>
                                               <strong style={{ color: 'var(--neon-cyan)', marginRight: '6px' }}>{sub.part}</strong>
-                                              {sub.question}
+                                              <MathText text={sub.question} as="span" />
                                             </div>
                                           </div>
                                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1455,8 +1456,8 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                                               <CheckCircle2 size={13} color="#10b981" />
                                               <span>Step-by-Step Solution:</span>
                                             </div>
-                                            <div style={{ fontSize: '0.85rem', color: '#e2e8f0', whiteSpace: 'pre-line', lineHeight: 1.6 }}>
-                                              {sub.solution}
+                                            <div style={{ fontSize: '0.85rem', color: '#e2e8f0', lineHeight: 1.6 }}>
+                                              <MathText text={sub.solution} />
                                             </div>
 
                                             {/* Marking Scheme */}
@@ -1471,7 +1472,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                                                 alignItems: 'center',
                                                 gap: '6px'
                                               }}>
-                                                <span>🎯 <strong>Official Rubric:</strong> {sub.markingScheme}</span>
+                                                <span>🎯 <strong>Official Rubric:</strong> <MathText text={sub.markingScheme} as="span" /></span>
                                               </div>
                                             )}
                                           </div>

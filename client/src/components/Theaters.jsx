@@ -39,6 +39,7 @@ import {
 import { initialShortNotes } from '../data/mockData';
 import { examRevisionNotes } from '../data/examRevisionNotesData';
 import { logUserActivity } from '../utils/activityTracker';
+import { MathFormula, MathText } from '../utils/mathRenderer';
 
 /* -------------------------------------------------------------------------
    ACADEMIC YEARS & SEMESTER CONFIGURATION
@@ -984,7 +985,7 @@ export default function Theaters({ currentUser, initialSubject }) {
                       </div>
 
                       <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.4 }}>
-                        {q.question}
+                        <MathText text={q.question || q.q} as="span" />
                       </h4>
 
                       <div style={{
@@ -994,13 +995,12 @@ export default function Theaters({ currentUser, initialSubject }) {
                         border: '1px solid rgba(0, 240, 255, 0.2)',
                         fontSize: '0.86rem',
                         color: '#cbd5e1',
-                        lineHeight: 1.55,
-                        whiteSpace: 'pre-line'
+                        lineHeight: 1.55
                       }}>
                         <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--neon-green)', marginBottom: '6px' }}>
                           MODEL STEP-BY-STEP SOLUTION:
                         </div>
-                        {q.solution}
+                        <MathText text={q.solution} style={{ color: '#cbd5e1' }} />
                       </div>
 
                       {q.keyPoints && q.keyPoints.length > 0 && (
@@ -1068,20 +1068,21 @@ export default function Theaters({ currentUser, initialSubject }) {
                         </span>
                       </div>
 
-                      {/* 1. Core Theories & High-Yield Definitions */}
-                      {currentUnit.keyTheories && currentUnit.keyTheories.length > 0 && (
+                      {/* 1. Core Theories / Core Concepts & Precise Definitions */}
+                      {((currentUnit.keyTheories && currentUnit.keyTheories.length > 0) || (currentUnit.coreConcepts && currentUnit.coreConcepts.length > 0)) && (
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                             <FileText size={18} color="var(--neon-cyan)" />
                             <h4 style={{ margin: 0, fontSize: '1.05rem', color: '#fff', fontWeight: 800 }}>
-                              📌 Core Theories &amp; Precise Definitions
+                              📌 Core Theories, Principles &amp; Definitions
                             </h4>
                           </div>
 
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
-                            {currentUnit.keyTheories.map((theory, tidx) => (
+                            {/* Render keyTheories if available */}
+                            {currentUnit.keyTheories && currentUnit.keyTheories.map((theory, tidx) => (
                               <div 
-                                key={tidx}
+                                key={`kt_${tidx}`}
                                 style={{
                                   padding: '16px',
                                   borderRadius: '10px',
@@ -1092,15 +1093,48 @@ export default function Theaters({ currentUser, initialSubject }) {
                                 <h5 style={{ margin: '0 0 6px 0', fontSize: '0.96rem', color: 'var(--neon-cyan)', fontWeight: 800 }}>
                                   {theory.term}
                                 </h5>
-                                <p style={{ margin: '0 0 8px 0', fontSize: '0.86rem', color: '#e2e8f0', lineHeight: 1.5 }}>
-                                  {theory.definition}
-                                </p>
+                                <MathText 
+                                  text={theory.definition} 
+                                  as="p" 
+                                  style={{ margin: '0 0 8px 0', fontSize: '0.86rem', color: '#e2e8f0', lineHeight: 1.55 }} 
+                                />
                                 {theory.bulletPoints && (
-                                  <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.82rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                                  <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.82rem', color: '#cbd5e1', lineHeight: 1.55 }}>
                                     {theory.bulletPoints.map((bp, bidx) => (
-                                      <li key={bidx} style={{ marginBottom: '4px' }}>{bp}</li>
+                                      <li key={bidx} style={{ marginBottom: '4px' }}>
+                                        <MathText text={bp} as="span" />
+                                      </li>
                                     ))}
                                   </ul>
+                                )}
+                              </div>
+                            ))}
+
+                            {/* Render coreConcepts if available */}
+                            {currentUnit.coreConcepts && currentUnit.coreConcepts.map((c, cidx) => (
+                              <div 
+                                key={`cc_${cidx}`}
+                                style={{
+                                  padding: '16px',
+                                  borderRadius: '10px',
+                                  background: 'rgba(15, 23, 42, 0.6)',
+                                  border: '1px solid rgba(255, 255, 255, 0.08)'
+                                }}
+                              >
+                                <h5 style={{ margin: '0 0 6px 0', fontSize: '0.96rem', color: 'var(--neon-cyan)', fontWeight: 800 }}>
+                                  {typeof c === 'string' ? c : c.title}
+                                </h5>
+                                {typeof c === 'object' && c.desc && (
+                                  <MathText 
+                                    text={c.desc} 
+                                    as="p" 
+                                    style={{ margin: '0 0 6px 0', fontSize: '0.86rem', color: '#e2e8f0', lineHeight: 1.55 }} 
+                                  />
+                                )}
+                                {typeof c === 'object' && c.takeaway && (
+                                  <div style={{ fontSize: '0.8rem', color: '#38bdf8', fontWeight: 700, marginTop: '4px' }}>
+                                    💡 Key Takeaway: <MathText text={c.takeaway} as="span" />
+                                  </div>
                                 )}
                               </div>
                             ))}
@@ -1108,13 +1142,35 @@ export default function Theaters({ currentUser, initialSubject }) {
                         </div>
                       )}
 
-                      {/* 2. Step-by-Step Exam Derivations */}
+                      {/* 2. High-Yield Cheat Sheet / Rapid Facts */}
+                      {currentUnit.cheatSheet && currentUnit.cheatSheet.length > 0 && (
+                        <div style={{
+                          padding: '14px 18px',
+                          borderRadius: '10px',
+                          background: 'rgba(245, 158, 11, 0.08)',
+                          border: '1px solid rgba(245, 158, 11, 0.3)'
+                        }}>
+                          <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Zap size={15} color="#fbbf24" />
+                            <span>⚡ High-Yield Cheat Sheet &amp; Rapid Facts</span>
+                          </div>
+                          <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.84rem', color: '#fef08a', lineHeight: 1.55 }}>
+                            {currentUnit.cheatSheet.map((pt, pIdx) => (
+                              <li key={pIdx} style={{ marginBottom: '4px' }}>
+                                <MathText text={pt} as="span" />
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* 3. Step-by-Step Exam Derivations with KaTeX */}
                       {currentUnit.derivations && currentUnit.derivations.length > 0 && (
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                             <Layers size={18} color="#38bdf8" />
                             <h4 style={{ margin: 0, fontSize: '1.05rem', color: '#fff', fontWeight: 800 }}>
-                              📐 Must-Know University Derivations
+                              📐 Must-Know University Derivations (KaTeX Formatted)
                             </h4>
                           </div>
 
@@ -1129,7 +1185,7 @@ export default function Theaters({ currentUser, initialSubject }) {
                                   border: '1.5px solid rgba(56, 189, 248, 0.3)'
                                 }}
                               >
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                                   <span style={{ fontSize: '0.98rem', fontWeight: 800, color: '#fff' }}>
                                     🎓 {d.title}
                                   </span>
@@ -1138,35 +1194,41 @@ export default function Theaters({ currentUser, initialSubject }) {
                                   </span>
                                 </div>
 
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
                                   {d.steps.map((st, sidx) => (
-                                    <div key={sidx} style={{ fontSize: '0.84rem', color: '#cbd5e1', lineHeight: 1.45 }}>
-                                      {st}
+                                    <div key={sidx} style={{ fontSize: '0.86rem', color: '#cbd5e1', lineHeight: 1.55 }}>
+                                      <MathText text={st} as="span" />
                                     </div>
                                   ))}
                                 </div>
 
                                 {d.finalFormula && (
                                   <div style={{
-                                    padding: '10px 14px',
-                                    borderRadius: '6px',
-                                    background: 'rgba(0, 240, 255, 0.1)',
-                                    border: '1px solid var(--neon-cyan)',
-                                    color: 'var(--neon-cyan)',
-                                    fontSize: '0.9rem',
-                                    fontWeight: 800,
+                                    padding: '12px 16px',
+                                    borderRadius: '8px',
+                                    background: 'rgba(0, 240, 255, 0.08)',
+                                    border: '1.5px solid var(--neon-cyan)',
+                                    boxShadow: '0 0 15px rgba(0, 240, 255, 0.2)',
                                     display: 'flex',
                                     justifyContent: 'space-between',
-                                    alignItems: 'center'
+                                    alignItems: 'center',
+                                    flexWrap: 'wrap',
+                                    gap: '10px'
                                   }}>
-                                    <span>FINAL BOXED FORMULA: {d.finalFormula}</span>
+                                    <div className="final-boxed-formula-content" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                                      <span style={{ fontSize: '0.76rem', fontWeight: 900, color: 'var(--neon-cyan)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                                        FINAL BOXED FORMULA:
+                                      </span>
+                                      <MathFormula formula={d.finalFormula} isDisplay={false} style={{ fontSize: '1.08rem', color: 'var(--neon-cyan)' }} />
+                                    </div>
                                     <button 
                                       type="button"
                                       onClick={() => handleCopyFormula(d.finalFormula)}
-                                      style={{ background: 'transparent', border: 'none', color: 'var(--neon-cyan)', cursor: 'pointer' }}
-                                      title="Copy Formula"
+                                      style={{ background: 'rgba(0, 240, 255, 0.15)', border: '1px solid rgba(0, 240, 255, 0.3)', borderRadius: '6px', padding: '4px 10px', color: 'var(--neon-cyan)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.74rem', fontWeight: 700 }}
+                                      title="Copy Formula LaTeX"
                                     >
-                                      {copiedFormula === d.finalFormula ? <CheckCheck size={16} /> : <Copy size={16} />}
+                                      {copiedFormula === d.finalFormula ? <CheckCheck size={14} /> : <Copy size={14} />}
+                                      <span>{copiedFormula === d.finalFormula ? 'Copied' : 'Copy'}</span>
                                     </button>
                                   </div>
                                 )}
@@ -1176,38 +1238,38 @@ export default function Theaters({ currentUser, initialSubject }) {
                         </div>
                       )}
 
-                      {/* 3. Essential Exam Formulas */}
+                      {/* 4. Essential Exam Formulas (Full KaTeX Typesetting) */}
                       {currentUnit.formulas && currentUnit.formulas.length > 0 && (
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                             <Flame size={18} color="var(--neon-amber)" />
                             <h4 style={{ margin: 0, fontSize: '1.05rem', color: '#fff', fontWeight: 800 }}>
-                              ⚡ Essential Formulas Cheat Sheet
+                              ⚡ Essential Formulas Cheat Sheet (KaTeX Rendered)
                             </h4>
                           </div>
 
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '12px' }}>
                             {currentUnit.formulas.map((f, fidx) => (
                               <div 
                                 key={fidx}
                                 style={{
-                                  padding: '12px 14px',
+                                  padding: '14px 16px',
                                   borderRadius: '8px',
-                                  background: 'rgba(15, 23, 42, 0.7)',
-                                  border: '1px solid rgba(255, 170, 0, 0.25)',
+                                  background: 'rgba(15, 23, 42, 0.75)',
+                                  border: '1px solid rgba(255, 170, 0, 0.3)',
                                   display: 'flex',
                                   flexDirection: 'column',
-                                  gap: '6px'
+                                  gap: '8px'
                                 }}
                               >
                                 <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 700 }}>
                                   {f.name}
                                 </div>
-                                <div style={{ fontSize: '0.92rem', color: '#ffaa00', fontWeight: 800, fontFamily: 'monospace' }}>
-                                  {f.formula}
+                                <div className="essential-formula-math" style={{ fontSize: '1.05rem', color: '#ffaa00', fontWeight: 700, padding: '4px 0', overflowX: 'auto' }}>
+                                  <MathFormula formula={f.formula} isDisplay={false} />
                                 </div>
                                 <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                                  Usage: {f.whereUsed}
+                                  Usage: <MathText text={f.whereUsed} as="span" />
                                 </div>
                               </div>
                             ))}
@@ -1215,7 +1277,7 @@ export default function Theaters({ currentUser, initialSubject }) {
                         </div>
                       )}
 
-                      {/* 4. Examiner Warnings & Pitfalls */}
+                      {/* 5. Examiner Warnings & Pitfalls */}
                       {currentUnit.examinerTips && (
                         <div style={{
                           padding: '14px 18px',
@@ -1231,9 +1293,9 @@ export default function Theaters({ currentUser, initialSubject }) {
                             <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#ff2a6d', textTransform: 'uppercase' }}>
                               ⚠️ TOPPER EXAM WARNING &amp; COMMON TRAP:
                             </span>
-                            <p style={{ margin: '3px 0 0 0', fontSize: '0.84rem', color: '#fecdd3', lineHeight: 1.45 }}>
-                              {currentUnit.examinerTips}
-                            </p>
+                            <div style={{ margin: '3px 0 0 0', fontSize: '0.84rem', color: '#fecdd3', lineHeight: 1.45 }}>
+                              <MathText text={currentUnit.examinerTips} />
+                            </div>
                           </div>
                         </div>
                       )}
@@ -1282,7 +1344,35 @@ export default function Theaters({ currentUser, initialSubject }) {
                     )}
                   </div>
 
-                  {/* Core Concepts */}
+                  {/* 1. Core Theories & Formulations */}
+                  {unit.keyTheories && unit.keyTheories.length > 0 && (
+                    <div style={{ marginBottom: '16px' }}>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px' }}>
+                        📌 Core Theories &amp; Formulations
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {unit.keyTheories.map((th, tIdx) => (
+                          <div key={tIdx} className="rev-print-avoid-break" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px 14px' }}>
+                            <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1e293b' }}>
+                              {th.term}
+                            </div>
+                            <MathText text={th.definition} as="div" style={{ fontSize: '0.85rem', color: '#334155', margin: '4px 0', lineHeight: 1.5 }} />
+                            {th.bulletPoints && (
+                              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '0.82rem', color: '#475569', lineHeight: 1.5 }}>
+                                {th.bulletPoints.map((bp, bIdx) => (
+                                  <li key={bIdx} style={{ marginBottom: '2px' }}>
+                                    <MathText text={bp} as="span" />
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. Core Concepts */}
                   {unit.coreConcepts && unit.coreConcepts.length > 0 && (
                     <div style={{ marginBottom: '16px' }}>
                       <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px' }}>
@@ -1295,13 +1385,11 @@ export default function Theaters({ currentUser, initialSubject }) {
                               {typeof c === 'string' ? c : c.title}
                             </div>
                             {typeof c === 'object' && c.desc && (
-                              <div style={{ fontSize: '0.85rem', color: '#334155', marginTop: '4px', lineHeight: 1.5 }}>
-                                {c.desc}
-                              </div>
+                              <MathText text={c.desc} as="div" style={{ fontSize: '0.85rem', color: '#334155', marginTop: '4px', lineHeight: 1.5 }} />
                             )}
                             {typeof c === 'object' && c.takeaway && (
                               <div style={{ fontSize: '0.8rem', color: '#0369a1', fontWeight: 700, marginTop: '4px' }}>
-                                💡 Key Takeaway: {c.takeaway}
+                                💡 Key Takeaway: <MathText text={c.takeaway} as="span" />
                               </div>
                             )}
                           </div>
@@ -1310,7 +1398,38 @@ export default function Theaters({ currentUser, initialSubject }) {
                     </div>
                   )}
 
-                  {/* Cheat Sheet Bullet Points */}
+                  {/* 3. Must-Know Derivations */}
+                  {unit.derivations && unit.derivations.length > 0 && (
+                    <div style={{ marginBottom: '16px' }}>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '8px', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px' }}>
+                        📐 Must-Know University Derivations (KaTeX Verified)
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {unit.derivations.map((d, dIdx) => (
+                          <div key={dIdx} className="rev-print-avoid-break" style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '12px 14px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                              <strong style={{ fontSize: '0.92rem', color: '#0f172a' }}>{d.title}</strong>
+                              <span style={{ fontSize: '0.78rem', color: '#b45309', fontWeight: 700 }}>{d.examFrequency}</span>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px' }}>
+                              {d.steps.map((st, sIdx) => (
+                                <div key={sIdx} style={{ fontSize: '0.84rem', color: '#334155', lineHeight: 1.5 }}>
+                                  <MathText text={st} as="span" />
+                                </div>
+                              ))}
+                            </div>
+                            {d.finalFormula && (
+                              <div style={{ background: '#e0f2fe', border: '1px solid #0284c7', borderRadius: '4px', padding: '6px 12px', fontSize: '0.88rem', color: '#0369a1', fontWeight: 800 }}>
+                                Final Formula: <MathFormula formula={d.finalFormula} isDisplay={false} style={{ color: '#0369a1' }} />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 4. Cheat Sheet Bullet Points */}
                   {unit.cheatSheet && unit.cheatSheet.length > 0 && (
                     <div className="rev-print-avoid-break" style={{ marginBottom: '16px', background: '#fefce8', border: '1px solid #fef08a', borderRadius: '6px', padding: '10px 14px' }}>
                       <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#854d0e', textTransform: 'uppercase', marginBottom: '6px' }}>
@@ -1318,39 +1437,43 @@ export default function Theaters({ currentUser, initialSubject }) {
                       </div>
                       <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.84rem', color: '#713f12', lineHeight: 1.5 }}>
                         {unit.cheatSheet.map((pt, pIdx) => (
-                          <li key={pIdx} style={{ marginBottom: '4px' }}>{pt}</li>
+                          <li key={pIdx} style={{ marginBottom: '4px' }}>
+                            <MathText text={pt} as="span" />
+                          </li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {/* Formulas & Equations */}
+                  {/* 5. Formulas & Equations (KaTeX Typeset) */}
                   {unit.formulas && unit.formulas.length > 0 && (
                     <div className="rev-print-avoid-break" style={{ marginBottom: '16px' }}>
                       <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '8px' }}>
-                        📐 Essential Formulas, Equations &amp; Relations
+                        📐 Essential Formulas, Equations &amp; Relations (KaTeX Typeset)
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '8px' }}>
                         {unit.formulas.map((f, fIdx) => (
                           <div key={fIdx} style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '8px 12px' }}>
                             <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>{f.name}</div>
-                            <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#b45309', fontFamily: 'monospace', margin: '3px 0' }}>{f.formula}</div>
-                            {f.whereUsed && <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Usage: {f.whereUsed}</div>}
+                            <div style={{ fontSize: '0.98rem', fontWeight: 800, color: '#b45309', margin: '4px 0' }}>
+                              <MathFormula formula={f.formula} isDisplay={false} style={{ color: '#b45309' }} />
+                            </div>
+                            {f.whereUsed && <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Usage: <MathText text={f.whereUsed} as="span" /></div>}
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {/* Examiner Tips */}
+                  {/* 6. Examiner Tips */}
                   {unit.examinerTips && (
                     <div className="rev-print-avoid-break" style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '6px', padding: '10px 14px' }}>
                       <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#be123c', textTransform: 'uppercase' }}>
                         ⚠️ Top Ranker Exam Warning &amp; Pitfall:
                       </span>
-                      <p style={{ margin: '4px 0 0 0', fontSize: '0.84rem', color: '#9f1239', lineHeight: 1.45 }}>
-                        {unit.examinerTips}
-                      </p>
+                      <div style={{ margin: '4px 0 0 0', fontSize: '0.84rem', color: '#9f1239', lineHeight: 1.45 }}>
+                        <MathText text={unit.examinerTips} />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1377,7 +1500,7 @@ export default function Theaters({ currentUser, initialSubject }) {
                               Unit {q.unitNum}
                             </span>
                             <span style={{ fontSize: '0.94rem', fontWeight: 800, color: '#0f172a' }}>
-                              Q{qIdx + 1}. {q.q}
+                              Q{qIdx + 1}. <MathText text={q.question || q.q} as="span" />
                             </span>
                           </div>
                           <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0f172a', background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', whiteSpace: 'nowrap' }}>
@@ -1385,13 +1508,13 @@ export default function Theaters({ currentUser, initialSubject }) {
                           </span>
                         </div>
 
-                        <div style={{ fontSize: '0.86rem', color: '#1e293b', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
-                          {q.solution}
+                        <div style={{ fontSize: '0.86rem', color: '#1e293b', lineHeight: 1.6 }}>
+                          <MathText text={q.solution} />
                         </div>
 
                         {q.keyPoint && (
                           <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed #cbd5e1', fontSize: '0.8rem', fontWeight: 700, color: '#059669' }}>
-                            🎯 Key Examiner Criterion: {q.keyPoint}
+                            🎯 Key Examiner Criterion: <MathText text={q.keyPoint} as="span" />
                           </div>
                         )}
                       </div>

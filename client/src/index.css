@@ -3334,5 +3334,50 @@ button,
   .paper-scroll-area [style*="border-left"] {
     border-left-color: #475569 !important;
   }
+
+  .katex,
+  .katex * {
+    color: #000000 !important;
+  }
 }
+
+/* =========================================================================
+   KATEX MATHEMATICAL TYPOGRAPHY STYLING (GLOBAL & REVISION)
+   ========================================================================= */
+.katex-formula-container,
+.katex-inline-wrapper {
+  color: inherit;
+  font-size: 1.04em;
+  padding: 0 1px;
+  vertical-align: middle;
+}
+
+.katex-display-wrapper {
+  margin: 10px 0;
+  text-align: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+}
+
+.math-text-container {
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.math-text-container .katex {
+  color: inherit;
+  font-size: 1.05em;
+}
+
+.final-boxed-formula-content .katex {
+  color: var(--neon-cyan) !important;
+  font-size: 1.15em;
+}
+
+.essential-formula-math .katex {
+  color: #ffaa00 !important;
+  font-size: 1.1em;
+}
+
 
