@@ -25,6 +25,7 @@ import {
   Cpu,
   Award,
   Zap,
+  Code2,
   X 
 } from 'lucide-react';
 
@@ -73,7 +74,7 @@ export default function Sidebar({
     { id: 'notes-reader', label: 'Interactive Notes Reader', icon: FileText, badge: 'Quick Read' },
     { id: 'syllabus', label: 'Syllabus & Curriculum', icon: GraduationCap },
     { id: 'short-notes', label: 'Short Notes & Exam Notes', icon: Sparkles, badge: 'High Yield' },
-    { id: 'downloads-lab', label: 'Lab Manuals & Downloads', icon: DownloadCloud },
+    { id: 'downloads-lab', label: 'Lab Manuals & Practical Codes', icon: Code2, badge: 'Codes & Labs' },
     { id: 'doubt-forum', label: 'Student Doubt Forum', icon: MessageSquare },
     ...(isSuperAdmin ? [
       { id: 'admin-panel', label: 'Super Admin Panel', icon: Crown, badge: 'ADMIN' }

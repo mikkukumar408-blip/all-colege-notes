@@ -296,7 +296,7 @@ export default function App() {
       case 'notes-reader': return 'Interactive Notes Reader';
       case 'syllabus': return 'Syllabus & Curriculum';
       case 'short-notes': return 'Short Notes & Exam Revision Sheets';
-      case 'downloads-lab': return 'Lab Manuals & Downloads';
+      case 'downloads-lab': return 'Practical Lab Manuals & Codes';
       case 'doubt-forum': return 'Student Doubt Forum';
       case 'admin-panel': return 'Super Admin Control Center';
       default: return 'College Academic Portal';

@@ -316,6 +316,9 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [notebookSemFilter, setNotebookSemFilter] = useState('All');
   const [notebookSearchQuery, setNotebookSearchQuery] = useState('');
+  const [activeTabSubView, setActiveTabSubView] = useState('labs'); // 'labs' | 'notebooks' | 'bundle'
+  const [labSearchQuery, setLabSearchQuery] = useState('');
+  const [labSemFilter, setLabSemFilter] = useState('All');
 
   // Interactive Practical Lab Studio Modal States
   const [selectedLab, setSelectedLab] = useState(null);
@@ -543,6 +546,26 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
     return matchSem && matchSearch;
   });
 
+  const filteredLabs = labManuals.filter(lab => {
+    const query = labSearchQuery.trim().toLowerCase();
+    const matchSearch = !query || 
+      lab.title?.toLowerCase().includes(query) ||
+      lab.code?.toLowerCase().includes(query) ||
+      lab.subject?.toLowerCase().includes(query) ||
+      lab.branch?.toLowerCase().includes(query) ||
+      lab.capstoneProject?.title?.toLowerCase().includes(query) ||
+      (Array.isArray(lab.experiments) && lab.experiments.some(e => e.title?.toLowerCase().includes(query) || e.objective?.toLowerCase().includes(query)));
+
+    const matchSem = labSemFilter === 'All' ||
+      lab.semester?.toLowerCase().includes(`semester ${labSemFilter}`.toLowerCase()) ||
+      lab.semester?.toLowerCase().includes(`sem ${labSemFilter}`.toLowerCase()) ||
+      (labSemFilter === '1' && (lab.semester?.includes('1') || lab.semester?.includes('Semester 1'))) ||
+      (labSemFilter === '2' && (lab.semester?.includes('2') || lab.semester?.includes('Semester 2'))) ||
+      (labSemFilter === '3' && (lab.semester?.includes('3') || lab.semester?.includes('Semester 3')));
+
+    return matchSearch && matchSem;
+  });
+
   /* -----------------------------------------------------------------------
      ACTION: Compiles bundle and triggers confetti celebration
      ----------------------------------------------------------------------- */
@@ -567,19 +590,109 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* -------------------------------------------------------------------
          PART A: RESOURCE HUB HEADER
          ------------------------------------------------------------------- */}
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <span className="badge-neon font-display">RESOURCE REPOSITORY</span>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>Free & High-Speed Direct Downloads</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <span className="badge-neon font-display" style={{ background: 'rgba(0, 240, 255, 0.15)', border: '1px solid var(--neon-cyan)' }}>
+            🧪 PRACTICAL LABORATORY WORKBENCH
+          </span>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>
+            100% University Aligned • Executable Codes • Viva-Voce Banks
+          </span>
         </div>
-        <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff' }}>Lab Manuals & Subject Download Bundles</h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.94rem' }}>
-          Download official practical lab manuals, executable experiment programs, viva-voce answers, and complete 5-unit semester note packages.
+        <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', margin: 0 }}>
+          Practical Lab Manuals & Code Hub
+        </h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.94rem', margin: 0, maxWidth: '850px', lineHeight: 1.5 }}>
+          Official practical laboratory manuals featuring verified working programs, line-by-line algorithms, terminal output proofs, and exhaustive viva-voce question banks.
         </p>
+      </div>
+
+      {/* -------------------------------------------------------------------
+         PART B: TOP VIEW SWITCHER (Tabs: Labs vs Scanned Notebooks vs Bundle)
+         ------------------------------------------------------------------- */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        background: 'rgba(10, 15, 26, 0.75)',
+        padding: '6px',
+        borderRadius: '12px',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        width: 'fit-content',
+        flexWrap: 'wrap'
+      }}>
+        <button
+          type="button"
+          onClick={() => setActiveTabSubView('labs')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 18px',
+            borderRadius: '8px',
+            fontSize: '0.88rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: activeTabSubView === 'labs' ? '1px solid var(--neon-cyan)' : 'none',
+            background: activeTabSubView === 'labs' ? 'rgba(0, 240, 255, 0.2)' : 'transparent',
+            color: activeTabSubView === 'labs' ? '#fff' : 'var(--text-dim)',
+            boxShadow: activeTabSubView === 'labs' ? '0 0 15px rgba(0, 240, 255, 0.3)' : 'none'
+          }}
+        >
+          <Code2 size={16} color={activeTabSubView === 'labs' ? 'var(--neon-cyan)' : 'currentColor'} />
+          <span>🧪 Practical Lab Manuals ({labManuals.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTabSubView('notebooks')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 18px',
+            borderRadius: '8px',
+            fontSize: '0.88rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: activeTabSubView === 'notebooks' ? '1px solid #c084fc' : 'none',
+            background: activeTabSubView === 'notebooks' ? 'rgba(192, 132, 252, 0.2)' : 'transparent',
+            color: activeTabSubView === 'notebooks' ? '#fff' : 'var(--text-dim)',
+            boxShadow: activeTabSubView === 'notebooks' ? '0 0 15px rgba(192, 132, 252, 0.3)' : 'none'
+          }}
+        >
+          <BookOpen size={16} color={activeTabSubView === 'notebooks' ? '#c084fc' : 'currentColor'} />
+          <span>✍️ Full Handwritten Notebooks ({handwrittenNotebooks.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTabSubView('bundle')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 18px',
+            borderRadius: '8px',
+            fontSize: '0.88rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: activeTabSubView === 'bundle' ? '1px solid var(--neon-green)' : 'none',
+            background: activeTabSubView === 'bundle' ? 'rgba(5, 255, 161, 0.2)' : 'transparent',
+            color: activeTabSubView === 'bundle' ? '#fff' : 'var(--text-dim)',
+            boxShadow: activeTabSubView === 'bundle' ? '0 0 15px rgba(5, 255, 161, 0.3)' : 'none'
+          }}
+        >
+          <FolderArchive size={16} color={activeTabSubView === 'bundle' ? 'var(--neon-green)' : 'currentColor'} />
+          <span>📦 Custom Study Bundle Builder</span>
+        </button>
       </div>
 
       {/* -------------------------------------------------------------------
@@ -652,39 +765,45 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
             </button>
           </div>
         </div>
-      ) : (
+      ) : activeTabSubView === 'labs' ? (
         /* -----------------------------------------------------------------
-           PART C: FEATURED HANDWRITTEN NOTEBOOKS + 2-COLUMN LAYOUT
+           VIEW 1: PRACTICAL LAB MANUALS & WORKING CODES (PROMINENT TOP VIEW)
            ----------------------------------------------------------------- */
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          
-          {/* Featured Authentic Handwritten Master Notebooks */}
-          <div className="glass-panel" style={{ padding: '24px', border: '1.5px solid rgba(0, 240, 255, 0.3)', background: 'linear-gradient(135deg, rgba(7, 15, 30, 0.8) 0%, rgba(10, 20, 45, 0.6) 100%)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="glass-panel" style={{ padding: '24px', border: '1.5px solid rgba(0, 240, 255, 0.35)', background: 'linear-gradient(135deg, rgba(7, 15, 30, 0.85) 0%, rgba(10, 20, 45, 0.65) 100%)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span className="badge-neon" style={{ fontSize: '0.75rem' }}>OFFICIAL VERIFIED REPOSITORY</span>
+                <span className="badge-neon" style={{ fontSize: '0.75rem' }}>MMEC OFFICIAL CURRICULUM</span>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#fff', margin: 0 }}>
-                  ✍️ Hand-Crafted Master Notebooks (High-Definition Print PDFs)
+                  🧪 Verified Practical Laboratory Manuals with Working Codes &amp; Viva
                 </h3>
-                <span className="badge-neon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid #10b981', fontSize: '0.75rem' }}>
-                  {filteredNotebooks.length} Subjects Available
+                <span className="badge-neon" style={{ background: 'rgba(0, 240, 255, 0.15)', color: 'var(--neon-cyan)', border: '1px solid var(--neon-cyan)', fontSize: '0.75rem' }}>
+                  {filteredLabs.length} Labs Available
                 </span>
               </div>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Authentic Lined Paper • Human Handwriting • KaTeX Formatted</span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Session 2025-26 • Tested Codes • Algorithms • Viva Question Banks</span>
             </div>
 
             {/* Filter Toolbar: Semester Tabs + Search */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', flexWrap: 'wrap', gap: '12px' }}>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                {['All', '1', '2', '3', '4', '5', '6', '7', '8'].map(sem => {
-                  const isSelected = notebookSemFilter === sem;
-                  const count = sem === 'All' 
-                    ? handwrittenNotebooks.length 
-                    : handwrittenNotebooks.filter(n => n.semNumber === Number(sem)).length;
+                {['All', '1', '2', '3', '4', '5'].map(sem => {
+                  const isSelected = labSemFilter === sem;
+                  const count = sem === 'All'
+                    ? labManuals.length
+                    : labManuals.filter(l => 
+                        l.semester?.toLowerCase().includes(`semester ${sem}`.toLowerCase()) ||
+                        l.semester?.toLowerCase().includes(`sem ${sem}`.toLowerCase()) ||
+                        (sem === '1' && (l.semester?.includes('1') || l.semester?.includes('Semester 1'))) ||
+                        (sem === '2' && (l.semester?.includes('2') || l.semester?.includes('Semester 2'))) ||
+                        (sem === '3' && (l.semester?.includes('3') || l.semester?.includes('Semester 3'))) ||
+                        (sem === '4' && (l.semester?.includes('4') || l.semester?.includes('Semester 4'))) ||
+                        (sem === '5' && (l.semester?.includes('5') || l.semester?.includes('Semester 5')))
+                      ).length;
                   return (
                     <button
                       key={sem}
-                      onClick={() => setNotebookSemFilter(sem)}
+                      onClick={() => setLabSemFilter(sem)}
                       style={{
                         padding: '6px 14px',
                         borderRadius: '20px',
@@ -698,7 +817,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                         boxShadow: isSelected ? '0 0 12px rgba(0, 240, 255, 0.3)' : 'none'
                       }}
                     >
-                      {sem === 'All' ? `All Subjects (${count})` : `Sem ${sem} (${count})`}
+                      {sem === 'All' ? `All Practical Labs (${count})` : `Sem ${sem} (${count})`}
                     </button>
                   );
                 })}
@@ -708,9 +827,9 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                 <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
                 <input
                   type="text"
-                  placeholder="Search subjects, codes, or topics..."
-                  value={notebookSearchQuery}
-                  onChange={(e) => setNotebookSearchQuery(e.target.value)}
+                  placeholder="Search labs, codes, algorithms, or viva..."
+                  value={labSearchQuery}
+                  onChange={(e) => setLabSearchQuery(e.target.value)}
                   style={{
                     width: '100%',
                     padding: '8px 12px 8px 34px',
@@ -725,111 +844,111 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
               </div>
             </div>
 
-            {/* Grid of All Hand-Crafted Master Notebooks */}
-            <div className="notebooks-catalog-grid">
-              {filteredNotebooks.map(nb => (
+            {/* Grid of Practical Lab Manuals */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '20px' }}>
+              {filteredLabs.map(lab => (
                 <div 
-                  key={nb.id}
+                  key={lab.id} 
                   className="glass-panel" 
                   style={{ 
-                    padding: '20px', 
-                    border: `1px solid ${nb.borderColor}`, 
-                    background: 'rgba(11, 15, 25, 0.75)', 
+                    padding: '22px', 
                     display: 'flex', 
                     flexDirection: 'column', 
                     justifyContent: 'space-between',
-                    gap: '14px',
-                    transition: 'transform 0.2s ease, border-color 0.2s ease'
+                    gap: '16px',
+                    border: '1px solid rgba(0, 240, 255, 0.25)',
+                    background: 'rgba(11, 15, 25, 0.75)',
+                    transition: 'all 0.25s ease',
+                    position: 'relative'
                   }}
                 >
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span 
-                        className="badge-neon" 
-                        style={{ 
-                          background: nb.badgeBg, 
-                          color: nb.accentColor, 
-                          border: `1px solid ${nb.accentColor}`,
-                          textTransform: 'uppercase'
-                        }}
-                      >
-                        {nb.code} • {nb.semester}
-                      </span>
-                      <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 700 }}>
-                        {nb.pages}
-                      </span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                        {lab.code && (
+                          <span style={{ 
+                            fontSize: '0.72rem', 
+                            fontWeight: 800, 
+                            padding: '2px 8px', 
+                            borderRadius: '4px', 
+                            background: 'rgba(0, 240, 255, 0.15)', 
+                            color: 'var(--neon-cyan)',
+                            border: '1px solid rgba(0, 240, 255, 0.3)'
+                          }}>
+                            {lab.code}
+                          </span>
+                        )}
+                        <span className="badge-neon" style={{ fontSize: '0.72rem' }}>{lab.semester}</span>
+                        {lab.year && (
+                          <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>• {lab.year}</span>
+                        )}
+                      </div>
+                      <span className="badge-amber" style={{ fontSize: '0.75rem' }}>{lab.fileSize || 'Official PDF'}</span>
                     </div>
-                    <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', marginBottom: '6px' }}>
-                      {nb.title}
+
+                    <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', margin: '4px 0 6px 0' }}>
+                      {lab.title}
                     </h4>
-                    <p style={{ fontSize: '0.84rem', color: '#94a3b8', lineHeight: '1.45', margin: 0 }}>
-                      {nb.description}
-                    </p>
+                    <div style={{ fontSize: '0.82rem', color: 'var(--text-dim)', marginBottom: '8px' }}>
+                      Subject: <strong style={{ color: '#e2e8f0' }}>{lab.subject}</strong>
+                    </div>
+                    {lab.branch && (
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginBottom: '10px' }}>
+                        Branch: <span style={{ color: '#94a3b8' }}>{lab.branch}</span>
+                      </div>
+                    )}
+
+                    {/* Practical Highlights Pill Row */}
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', fontSize: '0.78rem', color: '#c0c8db', marginTop: '6px' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(16, 185, 129, 0.12)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#34d399' }}>
+                        <Code2 size={14} /> <strong>{lab.experiments?.length || lab.totalExperiments || '10+'} Tested Working Codes</strong>
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(56, 189, 248, 0.12)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(56, 189, 248, 0.3)', color: '#38bdf8' }}>
+                        <HelpCircle size={14} /> <strong>{lab.vivaQuestions?.length || 15}+ Viva-Voce Q&amp;A</strong>
+                      </span>
+                      {lab.capstoneProject && (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(245, 158, 11, 0.12)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(245, 158, 11, 0.3)', color: '#fbbf24' }}>
+                          <Trophy size={14} /> <strong>Capstone: {lab.capstoneProject.title}</strong>
+                        </span>
+                      )}
+                    </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                    <a
-                      href={nb.isDead || nb.code === 'CS301' ? undefined : nb.pdfUrl}
-                      target={nb.isDead || nb.code === 'CS301' ? undefined : "_blank"}
-                      rel="noopener noreferrer"
-                      className={nb.isDead || nb.code === 'CS301' ? "btn-secondary" : "btn-review-glow"}
-                      onClick={(e) => {
-                        if (nb.isDead || nb.code === 'CS301') {
-                          e.preventDefault();
-                          return;
-                        }
-                        handleReviewNotebook(nb);
+                  {/* Action Buttons */}
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                    <button 
+                      className="btn-primary"
+                      style={{ padding: '8px 16px', fontSize: '0.82rem', gap: '6px', flex: '1', minWidth: '180px', justifyContent: 'center' }}
+                      onClick={() => {
+                        setSelectedLab(lab);
+                        setLabActiveTab('experiments');
+                        setSelectedExpIndex(0);
+                        setExpSubView('code');
+                        setCapstoneSubView('code');
                       }}
-                      style={{ 
-                        textDecoration: 'none', 
-                        display: 'inline-flex', 
-                        alignItems: 'center', 
-                        gap: '6px', 
-                        fontSize: '0.82rem', 
-                        padding: '8px 14px',
-                        opacity: nb.isDead || nb.code === 'CS301' ? 0.35 : 1,
-                        cursor: nb.isDead || nb.code === 'CS301' ? 'not-allowed' : 'pointer'
-                      }}
-                      title={nb.isDead || nb.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Open & Review PDF'}
                     >
-                      <Eye size={15} /> Open &amp; Review PDF
-                    </a>
-                    <a
-                      href={nb.isDead || nb.code === 'CS301' ? undefined : nb.pdfUrl}
-                      download={nb.isDead || nb.code === 'CS301' ? undefined : nb.downloadName}
-                      className={nb.isDead || nb.code === 'CS301' ? "btn-secondary" : "btn-primary"}
-                      onClick={(e) => {
-                        if (nb.isDead || nb.code === 'CS301') {
-                          e.preventDefault();
-                          return;
-                        }
-                        handleDownloadNotebook(nb);
-                      }}
-                      style={{ 
-                        textDecoration: 'none', 
-                        display: 'inline-flex', 
-                        alignItems: 'center', 
-                        gap: '6px', 
-                        fontSize: '0.82rem', 
-                        padding: '8px 14px',
-                        opacity: nb.isDead || nb.code === 'CS301' ? 0.35 : 1,
-                        cursor: nb.isDead || nb.code === 'CS301' ? 'not-allowed' : 'pointer'
-                      }}
-                      title={nb.isDead || nb.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Download PDF'}
+                      <Code2 size={15} /> 🚀 Explore Experiments &amp; Codes
+                    </button>
+
+                    <button 
+                      className="btn-outline" 
+                      style={{ padding: '8px 14px', fontSize: '0.82rem', gap: '6px' }}
+                      onClick={() => handleDownloadLab(lab)}
+                      title="Download Complete Practical Manual PDF"
                     >
                       <DownloadCloud size={15} /> Download PDF
-                    </a>
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
 
-            {filteredNotebooks.length === 0 && (
+            {filteredLabs.length === 0 && (
               <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-dim)' }}>
-                <p style={{ margin: 0, fontSize: '0.95rem' }}>No master notebooks found matching "{notebookSearchQuery}".</p>
+                <p style={{ margin: 0, fontSize: '0.95rem' }}>No practical lab manuals found matching "{labSearchQuery}".</p>
                 <button 
                   className="btn-secondary" 
-                  onClick={() => { setNotebookSemFilter('All'); setNotebookSearchQuery(''); }}
+                  onClick={() => { setLabSemFilter('All'); setLabSearchQuery(''); }}
                   style={{ marginTop: '12px', fontSize: '0.8rem', padding: '6px 14px' }}
                 >
                   Reset Filters
@@ -837,190 +956,294 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
               </div>
             )}
           </div>
-
-          <div className="lab-manuals-layout-grid">
-          
-          {/* Column 1: Verified Practical Lab Manuals */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-              <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', margin: 0 }}>
-                  Practical Lab Manuals with Working Codes & Viva
-                </h3>
-                <p style={{ margin: '3px 0 0 0', fontSize: '0.8rem', color: 'var(--text-dim)' }}>
-                  100% MMEC Syllabus-compliant working programs, step-by-step algorithms, terminal outputs & viva banks
-                </p>
-              </div>
-              <span className="badge-neon" style={{ background: 'rgba(0, 240, 255, 0.1)', borderColor: 'rgba(0, 240, 255, 0.4)' }}>
-                Session 2025-26
+        </div>
+      ) : activeTabSubView === 'notebooks' ? (
+        /* -----------------------------------------------------------------
+           VIEW 2: HANDWRITTEN MASTER NOTEBOOKS (SEPARATE TAB)
+           ----------------------------------------------------------------- */
+        <div className="glass-panel" style={{ padding: '24px', border: '1.5px solid rgba(192, 132, 252, 0.35)', background: 'linear-gradient(135deg, rgba(7, 15, 30, 0.8) 0%, rgba(20, 10, 45, 0.6) 100%)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <span className="badge-neon" style={{ fontSize: '0.75rem' }}>OFFICIAL VERIFIED REPOSITORY</span>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#fff', margin: 0 }}>
+                ✍️ Hand-Crafted Master Notebooks (High-Definition Print PDFs)
+              </h3>
+              <span className="badge-neon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid #10b981', fontSize: '0.75rem' }}>
+                {filteredNotebooks.length} Subjects Available
               </span>
             </div>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Authentic Lined Paper • Human Handwriting • KaTeX Formatted</span>
+          </div>
 
-            {labManuals.map(lab => (
-              <div 
-                key={lab.id} 
-                className="glass-panel" 
-                style={{ 
-                  padding: '22px', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  gap: '14px',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  transition: 'all 0.25s ease',
-                  position: 'relative'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
-                  <div>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '6px' }}>
-                      {lab.code && (
-                        <span style={{ 
-                          fontSize: '0.72rem', 
-                          fontWeight: 800, 
-                          padding: '2px 8px', 
-                          borderRadius: '4px', 
-                          background: 'rgba(0, 240, 255, 0.15)', 
-                          color: 'var(--neon-cyan)',
-                          border: '1px solid rgba(0, 240, 255, 0.3)'
-                        }}>
-                          {lab.code}
-                        </span>
-                      )}
-                      <span className="badge-neon" style={{ fontSize: '0.72rem' }}>{lab.semester}</span>
-                      {lab.year && (
-                        <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>• {lab.year}</span>
-                      )}
-                    </div>
-                    <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff', margin: '2px 0 4px 0' }}>
-                      {lab.title}
-                    </h4>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>
-                      Subject: <strong style={{ color: '#e2e8f0' }}>{lab.subject}</strong>
-                    </div>
-                  </div>
-                  <span className="badge-amber" style={{ fontSize: '0.75rem' }}>{lab.fileSize || 'Official PDF'}</span>
-                </div>
-
-                {/* Practical Highlights Pill Row */}
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', fontSize: '0.8rem', color: '#c0c8db' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(16, 185, 129, 0.1)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.25)', color: '#34d399' }}>
-                    <Code2 size={15} /> <strong>{lab.experiments?.length || lab.totalExperiments || '10+'} Tested Working Codes</strong>
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(56, 189, 248, 0.1)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(56, 189, 248, 0.25)', color: '#38bdf8' }}>
-                    <HelpCircle size={15} /> <strong>{lab.vivaQuestions?.length || 15}+ Viva-Voce Q&A</strong>
-                  </span>
-                  {lab.capstoneProject && (
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(245, 158, 11, 0.1)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(245, 158, 11, 0.25)', color: '#fbbf24' }}>
-                      <Trophy size={14} /> <strong>Capstone: {lab.capstoneProject.title}</strong>
-                    </span>
-                  )}
-                </div>
-
-                {/* Action Buttons */}
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '4px' }}>
-                  <button 
-                    className="btn-primary"
-                    style={{ padding: '8px 16px', fontSize: '0.82rem', gap: '6px' }}
-                    onClick={() => {
-                      setSelectedLab(lab);
-                      setLabActiveTab('experiments');
-                      setSelectedExpIndex(0);
-                      setExpSubView('code');
-                      setCapstoneSubView('code');
+          {/* Filter Toolbar: Semester Tabs + Search */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+              {['All', '1', '2', '3', '4', '5', '6', '7', '8'].map(sem => {
+                const isSelected = notebookSemFilter === sem;
+                const count = sem === 'All' 
+                  ? handwrittenNotebooks.length 
+                  : handwrittenNotebooks.filter(n => n.semNumber === Number(sem)).length;
+                return (
+                  <button
+                    key={sem}
+                    onClick={() => setNotebookSemFilter(sem)}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '20px',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      border: isSelected ? '1px solid #c084fc' : '1px solid rgba(255, 255, 255, 0.1)',
+                      background: isSelected ? 'rgba(192, 132, 252, 0.2)' : 'rgba(15, 23, 42, 0.6)',
+                      color: isSelected ? '#fff' : 'var(--text-dim)',
+                      boxShadow: isSelected ? '0 0 12px rgba(192, 132, 252, 0.3)' : 'none'
                     }}
                   >
-                    <Code2 size={15} /> 🚀 Explore Experiments & Working Codes
+                    {sem === 'All' ? `All Subjects (${count})` : `Sem ${sem} (${count})`}
                   </button>
+                );
+              })}
+            </div>
 
-                  <button 
-                    className="btn-outline" 
-                    style={{ padding: '8px 14px', fontSize: '0.82rem', gap: '6px' }}
-                    onClick={() => handleDownloadLab(lab)}
+            <div style={{ position: 'relative', minWidth: '240px', flex: '1', maxWidth: '340px' }}>
+              <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+              <input
+                type="text"
+                placeholder="Search subjects, codes, or topics..."
+                value={notebookSearchQuery}
+                onChange={(e) => setNotebookSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px 8px 34px',
+                  borderRadius: '8px',
+                  background: 'rgba(7, 9, 14, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  color: '#fff',
+                  fontSize: '0.82rem',
+                  outline: 'none'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Grid of All Hand-Crafted Master Notebooks */}
+          <div className="notebooks-catalog-grid">
+            {filteredNotebooks.map(nb => (
+              <div 
+                key={nb.id}
+                className="glass-panel" 
+                style={{ 
+                  padding: '20px', 
+                  border: `1px solid ${nb.borderColor}`, 
+                  background: 'rgba(11, 15, 25, 0.75)', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  justifyContent: 'space-between',
+                  gap: '14px',
+                  transition: 'transform 0.2s ease, border-color 0.2s ease'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span 
+                      className="badge-neon" 
+                      style={{ 
+                        background: nb.badgeBg, 
+                        color: nb.accentColor, 
+                        border: `1px solid ${nb.accentColor}`,
+                        textTransform: 'uppercase'
+                      }}
+                    >
+                      {nb.code} • {nb.semester}
+                    </span>
+                    <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 700 }}>
+                      {nb.pages}
+                    </span>
+                  </div>
+                  <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', marginBottom: '6px' }}>
+                    {nb.title}
+                  </h4>
+                  <p style={{ fontSize: '0.84rem', color: '#94a3b8', lineHeight: '1.45', margin: 0 }}>
+                    {nb.description}
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <a
+                    href={nb.isDead || nb.code === 'CS301' ? undefined : nb.pdfUrl}
+                    target={nb.isDead || nb.code === 'CS301' ? undefined : "_blank"}
+                    rel="noopener noreferrer"
+                    className={nb.isDead || nb.code === 'CS301' ? "btn-secondary" : "btn-review-glow"}
+                    onClick={(e) => {
+                      if (nb.isDead || nb.code === 'CS301') {
+                        e.preventDefault();
+                        return;
+                      }
+                      handleReviewNotebook(nb);
+                    }}
+                    style={{ 
+                      textDecoration: 'none', 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '6px', 
+                      fontSize: '0.82rem', 
+                      padding: '8px 14px',
+                      opacity: nb.isDead || nb.code === 'CS301' ? 0.35 : 1,
+                      cursor: nb.isDead || nb.code === 'CS301' ? 'not-allowed' : 'pointer'
+                    }}
+                    title={nb.isDead || nb.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Open & Review PDF'}
                   >
-                    <DownloadCloud size={15} /> Download PDF Manual
-                  </button>
+                    <Eye size={15} /> Open &amp; Review PDF
+                  </a>
+                  <a
+                    href={nb.isDead || nb.code === 'CS301' ? undefined : nb.pdfUrl}
+                    download={nb.isDead || nb.code === 'CS301' ? undefined : nb.downloadName}
+                    className={nb.isDead || nb.code === 'CS301' ? "btn-secondary" : "btn-primary"}
+                    onClick={(e) => {
+                      if (nb.isDead || nb.code === 'CS301') {
+                        e.preventDefault();
+                        return;
+                      }
+                      handleDownloadNotebook(nb);
+                    }}
+                    style={{ 
+                      textDecoration: 'none', 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '6px', 
+                      fontSize: '0.82rem', 
+                      padding: '8px 14px',
+                      opacity: nb.isDead || nb.code === 'CS301' ? 0.35 : 1,
+                      cursor: nb.isDead || nb.code === 'CS301' ? 'not-allowed' : 'pointer'
+                    }}
+                    title={nb.isDead || nb.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Download PDF'}
+                  >
+                    <DownloadCloud size={15} /> Download PDF
+                  </a>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Column 2: Custom Note Bundle Generator Form */}
-          <div className="glass-panel" style={{ padding: '24px', height: 'fit-content', display: 'flex', flexDirection: 'column', gap: '18px' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', borderBottom: '1px solid var(--border-dim)', paddingBottom: '12px' }}>
-              Create Custom Study Bundle
-            </h3>
+          {filteredNotebooks.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-dim)' }}>
+              <p style={{ margin: 0, fontSize: '0.95rem' }}>No master notebooks found matching "{notebookSearchQuery}".</p>
+              <button 
+                className="btn-secondary" 
+                onClick={() => { setNotebookSemFilter('All'); setNotebookSearchQuery(''); }}
+                style={{ marginTop: '12px', fontSize: '0.8rem', padding: '6px 14px' }}
+              >
+                Reset Filters
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* -----------------------------------------------------------------
+           VIEW 3: CUSTOM STUDY BUNDLE BUILDER
+           ----------------------------------------------------------------- */
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div className="glass-panel" style={{ padding: '30px', maxWidth: '750px', width: '100%', display: 'flex', flexDirection: 'column', gap: '22px', border: '1.5px solid rgba(5, 255, 161, 0.3)', background: 'linear-gradient(135deg, rgba(7, 25, 20, 0.85) 0%, rgba(10, 30, 25, 0.65) 100%)' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <span className="badge-neon" style={{ background: 'rgba(5, 255, 161, 0.15)', color: 'var(--neon-green)', borderColor: 'var(--neon-green)', fontSize: '0.75rem' }}>
+                  BUNDLE COMPILER
+                </span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Instant Single-File Download Package</span>
+              </div>
+              <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff', margin: '0 0 6px 0' }}>
+                📦 Create Custom Academic Study Bundle
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.5' }}>
+                Select any subject to automatically assemble full lecture notes, high-yield exam short summaries, 1-page formula cheat sheets, and comprehensive viva-voce question banks into a single personalized PDF package.
+              </p>
+            </div>
 
             <div>
-              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px', display: 'block' }}>
-                Select Subject:
+              <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '8px', display: 'block' }}>
+                1. Select Target Subject:
               </label>
               <select
                 value={selectedSubjectId}
                 onChange={(e) => setSelectedSubjectId(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', background: 'rgba(7, 9, 14, 0.8)', color: '#fff', border: '1px solid var(--border-dim)', fontSize: '0.85rem' }}
+                style={{ width: '100%', padding: '12px', borderRadius: '8px', background: 'rgba(7, 9, 14, 0.85)', color: '#fff', border: '1px solid var(--border-dim)', fontSize: '0.9rem', outline: 'none' }}
               >
                 {subjects.map(s => (
-                  <option key={s.id} value={s.id}>{s.code}: {s.name} (Sem {s.semester})</option>
+                  <option key={s.id} value={s.id}>{s.code}: {s.name} (Semester {s.semester} • {s.year})</option>
                 ))}
               </select>
             </div>
 
             {/* Inclusions checkboxes */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Include in your PDF Bundle:</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0' }}>2. Choose Components to Include in Your PDF Bundle:</label>
               
-              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#fff', cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '8px', background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255, 255, 255, 0.08)', cursor: 'pointer' }}>
                 <input 
                   type="checkbox" 
                   checked={includeViva} 
                   onChange={(e) => setIncludeViva(e.target.checked)} 
-                  style={{ accentColor: 'var(--neon-cyan)', width: 16, height: 16 }}
+                  style={{ accentColor: 'var(--neon-green)', width: 18, height: 18 }}
                 />
-                <span>Comprehensive Viva & Interview Prep Questions</span>
+                <div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff' }}>Comprehensive Viva &amp; Interview Prep Questions</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>Faculty question bank with model answers, technical definitions, and examiner focus areas</div>
+                </div>
               </label>
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#fff', cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '8px', background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255, 255, 255, 0.08)', cursor: 'pointer' }}>
                 <input 
                   type="checkbox" 
                   checked={includeShortNotes} 
                   onChange={(e) => setIncludeShortNotes(e.target.checked)} 
-                  style={{ accentColor: 'var(--neon-cyan)', width: 16, height: 16 }}
+                  style={{ accentColor: 'var(--neon-green)', width: 18, height: 18 }}
                 />
-                <span>High-Yield Short Notes & Exam Revision Summary</span>
+                <div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff' }}>High-Yield Short Notes &amp; Exam Revision Summary</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>KaTeX-formatted formulas, quick recall definitions, and key exam derivation summaries</div>
+                </div>
               </label>
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: '#fff', cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '8px', background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255, 255, 255, 0.08)', cursor: 'pointer' }}>
                 <input 
                   type="checkbox" 
                   checked={includeFormulaSheets} 
                   onChange={(e) => setIncludeFormulaSheets(e.target.checked)} 
-                  style={{ accentColor: 'var(--neon-cyan)', width: 16, height: 16 }}
+                  style={{ accentColor: 'var(--neon-green)', width: 18, height: 18 }}
                 />
-                <span>1-Page Exam Formula & Algorithm Cheat Sheet</span>
+                <div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff' }}>1-Page Exam Formula &amp; Algorithm Cheat Sheet</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>Quick-reference single-page cheat sheet for rapid last-minute revision before exams</div>
+                </div>
               </label>
             </div>
 
             {/* Submission Form */}
-            <form onSubmit={handleGenerateBundle} style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
-              <input
-                type="text"
-                placeholder="Student Roll / Registration No. (Optional)"
-                value={studentRollNo}
-                onChange={(e) => setStudentRollNo(e.target.value)}
-                style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: 'rgba(7, 9, 14, 0.8)', color: '#fff', border: '1px solid var(--border-dim)', fontSize: '0.85rem' }}
-              />
+            <form onSubmit={handleGenerateBundle} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '6px' }}>
+              <div>
+                <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '8px', display: 'block' }}>
+                  3. Student Registration / Roll No. (Optional):
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 11232541 (Printed on bundle cover)"
+                  value={studentRollNo}
+                  onChange={(e) => setStudentRollNo(e.target.value)}
+                  style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', background: 'rgba(7, 9, 14, 0.85)', color: '#fff', border: '1px solid var(--border-dim)', fontSize: '0.88rem', outline: 'none' }}
+                />
+              </div>
 
               <button 
                 type="submit" 
                 className="btn-primary"
-                style={{ width: '100%', justifyContent: 'center', marginTop: '6px' }}
+                style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '0.92rem', gap: '8px', marginTop: '4px', background: 'linear-gradient(135deg, #05ffa1 0%, #00f0ff 100%)', color: '#07090e', fontWeight: 800 }}
               >
-                <FolderArchive size={16} /> Compile & Download Full PDF Bundle
+                <FolderArchive size={18} /> Compile &amp; Download Full PDF Bundle
               </button>
             </form>
           </div>
         </div>
-      </div>
       )}
 
       {/* -------------------------------------------------------------------
