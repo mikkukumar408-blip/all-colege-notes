@@ -170,15 +170,14 @@ export const handwrittenNotebooks = [
     subjectCode: 'CS301',
     semester: '2nd Year (Sem 3)',
     semNumber: 3,
-    isDead: true,
-    pages: 'Under Preparation',
-    title: 'Data Structures & Algorithms Master Notes (Under Preparation)',
-    description: 'Semester 3 Advanced DSA Syllabus (AVL Trees, Red-Black Trees, Dynamic Programming, Greedy Methods, Dijkstra, Bellman-Ford) is currently under preparation. Please refer to Semester 2 Data Structures (BCSE-007) for active master notes.',
-    pdfUrl: '#',
-    downloadName: '',
-    accentColor: '#94a3b8',
-    borderColor: 'rgba(148, 163, 184, 0.25)',
-    badgeBg: 'rgba(148, 163, 184, 0.1)'
+    pages: '40 Pages • 2.6 MB High-Res',
+    title: 'Data Structures & Algorithms Master Notes',
+    description: 'Semester 3 Advanced DSA Syllabus: AVL Trees, Red-Black Trees, Dynamic Programming, Greedy Methods, Dijkstra, Bellman-Ford, and Graph Traversals.',
+    pdfUrl: '/CS301_Data_Structures_and_Algorithms_Short_Notes.pdf',
+    downloadName: 'CS301_Data_Structures_and_Algorithms_Notes.pdf',
+    accentColor: '#38bdf8',
+    borderColor: 'rgba(56, 189, 248, 0.35)',
+    badgeBg: 'rgba(56, 189, 248, 0.15)'
   },
   {
     id: 'nb-dld',
@@ -329,6 +328,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
   const [expSubView, setExpSubView] = useState('code'); // 'code' | 'algorithm' | 'both'
   const [capstoneSubView, setCapstoneSubView] = useState('code'); // 'code' | 'overview'
   const [selectedLang, setSelectedLang] = useState('C'); // Language for code viewer
+  const [viewingPdf, setViewingPdf] = useState(null); // In-App PDF Reader Modal State
 
   // ─── Multi-Language Code Translator ─────────────────────────────────────────
   const translateCode = (rawCode, lang) => {
@@ -470,7 +470,53 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
+  // Robust PDF Downloader supporting Web Blob download with Fallbacks
+  const handleDownloadPdf = async (url, downloadName) => {
+    if (!url || url === '#' || url === '') {
+      alert('This document is currently being finalized. Please check back shortly!');
+      return;
+    }
+    const safeName = downloadName || 'College_Notes_Document.pdf';
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Fetch failed with status ' + res.status);
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.setAttribute('download', safeName);
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 15000);
+      try {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.75 }
+        });
+      } catch (err) {}
+    } catch (err) {
+      console.warn('Direct blob download error, triggering fallback:', err);
+      // Fallback: direct anchor trigger or window.open
+      try {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = safeName;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch (e) {
+        window.open(url, '_blank') || (window.location.href = url);
+      }
+    }
+  };
+
   const handleDownloadLab = (lab) => {
+    if (!lab) return;
     try {
       logUserActivity(
         currentUser?.username || 'student',
@@ -479,27 +525,9 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
         `Downloaded Practical Lab Manual (${lab.fileSize || 'PDF'})`
       );
     } catch (err) {}
-    if (lab.pdfUrl) {
-      const link = document.createElement('a');
-      link.href = lab.pdfUrl;
-      link.download = `${(lab.code || 'Lab').replace(/[^a-zA-Z0-9_-]/g, '_')}_Manual.pdf`;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      try {
-        confetti({
-          particleCount: 50,
-          spread: 60,
-          origin: { y: 0.75 }
-        });
-      } catch (err) {}
-    } else {
-      alert(`Downloading official PDF manual for ${lab.title}...`);
-    }
+    const safeFilename = `${(lab.code || 'Lab').replace(/[^a-zA-Z0-9_-]/g, '_')}_Manual.pdf`;
+    handleDownloadPdf(lab.pdfUrl, safeFilename);
   };
-
 
   const activeSubject = subjects.find(s => s.id === selectedSubjectId) || subjects[0];
 
@@ -513,6 +541,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
   ) || handwrittenNotebooks[0];
 
   const handleDownloadNotebook = (notebook) => {
+    if (!notebook) return;
     try {
       logUserActivity(
         currentUser?.username || 'student',
@@ -521,9 +550,11 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
         `Downloaded Hand-Crafted Master Notebook (${notebook.pages})`
       );
     } catch (err) {}
+    handleDownloadPdf(notebook.pdfUrl, notebook.downloadName || `${notebook.code}_Notes.pdf`);
   };
 
   const handleReviewNotebook = (notebook) => {
+    if (!notebook) return;
     try {
       logUserActivity(
         currentUser?.username || 'student',
@@ -532,6 +563,17 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
         `Reviewed Hand-Crafted Master Notebook PDF`
       );
     } catch (err) {}
+    if (!notebook.pdfUrl || notebook.pdfUrl === '#' || notebook.isDead) {
+      alert(`The master notes for ${notebook.title} are currently being finalized. Please check back soon!`);
+      return;
+    }
+    setViewingPdf({
+      url: notebook.pdfUrl,
+      title: notebook.title,
+      code: notebook.code,
+      downloadName: notebook.downloadName || `${notebook.code}_Notes.pdf`,
+      pages: notebook.pages
+    });
   };
 
   const filteredNotebooks = handwrittenNotebooks.filter(nb => {
@@ -738,26 +780,24 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
           </div>
 
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a
-              href={activeNotebook.pdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
               className="btn-secondary"
               onClick={() => handleReviewNotebook(activeNotebook)}
-              style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
             >
               <Eye size={18} /> Open &amp; Review {activeSubject.code} Notes PDF
-            </a>
-            <a
-              href={activeNotebook.pdfUrl}
-              download={activeNotebook.downloadName}
+            </button>
+            <button
+              type="button"
               className="btn-primary"
               onClick={() => handleDownloadNotebook(activeNotebook)}
-              style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
             >
               <DownloadCloud size={18} /> Download {activeSubject.code} PDF Package
-            </a>
+            </button>
             <button 
+              type="button"
               className="btn-outline"
               onClick={() => setDownloadSuccess(false)}
             >
@@ -1070,57 +1110,46 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                  <a
-                    href={nb.isDead || nb.code === 'CS301' ? undefined : nb.pdfUrl}
-                    target={nb.isDead || nb.code === 'CS301' ? undefined : "_blank"}
-                    rel="noopener noreferrer"
-                    className={nb.isDead || nb.code === 'CS301' ? "btn-secondary" : "btn-review-glow"}
-                    onClick={(e) => {
-                      if (nb.isDead || nb.code === 'CS301') {
-                        e.preventDefault();
-                        return;
-                      }
+                  <button
+                    type="button"
+                    className={nb.isDead ? "btn-secondary" : "btn-review-glow"}
+                    onClick={() => {
+                      if (nb.isDead) return;
                       handleReviewNotebook(nb);
                     }}
                     style={{ 
-                      textDecoration: 'none', 
                       display: 'inline-flex', 
                       alignItems: 'center', 
                       gap: '6px', 
                       fontSize: '0.82rem', 
                       padding: '8px 14px',
-                      opacity: nb.isDead || nb.code === 'CS301' ? 0.35 : 1,
-                      cursor: nb.isDead || nb.code === 'CS301' ? 'not-allowed' : 'pointer'
+                      opacity: nb.isDead ? 0.35 : 1,
+                      cursor: nb.isDead ? 'not-allowed' : 'pointer'
                     }}
-                    title={nb.isDead || nb.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Open & Review PDF'}
+                    title={nb.isDead ? 'Under Preparation (Unavailable)' : 'Open & Review PDF'}
                   >
                     <Eye size={15} /> Open &amp; Review PDF
-                  </a>
-                  <a
-                    href={nb.isDead || nb.code === 'CS301' ? undefined : nb.pdfUrl}
-                    download={nb.isDead || nb.code === 'CS301' ? undefined : nb.downloadName}
-                    className={nb.isDead || nb.code === 'CS301' ? "btn-secondary" : "btn-primary"}
-                    onClick={(e) => {
-                      if (nb.isDead || nb.code === 'CS301') {
-                        e.preventDefault();
-                        return;
-                      }
+                  </button>
+                  <button
+                    type="button"
+                    className={nb.isDead ? "btn-secondary" : "btn-primary"}
+                    onClick={() => {
+                      if (nb.isDead) return;
                       handleDownloadNotebook(nb);
                     }}
                     style={{ 
-                      textDecoration: 'none', 
                       display: 'inline-flex', 
                       alignItems: 'center', 
                       gap: '6px', 
                       fontSize: '0.82rem', 
                       padding: '8px 14px',
-                      opacity: nb.isDead || nb.code === 'CS301' ? 0.35 : 1,
-                      cursor: nb.isDead || nb.code === 'CS301' ? 'not-allowed' : 'pointer'
+                      opacity: nb.isDead ? 0.35 : 1,
+                      cursor: nb.isDead ? 'not-allowed' : 'pointer'
                     }}
-                    title={nb.isDead || nb.code === 'CS301' ? 'Under Preparation (Unavailable)' : 'Download PDF'}
+                    title={nb.isDead ? 'Under Preparation (Unavailable)' : 'Download PDF'}
                   >
                     <DownloadCloud size={15} /> Download PDF
-                  </a>
+                  </button>
                 </div>
               </div>
             ))}
@@ -1972,9 +2001,10 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                     height: '100%',
                     minHeight: 0,
                     flex: '1 1 0%',
-                    overflowY: 'scroll',
+                    overflowY: 'auto',
                     overflowX: 'hidden',
                     WebkitOverflowScrolling: 'touch',
+                    touchAction: 'pan-y',
                     padding: '20px 28px',
                     background: '#070a12'
                   }}>
@@ -2089,9 +2119,10 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                     height: '100%',
                     minHeight: 0,
                     flex: '1 1 0%',
-                    overflowY: 'scroll',
+                    overflowY: 'auto',
                     overflowX: 'hidden',
                     WebkitOverflowScrolling: 'touch',
+                    touchAction: 'pan-y',
                     padding: '20px 28px',
                     background: '#070a12'
                   }}>
@@ -2423,6 +2454,183 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                 </button>
               </div>
             </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ─── IN-APP PDF READER MODAL (FULLSCREEN RESPONSIVE PREVIEW) ─── */}
+      {viewingPdf && createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={viewingPdf.title}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            background: 'rgba(3, 7, 18, 0.94)',
+            backdropFilter: 'blur(14px)',
+            display: 'flex',
+            flexDirection: 'column',
+            animation: 'fadeIn 0.2s ease-out'
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setViewingPdf(null);
+          }}
+        >
+          {/* Reader Top Bar */}
+          <div style={{
+            padding: '12px 18px',
+            background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 26, 0.98) 100%)',
+            borderBottom: '1px solid rgba(0, 240, 255, 0.25)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '10px',
+            flexShrink: 0,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: '1 1 auto' }}>
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                background: 'rgba(0, 240, 255, 0.15)',
+                border: '1px solid rgba(0, 240, 255, 0.35)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <FileText size={20} color="var(--neon-cyan)" />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    background: 'rgba(0, 240, 255, 0.2)',
+                    color: 'var(--neon-cyan)',
+                    border: '1px solid rgba(0, 240, 255, 0.4)'
+                  }}>
+                    {viewingPdf.code || 'PDF'}
+                  </span>
+                  {viewingPdf.pages && (
+                    <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                      {viewingPdf.pages}
+                    </span>
+                  )}
+                </div>
+                <h3 style={{
+                  fontSize: '1rem',
+                  fontWeight: 800,
+                  color: '#fff',
+                  margin: '2px 0 0 0',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '520px'
+                }}>
+                  {viewingPdf.title}
+                </h3>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => handleDownloadPdf(viewingPdf.url, viewingPdf.downloadName)}
+                style={{ padding: '7px 14px', fontSize: '0.8rem', gap: '6px' }}
+                title="Download this PDF to device"
+              >
+                <DownloadCloud size={15} /> Download PDF
+              </button>
+              <button
+                type="button"
+                className="btn-outline"
+                onClick={() => {
+                  try {
+                    window.open(viewingPdf.url, '_blank') || window.open(viewingPdf.url, '_system');
+                  } catch (e) {
+                    window.location.href = viewingPdf.url;
+                  }
+                }}
+                style={{ padding: '7px 12px', fontSize: '0.8rem', gap: '6px' }}
+                title="Open in new window or external viewer"
+              >
+                <ExternalLink size={15} /> External View
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewingPdf(null)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s'
+                }}
+                title="Close PDF Viewer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* Reader Body / Embedded Frame */}
+          <div style={{ flex: '1 1 0%', position: 'relative', background: '#0a0f1d', overflow: 'hidden' }}>
+            <iframe
+              src={viewingPdf.url}
+              title={viewingPdf.title}
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                display: 'block',
+                background: '#0a0f1d'
+              }}
+            />
+          </div>
+
+          {/* Mobile Helper Sub-bar */}
+          <div style={{
+            padding: '8px 16px',
+            background: 'rgba(10, 15, 26, 0.95)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: '0.75rem',
+            color: 'var(--text-dim)',
+            flexShrink: 0
+          }}>
+            <span>💡 <em>Mobile hint:</em> If preview is blank on your phone, tap <strong>Download PDF</strong> or <strong>External View</strong> above.</span>
+            <button
+              type="button"
+              onClick={() => setViewingPdf(null)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--neon-cyan)',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+            >
+              Done &amp; Close
+            </button>
           </div>
         </div>,
         document.body

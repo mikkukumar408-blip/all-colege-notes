@@ -556,7 +556,17 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                   type="button"
                   onClick={() => setViewMode('questions-only')}
                   className={viewMode === 'questions-only' ? 'btn-primary' : 'btn-secondary'}
-                  style={{ fontSize: '0.78rem', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '5px' }}
+                  style={{ 
+                    fontSize: '0.78rem', 
+                    padding: '6px 12px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '5px',
+                    background: viewMode === 'questions-only' ? 'var(--neon-cyan)' : 'rgba(15, 23, 42, 0.9)',
+                    color: viewMode === 'questions-only' ? '#040711' : '#f1f5f9',
+                    border: viewMode === 'questions-only' ? '1px solid var(--neon-cyan)' : '1px solid rgba(0, 240, 255, 0.35)',
+                    fontWeight: 700
+                  }}
                 >
                   <Clock size={13} />
                   <span>Exam Hall View</span>
@@ -565,7 +575,19 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                   type="button"
                   onClick={() => setViewMode('solutions')}
                   className={viewMode === 'solutions' ? 'btn-review-glow' : 'btn-secondary'}
-                  style={{ fontSize: '0.78rem', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '5px' }}
+                  style={{ 
+                    fontSize: '0.78rem', 
+                    padding: '6px 12px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '5px',
+                    background: viewMode === 'solutions' 
+                      ? 'linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(157, 78, 221, 0.35))' 
+                      : 'rgba(15, 23, 42, 0.9)',
+                    color: viewMode === 'solutions' ? '#00f0ff' : '#f1f5f9',
+                    border: viewMode === 'solutions' ? '1.5px solid #00f0ff' : '1px solid rgba(0, 240, 255, 0.35)',
+                    fontWeight: 700
+                  }}
                 >
                   <Eye size={13} />
                   <span>Solutions &amp; Marking Scheme</span>
@@ -631,7 +653,17 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                   type="button"
                   onClick={handlePrint}
                   className="btn-secondary"
-                  style={{ fontSize: '0.78rem', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '5px' }}
+                  style={{ 
+                    fontSize: '0.78rem', 
+                    padding: '6px 12px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '5px',
+                    background: 'rgba(0, 240, 255, 0.15)',
+                    color: 'var(--neon-cyan)',
+                    border: '1px solid rgba(0, 240, 255, 0.4)',
+                    fontWeight: 700
+                  }}
                   title="Print Question Paper or Save as PDF"
                 >
                   <Printer size={13} />
