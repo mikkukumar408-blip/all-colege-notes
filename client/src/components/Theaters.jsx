@@ -346,7 +346,7 @@ export default function Theaters({ currentUser }) {
           </button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '24px' }}>
+        <div className="short-notes-cards-grid">
           {filteredNotes.map(item => (
             <div 
               key={item.id} 
@@ -406,7 +406,7 @@ export default function Theaters({ currentUser }) {
               </div>
 
               {/* Direct Open & Download Actions */}
-              <div style={{ marginTop: 'auto', paddingTop: '8px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <div className="short-note-card-actions">
                 <a 
                   href={item.isDead || item.code === 'CS301' ? undefined : item.pdfUrl}
                   target={item.isDead || item.code === 'CS301' ? undefined : "_blank"}

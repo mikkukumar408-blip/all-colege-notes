@@ -331,7 +331,7 @@ export default function App() {
            Contains sidebar collapse toggle, section title, and quick download
            ----------------------------------------------------------------- */}
         <header className="top-navbar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: '180px', flex: '1 1 auto', marginRight: '8px' }}>
+          <div className="nav-left-group">
             <button 
               className="sidebar-toggle-btn"
               onClick={() => {
@@ -361,6 +361,7 @@ export default function App() {
             />
             
             <div 
+              className="nav-user-pill"
               onClick={() => {
                 if (currentUser?.username?.toLowerCase() === 'bhavya mishra' || currentUser?.role === 'superadmin') {
                   setActiveTab('admin-panel');

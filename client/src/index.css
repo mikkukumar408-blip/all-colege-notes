@@ -340,6 +340,220 @@ h1, h2, h3, .font-heading {
   box-shadow: none;
 }
 
+/* =========================================================================
+   MOBILE RESPONSIVE GRIDS & VIEWPORT CONTAINMENT (Fixes Overflowing Buttons)
+   ========================================================================= */
+
+/* Global Button & Link Viewport Safety */
+button, 
+.btn-primary, 
+.btn-secondary, 
+.btn-outline, 
+.btn-review-holo,
+.btn-review-glow {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Hero Spotlight Banner Responsive Rules */
+.hero-spotlight-panel {
+  padding: 36px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .hero-spotlight-panel {
+    padding: 20px 16px !important;
+    min-height: auto !important;
+  }
+  .hero-btn-group {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+  .hero-btn-group button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 14px !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+/* Catalog Search Bar Wrapper */
+.catalog-search-wrapper {
+  position: relative;
+  width: 280px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .catalog-search-wrapper {
+    width: 100% !important;
+  }
+}
+
+/* Subject Catalog Cards Grid */
+.subject-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 22px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 680px) {
+  .subject-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+/* Hand-Crafted Master Notebooks Grid */
+.notebooks-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .notebooks-catalog-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+}
+
+/* Lab Manuals & Solved Codes 2-Column Grid (Collapses cleanly on Mobile) */
+.lab-manuals-layout-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.7fr) minmax(280px, 1.3fr);
+  gap: 28px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .lab-manuals-layout-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+}
+
+/* Short Notes & Exam Revision Sheets Grid */
+.short-notes-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .short-notes-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+.short-note-card-actions {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .short-note-card-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .short-note-card-actions a,
+  .short-note-card-actions button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* Syllabus & Curriculum Cards Grid */
+.syllabus-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 680px) {
+  .syllabus-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+/* Circuit Simulator Modal Split Grid */
+.circuit-sim-body-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  flex: 1;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 850px) {
+  .circuit-sim-body-grid {
+    grid-template-columns: 1fr !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* Interactive Notes Reader Action Bar Responsive Controls */
+.sensory-action-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .sensory-action-bar {
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  .sensory-action-bar button,
+  .sensory-action-bar a {
+    font-size: 0.76rem !important;
+    padding: 7px 10px !important;
+  }
+  .sensory-theme-toggle-group {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+  .sensory-theme-toggle-group button {
+    flex: 1 1 auto !important;
+    justify-content: center !important;
+    padding: 6px 8px !important;
+    font-size: 0.72rem !important;
+  }
+}
+
 /* Sensory FX Animations */
 @keyframes screenShake {
   0% { transform: translate(0, 0) rotate(0deg); }

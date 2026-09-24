@@ -1938,9 +1938,9 @@ body, body.theme-clean, .theme-clean, .notes-reader-panel.theme-clean {
         </div>
 
         {/* Action Controls & Multi-Theme Selector */}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', flex: '1 1 auto', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
+        <div className="sensory-action-bar" style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', flex: '1 1 auto', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
           {/* 3 Theme Options */}
-          <div style={{ 
+          <div className="sensory-theme-toggle-group" style={{ 
             display: 'flex', 
             background: 'rgba(255,255,255,0.06)', 
             borderRadius: '10px', 

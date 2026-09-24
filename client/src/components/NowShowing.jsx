@@ -104,14 +104,13 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
          ------------------------------------------------------------------- */}
       {featuredSubject && (
         <div 
-          className="glass-panel" 
+          className="glass-panel hero-spotlight-panel" 
           style={{
             position: 'relative',
             overflow: 'hidden',
             minHeight: '340px',
             display: 'flex',
             alignItems: 'flex-end',
-            padding: '36px',
             border: '1px solid rgba(0, 240, 255, 0.3)',
             boxShadow: '0 10px 40px rgba(0, 0, 0, 0.6)'
           }}
@@ -141,31 +140,31 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
               zIndex: 1
             }}
           />
-          <div style={{ position: 'relative', zIndex: 2, maxWidth: '780px' }}>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', zIndex: 2, maxWidth: '780px', width: '100%' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap' }}>
               <span className="badge-crimson font-display">FEATURED STUDY MODULE</span>
               <span className="badge-neon">{featuredSubject.year} • Semester {featuredSubject.semester}</span>
               <span className="badge-amber">{featuredSubject.code}</span>
               <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{featuredSubject.credits} Credits</span>
             </div>
 
-            <h1 style={{ fontSize: '2.4rem', fontWeight: 900, marginBottom: '12px', lineHeight: 1.1, color: '#fff' }}>
+            <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.4rem)', fontWeight: 900, marginBottom: '12px', lineHeight: 1.15, color: '#fff', wordBreak: 'break-word' }}>
               {featuredSubject.name}
             </h1>
-            <p style={{ color: '#d0d8e8', fontSize: '0.96rem', marginBottom: '20px', lineHeight: 1.6 }}>
+            <p style={{ color: '#d0d8e8', fontSize: '0.92rem', marginBottom: '20px', lineHeight: 1.6 }}>
               {featuredSubject.description}
             </p>
 
             {/* Coverage & Verification Metrics */}
             <div style={{ 
               background: 'rgba(14, 18, 29, 0.85)', 
-              padding: '14px 18px', 
+              padding: '12px 16px', 
               borderRadius: '12px', 
               border: '1px solid rgba(255,255,255,0.1)',
               marginBottom: '22px',
               display: 'flex',
               flexWrap: 'wrap',
-              gap: '16px',
+              gap: '14px',
               alignItems: 'center'
             }}>
               <div>
@@ -196,7 +195,7 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+            <div className="hero-btn-group" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button 
                 className={isSubjectCardActive(featuredSubject) ? "btn-primary" : "btn-secondary"}
                 disabled={!isSubjectCardActive(featuredSubject)}
@@ -242,7 +241,7 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
           </div>
 
           {/* Quick Search Input */}
-          <div style={{ position: 'relative', width: '280px' }}>
+          <div className="catalog-search-wrapper">
             <input
               type="text"
               placeholder="Search subject or code (e.g. CS301)..."
@@ -353,7 +352,7 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
           <span className="badge-neon">{filteredSubjects.length} SUBJECTS</span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '22px' }}>
+        <div className="subject-cards-grid">
           {filteredSubjects.map(sub => {
             const isFeatured = featuredSubject?.id === sub.id;
             const isCardActive = isSubjectCardActive(sub);

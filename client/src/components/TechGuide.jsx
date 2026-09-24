@@ -129,7 +129,7 @@ export default function TechGuide() {
       {/* -------------------------------------------------------------------
          PART D: SUBJECT SYLLABUS CARDS WITH PRESCRIBED TEXTBOOKS
          ------------------------------------------------------------------- */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '24px' }}>
+      <div className="syllabus-cards-grid">
         {semSubjects.map(sub => (
           <div key={sub.id} className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

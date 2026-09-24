@@ -200,7 +200,7 @@ Given: V_s = ${vs} V, R1 = ${r1} Ω, R2 = ${r2} Ω, Load R_L = ${rl} Ω
         </div>
 
         {/* MODAL BODY */}
-        <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', flex: 1, overflow: 'hidden' }}>
+        <div className="circuit-sim-body-grid">
           
           {/* LEFT: CONTROLS & INPUT SLIDERS */}
           <div 

@@ -726,7 +726,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
             </div>
 
             {/* Grid of All Hand-Crafted Master Notebooks */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+            <div className="notebooks-catalog-grid">
               {filteredNotebooks.map(nb => (
                 <div 
                   key={nb.id}
@@ -838,7 +838,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 1.7fr) minmax(280px, 1.3fr)', gap: '28px' }}>
+          <div className="lab-manuals-layout-grid">
           
           {/* Column 1: Verified Practical Lab Manuals */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
