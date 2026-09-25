@@ -51,7 +51,7 @@ export const expectedQuestionPapers = [
           marks: 2,
           question: 'State Kirchhoff\'s Current Law (KCL) and Kirchhoff\'s Voltage Law (KVL). Name the fundamental physical conservation law each is based on.',
           expectedFrequency: 'Every Year (2021, 2022, 2023, 2024)',
-          modelAnswer: '1. KCL states that the algebraic sum of currents entering any electrical node is zero (\\sum I_{in} = \\sum I_{out}). It is based on the Law of Conservation of Electric Charge.\\n2. KVL states that the algebraic sum of potential differences (voltages) around any closed loop is zero (\\sum V = 0). It is based on the Law of Conservation of Energy.',
+          modelAnswer: '1. **Kirchhoff\'s Current Law (KCL):**\\nThe algebraic sum of currents entering any electrical node is zero ($\\sum I_{in} = \\sum I_{out}$). It is based on the **Law of Conservation of Electric Charge**.\\n\\n2. **Kirchhoff\'s Voltage Law (KVL):**\\nThe algebraic sum of potential differences (voltages) around any closed loop is zero ($\\sum V = 0$). It is based on the **Law of Conservation of Energy**.',
           keyMarkingPoints: ['1 Mark for stating both laws correctly', '1 Mark for naming conservation of charge and energy']
         },
         {
@@ -60,7 +60,7 @@ export const expectedQuestionPapers = [
           marks: 2,
           question: 'Define the terms: (i) Form Factor, and (ii) Peak Factor for a sinusoidal alternating quantity. State their numerical values.',
           expectedFrequency: 'High Frequency (2020, 2022, 2024)',
-          modelAnswer: '1. Form Factor (K_f) = \\frac{V_{rms}}{V_{avg}} = \\frac{V_m / \\sqrt{2}}{2V_m / \\pi} = \\frac{\\pi}{2\\sqrt{2}} \\approx 1.11\\n2. Peak (Crest) Factor (K_p) = \\frac{V_{peak}}{V_{rms}} = \\frac{V_m}{V_m / \\sqrt{2}} = \\sqrt{2} \\approx 1.414',
+          modelAnswer: '1. **Form Factor ($K_f$):**\\n$$\\text{Form Factor } (K_f) = \\frac{V_{rms}}{V_{avg}} = \\frac{V_m / \\sqrt{2}}{2V_m / \\pi} = \\frac{\\pi}{2\\sqrt{2}} \\approx 1.11$$\\n\\n2. **Peak (Crest) Factor ($K_p$):**\\n$$\\text{Peak Factor } (K_p) = \\frac{V_{\\text{peak}}}{V_{rms}} = \\frac{V_m}{V_m / \\sqrt{2}} = \\sqrt{2} \\approx 1.414$$',
           keyMarkingPoints: ['1 Mark for exact definition ratios', '1 Mark for exact numerical values (1.11 and 1.414)']
         },
         {
@@ -69,7 +69,7 @@ export const expectedQuestionPapers = [
           marks: 2,
           question: 'State the condition for Maximum Power Transfer to a load in a DC network. What is the electrical efficiency at this condition?',
           expectedFrequency: 'Every Alternate Year',
-          modelAnswer: 'Condition: Maximum power is transferred from a DC source network to a variable load resistor R_L when R_L = R_{th} (load resistance equals Thevenin equivalent internal resistance).\\nEfficiency: At maximum power transfer, internal power loss equals load power: \\eta = \\frac{P_L}{P_{total}} \\times 100\\% = 50\\%.',
+          modelAnswer: '• **Condition:** Maximum power is transferred from a DC source network to a variable load resistor $R_L$ when $R_L = R_{th}$ (load resistance equals Thevenin equivalent internal resistance).\\n\\n• **Efficiency:** At maximum power transfer, internal power loss equals load power:\\n$$\\eta = \\frac{P_L}{P_{total}} \\times 100\\% = 50\\%$$',
           keyMarkingPoints: ['1 Mark for R_L = R_th condition', '1 Mark for stating 50% efficiency with reason']
         },
         {
@@ -78,7 +78,7 @@ export const expectedQuestionPapers = [
           marks: 2,
           question: 'Why is the core of a power transformer laminated rather than solid? Which specific loss is reduced?',
           expectedFrequency: 'High Frequency Topper Question',
-          modelAnswer: 'The core is laminated using thin sheets of silicon steel insulated by varnish to minimize Eddy Current Losses (P_e \\propto t^2, where t is lamination thickness). Laminations break the continuous circulating eddy current loops, increasing core resistance without reducing magnetic permeability.',
+          modelAnswer: 'The core is laminated using thin sheets of silicon steel insulated by varnish to minimize **Eddy Current Losses** ($P_e \\propto t^2$, where $t$ is lamination thickness).\\n\\nLaminations break the continuous circulating eddy current loops, increasing core resistance without reducing magnetic permeability.',
           keyMarkingPoints: ['1 Mark for identifying Eddy Current Loss', '1 Mark for formula P_e proportional to t^2 and insulation']
         },
         {
@@ -87,7 +87,7 @@ export const expectedQuestionPapers = [
           marks: 2,
           question: 'Define the term "All-Day Efficiency" of a distribution transformer and explain why it differs from commercial power efficiency.',
           expectedFrequency: 'University Favorite',
-          modelAnswer: 'All-Day Efficiency is the ratio of total energy output in kilowatt-hours (kWh) over 24 hours to total energy input in kWh over the same 24-hour period:\\n\\eta_{all-day} = \\frac{\\text{Energy Output in 24 hrs (kWh)}}{\\text{Energy Input in 24 hrs (kWh)}}\\nDistribution transformers have their primary energized 24/7 (constant core loss), while secondary load fluctuates heavily.',
+          modelAnswer: '**All-Day Efficiency** is the ratio of total energy output in kilowatt-hours (kWh) over 24 hours to total energy input in kWh over the same 24-hour period:\\n$$\\eta_{\\text{all-day}} = \\frac{\\text{Energy Output in 24 hrs (kWh)}}{\\text{Energy Input in 24 hrs (kWh)}}$$\\nDistribution transformers have their primary energized 24/7 (constant core loss), while secondary load fluctuates heavily.',
           keyMarkingPoints: ['1 Mark for energy formula in kWh (not instantaneous power)', '1 Mark for mentioning 24/7 core loss vs varying load']
         },
         {
@@ -96,7 +96,7 @@ export const expectedQuestionPapers = [
           marks: 2,
           question: 'Why does a DC series motor never be started under "No-Load" condition?',
           expectedFrequency: 'Frequent Viva & Exam Question',
-          modelAnswer: 'In a DC series motor, flux \\phi is proportional to armature current I_a (\\phi \\propto I_a). At no-load, I_a is extremely small, making \\phi \\to 0. Since speed N \\propto \\frac{E_b}{\\phi}, the speed reaches dangerously high levels (infinite theoretical speed), which can cause catastrophic centrifugal mechanical failure of the armature windings.',
+          modelAnswer: 'In a DC series motor, flux $\\phi$ is proportional to armature current $I_a$ ($\\phi \\propto I_a$).\\n\\nAt no-load, $I_a$ is extremely small, making $\\phi \\to 0$. Since speed $N \\propto \\frac{E_b}{\\phi}$, the speed reaches dangerously high levels (infinite theoretical speed), which can cause catastrophic centrifugal mechanical failure of the armature windings.',
           keyMarkingPoints: ['1 Mark for N proportional to E_b / phi', '1 Mark for dangerously high runaway speed explanation']
         },
         {
@@ -105,7 +105,7 @@ export const expectedQuestionPapers = [
           marks: 2,
           question: 'What is a Zener Diode? Explain its primary application in electronics circuits with a basic connection rule.',
           expectedFrequency: 'Every Year (2020, 2021, 2023, 2024)',
-          modelAnswer: 'A Zener diode is a heavily doped P-N junction diode designed to operate safely in the reverse breakdown region without damage. Its primary application is a Voltage Regulator. Connection Rule: It must always be connected in Reverse Bias in parallel with the load resistor, preceded by a current-limiting series resistor R_s.',
+          modelAnswer: 'A **Zener diode** is a heavily doped P-N junction diode designed to operate safely in the reverse breakdown region without damage.\\n\\n• **Primary Application:** Voltage Regulator\\n• **Connection Rule:** It must always be connected in **Reverse Bias** in parallel with the load resistor, preceded by a current-limiting series resistor $R_s$.',
           keyMarkingPoints: ['1 Mark for reverse breakdown definition', '1 Mark for voltage regulator application & reverse bias connection']
         },
         {
@@ -114,7 +114,7 @@ export const expectedQuestionPapers = [
           marks: 2,
           question: 'Write the relationship between transistor common-base current gain (\\alpha) and common-emitter current gain (\\beta). If \\alpha = 0.98, calculate \\beta.',
           expectedFrequency: 'Every Year Numerical',
-          modelAnswer: 'Relation: \\beta = \\frac{\\alpha}{1 - \\alpha} \\quad \\text{or} \\quad \\alpha = \\frac{\\beta}{1 + \\beta}\\nCalculation: For \\alpha = 0.98:\\n\\beta = \\frac{0.98}{1 - 0.98} = \\frac{0.98}{0.02} = 49.',
+          modelAnswer: '• **Relationship:**\\n$$\\beta = \\frac{\\alpha}{1 - \\alpha} \\quad \\text{or} \\quad \\alpha = \\frac{\\beta}{1 + \\beta}$$\\n\\n• **Calculation (for $\\alpha = 0.98$):**\\n$$\\beta = \\frac{0.98}{1 - 0.98} = \\frac{0.98}{0.02} = 49$$',
           keyMarkingPoints: ['1 Mark for exact algebraic formula', '1 Mark for correct numerical evaluation (beta = 49)']
         },
         {
@@ -123,7 +123,7 @@ export const expectedQuestionPapers = [
           marks: 2,
           question: 'State De Morgan\'s First and Second Laws in Boolean Algebra.',
           expectedFrequency: 'Every Year Standard',
-          modelAnswer: '1. First Law (NOR gate duality): (A + B)\' = A\' \\cdot B\' (The complement of a sum equals the product of the complements).\\n2. Second Law (NAND gate duality): (A \\cdot B)\' = A\' + B\' (The complement of a product equals the sum of the complements).',
+          modelAnswer: '1. **First Law (NOR Gate Duality):**\\n$$(A + B)\' = A\' \\cdot B\'$$\\n*(The complement of a sum equals the product of the complements)*\\n\\n2. **Second Law (NAND Gate Duality):**\\n$$(A \\cdot B)\' = A\' + B\'$$\\n*(The complement of a product equals the sum of the complements)*',
           keyMarkingPoints: ['1 Mark for (A+B)\' = A\'.B\'', '1 Mark for (A.B)\' = A\' + B\'']
         },
         {
@@ -132,7 +132,7 @@ export const expectedQuestionPapers = [
           marks: 2,
           question: 'Convert the decimal number (75.625)_{10} into its equivalent binary number.',
           expectedFrequency: 'Frequent Number System Problem',
-          modelAnswer: 'Integer part (75): 75/2 = 37 R 1; 37/2 = 18 R 1; 18/2 = 9 R 0; 9/2 = 4 R 1; 4/2 = 2 R 0; 2/2 = 1 R 0; 1/2 = 0 R 1 \\implies (1001011)_2\\nFractional part (0.625): 0.625 x 2 = 1.25 (1); 0.25 x 2 = 0.50 (0); 0.50 x 2 = 1.00 (1) \\implies (.101)_2\\nResult: (75.625)_{10} = (1001011.101)_2',
+          modelAnswer: '• **Integer Part ($75_{10}$):**\\n$75 \\div 2 = 37\\text{ R }1$; $37 \\div 2 = 18\\text{ R }1$; $18 \\div 2 = 9\\text{ R }0$; $9 \\div 2 = 4\\text{ R }1$; $4 \\div 2 = 2\\text{ R }0$; $2 \\div 2 = 1\\text{ R }0$; $1 \\div 2 = 0\\text{ R }1 \\implies (1001011)_2$\\n\\n• **Fractional Part ($0.625_{10}$):**\\n$0.625 \\times 2 = 1.25\\,(1)$; $0.25 \\times 2 = 0.50\\,(0)$; $0.50 \\times 2 = 1.00\\,(1) \\implies (.101)_2$\\n\\n• **Final Result:**\\n$$(75.625)_{10} = (1001011.101)_2$$',
           keyMarkingPoints: ['1 Mark for integer conversion 1001011', '1 Mark for fraction conversion .101']
         }
       ]

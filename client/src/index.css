@@ -3169,7 +3169,68 @@ button,
   .katex * {
     color: #000000 !important;
   }
+
+  /* -------------------------------------------------------------------------
+     SENSORY LAB NOTES PRINT OPTIMIZATION
+     ------------------------------------------------------------------------- */
+  body.sensory-printing nav,
+  body.sensory-printing header,
+  body.sensory-printing footer,
+  body.sensory-printing .study-deck-grid > div:first-child,
+  body.sensory-printing .sensory-lab-header,
+  body.sensory-printing .no-print,
+  body.sensory-printing .mobile-bottom-nav,
+  body.sensory-printing .floating-action-buttons,
+  body.sensory-printing button {
+    display: none !important;
+  }
+
+  body.sensory-printing,
+  body.sensory-printing #root {
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.sensory-printing .study-deck-grid {
+    display: block !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  body.sensory-printing .notes-reader-panel {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 6mm 10mm !important;
+    margin: 0 !important;
+  }
+
+  body.sensory-printing .notes-reader-panel * {
+    color: #000000 !important;
+    background: transparent !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body.sensory-printing .notes-reader-panel h1,
+  body.sensory-printing .notes-reader-panel h2,
+  body.sensory-printing .notes-reader-panel h3 {
+    color: #0f172a !important;
+    border-bottom-color: #94a3b8 !important;
+  }
 }
+
 
 /* =========================================================================
    KATEX MATHEMATICAL TYPOGRAPHY STYLING (GLOBAL & REVISION)

@@ -46,6 +46,7 @@ import {
 import { expectedQuestionPapers } from '../data/questionPapersData';
 import { logUserActivity } from '../utils/activityTracker';
 import { MathText, MathFormula } from '../utils/mathRenderer';
+import { triggerUniversalPrint } from '../utils/printHelper';
 
 const YEARS = ['All Years', '1st Year', '2nd Year', '3rd Year', '4th Year'];
 
@@ -340,7 +341,8 @@ export default function ExpectedQuestionPapers({ currentUser }) {
   };
 
   const handlePrint = () => {
-    window.print();
+    const title = (activePaper?.paperTitle || 'University_Question_Paper').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim();
+    triggerUniversalPrint(title);
   };
 
   const toggleSingleAnswer = (qKey) => {

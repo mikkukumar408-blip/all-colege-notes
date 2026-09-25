@@ -51,6 +51,7 @@ import InteractiveTheveninLab from './InteractiveTheveninLab';
 import { ForensicWatermark } from './SecurityShield';
 import CramAndRecallDeck from './CramAndRecallDeck';
 import katex from 'katex';
+import { triggerUniversalPrint } from '../utils/printHelper';
 
 /* -------------------------------------------------------------------------
    MATHEMATICAL & ADVANCED MARKDOWN CONTENT FORMATTER
@@ -1481,11 +1482,16 @@ export default function SensoryLab({
 
   const handlePrint = () => {
     setIsPrinting(true);
+    document.body.classList.add('sensory-printing');
     setTimeout(() => {
       try {
-        window.print();
+        const docTitle = `${activeSubject?.name || 'Notes'}_Unit_${selectedUnitNum}`.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim();
+        triggerUniversalPrint(docTitle);
       } finally {
-        setIsPrinting(false);
+        setTimeout(() => {
+          document.body.classList.remove('sensory-printing');
+          setIsPrinting(false);
+        }, 800);
       }
     }, 150);
   };

@@ -115,13 +115,72 @@ export function renderKaTeXSafe(rawFormula, isDisplay = false) {
   }
 }
 
+function extractBalancedBraces(str, startIndex) {
+  if (startIndex >= str.length || str[startIndex] !== '{') return null;
+  let depth = 0;
+  for (let i = startIndex; i < str.length; i++) {
+    if (str[i] === '{') depth++;
+    else if (str[i] === '}') {
+      depth--;
+      if (depth === 0) {
+        return {
+          content: str.slice(startIndex + 1, i),
+          endIndex: i
+        };
+      }
+    }
+  }
+  return null;
+}
+
+function extractUnwrappedFractions(str, inlineMathBlocks) {
+  let s = str;
+  let safety = 0;
+  while (safety++ < 60) {
+    const idx = s.indexOf('\\frac{');
+    if (idx === -1) break;
+    const num = extractBalancedBraces(s, idx + 5);
+    if (!num) break;
+    const denStart = num.endIndex + 1;
+    if (s[denStart] !== '{') break;
+    const den = extractBalancedBraces(s, denStart);
+    if (!den) break;
+
+    const fullFrac = s.slice(idx, den.endIndex + 1);
+    const rendered = renderKaTeXSafe(fullFrac, false);
+    const placeholder = `\x00IM_${inlineMathBlocks.length}\x00`;
+    inlineMathBlocks.push(`<span class="katex-inline-wrapper">${rendered}</span>`);
+    s = s.slice(0, idx) + placeholder + s.slice(den.endIndex + 1);
+  }
+  return s;
+}
+
+function extractUnwrappedSqrt(str, inlineMathBlocks) {
+  let s = str;
+  let safety = 0;
+  while (safety++ < 60) {
+    const idx = s.indexOf('\\sqrt{');
+    if (idx === -1) break;
+    const body = extractBalancedBraces(s, idx + 5);
+    if (!body) break;
+
+    const fullSqrt = s.slice(idx, body.endIndex + 1);
+    const rendered = renderKaTeXSafe(fullSqrt, false);
+    const placeholder = `\x00IM_${inlineMathBlocks.length}\x00`;
+    inlineMathBlocks.push(`<span class="katex-inline-wrapper">${rendered}</span>`);
+    s = s.slice(0, idx) + placeholder + s.slice(body.endIndex + 1);
+  }
+  return s;
+}
+
 /**
  * Formats a block of text, detecting:
  * - $$display math$$
  * - $inline math$
  * - Unwrapped LaTeX expressions like \frac{...}{...}, \sqrt{...}, etc.
  * - Bold markdown (**text**)
- * - Line breaks (\n)
+ * - Line breaks (\n or \\n)
+ * - Numbered lists (1. , 2. ) with proper paragraph spacing
  */
 export function formatMathText(text) {
   if (!text || typeof text !== 'string') return '';
@@ -129,9 +188,16 @@ export function formatMathText(text) {
     return textCache.get(text);
   }
 
-  let html = text;
+  // 1. Sanitize & Normalize line breaks and escaped characters
+  let html = text
+    .replace(/\r\n/g, '\n')
+    .replace(/\\r\\n/g, '\n')
+    // Convert literal \n when not a LaTeX command starting with \n
+    .replace(/\\n(?!(?:abla|eq|e\b|eg\b|otin|u\b|atural|earrow|warrow|obreak|olimits|norm|normalsize|null|phantom|space))/g, '\n')
+    .replace(/\\t/g, ' ')
+    .trim();
 
-  // 1. Extract $$...$$ display math blocks
+  // 2. Extract $$...$$ display math blocks
   const displayMathBlocks = [];
   html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
     const rendered = renderKaTeXSafe(math, true);
@@ -140,7 +206,7 @@ export function formatMathText(text) {
     return placeholder;
   });
 
-  // 2. Extract $...$ inline math blocks
+  // 3. Extract $...$ inline math blocks
   const inlineMathBlocks = [];
   html = html.replace(/\$([^\$\n]+?)\$/g, (_, math) => {
     const rendered = renderKaTeXSafe(math, false);
@@ -149,48 +215,33 @@ export function formatMathText(text) {
     return placeholder;
   });
 
-  // 3. Extract unwrapped \frac{...}{...}
-  let fracSafety = 0;
-  while (/\\frac\{([^{}]+)\}\{([^{}]+)\}/.test(html) && fracSafety < 20) {
-    fracSafety++;
-    html = html.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, (match) => {
-      const rendered = renderKaTeXSafe(match, false);
-      const placeholder = `\x00IM_${inlineMathBlocks.length}\x00`;
-      inlineMathBlocks.push(`<span class="katex-inline-wrapper">${rendered}</span>`);
-      return placeholder;
-    });
-  }
+  // 4. Extract unwrapped balanced-brace \frac{...}{...}
+  html = extractUnwrappedFractions(html, inlineMathBlocks);
 
-  // 4. Extract unwrapped \sqrt{...}
-  let sqrtSafety = 0;
-  while (/\\sqrt\{([^{}]+)\}/.test(html) && sqrtSafety < 20) {
-    sqrtSafety++;
-    html = html.replace(/\\sqrt\{([^{}]+)\}/g, (match) => {
-      const rendered = renderKaTeXSafe(match, false);
-      const placeholder = `\x00IM_${inlineMathBlocks.length}\x00`;
-      inlineMathBlocks.push(`<span class="katex-inline-wrapper">${rendered}</span>`);
-      return placeholder;
-    });
-  }
+  // 5. Extract unwrapped balanced-brace \sqrt{...}
+  html = extractUnwrappedSqrt(html, inlineMathBlocks);
 
-  // 5. Convert common standalone formulas with equal sign and math tokens if they contain \ or ^ or _
-  // e.g. "R_L = R_{th} \implies P_{\max} = \frac{V_{th}^2}{4 R_{th}}"
-  if (/(?:\\implies|\\frac|\\sqrt|\\sum|\\int|\\cdot|\^\{|\\omega|\\pi|\\alpha|\\beta)/.test(html)) {
-    // If the entire string is basically a formula without sentences
-    if (!html.includes(' ') || /^[A-Za-z0-9_\(\)\s\+\-\*\/=,\\^{}\\]+$/.test(html)) {
-      const rendered = renderKaTeXSafe(html, false);
-      setCacheEntry(textCache, text, rendered);
-      return rendered;
-    }
-  }
+  // 6. Standalone LaTeX math symbols & operators outside $...$
+  html = html.replace(/\\(approx|propto|implies|to|pm|mp|times|cdot|neq|le|ge|ll|gg|alpha|beta|gamma|delta|epsilon|theta|lambda|mu|pi|rho|sigma|tau|phi|psi|omega|Delta|Phi|Omega|sum|int|infty|parallel|degree)\b/g, (match) => {
+    const rendered = renderKaTeXSafe(match, false);
+    const placeholder = `\x00IM_${inlineMathBlocks.length}\x00`;
+    inlineMathBlocks.push(`<span class="katex-inline-wrapper">${rendered}</span>`);
+    return placeholder;
+  });
 
-  // 6. Format Markdown Bold **bold**
-  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // 7. Format Markdown Bold **bold** and Italics *italic*
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #67e8f9; font-weight: 700;">$1</strong>');
+  html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
 
-  // 7. Format line breaks
+  // 8. Numbered list formatting: ensure clear visual separation
+  // Add extra spacing before numbered items (e.g. \n2. or \n(b))
+  html = html.replace(/\n(?=(\d+[\.\)]|\([a-z0-9]+\))\s+)/gi, '\n\n');
+  
+  // Format double newlines into margin-spaced blocks
+  html = html.replace(/\n{2,}/g, '<div style="margin-top: 10px;"></div>');
   html = html.replace(/\n/g, '<br />');
 
-  // 8. Restore inline and display math blocks
+  // 9. Restore inline and display math blocks
   inlineMathBlocks.forEach((rendered, i) => {
     html = html.replace(`\x00IM_${i}\x00`, rendered);
   });
