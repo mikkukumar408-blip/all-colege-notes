@@ -166,7 +166,6 @@ export default function SecurityShield({ enabled = true, isAdmin = false, showBa
           zIndex: 9999,
           fontSize: '0.88rem',
           fontWeight: 700,
-          backdropFilter: 'blur(12px)',
           maxWidth: '420px'
         }}>
           <Lock size={18} color="#00f0ff" style={{ flexShrink: 0 }} />
@@ -183,8 +182,7 @@ export default function SecurityShield({ enabled = true, isAdmin = false, showBa
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(4, 7, 18, 0.85)',
-          backdropFilter: 'blur(10px)',
+          background: 'rgba(4, 7, 18, 0.94)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

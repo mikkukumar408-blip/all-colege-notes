@@ -1091,8 +1091,7 @@ export default function SuperAdminPanel() {
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(0, 0, 0, 0.85)',
-          backdropFilter: 'blur(10px)',
+          background: 'rgba(0, 0, 0, 0.92)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -1630,8 +1629,7 @@ export default function SuperAdminPanel() {
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(0, 0, 0, 0.8)',
-          backdropFilter: 'blur(8px)',
+          background: 'rgba(0, 0, 0, 0.9)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -1774,8 +1772,7 @@ export default function SuperAdminPanel() {
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(0, 0, 0, 0.82)',
-          backdropFilter: 'blur(8px)',
+          background: 'rgba(0, 0, 0, 0.92)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

@@ -8,12 +8,35 @@
 import React from 'react';
 import katex from 'katex';
 
+// High-Performance In-Memory String Caches (Eliminates repeated KaTeX parsing & regex executions)
+const MAX_CACHE_SIZE = 2500;
+const formulaCache = new Map();
+const textCache = new Map();
+
+function setCacheEntry(cache, key, value) {
+  if (cache.size >= MAX_CACHE_SIZE) {
+    // Evict oldest 500 entries to prevent memory buildup
+    const it = cache.keys();
+    for (let i = 0; i < 500; i++) {
+      const nextKey = it.next().value;
+      if (nextKey !== undefined) cache.delete(nextKey);
+      else break;
+    }
+  }
+  cache.set(key, value);
+}
+
 /**
  * Normalizes and safely renders LaTeX mathematics using KaTeX.
  * Prevents throwing errors on malformed input by falling back gracefully.
  */
 export function renderKaTeXSafe(rawFormula, isDisplay = false) {
   if (!rawFormula || typeof rawFormula !== 'string') return '';
+  const cacheKey = `${isDisplay ? 'D:' : 'I:'}${rawFormula}`;
+  if (formulaCache.has(cacheKey)) {
+    return formulaCache.get(cacheKey);
+  }
+
   let clean = rawFormula.trim();
 
   // Strip outer dollar signs if passed as $formula$ or $$formula$$
@@ -68,6 +91,7 @@ export function renderKaTeXSafe(rawFormula, isDisplay = false) {
       strict: 'ignore'
     });
     if (!rendered.includes('katex-error')) {
+      setCacheEntry(formulaCache, cacheKey, rendered);
       return rendered;
     }
   } catch (e) {
@@ -77,13 +101,17 @@ export function renderKaTeXSafe(rawFormula, isDisplay = false) {
   // Second pass: sanitize and render
   try {
     const fallbackClean = clean.replace(/[\x00-\x1F\x7F]/g, ' ');
-    return katex.renderToString(fallbackClean, {
+    const rendered = katex.renderToString(fallbackClean, {
       displayMode: isDisplay,
       throwOnError: false,
       strict: 'ignore'
     });
+    setCacheEntry(formulaCache, cacheKey, rendered);
+    return rendered;
   } catch (e) {
-    return `<code>${clean}</code>`;
+    const fallback = `<code>${clean}</code>`;
+    setCacheEntry(formulaCache, cacheKey, fallback);
+    return fallback;
   }
 }
 
@@ -97,6 +125,9 @@ export function renderKaTeXSafe(rawFormula, isDisplay = false) {
  */
 export function formatMathText(text) {
   if (!text || typeof text !== 'string') return '';
+  if (textCache.has(text)) {
+    return textCache.get(text);
+  }
 
   let html = text;
 
@@ -148,6 +179,7 @@ export function formatMathText(text) {
     // If the entire string is basically a formula without sentences
     if (!html.includes(' ') || /^[A-Za-z0-9_\(\)\s\+\-\*\/=,\\^{}\\]+$/.test(html)) {
       const rendered = renderKaTeXSafe(html, false);
+      setCacheEntry(textCache, text, rendered);
       return rendered;
     }
   }
@@ -167,13 +199,14 @@ export function formatMathText(text) {
     html = html.replace(`\x00DM_${i}\x00`, rendered);
   });
 
+  setCacheEntry(textCache, text, html);
   return html;
 }
 
 /**
- * React Component to render pure mathematical formula with KaTeX
+ * React Component to render pure mathematical formula with KaTeX (Memoized for max 60fps performance)
  */
-export function MathFormula({ formula, isDisplay = false, className = '', style = {} }) {
+export const MathFormula = React.memo(function MathFormula({ formula, isDisplay = false, className = '', style = {} }) {
   if (!formula) return null;
   const renderedHtml = renderKaTeXSafe(formula, isDisplay);
 
@@ -188,12 +221,12 @@ export function MathFormula({ formula, isDisplay = false, className = '', style 
       dangerouslySetInnerHTML={{ __html: renderedHtml }}
     />
   );
-}
+});
 
 /**
- * React Component to render mixed prose containing KaTeX math, derivations, and definitions
+ * React Component to render mixed prose containing KaTeX math, derivations, and definitions (Memoized)
  */
-export function MathText({ text, className = '', style = {}, as: Component = 'div' }) {
+export const MathText = React.memo(function MathText({ text, className = '', style = {}, as: Component = 'div' }) {
   if (!text) return null;
   const formattedHtml = formatMathText(text);
 
@@ -204,6 +237,6 @@ export function MathText({ text, className = '', style = {}, as: Component = 'di
       dangerouslySetInnerHTML={{ __html: formattedHtml }}
     />
   );
-}
+});
 
 export default MathFormula;

@@ -576,8 +576,7 @@ export default function AuthPage({ onLogin }) {
         width: '550px',
         height: '550px',
         borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(0, 240, 255, 0.18) 0%, transparent 70%)',
-        filter: 'blur(70px)',
+        background: 'radial-gradient(circle, rgba(0, 240, 255, 0.14) 0%, transparent 70%)',
         pointerEvents: 'none',
         zIndex: 1,
         animation: 'pulseGlow 6s infinite ease-in-out'
@@ -590,8 +589,7 @@ export default function AuthPage({ onLogin }) {
         width: '500px',
         height: '500px',
         borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(255, 42, 109, 0.16) 0%, transparent 70%)',
-        filter: 'blur(70px)',
+        background: 'radial-gradient(circle, rgba(255, 42, 109, 0.12) 0%, transparent 70%)',
         pointerEvents: 'none',
         zIndex: 1,
         animation: 'pulseGlow 8s infinite ease-in-out reverse'
@@ -625,7 +623,6 @@ export default function AuthPage({ onLogin }) {
             gap: '6px',
             fontSize: '0.75rem',
             fontWeight: 700,
-            backdropFilter: 'blur(8px)',
             transition: 'all 0.2s ease'
           }}
         >
@@ -651,7 +648,6 @@ export default function AuthPage({ onLogin }) {
             gap: '6px',
             fontSize: '0.75rem',
             fontWeight: 700,
-            backdropFilter: 'blur(8px)',
             transition: 'all 0.2s ease'
           }}
         >

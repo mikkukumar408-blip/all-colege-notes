@@ -326,13 +326,10 @@ h1, h2, h3, .font-heading {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
-@supports (backdrop-filter: blur(8px)) {
-  @media (min-width: 901px) {
-    .glass-panel {
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-  }
+/* High-performance solid card styling (Zero GPU texture-blur recompositing overhead) */
+.glass-panel {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .glass-panel:hover {
@@ -2241,9 +2238,7 @@ button,
 
 .card-4dx-content {
   position: relative;
-  background: rgba(7, 12, 26, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: #070c1a;
   border-radius: 22px;
   z-index: 1;
   overflow: hidden;

@@ -96,6 +96,18 @@ export default function Theaters({ currentUser, initialSubject }) {
   const [selectedRevisionNote, setSelectedRevisionNote] = useState(null);
   const [activeModalUnit, setActiveModalUnit] = useState(1);
   const [copiedFormula, setCopiedFormula] = useState(null);
+  const [isPrintReady, setIsPrintReady] = useState(false);
+
+  React.useEffect(() => {
+    const handleBeforePrint = () => setIsPrintReady(true);
+    const handleAfterPrint = () => setIsPrintReady(false);
+    window.addEventListener('beforeprint', handleBeforePrint);
+    window.addEventListener('afterprint', handleAfterPrint);
+    return () => {
+      window.removeEventListener('beforeprint', handleBeforePrint);
+      window.removeEventListener('afterprint', handleAfterPrint);
+    };
+  }, []);
 
   React.useEffect(() => {
     if (selectedRevisionNote) {
@@ -746,8 +758,7 @@ export default function Theaters({ currentUser, initialSubject }) {
             position: 'fixed',
             inset: 0,
             zIndex: 999999,
-            background: 'rgba(4, 7, 13, 0.94)',
-            backdropFilter: 'blur(16px)',
+            background: 'rgba(4, 7, 13, 0.96)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -813,7 +824,12 @@ export default function Theaters({ currentUser, initialSubject }) {
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <button
                   type="button"
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    setIsPrintReady(true);
+                    setTimeout(() => {
+                      window.print();
+                    }, 50);
+                  }}
                   style={{
                     background: 'rgba(255, 255, 255, 0.08)',
                     border: '1px solid rgba(255, 255, 255, 0.15)',
@@ -1308,10 +1324,11 @@ export default function Theaters({ currentUser, initialSubject }) {
           {/* End revision-screen-content */}
 
             {/* =============================================================
-               DEDICATED FULL PRINT DOCUMENT (Visible ONLY during window.print)
+               DEDICATED FULL PRINT DOCUMENT (Mounted dynamically ONLY when printing)
                Renders all Units (1-4), Solved Questions, Formulas & Traps sequentially
                ============================================================= */}
-            <div className="revision-print-document">
+            {isPrintReady && (
+              <div className="revision-print-document">
               {/* Document Master Header */}
               <div style={{ textAlign: 'center', borderBottom: '2px solid #0f172a', paddingBottom: '14px', marginBottom: '20px' }}>
                 <div style={{ fontSize: '0.85rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#475569' }}>
@@ -1527,6 +1544,7 @@ export default function Theaters({ currentUser, initialSubject }) {
                 *** END OF EXAM REVISION HANDBOOK — ALL THE BEST FOR YOUR EXAMINATIONS ***
               </div>
             </div>
+          )}
           </div>
         </div>,
         document.body

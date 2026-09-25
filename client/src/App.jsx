@@ -53,7 +53,7 @@ export default function App() {
       lastActivityRef.current = Date.now();
     };
 
-    const activityEvents = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+    const activityEvents = ['pointerdown', 'keydown', 'touchstart'];
     activityEvents.forEach((evt) => window.addEventListener(evt, resetActivity, { passive: true }));
 
     // Check every 30 seconds
@@ -112,7 +112,7 @@ export default function App() {
     };
 
     fetchControls();
-    const interval = setInterval(fetchControls, 8000);
+    const interval = setInterval(fetchControls, 45000);
     return () => clearInterval(interval);
   }, []);
 
@@ -267,14 +267,6 @@ export default function App() {
 
   return (
     <div className="app-wrapper">
-      {/* 4DX Fluid Glowing Ambient Background */}
-      <div className="fluid-bg-container" aria-hidden="true">
-        <div className="fluid-orb fluid-orb-cyan"></div>
-        <div className="fluid-orb fluid-orb-purple"></div>
-        <div className="fluid-orb fluid-orb-pink"></div>
-        <div className="fluid-orb fluid-orb-amber"></div>
-      </div>
-
       {/* Collapsible Sidebar Navigation */}
       <Sidebar 
         currentUser={currentUser}
