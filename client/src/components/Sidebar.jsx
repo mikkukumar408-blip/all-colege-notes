@@ -159,7 +159,7 @@ export default function Sidebar({
             <div className="pulse-dot" />
             <div>
               <div style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.82rem' }}>Academic Portal Active</div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Semesters 1 through 8 Ready</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Semester 1 & 2 Core Curriculum Ready</div>
             </div>
           </div>
         </div>

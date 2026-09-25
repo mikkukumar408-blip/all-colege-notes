@@ -1013,17 +1013,16 @@ export default function SensoryLab({
   setIsUnitsCollapsed: controlledSetIsUnitsCollapsed,
   onNavigateTab
 }) {
-  // Combine Physics, Python, DSA, C, Web Tech, BEEE, AIML, and Math 1 with other subjects
+  // Verified active curriculum subjects with full notes ready
   const allSubjects = [
-    physicsSubjectDetails,
-    pythonSubjectDetails,
-    dsaSubjectDetails,
-    cSubjectDetails,
-    webTechSubjectDetails,
     beeeSubjectDetails,
     aimlSubjectDetails,
     math1SubjectDetails,
-    ...initialSubjects.filter(s => s.id !== 'sub-p1' && s.id !== 'sub-physics' && s.id !== 'sub-py' && s.id !== 'sub-python' && s.id !== 'sub-c1' && s.id !== 'sub-webtech' && s.id !== 'sub-beee' && s.id !== 'sub-aiml' && s.id !== 'sub-m1' && s.id !== 'sub-math1' && s.id !== 'sub-dsa-bcse007')
+    cSubjectDetails,
+    webTechSubjectDetails,
+    physicsSubjectDetails,
+    pythonSubjectDetails,
+    dsaSubjectDetails
   ];
   
   const [currentSubjectId, setCurrentSubjectId] = useState(() => {
@@ -1040,7 +1039,6 @@ export default function SensoryLab({
   const setIsUnitsCollapsed = controlledSetIsUnitsCollapsed || setInternalUnitsCollapsed;
   
   const [fontSize, setFontSize] = useState('normal'); // 'normal' | 'large'
-  const [bookmarked, setBookmarked] = useState(false);
   const [showFormulaSheet, setShowFormulaSheet] = useState(false);
 
   const [masteryData, setMasteryData] = useState(() => {
@@ -1479,6 +1477,18 @@ export default function SensoryLab({
   const notesPanelRef = useRef(null);
   const [isPrinting, setIsPrinting] = useState(false);
 
+  const getSubjectMasterPdf = () => {
+    if (isBEEE) return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: 'BELE001_BEEE_Notes.pdf' };
+    if (isAIML) return { url: '/AIML_notes_handwritten.pdf', name: 'BCSE011_AIML_Notes.pdf' };
+    if (isMath1) return { url: '/BMAT001_Mathematics_I_MMU_Handwritten_Notes.pdf', name: 'BMAT001_Maths_I_Notes.pdf' };
+    if (isC) return { url: '/BCSE008_Computational_and_Problem_Solving_using_C_notes.pdf', name: 'BCSE008_C_Programming_Notes.pdf' };
+    if (isWebTech) return { url: '/BCSE012_Fundamental_of_Web_Technologies_Long_Notes.pdf', name: 'BCSE012_Web_Technologies_Notes.pdf' };
+    if (isPhysics) return { url: '/Applied_Physics_Master_Notes.pdf', name: 'Applied_Physics_Notes.pdf' };
+    if (isPython) return { url: '/Python_Programming_Master_Notes.pdf', name: 'Python_Programming_Notes.pdf' };
+    if (isDSA) return { url: '/Data_Structures_Master_Notes.pdf', name: 'Data_Structures_Notes.pdf' };
+    return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: 'College_Notes.pdf' };
+  };
+
   const handlePrint = () => {
     setIsPrinting(true);
     document.body.classList.add('sensory-printing');
@@ -1702,7 +1712,7 @@ export default function SensoryLab({
             <ChevronLeft size={15} /> All Subjects
           </button>
 
-          {/* Collapse / Expand Select Subject Column Toggle */}
+          {/* Toggle Unit Selector Drawer */}
           <button 
             className="btn-outline" 
             onClick={() => setIsUnitsCollapsed(!isUnitsCollapsed)}
@@ -1710,234 +1720,45 @@ export default function SensoryLab({
               borderColor: isUnitsCollapsed ? 'var(--neon-cyan)' : undefined, 
               color: isUnitsCollapsed ? 'var(--neon-cyan)' : undefined,
               background: isUnitsCollapsed ? 'rgba(0, 240, 255, 0.14)' : undefined,
-              fontWeight: 800,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-            title={isUnitsCollapsed ? "Open Select Subject Section (>)" : "Close Select Subject Section (<)"}
-          >
-            {isUnitsCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-            {isUnitsCollapsed ? 'Show Subject (>)' : 'Close Subject (<)'}
-          </button>
-
-          <button 
-            className="btn-outline" 
-            onClick={() => setBookmarked(!bookmarked)}
-            style={{ borderColor: bookmarked ? 'var(--neon-green)' : undefined, color: bookmarked ? 'var(--neon-green)' : undefined }}
-          >
-            <Bookmark size={16} /> {bookmarked ? 'Saved' : 'Bookmark'}
-          </button>
-
-          {/* Quick Switch to Balanced Exam Revision Notes */}
-          <button
-            onClick={() => {
-              if (onNavigateTab) {
-                onNavigateTab('short-notes', activeSubject);
-              } else {
-                window.location.hash = '#short-notes';
-              }
-            }}
-            style={{
-              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-              color: '#000',
-              fontWeight: 800,
-              fontSize: '0.8rem',
-              padding: '8px 14px',
+              fontWeight: 700,
+              fontSize: '0.82rem',
+              padding: '7px 14px',
               borderRadius: '8px',
-              border: 'none',
-              cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              boxShadow: '0 2px 10px rgba(245, 158, 11, 0.35)'
+              cursor: 'pointer'
             }}
-            title="Switch from exhaustive long notes to high-yield balanced Exam Revision Notes (8-12 pages with solved questions)"
+            title={isUnitsCollapsed ? "Open Units Panel" : "Hide Units Panel"}
           >
-            <Sparkles size={15} /> ⚡ Switch to Exam Revision Notes
+            {isUnitsCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+            <span>{isUnitsCollapsed ? 'Show Units' : 'Hide Units'}</span>
           </button>
 
-          {isAIML && (
-            <a
-              href="/AIML_notes_handwritten.pdf"
-              download="BCSE-011_Fundamentals_of_AI_ML_Handwritten_Notes.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-outline"
-              style={{
-                borderColor: '#f59e0b',
-                color: '#f59e0b',
-                background: 'rgba(245, 158, 11, 0.12)',
-                fontWeight: 800,
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-              title="Download Scanned Handwritten Notes PDF (12 Pages)"
-            >
-              <Download size={16} /> Handwritten PDF (12 Pgs)
-            </a>
-          )}
-
-          {isMath1 && (
-            <a
-              href="/BMAT001_Mathematics_I_MMU_Handwritten_Notes.pdf"
-              download="BMAT-001_Mathematics_I_MMU_Handwritten_Notes.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-outline"
-              style={{
-                borderColor: '#0284c7',
-                color: '#0284c7',
-                background: 'rgba(2, 132, 199, 0.12)',
-                fontWeight: 800,
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-              title="Download MMU BMAT-001 Official Handwritten Notes PDF (11 Pages)"
-            >
-              <Download size={16} /> Handwritten PDF (11 Pgs)
-            </a>
-          )}
-
-          {isWebTech && (
-            <a
-              href="/BCSE012_Fundamental_of_Web_Technologies_Long_Notes.pdf"
-              download="Fundamental of Web Technologies notes.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-outline"
-              style={{
-                borderColor: '#10b981',
-                color: '#10b981',
-                background: 'rgba(16, 185, 129, 0.12)',
-                fontWeight: 800,
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-              title="Download Official BCSE-012 Comprehensive Long Notes PDF"
-            >
-              <Download size={16} /> Official Long Notes PDF
-            </a>
-          )}
-
-          {isC && (
-            <a
-              href="/BCSE008_Computational_and_Problem_Solving_using_C_notes.pdf"
-              download="Computational and Problem Solving using C notes.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-outline"
-              style={{
-                borderColor: '#0284c7',
-                color: '#0284c7',
-                background: 'rgba(2, 132, 199, 0.12)',
-                fontWeight: 800,
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-              title="Download Official BCSE-008 Comprehensive Long Notes PDF (16 Pages)"
-            >
-              <Download size={16} /> Official Long Notes PDF (16 Pgs)
-            </a>
-          )}
-
-          {isPython && (
-            <>
-              <a
-                href="/Python_Programming_Master_Notes.pdf"
-                download="Python Programming Master Notes.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-outline"
-                style={{
-                  borderColor: '#38bdf8',
-                  color: '#38bdf8',
-                  background: 'rgba(56, 189, 248, 0.12)',
-                  fontWeight: 800,
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-                title="Download Official BCSE-004 Comprehensive Master Notes PDF (12 Pages)"
-              >
-                <Download size={16} /> Master Notes PDF (12 Pgs)
-              </a>
-              <a
-                href="/Python_Programming_Exam_Revision_Sheet.pdf"
-                download="Python Programming Exam Revision Sheet.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-outline"
-                style={{
-                  borderColor: '#4ade80',
-                  color: '#4ade80',
-                  background: 'rgba(74, 222, 128, 0.12)',
-                  fontWeight: 800,
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-                title="Download Official BCSE-004 2-Page Flowchart Exam Revision Sheet"
-              >
-                <Download size={16} /> Exam Revision Sheet (2 Pgs)
-              </a>
-            </>
-          )}
-
-          {isDSA && (
-            <>
-              <a
-                href="/Data_Structures_Master_Notes.pdf"
-                download="Data Structures Master Notes.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-outline"
-                style={{
-                  borderColor: '#38bdf8',
-                  color: '#38bdf8',
-                  background: 'rgba(56, 189, 248, 0.12)',
-                  fontWeight: 800,
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-                title="Download Official BCSE-007 Comprehensive Master Notes PDF (12 Pages)"
-              >
-                <Download size={16} /> Master Notes PDF (12 Pgs)
-              </a>
-              <a
-                href="/Data_Structures_Exam_Revision_Sheet.pdf"
-                download="Data Structures Exam Revision Sheet.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-outline"
-                style={{
-                  borderColor: '#4ade80',
-                  color: '#4ade80',
-                  background: 'rgba(74, 222, 128, 0.12)',
-                  fontWeight: 800,
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-                title="Download Official BCSE-007 2-Page Flowchart Exam Revision Sheet"
-              >
-                <Download size={16} /> Exam Revision Sheet (2 Pgs)
-              </a>
-            </>
-          )}
+          {/* 📥 1-Click Master Notes PDF Download */}
+          <a
+            href={getSubjectMasterPdf().url}
+            download={getSubjectMasterPdf().name}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-outline"
+            style={{
+              borderColor: '#38bdf8',
+              color: '#38bdf8',
+              background: 'rgba(56, 189, 248, 0.12)',
+              fontWeight: 800,
+              fontSize: '0.82rem',
+              padding: '7px 14px',
+              borderRadius: '8px',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+            title={`Download Master Notes PDF for ${activeSubject.name}`}
+          >
+            <Download size={15} /> Download PDF
+          </a>
 
           {/* ⚡ 1-Click Formula & Theorem Cheat-Sheet Modal */}
           <button 
@@ -1959,7 +1780,7 @@ export default function SensoryLab({
             }}
             title="Open Interactive 1-Page Formula & Theorem Cheat-Sheet for this Unit"
           >
-            <Zap size={15} /> Formula Cheat-Sheet
+            <Zap size={15} /> Formula Sheet
           </button>
 
           {/* 🖨️ Clean University Print / Save as PDF */}
@@ -1984,7 +1805,7 @@ export default function SensoryLab({
             }}
             title="Print Full Unit Notes or Save as PDF"
           >
-            <Printer size={16} /> {isPrinting ? 'Opening Print Dialog...' : 'Print Notes'}
+            <Printer size={15} /> {isPrinting ? 'Opening Print...' : 'Print Notes'}
           </button>
         </div>
       </div>
@@ -2034,12 +1855,7 @@ export default function SensoryLab({
               <select
                 value={isDSA ? 'sub-dsa-bcse007' : currentSubjectId}
                 onChange={(e) => {
-                  const targetId = e.target.value;
-                  if (!isSensorySubjectAllowed(targetId)) {
-                    e.preventDefault();
-                    return; // Dead: cannot select
-                  }
-                  setCurrentSubjectId(targetId);
+                  setCurrentSubjectId(e.target.value);
                   setSelectedUnitNum(1);
                 }}
                 style={{
@@ -2052,19 +1868,15 @@ export default function SensoryLab({
                   fontSize: '0.85rem'
                 }}
               >
-                {allSubjects.map(s => {
-                  const active = isSensorySubjectAllowed(s.id);
-                  return (
-                    <option 
-                      key={s.id} 
-                      value={s.id}
-                      disabled={!active}
-                      style={{ color: active ? '#fff' : '#64748b' }}
-                    >
-                      {s.code}: {s.name} {!active ? '(Unavailable)' : `(Sem ${s.semester})`}
-                    </option>
-                  );
-                })}
+                {allSubjects.map(s => (
+                  <option 
+                    key={s.id} 
+                    value={s.id}
+                    style={{ color: '#fff' }}
+                  >
+                    {s.code}: {s.name} (Semester {s.semester})
+                  </option>
+                ))}
               </select>
             </div>
 

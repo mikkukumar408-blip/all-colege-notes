@@ -306,15 +306,9 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
      ----------------------------------------------------------------------- */
   const [subjects] = useState(initialSubjects);
   const [labManuals] = useState(initialLabManuals);
-  const [selectedSubjectId, setSelectedSubjectId] = useState(preselectedMovie?.id || initialSubjects[3].id);
-  const [includeViva, setIncludeViva] = useState(true);
-  const [includeShortNotes, setIncludeShortNotes] = useState(true);
-  const [includeFormulaSheets, setIncludeFormulaSheets] = useState(true);
-  const [studentRollNo, setStudentRollNo] = useState('');
-  const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [notebookSemFilter, setNotebookSemFilter] = useState('All');
   const [notebookSearchQuery, setNotebookSearchQuery] = useState('');
-  const [activeTabSubView, setActiveTabSubView] = useState('labs'); // 'labs' | 'notebooks' | 'bundle'
+  const [activeTabSubView, setActiveTabSubView] = useState('labs'); // 'labs' | 'notebooks'
   const [labSearchQuery, setLabSearchQuery] = useState('');
   const [labSemFilter, setLabSemFilter] = useState('All');
 
@@ -521,17 +515,6 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
     handleDownloadPdf(lab.pdfUrl, safeFilename);
   };
 
-  const activeSubject = subjects.find(s => s.id === selectedSubjectId) || subjects[0];
-
-  // Resolve matching PDF for compiled custom study bundle
-  const activeNotebook = handwrittenNotebooks.find(nb => 
-    nb.code === activeSubject.code || 
-    nb.subjectCode === activeSubject.code || 
-    nb.id === activeSubject.id ||
-    activeSubject.name.toLowerCase().includes(nb.code.toLowerCase()) ||
-    nb.title.toLowerCase().includes(activeSubject.name.toLowerCase())
-  ) || handwrittenNotebooks[0];
-
   const handleDownloadNotebook = (notebook) => {
     if (!notebook) return;
     try {
@@ -599,22 +582,6 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
 
     return matchSearch && matchSem;
   });
-
-  /* -----------------------------------------------------------------------
-     ACTION: Compiles bundle and triggers confetti celebration
-     ----------------------------------------------------------------------- */
-  const handleGenerateBundle = (e) => {
-    e.preventDefault();
-    setDownloadSuccess(true);
-    try {
-      logUserActivity(
-        currentUser?.username || 'student',
-        'DOWNLOAD',
-        `${activeSubject.code || ''}: ${activeSubject.name} Complete Study Bundle`,
-        `Generated custom bundle with Viva Q&A and Formula sheets`
-      );
-    } catch (err) {}
-  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

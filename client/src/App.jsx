@@ -386,7 +386,7 @@ export default function App() {
             </button>
             <div className="nav-title-group">
               <h2>{getSectionTitle()}</h2>
-              <p>University Study Portal • All 4 Years & 8 Semesters</p>
+              <p>University Engineering Study Portal • Verified Semester Notes & Papers</p>
             </div>
           </div>
 
