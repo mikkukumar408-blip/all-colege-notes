@@ -434,6 +434,14 @@ let registeredUsers = [
 ];
 
 let telemetryEvents = [];
+let visitorAnalytics = {
+  totalVisitors: 0,
+  totalVisits: 0,
+  appVisitors: 0,
+  webVisitors: 0,
+  visitorsMap: {},
+  recentVisits: []
+};
 let systemControls = {
   announcement: '',
   announcementActive: false,
@@ -480,7 +488,7 @@ async function pushBackupUsers(users) {
   } catch (e) {}
 }
 
-// Helper to load persistent telemetry stream
+// Helper to load persistent telemetry stream and visitor analytics
 async function fetchBackupTelemetry() {
   try {
     const controller = new AbortController();
@@ -489,15 +497,27 @@ async function fetchBackupTelemetry() {
     clearTimeout(timer);
     if (res.ok) {
       const json = await res.json();
-      if (json && json.data && Array.isArray(json.data.events)) {
-        return json.data.events;
+      if (json && json.data) {
+        if (json.data.visitorAnalytics && typeof json.data.visitorAnalytics === 'object') {
+          visitorAnalytics = {
+            totalVisitors: json.data.visitorAnalytics.totalVisitors || visitorAnalytics.totalVisitors,
+            totalVisits: json.data.visitorAnalytics.totalVisits || visitorAnalytics.totalVisits,
+            appVisitors: json.data.visitorAnalytics.appVisitors || visitorAnalytics.appVisitors,
+            webVisitors: json.data.visitorAnalytics.webVisitors || visitorAnalytics.webVisitors,
+            visitorsMap: json.data.visitorAnalytics.visitorsMap || visitorAnalytics.visitorsMap,
+            recentVisits: Array.isArray(json.data.visitorAnalytics.recentVisits) ? json.data.visitorAnalytics.recentVisits : visitorAnalytics.recentVisits
+          };
+        }
+        if (Array.isArray(json.data.events)) {
+          return json.data.events;
+        }
       }
     }
   } catch (e) {}
   return null;
 }
 
-// Helper to save persistent telemetry stream
+// Helper to save persistent telemetry stream and visitor analytics
 async function pushBackupTelemetry(events) {
   try {
     const controller = new AbortController();
@@ -509,7 +529,8 @@ async function pushBackupTelemetry(events) {
         name: 'college_notes_telemetry_stream_v1',
         data: {
           updatedAt: new Date().toISOString(),
-          events: events.slice(0, 250)
+          events: events.slice(0, 250),
+          visitorAnalytics
         }
       }),
       signal: controller.signal
@@ -851,6 +872,328 @@ router.post('/controls', async (req, res) => {
   ).catch(() => {});
 
   res.json({ success: true, controls: systemControls });
+});
+
+// ---------------------------------------------------------------------------
+// 7. REAL-TIME VISITOR TRACKING & ANALYTICS
+// ---------------------------------------------------------------------------
+router.post('/visitors', async (req, res) => {
+  try {
+    const { visitorId, platform, device, page, referrer } = req.body || {};
+    const cleanVisitorId = sanitizeInput(String(visitorId || 'vis-' + Math.random().toString(36).substr(2, 9)));
+    const isApp = String(platform || '').toLowerCase().includes('app') || String(device || '').toLowerCase().includes('android');
+    const cleanPlatform = isApp ? 'app' : 'web';
+    const cleanDevice = sanitizeInput(String(device || 'Device'));
+    const now = new Date().toISOString();
+
+    await fetchBackupTelemetry();
+
+    if (!visitorAnalytics.visitorsMap) visitorAnalytics.visitorsMap = {};
+    const isNew = !visitorAnalytics.visitorsMap[cleanVisitorId];
+
+    if (isNew) {
+      visitorAnalytics.totalVisitors = (visitorAnalytics.totalVisitors || 0) + 1;
+      if (cleanPlatform === 'app') {
+        visitorAnalytics.appVisitors = (visitorAnalytics.appVisitors || 0) + 1;
+      } else {
+        visitorAnalytics.webVisitors = (visitorAnalytics.webVisitors || 0) + 1;
+      }
+      visitorAnalytics.visitorsMap[cleanVisitorId] = {
+        firstSeen: now,
+        lastSeen: now,
+        visits: 1,
+        platform: cleanPlatform,
+        device: cleanDevice
+      };
+    } else {
+      visitorAnalytics.visitorsMap[cleanVisitorId].lastSeen = now;
+      visitorAnalytics.visitorsMap[cleanVisitorId].visits = (visitorAnalytics.visitorsMap[cleanVisitorId].visits || 1) + 1;
+      visitorAnalytics.visitorsMap[cleanVisitorId].platform = cleanPlatform;
+      visitorAnalytics.visitorsMap[cleanVisitorId].device = cleanDevice;
+    }
+
+    visitorAnalytics.totalVisits = (visitorAnalytics.totalVisits || 0) + 1;
+
+    const visitRecord = {
+      id: 'vis-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+      visitorId: cleanVisitorId.slice(0, 12),
+      platform: cleanPlatform === 'app' ? '📱 Mobile App' : '🌐 Website',
+      device: cleanDevice,
+      page: sanitizeInput(String(page || 'home')),
+      timestamp: now,
+      isNew
+    };
+
+    visitorAnalytics.recentVisits = [visitRecord, ...(visitorAnalytics.recentVisits || [])].slice(0, 60);
+
+    // Save asynchronously to cloud backup
+    pushBackupTelemetry(telemetryEvents).catch(() => {});
+
+    res.json({
+      success: true,
+      isNew,
+      totalVisitors: visitorAnalytics.totalVisitors,
+      totalVisits: visitorAnalytics.totalVisits,
+      appVisitors: visitorAnalytics.appVisitors,
+      webVisitors: visitorAnalytics.webVisitors
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to record visit' });
+  }
+});
+
+router.get('/visitors', async (req, res) => {
+  await fetchBackupTelemetry();
+  res.json({
+    success: true,
+    totalVisitors: visitorAnalytics.totalVisitors || 0,
+    totalVisits: visitorAnalytics.totalVisits || 0,
+    appVisitors: visitorAnalytics.appVisitors || 0,
+    webVisitors: visitorAnalytics.webVisitors || 0,
+    recentVisits: visitorAnalytics.recentVisits || [],
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Live Web Analytics Dashboard View (Accessible via /stats or /api/stats)
+router.get(['/stats', '/visitors/dashboard'], async (req, res) => {
+  await fetchBackupTelemetry();
+
+  const totalVisitors = visitorAnalytics.totalVisitors || 0;
+  const totalVisits = visitorAnalytics.totalVisits || 0;
+  const appVisitors = visitorAnalytics.appVisitors || 0;
+  const webVisitors = visitorAnalytics.webVisitors || 0;
+  const recentVisits = visitorAnalytics.recentVisits || [];
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Notes • Live Visitor Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #07090e;
+      color: #f0f4fc;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 24px 16px;
+      min-height: 100vh;
+    }
+    .container { max-width: 960px; margin: 0 auto; }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 24px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00f0ff, #7000ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+    }
+    .brand h1 { font-size: 1.35rem; font-weight: 800; letter-spacing: 0.5px; }
+    .brand p { font-size: 0.8rem; color: #94a3b8; }
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .pulse-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #34d399;
+      box-shadow: 0 0 10px #34d399;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: var(--accent, #00f0ff);
+    }
+    .stat-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 8px; font-weight: 700; }
+    .stat-value { font-size: 2.2rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace; }
+    .stat-sub { font-size: 0.75rem; color: #64748b; margin-top: 6px; }
+
+    .feed-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 22px;
+      backdrop-filter: blur(8px);
+    }
+    .feed-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .feed-header h2 { font-size: 1.05rem; font-weight: 700; color: #e2e8f0; }
+    .refresh-btn {
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      color: #00f0ff;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .refresh-btn:hover { background: rgba(0, 240, 255, 0.2); }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; text-align: left; }
+    th { padding: 10px 14px; color: #64748b; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    td { padding: 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); color: #cbd5e1; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .badge-app { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-web { background: rgba(0, 240, 255, 0.18); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.3); }
+    .badge-new { background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .time-mono { font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <div class="logo-badge">📚</div>
+        <div>
+          <h1>College Notes • Live Traffic</h1>
+          <p>Real-Time Visitor & Device Analytics for App & Website</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <span class="live-indicator"><span class="pulse-dot"></span> Live Tracking Active</span>
+        <a href="/stats" class="refresh-btn">🔄 Refresh</a>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card" style="--accent: #00f0ff;">
+        <div class="stat-label">👥 Total Unique Visitors</div>
+        <div class="stat-value">${totalVisitors.toLocaleString()}</div>
+        <div class="stat-sub">Distinct users & installations</div>
+      </div>
+
+      <div class="stat-card" style="--accent: #34d399;">
+        <div class="stat-label">📱 Android App Users</div>
+        <div class="stat-value" style="color: #34d399;">${appVisitors.toLocaleString()}</div>
+        <div class="stat-sub">Installed mobile APK opens</div>
+      </div>
+
+      <div class="stat-card" style="--accent: #a855f7;">
+        <div class="stat-label">🌐 Web Browser Users</div>
+        <div class="stat-value" style="color: #c084fc;">${webVisitors.toLocaleString()}</div>
+        <div class="stat-sub">Chrome, Safari, Edge visitors</div>
+      </div>
+
+      <div class="stat-card" style="--accent: #f59e0b;">
+        <div class="stat-label">📈 Total Visits / Sessions</div>
+        <div class="stat-value" style="color: #fbbf24;">${totalVisits.toLocaleString()}</div>
+        <div class="stat-sub">Portal views across all devices</div>
+      </div>
+    </div>
+
+    <div class="feed-card">
+      <div class="feed-header">
+        <h2>🕒 Recent Real-Time Visits Log</h2>
+        <span style="font-size: 0.75rem; color: #64748b;">Auto-updates continuously</span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Platform</th>
+              <th>Device</th>
+              <th>Visitor ID</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${recentVisits.length === 0 ? `
+              <tr>
+                <td colspan="5" style="text-align: center; color: #64748b; padding: 28px;">
+                  No visits recorded yet. Visits will automatically stream here as users open the app or website.
+                </td>
+              </tr>
+            ` : recentVisits.map(v => `
+              <tr>
+                <td>${v.isNew ? '<span class="badge badge-new">✨ New</span>' : '<span style="color:#64748b; font-size:0.75rem;">Returning</span>'}</td>
+                <td><span class="badge ${v.platform.includes('App') ? 'badge-app' : 'badge-web'}">${v.platform}</span></td>
+                <td>${v.device || 'Unknown Device'}</td>
+                <td class="time-mono">${v.visitorId || 'anon'}</td>
+                <td class="time-mono">${new Date(v.timestamp).toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px; text-align: center; font-size: 0.78rem; color: #475569;">
+      All College Notes Study Portal • Built for students • Real-time dual cloud sync
+    </div>
+  </div>
+
+  <script>
+    // Auto-refresh the dashboard every 30 seconds
+    setTimeout(() => { window.location.reload(); }, 30000);
+  </script>
+</body>
+</html>`;
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 });
 
 app.use('/api', router);

@@ -32,7 +32,6 @@ import {
   ChevronRight,
   Play
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { initialSubjects, initialLabManuals } from '../data/mockData';
 
 /* -------------------------------------------------------------------------
@@ -490,13 +489,6 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
       link.click();
       document.body.removeChild(link);
       setTimeout(() => window.URL.revokeObjectURL(blobUrl), 15000);
-      try {
-        confetti({
-          particleCount: 50,
-          spread: 60,
-          origin: { y: 0.75 }
-        });
-      } catch (err) {}
     } catch (err) {
       console.warn('Direct blob download error, triggering fallback:', err);
       // Fallback: direct anchor trigger or window.open
@@ -621,13 +613,6 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
         `${activeSubject.code || ''}: ${activeSubject.name} Complete Study Bundle`,
         `Generated custom bundle with Viva Q&A and Formula sheets`
       );
-    } catch (err) {}
-    try {
-      confetti({
-        particleCount: 90,
-        spread: 80,
-        origin: { y: 0.6 }
-      });
     } catch (err) {}
   };
 

@@ -11,9 +11,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import NowShowing from './components/NowShowing';
-import SecurityShield from './components/SecurityShield';
-import AuthPage from './components/AuthPage';
 import CampusAIChatbot from './components/CampusAIChatbot';
+import VisitorAnalyticsModal from './components/VisitorAnalyticsModal';
 const SensoryLab = React.lazy(() => import('./components/SensoryLab'));
 const TechGuide = React.lazy(() => import('./components/TechGuide'));
 const Theaters = React.lazy(() => import('./components/Theaters'));
@@ -22,26 +21,27 @@ const SeatBooking = React.lazy(() => import('./components/SeatBooking'));
 const SuperAdminPanel = React.lazy(() => import('./components/SuperAdminPanel'));
 const QuickSearchPalette = React.lazy(() => import('./components/QuickSearchPalette'));
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, FileText, User, LogOut, Sparkles, Code2, ClipboardCheck, Search } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, GraduationCap, Download, BookOpen, FileText, Sparkles, Code2, ClipboardCheck, Search, Activity, Crown } from 'lucide-react';
 import { App as CapApp } from '@capacitor/app';
-import { logSecurityEvent } from './utils/security';
-import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers, getApiUrl, pullCloudControls } from './utils/cloudSync';
+import { pullCloudUsers, getApiUrl, pullCloudControls } from './utils/cloudSync';
+import { recordVisit } from './utils/visitorTracker';
 import './App.css';
 
 export default function App() {
   /* -----------------------------------------------------------------------
-     0. USER AUTHENTICATION & SESSION STATE
+     0. USER CONTEXT: OPEN ACCESS (NO LOGIN REQUIRED)
+     All students access notes freely without any login barriers.
      ----------------------------------------------------------------------- */
   const [currentUser, setCurrentUser] = useState(() => {
     try {
-      // Clear legacy localStorage so opening the link requires logging in
-      localStorage.removeItem('college_notes_auth_user');
-      const saved = sessionStorage.getItem('college_notes_auth_user');
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) {
-      return null;
-    }
+      const savedAdmin = localStorage.getItem('college_notes_admin_session');
+      if (savedAdmin) return JSON.parse(savedAdmin);
+    } catch (e) {}
+    return { username: 'Student', role: 'student', isSuperAdmin: false };
   });
+
+  // Real-Time Visitor Analytics Modal State
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
 
   /* -----------------------------------------------------------------------
      THEME: PERMANENT DARK MODE ALWAYS
@@ -55,53 +55,36 @@ export default function App() {
     } catch (e) {}
   }, []);
 
-  // Zero-Trust Session Inactivity Timeout Guard (30 Minutes)
-  const lastActivityRef = useRef(Date.now());
-
+  // Record real-time visitor visit on launch
   useEffect(() => {
-    if (!currentUser) return;
+    recordVisit('home').catch(() => {});
+  }, []);
 
-    const resetActivity = () => {
-      if (Date.now() - lastActivityRef.current < 2000) return;
-      lastActivityRef.current = Date.now();
-    };
-
-    const activityEvents = ['pointerdown', 'keydown', 'touchstart'];
-    activityEvents.forEach((evt) => window.addEventListener(evt, resetActivity, { passive: true }));
-
-    // Check every 30 seconds
-    const interval = setInterval(() => {
-      const idleTime = Date.now() - lastActivityRef.current;
-      const MAX_IDLE_MS = 30 * 60 * 1000; // 30 minutes
-
-      if (idleTime > MAX_IDLE_MS) {
-        logSecurityEvent('SESSION_IDLE_TIMEOUT', `Auto-lockout engaged for @${currentUser.username} after 30m inactivity`, 'WARN');
-        try {
-          sessionStorage.removeItem('college_notes_auth_user');
-          localStorage.removeItem('college_notes_auth_user');
-        } catch (e) {}
-        setCurrentUser(null);
-        return;
-      }
-
-      // Check 2-Device Simultaneous Limit Heartbeat
-      checkDeviceSessionActive(currentUser.username).then((active) => {
-        if (!active) {
-          logSecurityEvent('DEVICE_LIMIT_DISPLACED', `Session displaced for @${currentUser.username} (max 2 devices limit)`, 'WARN');
-          try {
-            sessionStorage.removeItem('college_notes_auth_user');
-            localStorage.removeItem('college_notes_auth_user');
-          } catch (e) {}
-          alert("⚠️ Session Terminated: This account reached the 2-device simultaneous limit or was signed out from another device.");
-          setCurrentUser(null);
+  // Secret Hotkey: Ctrl+Shift+A (Toggle Super Admin mode for Bhavya Mishra)
+  useEffect(() => {
+    const handleAdminKey = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        if (currentUser?.isSuperAdmin) {
+          const resetUser = { username: 'Student', role: 'student', isSuperAdmin: false };
+          setCurrentUser(resetUser);
+          localStorage.removeItem('college_notes_admin_session');
+          alert('Switched back to Normal Student Mode');
+        } else {
+          const pass = prompt('Enter Admin Access Code:');
+          if (pass === 'bhavya2026' || pass === 'admin123') {
+            const adminUser = { username: 'Bhavya Mishra', role: 'superadmin', isSuperAdmin: true };
+            setCurrentUser(adminUser);
+            localStorage.setItem('college_notes_admin_session', JSON.stringify(adminUser));
+            alert('👑 Super Admin Mode Activated! Super Admin Panel is now unlocked in your menu.');
+          } else if (pass !== null) {
+            alert('Incorrect admin code.');
+          }
         }
-      }).catch(() => {});
-    }, 25000);
-
-    return () => {
-      clearInterval(interval);
-      activityEvents.forEach((evt) => window.removeEventListener(evt, resetActivity));
+      }
     };
+    window.addEventListener('keydown', handleAdminKey);
+    return () => window.removeEventListener('keydown', handleAdminKey);
   }, [currentUser]);
 
   // Live Portal Announcement & System Controls from Super Admin
@@ -346,24 +329,6 @@ export default function App() {
 
   const isSuperAdmin = (currentUser?.username?.toLowerCase() === 'bhavya mishra') || (currentUser?.role === 'superadmin') || (currentUser?.isSuperAdmin === true) || (currentUser?.role === 'admin');
 
-  // Authentication Guard: Show login/create account page if not signed in
-  if (!currentUser) {
-    return (
-      <AuthPage 
-        onLogin={(user) => {
-          setCurrentUser(user);
-          try {
-            sessionStorage.setItem('college_notes_auth_user', JSON.stringify(user));
-            localStorage.setItem('college_notes_has_account', 'true');
-            if (user?.username) {
-              localStorage.setItem('college_notes_last_username', user.username);
-            }
-          } catch (e) {}
-        }} 
-      />
-    );
-  }
-
   return (
     <div className="app-wrapper">
       {/* Collapsible Sidebar Navigation */}
@@ -375,6 +340,7 @@ export default function App() {
         setIsOpen={setSidebarOpen}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        onOpenAnalytics={() => setAnalyticsOpen(true)}
       />
 
       <div className={`main-viewport ${isSidebarCollapsed ? 'collapsed' : ''}`}>
@@ -402,7 +368,7 @@ export default function App() {
 
         {/* -----------------------------------------------------------------
            5. TOP STICKY NAVBAR
-           Contains sidebar collapse toggle, section title, and quick download
+           Clean, streamlined, uncluttered: Title, Search, Stats, Download
            ----------------------------------------------------------------- */}
         <header className="top-navbar">
           <div className="nav-left-group">
@@ -426,57 +392,54 @@ export default function App() {
           </div>
 
           <div className="top-actions">
-            {/* Security Shield: Unrestricted for Admin accounts, active for normal students */}
-            <SecurityShield 
-              enabled={!isSuperAdmin} 
-              isAdmin={isSuperAdmin}
-              showBadge={false} 
-              watermarkId={`STU-${(currentUser?.username || 'STUDENT').toUpperCase()}-BEEE-8491`} 
-            />
-            
-            <div 
-              className="nav-user-pill"
-              onClick={() => {
-                if (currentUser?.username?.toLowerCase() === 'bhavya mishra' || currentUser?.role === 'superadmin') {
-                  setActiveTab('admin-panel');
-                }
-              }}
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '8px', 
-                background: (currentUser?.username?.toLowerCase() === 'bhavya mishra' || currentUser?.role === 'superadmin') ? 'rgba(245, 158, 11, 0.15)' : 'rgba(0, 240, 255, 0.08)', 
-                border: (currentUser?.username?.toLowerCase() === 'bhavya mishra' || currentUser?.role === 'superadmin') ? '1.5px solid #f59e0b' : '1px solid rgba(0, 240, 255, 0.25)', 
-                padding: '6px 14px', 
+            {/* Real-Time Visitor Stats Button */}
+            <button 
+              className="nav-stats-trigger"
+              onClick={() => setAnalyticsOpen(true)}
+              title="View Live Real-Time Visitor Traffic"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(0, 240, 255, 0.08)',
+                border: '1px solid rgba(0, 240, 255, 0.25)',
+                color: 'var(--neon-cyan)',
+                padding: '6px 12px',
                 borderRadius: '20px',
-                boxShadow: (currentUser?.username?.toLowerCase() === 'bhavya mishra' || currentUser?.role === 'superadmin') ? '0 0 15px rgba(245, 158, 11, 0.25)' : 'none',
-                cursor: (currentUser?.username?.toLowerCase() === 'bhavya mishra' || currentUser?.role === 'superadmin') ? 'pointer' : 'default',
-                transition: 'transform 0.15s ease'
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
               }}
-              title={(currentUser?.username?.toLowerCase() === 'bhavya mishra' || currentUser?.role === 'superadmin') ? 'Click to jump to Super Admin Panel' : undefined}
             >
-              <User size={15} color={(currentUser?.username?.toLowerCase() === 'bhavya mishra' || currentUser?.role === 'superadmin') ? '#f59e0b' : 'var(--neon-cyan)'} />
-              <span style={{ 
-                fontSize: '0.78rem', 
-                color: (currentUser?.username?.toLowerCase() === 'bhavya mishra' || currentUser?.role === 'superadmin') ? '#fef08a' : 'var(--neon-cyan)', 
-                fontWeight: 700 
-              }}>
-                @{currentUser?.username}
-              </span>
-              {(currentUser?.username?.toLowerCase() === 'bhavya mishra' || currentUser?.role === 'superadmin') && (
-                <span className="admin-crown-badge" style={{
-                  fontSize: '0.66rem',
-                  fontWeight: 900,
-                  letterSpacing: '0.5px',
-                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                  color: '#000',
-                  padding: '2px 7px',
-                  borderRadius: '10px'
-                }}>
-                  👑 ADMIN
-                </span>
-              )}
-            </div>
+              <Activity size={14} color="var(--neon-cyan)" />
+              <span className="stats-text-desktop">Live Traffic</span>
+            </button>
+
+            {/* Elevated Super Admin Pill (if Bhavya activated admin mode) */}
+            {isSuperAdmin && (
+              <button 
+                onClick={() => setActiveTab('admin-panel')}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '6px', 
+                  background: 'rgba(245, 158, 11, 0.15)', 
+                  border: '1.5px solid #f59e0b', 
+                  color: '#fef08a',
+                  padding: '6px 12px', 
+                  borderRadius: '20px',
+                  boxShadow: '0 0 15px rgba(245, 158, 11, 0.25)',
+                  cursor: 'pointer',
+                  fontSize: '0.74rem',
+                  fontWeight: 800
+                }}
+                title="Super Admin Control Active"
+              >
+                <Crown size={14} color="#f59e0b" />
+                <span>ADMIN</span>
+              </button>
+            )}
 
             {/* Universal Cross-Subject Quick Search Trigger (Ctrl+K) */}
             <button 
@@ -487,28 +450,6 @@ export default function App() {
               <Search size={14} color="var(--neon-cyan)" />
               <span className="search-text-desktop">Search</span>
               <kbd className="nav-search-kbd">Ctrl+K</kbd>
-            </button>
-
-
-
-            {/* Dedicated Sign Out Button */}
-            <button 
-              className="btn-secondary nav-logout-btn" 
-              style={{ padding: '6px 14px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px', borderColor: 'rgba(255, 75, 75, 0.4)', color: '#ff6b6b', background: 'rgba(255, 75, 75, 0.08)', cursor: 'pointer' }}
-              onClick={() => {
-                if (currentUser && currentUser.username) {
-                  removeDeviceSession(currentUser.username).catch(() => {});
-                }
-                try {
-                  sessionStorage.removeItem('college_notes_auth_user');
-                  localStorage.removeItem('college_notes_auth_user');
-                } catch (e) {}
-                setCurrentUser(null);
-              }}
-              title="Sign Out & Lock Portal"
-            >
-              <LogOut size={15} />
-              <span className="logout-text-desktop">Log Out</span>
             </button>
             
             <button 
@@ -589,6 +530,12 @@ export default function App() {
           />
         )}
       </React.Suspense>
+
+      {/* Real-time Visitor Traffic & Analytics Modal */}
+      <VisitorAnalyticsModal
+        isOpen={analyticsOpen}
+        onClose={() => setAnalyticsOpen(false)}
+      />
 
       {/* Android Back Button Double-Tap Confirmation Toast */}
       {backToastMessage && (

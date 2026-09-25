@@ -662,16 +662,16 @@ body.theme-light .nav-item.active {
     padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
-  /* Position floating chatbot above bottom nav */
+  /* Position floating chatbot comfortably above bottom nav */
   .campus-ai-floating-widget {
-    bottom: calc(66px + env(safe-area-inset-bottom, 0px)) !important;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
     right: 16px !important;
   }
 
   .campus-ai-floating-panel {
-    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
     right: 12px !important;
-    max-height: calc(100vh - 140px) !important;
+    max-height: calc(100vh - 145px) !important;
   }
 }
 
