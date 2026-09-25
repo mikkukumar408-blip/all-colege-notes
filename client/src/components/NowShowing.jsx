@@ -79,28 +79,28 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
   const [selectedYear, setSelectedYear] = useState('All');
   const [selectedSem, setSelectedSem] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [subjects] = useState(initialSubjects);
+  
+  // Only present verified, active subjects with full notes ready
+  const activeSubjects = initialSubjects.filter(isSubjectCardActive);
   const [featuredSubject, setFeaturedSubject] = useState(
-    initialSubjects.find(s => s.id === 'sub-beee') || initialSubjects[0]
-  ); // Defaults to BEEE (BELE-001) Flagship Subject
+    activeSubjects.find(s => s.id === 'sub-beee') || activeSubjects[0]
+  );
 
   /* -----------------------------------------------------------------------
      FILTER LOGIC
-     Filters subjects by Year, Semester, and Subject Name / Course Code
+     Filters active subjects by Semester and Subject Name / Course Code
      ----------------------------------------------------------------------- */
-  const filteredSubjects = subjects.filter(sub => {
-    const matchesYear = selectedYear === 'All' || sub.year === selectedYear;
+  const filteredSubjects = activeSubjects.filter(sub => {
     const matchesSem = selectedSem === 'All' || sub.semester === Number(selectedSem);
     const matchesSearch = sub.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           sub.code.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesYear && matchesSem && matchesSearch;
+    return matchesSem && matchesSearch;
   });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* -------------------------------------------------------------------
-         PART A: HERO SPOTLIGHT SUBJECT BANNER
-         Shows featured subject with detailed info and direct launch buttons
+         PART A: HERO SPOTLIGHT SUBJECT BANNER (Desktop/Tablet Hero)
          ------------------------------------------------------------------- */}
       {featuredSubject && (
         <div 
@@ -108,7 +108,7 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
           style={{
             position: 'relative',
             overflow: 'hidden',
-            minHeight: '340px',
+            minHeight: '280px',
             display: 'flex',
             alignItems: 'flex-end',
             border: '1px solid rgba(0, 240, 255, 0.3)',
@@ -128,7 +128,7 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              filter: 'brightness(0.3) contrast(1.1)',
+              filter: 'brightness(0.25) contrast(1.1)',
               zIndex: 0
             }}
           />
@@ -136,93 +136,37 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(to top, #07090e 10%, rgba(7,9,14,0.7) 60%, transparent 100%)',
+              background: 'linear-gradient(to top, #07090e 15%, rgba(7,9,14,0.7) 65%, transparent 100%)',
               zIndex: 1
             }}
           />
-          <div style={{ position: 'relative', zIndex: 2, maxWidth: '780px', width: '100%' }}>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap' }}>
-              <span className="badge-crimson font-display">FEATURED STUDY MODULE</span>
-              <span className="badge-neon">{featuredSubject.year} • Semester {featuredSubject.semester}</span>
+          <div style={{ position: 'relative', zIndex: 2, maxWidth: '780px', width: '100%', padding: '24px' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
+              <span className="badge-crimson font-display">VERIFIED CURRICULUM</span>
+              <span className="badge-neon">1st Year • Semester {featuredSubject.semester}</span>
               <span className="badge-amber">{featuredSubject.code}</span>
               <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{featuredSubject.credits} Credits</span>
             </div>
 
-            <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.4rem)', fontWeight: 900, marginBottom: '12px', lineHeight: 1.15, color: '#fff', wordBreak: 'break-word' }}>
+            <h1 style={{ fontSize: 'clamp(1.4rem, 3vw, 2.2rem)', fontWeight: 900, marginBottom: '8px', lineHeight: 1.2, color: '#fff', wordBreak: 'break-word' }}>
               {featuredSubject.name}
             </h1>
-            <p style={{ color: '#d0d8e8', fontSize: '0.92rem', marginBottom: '20px', lineHeight: 1.6 }}>
+            <p style={{ color: '#d0d8e8', fontSize: '0.9rem', marginBottom: '16px', lineHeight: 1.5 }}>
               {featuredSubject.description}
             </p>
 
-            {/* Coverage & Verification Metrics */}
-            <div style={{ 
-              background: 'rgba(14, 18, 29, 0.85)', 
-              padding: '12px 16px', 
-              borderRadius: '12px', 
-              border: '1px solid rgba(255,255,255,0.1)',
-              marginBottom: '22px',
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '14px',
-              alignItems: 'center'
-            }}>
-              <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--neon-cyan)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  Coverage
-                </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>
-                  {featuredSubject.notesCount}
-                </div>
-              </div>
-              <div style={{ width: '1px', height: '28px', background: 'rgba(255,255,255,0.1)' }} />
-              <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--neon-green)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  Verified Notes
-                </div>
-                <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>
-                  Topper & Faculty Notes
-                </div>
-              </div>
-              <div style={{ width: '1px', height: '28px', background: 'rgba(255,255,255,0.1)' }} />
-              <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--neon-amber)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  Instructor
-                </div>
-                <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>
-                  {featuredSubject.instructor}
-                </div>
-              </div>
-            </div>
-
-            <div className="hero-btn-group" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div className="hero-btn-group" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button 
-                className={isSubjectCardActive(featuredSubject) ? "btn-primary" : "btn-secondary"}
-                disabled={!isSubjectCardActive(featuredSubject)}
-                style={{
-                  opacity: isSubjectCardActive(featuredSubject) ? 1 : 0.4,
-                  cursor: isSubjectCardActive(featuredSubject) ? 'pointer' : 'not-allowed'
-                }}
-                onClick={() => {
-                  if (!isSubjectCardActive(featuredSubject)) return;
-                  onReadNotes && onReadNotes(featuredSubject);
-                }}
+                className="btn-primary"
+                onClick={() => onReadNotes && onReadNotes(featuredSubject)}
               >
                 <BookOpen size={16} /> Open Notes Reader <ChevronRight size={18} />
               </button>
               <button 
                 className="btn-outline"
-                disabled={!isSubjectCardActive(featuredSubject)}
-                style={{
-                  opacity: isSubjectCardActive(featuredSubject) ? 1 : 0.4,
-                  cursor: isSubjectCardActive(featuredSubject) ? 'pointer' : 'not-allowed'
-                }}
-                onClick={() => {
-                  if (!isSubjectCardActive(featuredSubject)) return;
-                  onSelectSubject && onSelectSubject(featuredSubject);
-                }}
+                onClick={() => onSelectSubject && onSelectSubject(featuredSubject)}
               >
-                <Download size={16} color={isSubjectCardActive(featuredSubject) ? "var(--neon-cyan)" : "var(--text-dim)"} /> Download Study Materials
+                <Download size={16} color="var(--neon-cyan)" /> Download Study Materials
               </button>
             </div>
           </div>
@@ -230,114 +174,70 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
       )}
 
       {/* -------------------------------------------------------------------
-         PART B: YEAR & SEMESTER FILTER TABS + SEARCH BAR
-         Allows students to switch between 1st, 2nd, 3rd, 4th Year and Sem 1-8
+         PART B: SEMESTER FILTER TABS + SEARCH BAR (Clean, fast, no dead buttons)
          ------------------------------------------------------------------- */}
-      <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="glass-panel" style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div>
-            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff' }}>Academic Year Filter</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>Select your academic year to view relevant semester subjects</p>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', margin: 0 }}>Subject Catalog</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: '4px 0 0 0' }}>All 8 Core B.Tech Subjects with Complete Lecture Notes</p>
           </div>
 
           {/* Quick Search Input */}
-          <div className="catalog-search-wrapper">
+          <div className="catalog-search-wrapper" style={{ minWidth: '260px', flex: '1', maxWidth: '380px', position: 'relative' }}>
             <input
               type="text"
-              placeholder="Search subject or code (e.g. CS301)..."
+              placeholder="Search by subject name or code (e.g. BEEE, Python)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 width: '100%',
-                padding: '10px 14px 10px 36px',
+                padding: '9px 14px 9px 36px',
                 borderRadius: '8px',
-                background: 'rgba(7, 9, 14, 0.8)',
+                background: 'rgba(7, 9, 14, 0.85)',
                 color: '#fff',
                 border: '1px solid var(--border-dim)',
-                fontSize: '0.85rem',
-                outline: 'none'
+                fontSize: '0.84rem',
+                outline: 'none',
+                boxSizing: 'border-box'
               }}
             />
-            <Search size={16} color="var(--text-dim)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+            <Search size={15} color="var(--text-dim)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
           </div>
         </div>
 
-        {/* 1st, 2nd, 3rd, 4th Year Filter Buttons */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {['All', '1st Year', '2nd Year', '3rd Year', '4th Year'].map(yr => {
-            const isDead = yr === '2nd Year' || yr === '3rd Year' || yr === '4th Year';
+        {/* Active Semester Filter Pills */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          {[
+            { id: 'All', label: `All Subjects (${activeSubjects.length})` },
+            { id: '1', label: `Semester 1 (${activeSubjects.filter(s => s.semester === 1).length} Subjects)` },
+            { id: '2', label: `Semester 2 (${activeSubjects.filter(s => s.semester === 2).length} Subjects)` }
+          ].map(tab => {
+            const isSelected = selectedSem === tab.id;
             return (
               <button
-                key={yr}
-                disabled={isDead}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (isDead) {
-                    return false; // Dead button: clicking does nothing
-                  }
-                  setSelectedYear(yr);
-                  setSelectedSem('All');
-                }}
-                title={isDead ? `${yr} (Unavailable)` : undefined}
+                key={tab.id}
+                onClick={() => setSelectedSem(tab.id)}
                 style={{
-                  padding: '8px 18px',
-                  borderRadius: '8px',
-                  fontSize: '0.84rem',
-                  fontWeight: 700,
-                  cursor: isDead ? 'not-allowed' : 'pointer',
-                  opacity: isDead ? 0.35 : 1,
-                  background: (!isDead && selectedYear === yr) ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.05)',
-                  color: (!isDead && selectedYear === yr) ? '#030a16' : isDead ? 'var(--text-dim)' : '#fff',
-                  border: (!isDead && selectedYear === yr) ? 'none' : '1px solid var(--border-dim)',
-                  transition: 'all 0.2s ease',
+                  padding: '7px 16px',
+                  borderRadius: '20px',
+                  fontSize: '0.82rem',
+                  fontWeight: isSelected ? 800 : 600,
+                  cursor: 'pointer',
+                  background: isSelected ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.06)',
+                  color: isSelected ? '#030a16' : '#e2e8f0',
+                  border: isSelected ? 'none' : '1px solid var(--border-dim)',
+                  transition: 'all 0.15s ease',
                   userSelect: 'none'
                 }}
               >
-                {yr}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Semester 1 to 8 Filter Pills */}
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center', borderTop: '1px solid var(--border-dim)', paddingTop: '12px' }}>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginRight: '6px' }}>Semester:</span>
-          {['All', '1', '2', '3', '4', '5', '6', '7', '8'].map(sem => {
-            const isDead = sem !== 'All' && sem !== '1' && sem !== '2';
-            return (
-              <button
-                key={sem}
-                disabled={isDead}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (isDead) {
-                    return false; // Dead button: clicking does nothing
-                  }
-                  setSelectedSem(sem);
-                }}
-                title={isDead ? `Semester ${sem} (Unavailable)` : undefined}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: '6px',
-                  fontSize: '0.78rem',
-                  fontWeight: 600,
-                  cursor: isDead ? 'not-allowed' : 'pointer',
-                  opacity: isDead ? 0.35 : 1,
-                  background: (!isDead && selectedSem === sem) ? 'rgba(0, 240, 255, 0.15)' : 'transparent',
-                  color: (!isDead && selectedSem === sem) ? 'var(--neon-cyan)' : 'var(--text-muted)',
-                  border: (!isDead && selectedSem === sem) ? '1px solid var(--neon-cyan)' : '1px solid transparent',
-                  transition: 'all 0.2s ease',
-                  userSelect: 'none'
-                }}
-              >
-                {sem === 'All' ? 'All Semesters' : `Semester ${sem}`}
+                {tab.label}
               </button>
             );
           })}
         </div>
       </div>
+
 
       {/* -------------------------------------------------------------------
          PART C: SUBJECT CARDS GRID
@@ -355,147 +255,119 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
         <div className="subject-cards-grid">
           {filteredSubjects.map(sub => {
             const isFeatured = featuredSubject?.id === sub.id;
-            const isCardActive = isSubjectCardActive(sub);
-            const isDead = !isCardActive;
 
             return (
               <div 
                 key={sub.id}
-                className={`glass-panel subject-catalog-card ${isDead ? 'dead' : ''}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (isDead) {
-                    return false; // Dead card: clicking does nothing
-                  }
-                  setFeaturedSubject(sub);
-                }}
-                title={isDead ? `${sub.name} (Unavailable)` : undefined}
+                className="glass-panel subject-catalog-card"
+                onClick={() => setFeaturedSubject(sub)}
+                style={{ cursor: 'pointer', transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
               >
-              {/* Subject Thumbnail Banner */}
-              <div style={{ position: 'relative', height: '140px', overflow: 'hidden' }}>
-                <img 
-                  src={sub.banner || '/images/dsa.jpg'} 
-                  alt={sub.name}
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = '/images/dsa.jpg';
-                  }}
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover',
-                    filter: isDead ? 'grayscale(85%) brightness(0.7)' : 'none'
-                  }}
-                />
-                <div style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  background: 'rgba(7,9,14,0.85)',
-                  borderRadius: '6px',
-                  padding: '4px 8px',
-                  fontSize: '0.72rem',
-                  fontWeight: 700,
-                  color: isDead ? 'var(--text-dim)' : 'var(--neon-cyan)',
-                  border: isDead ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,240,255,0.3)'
-                }}>
-                  {sub.code}
-                </div>
-                <div style={{
-                  position: 'absolute',
-                  bottom: '8px',
-                  left: '10px',
-                  display: 'flex',
-                  gap: '6px'
-                }}>
-                  <span style={{ background: 'rgba(7,9,14,0.9)', color: isDead ? 'var(--text-dim)' : 'var(--neon-amber)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
-                    Semester {sub.semester}
-                  </span>
-                  <span style={{ background: 'rgba(7,9,14,0.9)', color: isDead ? 'var(--text-dim)' : '#fff', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px' }}>
-                    {sub.credits} Credits
-                  </span>
-                </div>
-              </div>
-
-              {/* Subject Information */}
-              <div style={{ padding: '18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: isDead ? 'var(--text-dim)' : '#fff', marginBottom: '6px' }}>
-                  {sub.name}
-                </h4>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '14px', flex: 1, lineHeight: 1.5 }}>
-                  {sub.description.slice(0, 95)}...
-                </p>
-
-                {/* Available Unit Pills */}
-                <div style={{ marginBottom: '16px' }}>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Units Available:
+                {/* Subject Thumbnail Banner */}
+                <div style={{ position: 'relative', height: '140px', overflow: 'hidden' }}>
+                  <img 
+                    src={sub.banner || '/images/dsa.jpg'} 
+                    alt={sub.name}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = '/images/dsa.jpg';
+                    }}
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover'
+                    }}
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    background: 'rgba(7,9,14,0.85)',
+                    borderRadius: '6px',
+                    padding: '4px 8px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    color: 'var(--neon-cyan)',
+                    border: '1px solid rgba(0,240,255,0.3)'
+                  }}>
+                    {sub.code}
                   </div>
-                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                    {sub.units.map(u => (
-                      <span key={u.num} style={{ background: 'rgba(255,255,255,0.05)', color: isDead ? 'var(--text-dim)' : 'var(--text-main)', fontSize: '0.68rem', padding: '2px 6px', borderRadius: '4px' }}>
-                        U{u.num} ({u.pages}p)
-                      </span>
-                    ))}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '8px',
+                    left: '10px',
+                    display: 'flex',
+                    gap: '6px'
+                  }}>
+                    <span style={{ background: 'rgba(7,9,14,0.9)', color: 'var(--neon-amber)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
+                      Semester {sub.semester}
+                    </span>
+                    <span style={{ background: 'rgba(7,9,14,0.9)', color: '#fff', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px' }}>
+                      {sub.credits} Credits
+                    </span>
                   </div>
                 </div>
 
-                {/* Card Action Buttons */}
-                <div style={{ borderTop: '1px solid var(--border-dim)', paddingTop: '12px', marginTop: 'auto', display: 'flex', gap: '8px' }}>
-                  <button 
-                    className={isDead ? "btn-secondary" : "btn-primary"} 
-                    disabled={isDead}
-                    style={{ 
-                      flex: 1, 
-                      padding: '8px 10px', 
-                      fontSize: '0.82rem', 
-                      justifyContent: 'center',
-                      cursor: isDead ? 'not-allowed' : 'pointer',
-                      opacity: isDead ? 0.35 : 1,
-                      background: isDead ? 'rgba(255,255,255,0.05)' : undefined,
-                      color: isDead ? 'var(--text-dim)' : undefined,
-                      borderColor: isDead ? 'rgba(255,255,255,0.1)' : undefined
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (isDead) {
-                        return false; // Dead card: clicking does nothing
-                      }
-                      onReadNotes && onReadNotes(sub);
-                    }}
-                    title={isDead ? `${sub.name} (Unavailable)` : 'Read Notes'}
-                  >
-                    <BookOpen size={14} /> Read Notes
-                  </button>
-                  <button 
-                    className="btn-outline" 
-                    disabled={isDead}
-                    style={{ 
-                      padding: '8px 12px', 
-                      fontSize: '0.82rem', 
-                      cursor: isDead ? 'not-allowed' : 'pointer',
-                      opacity: isDead ? 0.35 : 1,
-                      borderColor: isDead ? 'rgba(255,255,255,0.1)' : undefined
-                    }}
-                    title={isDead ? `${sub.name} (Unavailable)` : 'Download PDFs'}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (isDead) {
-                        return false; // Dead card: clicking does nothing
-                      }
-                      onSelectSubject && onSelectSubject(sub);
-                    }}
-                  >
-                    <Download size={14} color={isDead ? "var(--text-dim)" : "var(--neon-cyan)"} />
-                  </button>
+                {/* Subject Information */}
+                <div style={{ padding: '18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff', marginBottom: '6px' }}>
+                    {sub.name}
+                  </h4>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '14px', flex: 1, lineHeight: 1.5 }}>
+                    {sub.description.slice(0, 95)}...
+                  </p>
+
+                  {/* Available Unit Pills */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Units Available:
+                    </div>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                      {sub.units.map(u => (
+                        <span key={u.num} style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', fontSize: '0.68rem', padding: '2px 6px', borderRadius: '4px' }}>
+                          U{u.num} ({u.pages}p)
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Card Action Buttons */}
+                  <div style={{ borderTop: '1px solid var(--border-dim)', paddingTop: '12px', marginTop: 'auto', display: 'flex', gap: '8px' }}>
+                    <button 
+                      className="btn-primary" 
+                      style={{ 
+                        flex: 1, 
+                        padding: '8px 10px', 
+                        fontSize: '0.82rem', 
+                        justifyContent: 'center'
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onReadNotes && onReadNotes(sub);
+                      }}
+                      title="Read Notes"
+                    >
+                      <BookOpen size={14} /> Read Notes
+                    </button>
+                    <button 
+                      className="btn-outline" 
+                      style={{ 
+                        padding: '8px 12px', 
+                        fontSize: '0.82rem'
+                      }}
+                      title="Download PDFs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectSubject && onSelectSubject(sub);
+                      }}
+                    >
+                      <Download size={14} color="var(--neon-cyan)" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
         </div>
       </div>
     </div>

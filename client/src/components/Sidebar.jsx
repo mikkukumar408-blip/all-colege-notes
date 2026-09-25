@@ -41,12 +41,11 @@ export default function Sidebar({
   const isSuperAdmin = (currentUser?.username?.toLowerCase() === 'bhavya mishra') || (currentUser?.role === 'superadmin') || (currentUser?.isSuperAdmin === true);
 
   const navSections = [
-    { id: 'subjects-notes', label: 'Semester Notes & Subjects', icon: BookOpen, badge: 'All Years' },
-    { id: 'notes-reader', label: 'Interactive Notes Reader', icon: FileText, badge: 'Quick Read' },
+    { id: 'subjects-notes', label: 'Semester Notes & Subjects', icon: BookOpen, badge: 'Core Notes' },
+    { id: 'short-notes', label: 'Exam Revision & Short Notes', icon: Sparkles, badge: 'Fast Track' },
+    { id: 'question-papers', label: 'Expected Question Papers', icon: ClipboardCheck, badge: '2026 Exams' },
+    { id: 'downloads-lab', label: 'Lab Manuals & Practical Codes', icon: Code2, badge: 'Lab & Viva' },
     { id: 'syllabus', label: 'Syllabus & Curriculum', icon: GraduationCap },
-    { id: 'short-notes', label: 'Exam Revision & Short Notes', icon: Sparkles, badge: 'Exam Ready' },
-    { id: 'question-papers', label: 'Expected Question Papers', icon: ClipboardCheck, badge: '2026 Pattern' },
-    { id: 'downloads-lab', label: 'Lab Manuals & Practical Codes', icon: Code2, badge: 'Codes & Labs' },
     ...(isSuperAdmin ? [
       { id: 'admin-panel', label: 'Super Admin Panel', icon: Crown, badge: 'ADMIN' }
     ] : [])

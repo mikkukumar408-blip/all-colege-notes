@@ -48,7 +48,6 @@ import { pythonUnitsData, pythonSubjectDetails } from '../data/pythonNotesData';
 import { dsaUnitsData, dsaSubjectDetails } from '../data/dsaNotesData';
 import HandwrittenDiagram from './HandwrittenDiagram';
 import InteractiveTheveninLab from './InteractiveTheveninLab';
-import { ForensicWatermark } from './SecurityShield';
 import CramAndRecallDeck from './CramAndRecallDeck';
 import katex from 'katex';
 import { triggerUniversalPrint } from '../utils/printHelper';
@@ -1678,6 +1677,31 @@ export default function SensoryLab({
         {/* Action Controls */}
         <div className="sensory-action-bar" style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', flex: '1 1 auto', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
 
+          {/* Quick Back to Catalog Button */}
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => {
+              if (onNavigateTab) onNavigateTab('subjects-notes');
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '7px 14px',
+              borderRadius: '8px',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              background: 'rgba(255, 255, 255, 0.08)',
+              color: '#fff',
+              border: '1px solid var(--border-dim)'
+            }}
+            title="Return to Subject Catalog"
+          >
+            <ChevronLeft size={15} /> All Subjects
+          </button>
+
           {/* Collapse / Expand Select Subject Column Toggle */}
           <button 
             className="btn-outline" 
@@ -2124,8 +2148,7 @@ export default function SensoryLab({
             transition: 'all 0.3s ease'
           }}
         >
-          {/* Forensic Dynamic Anti-Leak Watermark Layer */}
-          <ForensicWatermark watermarkText="ACADEMIC LICENSE • STU-BEEE-8491 • CONFIDENTIAL DO NOT LEAK" />
+          {/* Clean Academic Content Viewport */}
 
           {/* Quick Horizontal Unit Switcher Bar (Appears when units sidebar is collapsed) */}
           {isUnitsCollapsed && (

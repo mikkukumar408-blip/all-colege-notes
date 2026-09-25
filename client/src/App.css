@@ -1117,4 +1117,15 @@ body.theme-light .nav-item.active {
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
+/* =========================================================================
+   MOBILE USER-FRIENDLINESS OPTIMIZATIONS
+   ========================================================================= */
+@media (max-width: 768px) {
+  /* Hide the 340px billboard on phones so subjects & search are immediately visible */
+  .hero-spotlight-panel {
+    display: none !important;
+  }
+}
+
+
 

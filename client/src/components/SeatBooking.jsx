@@ -672,7 +672,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
           }}
         >
           <Code2 size={16} color={activeTabSubView === 'labs' ? 'var(--neon-cyan)' : 'currentColor'} />
-          <span>🧪 Practical Lab Manuals ({labManuals.length})</span>
+          <span>🧪 Practical Lab Manuals &amp; Codes ({labManuals.length})</span>
         </button>
 
         <button
@@ -697,102 +697,12 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
           <BookOpen size={16} color={activeTabSubView === 'notebooks' ? '#c084fc' : 'currentColor'} />
           <span>✍️ Full Handwritten Notebooks ({handwrittenNotebooks.length})</span>
         </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTabSubView('bundle')}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 18px',
-            borderRadius: '8px',
-            fontSize: '0.88rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            border: activeTabSubView === 'bundle' ? '1px solid var(--neon-green)' : 'none',
-            background: activeTabSubView === 'bundle' ? 'rgba(5, 255, 161, 0.2)' : 'transparent',
-            color: activeTabSubView === 'bundle' ? '#fff' : 'var(--text-dim)',
-            boxShadow: activeTabSubView === 'bundle' ? '0 0 15px rgba(5, 255, 161, 0.3)' : 'none'
-          }}
-        >
-          <FolderArchive size={16} color={activeTabSubView === 'bundle' ? 'var(--neon-green)' : 'currentColor'} />
-          <span>📦 Custom Study Bundle Builder</span>
-        </button>
       </div>
 
-      {/* -------------------------------------------------------------------
-         PART B: DOWNLOAD CONFIRMATION VOUCHER (Shown after clicking compile)
-         ------------------------------------------------------------------- */}
-      {downloadSuccess ? (
-        <div 
-          className="glass-panel" 
-          style={{ 
-            padding: '40px', 
-            maxWidth: '650px', 
-            margin: '0 auto', 
-            textAlign: 'center', 
-            border: '2px solid var(--neon-cyan)',
-            boxShadow: '0 0 40px rgba(0, 240, 255, 0.25)'
-          }}
-        >
-          <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(5, 255, 161, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: 'var(--neon-green)' }}>
-            <CheckCircle2 size={36} />
-          </div>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#fff', marginBottom: '10px' }}>
-            Study Material Ready for Download!
-          </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', marginBottom: '24px' }}>
-            Your bundle for <strong>{activeSubject.name} ({activeSubject.code})</strong> has been compiled.
-          </p>
-
-          <div style={{ background: 'rgba(7, 9, 14, 0.7)', borderRadius: '12px', padding: '20px', textAlign: 'left', marginBottom: '24px', border: '1px solid var(--border-dim)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-              <span style={{ color: 'var(--text-dim)', fontSize: '0.85rem' }}>Package Contents:</span>
-              <strong style={{ color: '#fff' }}>Units 1–5 Complete Lecture Notes</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-              <span style={{ color: 'var(--text-dim)', fontSize: '0.85rem' }}>Included Supplements:</span>
-              <strong style={{ color: 'var(--neon-green)' }}>
-                {includeViva ? 'Viva Q&A • ' : ''}{includeShortNotes ? 'High-Yield Short Notes • ' : ''}{includeFormulaSheets ? 'Formula Cheatsheet' : ''}
-              </strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--text-dim)', fontSize: '0.85rem' }}>Total File Size:</span>
-              <strong style={{ color: 'var(--neon-cyan)', fontSize: '1rem' }}>14.8 MB (High-Quality PDF)</strong>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => handleReviewNotebook(activeNotebook)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
-            >
-              <Eye size={18} /> Open &amp; Review {activeSubject.code} Notes PDF
-            </button>
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={() => handleDownloadNotebook(activeNotebook)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
-            >
-              <DownloadCloud size={18} /> Download {activeSubject.code} PDF Package
-            </button>
-            <button 
-              type="button"
-              className="btn-outline"
-              onClick={() => setDownloadSuccess(false)}
-            >
-              Choose Another Subject
-            </button>
-          </div>
-        </div>
-      ) : activeTabSubView === 'labs' ? (
+      {activeTabSubView === 'labs' ? (
         /* -----------------------------------------------------------------
            VIEW 1: PRACTICAL LAB MANUALS & WORKING CODES (PROMINENT TOP VIEW)
+
            ----------------------------------------------------------------- */
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div className="glass-panel" style={{ padding: '24px', border: '1.5px solid rgba(0, 240, 255, 0.35)', background: 'linear-gradient(135deg, rgba(7, 15, 30, 0.85) 0%, rgba(10, 20, 45, 0.65) 100%)' }}>
@@ -1153,112 +1063,8 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
             </div>
           )}
         </div>
-      ) : (
-        /* -----------------------------------------------------------------
-           VIEW 3: CUSTOM STUDY BUNDLE BUILDER
-           ----------------------------------------------------------------- */
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div className="glass-panel" style={{ padding: '30px', maxWidth: '750px', width: '100%', display: 'flex', flexDirection: 'column', gap: '22px', border: '1.5px solid rgba(5, 255, 161, 0.3)', background: 'linear-gradient(135deg, rgba(7, 25, 20, 0.85) 0%, rgba(10, 30, 25, 0.65) 100%)' }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span className="badge-neon" style={{ background: 'rgba(5, 255, 161, 0.15)', color: 'var(--neon-green)', borderColor: 'var(--neon-green)', fontSize: '0.75rem' }}>
-                  BUNDLE COMPILER
-                </span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Instant Single-File Download Package</span>
-              </div>
-              <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff', margin: '0 0 6px 0' }}>
-                📦 Create Custom Academic Study Bundle
-              </h3>
-              <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.5' }}>
-                Select any subject to automatically assemble full lecture notes, high-yield exam short summaries, 1-page formula cheat sheets, and comprehensive viva-voce question banks into a single personalized PDF package.
-              </p>
-            </div>
+      ) : null}
 
-            <div>
-              <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '8px', display: 'block' }}>
-                1. Select Target Subject:
-              </label>
-              <select
-                value={selectedSubjectId}
-                onChange={(e) => setSelectedSubjectId(e.target.value)}
-                style={{ width: '100%', padding: '12px', borderRadius: '8px', background: 'rgba(7, 9, 14, 0.85)', color: '#fff', border: '1px solid var(--border-dim)', fontSize: '0.9rem', outline: 'none' }}
-              >
-                {subjects.map(s => (
-                  <option key={s.id} value={s.id}>{s.code}: {s.name} (Semester {s.semester} • {s.year})</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Inclusions checkboxes */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0' }}>2. Choose Components to Include in Your PDF Bundle:</label>
-              
-              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '8px', background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255, 255, 255, 0.08)', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={includeViva} 
-                  onChange={(e) => setIncludeViva(e.target.checked)} 
-                  style={{ accentColor: 'var(--neon-green)', width: 18, height: 18 }}
-                />
-                <div>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff' }}>Comprehensive Viva &amp; Interview Prep Questions</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>Faculty question bank with model answers, technical definitions, and examiner focus areas</div>
-                </div>
-              </label>
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '8px', background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255, 255, 255, 0.08)', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={includeShortNotes} 
-                  onChange={(e) => setIncludeShortNotes(e.target.checked)} 
-                  style={{ accentColor: 'var(--neon-green)', width: 18, height: 18 }}
-                />
-                <div>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff' }}>High-Yield Short Notes &amp; Exam Revision Summary</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>KaTeX-formatted formulas, quick recall definitions, and key exam derivation summaries</div>
-                </div>
-              </label>
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '8px', background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255, 255, 255, 0.08)', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={includeFormulaSheets} 
-                  onChange={(e) => setIncludeFormulaSheets(e.target.checked)} 
-                  style={{ accentColor: 'var(--neon-green)', width: 18, height: 18 }}
-                />
-                <div>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff' }}>1-Page Exam Formula &amp; Algorithm Cheat Sheet</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>Quick-reference single-page cheat sheet for rapid last-minute revision before exams</div>
-                </div>
-              </label>
-            </div>
-
-            {/* Submission Form */}
-            <form onSubmit={handleGenerateBundle} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '6px' }}>
-              <div>
-                <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '8px', display: 'block' }}>
-                  3. Student Registration / Roll No. (Optional):
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. 11232541 (Printed on bundle cover)"
-                  value={studentRollNo}
-                  onChange={(e) => setStudentRollNo(e.target.value)}
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', background: 'rgba(7, 9, 14, 0.85)', color: '#fff', border: '1px solid var(--border-dim)', fontSize: '0.88rem', outline: 'none' }}
-                />
-              </div>
-
-              <button 
-                type="submit" 
-                className="btn-primary"
-                style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '0.92rem', gap: '8px', marginTop: '4px', background: 'linear-gradient(135deg, #05ffa1 0%, #00f0ff 100%)', color: '#07090e', fontWeight: 800 }}
-              >
-                <FolderArchive size={18} /> Compile &amp; Download Full PDF Bundle
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* -------------------------------------------------------------------
          PART C: INTERACTIVE GOD-LEVEL PRACTICAL LAB & CODE STUDIO MODAL
