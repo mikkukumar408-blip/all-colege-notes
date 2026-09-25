@@ -44,7 +44,7 @@ export default function TechGuide() {
         </div>
         <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff' }}>Syllabus & Credit Distribution</h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.94rem', maxWidth: '750px' }}>
-          Explore the official semester curriculum, credit hours, unit breakdown, and recommended reference textbooks across all 8 semesters.
+          Explore the official semester curriculum, credit hours, unit breakdown, and prescribed reference textbooks across 1st Year (Semesters 1 & 2).
         </p>
       </div>
 

@@ -19,7 +19,7 @@ const SeatBooking = React.lazy(() => import('./components/SeatBooking'));
 const SuperAdminPanel = React.lazy(() => import('./components/SuperAdminPanel'));
 const QuickSearchPalette = React.lazy(() => import('./components/QuickSearchPalette'));
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, GraduationCap, Download, BookOpen, FileText, Sparkles, Code2, ClipboardCheck, Search, Activity, Crown } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, BookOpen, FileText, Sparkles, Code2, ClipboardCheck, Search, Crown } from 'lucide-react';
 import { App as CapApp } from '@capacitor/app';
 import { pullCloudUsers, getApiUrl, pullCloudControls } from './utils/cloudSync';
 import { recordVisit } from './utils/visitorTracker';
@@ -241,12 +241,6 @@ export default function App() {
     return ['BELE-001', 'EE101', 'BCSE-011', 'BMAT-001', 'BCSE-008', 'CS102', 'BCSE-012', 'PHYS102', 'BPHY-001', 'BCSE-004', 'PYTHON', 'BCSE-007'].includes(code);
   };
 
-  const handleSelectSubjectForDownload = (subject) => {
-    if (!isSubjectValid(subject)) return;
-    setSelectedSubject(subject);
-    setActiveTab('downloads-lab');
-  };
-
   const handleOpenNotesReader = (subject) => {
     if (!isSubjectValid(subject)) return;
     setSelectedSubject(subject);
@@ -268,7 +262,6 @@ export default function App() {
       case 'subjects-notes':
         return (
           <NowShowing 
-            onSelectSubject={handleSelectSubjectForDownload} 
             onReadNotes={handleOpenNotesReader} 
           />
         );
@@ -299,7 +292,6 @@ export default function App() {
       default:
         return (
           <NowShowing 
-            onSelectSubject={handleSelectSubjectForDownload} 
             onReadNotes={handleOpenNotesReader} 
           />
         );

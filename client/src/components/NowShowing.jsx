@@ -101,15 +101,13 @@ export const getSubjectPdf = (sub) => {
   return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: `${sub.code || 'College'}_Notes.pdf` };
 };
 
-export default function NowShowing({ onSelectSubject, onReadNotes }) {
+export default function NowShowing({ onReadNotes }) {
   /* -----------------------------------------------------------------------
      STATE MANAGEMENT
-     - selectedYear: Active Year filter ('All', '1st Year', '2nd Year', etc.)
-     - selectedSem: Active Semester filter ('All', '1', '2', ..., '8')
+     - selectedSem: Active Semester filter ('All', '1', '2')
      - searchQuery: User text input in search field
      - featuredSubject: Subject shown in the top hero spotlight banner
      ----------------------------------------------------------------------- */
-  const [selectedYear, setSelectedYear] = useState('All');
   const [selectedSem, setSelectedSem] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   

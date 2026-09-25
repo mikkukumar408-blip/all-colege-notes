@@ -494,10 +494,6 @@ function renderCodeEditor(rawCode, rawLang) {
           </svg>
           <span class="copy-text">Copy</span>
         </button>
-        <button class="code-tutor-btn" type="button" title="Open in Bhavya's AI Coding Tutor with Memory & Step-by-Step Tracing" style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.4);color:#d8b4fe;border-radius:6px;padding:3px 8px;font-size:0.72rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          <span>AI Tutor</span>
-        </button>
       </div>
     </div>
     <div class="code-editor-body">
@@ -861,9 +857,6 @@ function formatNoteContent(content, activeRecallMode = false) {
       <div class="example-tag-header">
         <span class="difficulty-pill ${badgeClass}">${badgeLabel}</span>
         <span>📘 ${title}</span>
-        <button class="ask-ai-deep-btn" data-topic="${encodeURIComponent(title)}" type="button" title="Ask Bhavya's AI Assistant to explain this example" style="margin-left:auto;background:rgba(0,240,255,0.12);border:1px solid rgba(0,240,255,0.3);color:var(--neon-cyan);padding:2px 8px;border-radius:6px;font-size:0.7rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-          🤖 Ask AI
-        </button>
       </div>
       ${body}
       ${maskOverlay}
@@ -888,9 +881,6 @@ function formatNoteContent(content, activeRecallMode = false) {
         <span class="derivation-pill">📐 FORMAL UNIVERSITY DERIVATION</span>
         <span class="derivation-title">🎓 ${title}</span>
         ${marks ? `<span class="derivation-marks-pill">⭐ ${marks}</span>` : ''}
-        <button class="ask-ai-deep-btn" data-topic="${encodeURIComponent('Derivation of ' + title)}" type="button" title="Ask Bhavya's AI Assistant for intuitive derivation proof" style="margin-left:auto;background:rgba(0,240,255,0.12);border:1px solid rgba(0,240,255,0.3);color:var(--neon-cyan);padding:2px 8px;border-radius:6px;font-size:0.7rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-          🤖 Ask AI
-        </button>
       </div>
       <div class="derivation-body">
         ${body}
@@ -1172,26 +1162,7 @@ export default function SensoryLab({
         return;
       }
 
-    // 4. Open in Bhavya's AI Coding Tutor (Cross-App Teleportation)
-    const tutorBtn = e.target.closest('.code-tutor-btn');
-    if (tutorBtn) {
-      const box = tutorBtn.closest('.code-editor-box');
-      if (box) {
-        const rawCode = decodeURIComponent(box.getAttribute('data-code') || '');
-        window.open(`https://ai-coding-tutor.vercel.app?code=${encodeURIComponent(rawCode)}`, '_blank');
-      }
-      return;
-    }
-
-    // 5. Ask Bhavya's AI Assistant Deep Link
-    const aiBtn = e.target.closest('.ask-ai-deep-btn');
-    if (aiBtn) {
-      const topic = decodeURIComponent(aiBtn.getAttribute('data-topic') || '');
-      window.open(`https://bhavyas-ai-assistant.vercel.app?q=${encodeURIComponent('Explain step-by-step with exam tips and proofs: ' + topic)}`, '_blank');
-      return;
-    }
-
-    // 6. Active Recall Mask Curtain Reveal
+    // 4. Active Recall Mask Curtain Reveal
     const maskCurtain = e.target.closest('.active-recall-mask-curtain');
     if (maskCurtain) {
       maskCurtain.style.display = 'none';

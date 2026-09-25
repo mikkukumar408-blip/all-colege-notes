@@ -45,7 +45,7 @@ import { triggerUniversalPrint } from '../utils/printHelper';
 /* -------------------------------------------------------------------------
    ACADEMIC YEARS & SEMESTER CONFIGURATION
    ------------------------------------------------------------------------- */
-const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'All Years'];
+const YEARS = ['1st Year', '2nd Year', '3rd Year', 'All Years'];
 
 const YEAR_CONFIG = {
   '1st Year': {
