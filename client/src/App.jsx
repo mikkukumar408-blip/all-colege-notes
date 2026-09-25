@@ -11,7 +11,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import NowShowing from './components/NowShowing';
-import CampusAIChatbot from './components/CampusAIChatbot';
 import VisitorAnalyticsModal from './components/VisitorAnalyticsModal';
 const SensoryLab = React.lazy(() => import('./components/SensoryLab'));
 const TechGuide = React.lazy(() => import('./components/TechGuide'));
@@ -453,13 +452,6 @@ export default function App() {
           </React.Suspense>
         </main>
       </div>
-
-      {/* Floating AI Assistant Chatbot (Bottom Right) */}
-      <CampusAIChatbot
-        onOpenNotesReader={handleOpenNotesReader}
-        onNavigate={setActiveTab}
-        subjects={initialSubjects}
-      />
 
       {/* -----------------------------------------------------------------
          6. MOBILE BOTTOM NAVIGATION DOCK (Phones & Small Tablets <= 768px)
