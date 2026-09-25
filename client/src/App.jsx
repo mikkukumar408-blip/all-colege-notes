@@ -392,31 +392,7 @@ export default function App() {
           </div>
 
           <div className="top-actions">
-            {/* Real-Time Visitor Stats Button */}
-            <button 
-              className="nav-stats-trigger"
-              onClick={() => setAnalyticsOpen(true)}
-              title="View Live Real-Time Visitor Traffic"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(0, 240, 255, 0.08)',
-                border: '1px solid rgba(0, 240, 255, 0.25)',
-                color: 'var(--neon-cyan)',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.15s ease'
-              }}
-            >
-              <Activity size={14} color="var(--neon-cyan)" />
-              <span className="stats-text-desktop">Live Traffic</span>
-            </button>
-
-            {/* Elevated Super Admin Pill (if Bhavya activated admin mode) */}
+            {/* Elevated Super Admin Pill (only if Bhavya activated admin mode) */}
             {isSuperAdmin && (
               <button 
                 onClick={() => setActiveTab('admin-panel')}

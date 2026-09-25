@@ -47,7 +47,6 @@ export default function Sidebar({
     { id: 'short-notes', label: 'Exam Revision & Short Notes', icon: Sparkles, badge: 'Exam Ready' },
     { id: 'question-papers', label: 'Expected Question Papers', icon: ClipboardCheck, badge: '2026 Pattern' },
     { id: 'downloads-lab', label: 'Lab Manuals & Practical Codes', icon: Code2, badge: 'Codes & Labs' },
-    { id: 'visitor-analytics', label: 'Live Visitor Analytics', icon: Activity, badge: 'STATS' },
     ...(isSuperAdmin ? [
       { id: 'admin-panel', label: 'Super Admin Panel', icon: Crown, badge: 'ADMIN' }
     ] : [])
@@ -133,21 +132,16 @@ export default function Sidebar({
                 key={item.id}
                 className={`nav-item ${isActive ? 'active' : ''}`}
                 onClick={() => {
-                  if (item.id === 'visitor-analytics' && onOpenAnalytics) {
-                    onOpenAnalytics();
-                    setIsOpen(false);
-                    return;
-                  }
                   setActiveTab(item.id);
                   setIsOpen(false);
                 }}
               >
-                <Icon size={19} className="nav-icon" style={{ color: item.id === 'admin-panel' ? '#f59e0b' : item.id === 'visitor-analytics' ? '#00f0ff' : undefined }} />
+                <Icon size={19} className="nav-icon" style={{ color: item.id === 'admin-panel' ? '#f59e0b' : undefined }} />
                 <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: item.id === 'admin-panel' ? (isActive ? '#fef08a' : '#f59e0b') : undefined, fontWeight: item.id === 'admin-panel' ? 700 : undefined }}>
                   {item.label}
                 </span>
                 {item.badge && (
-                  <span className={item.badge === 'ADMIN' ? 'badge-amber' : item.badge === 'All Years' ? 'badge-neon' : item.badge === 'STATS' ? 'badge-neon' : 'badge-crimson'} style={{ padding: '2px 6px', fontSize: '0.65rem' }}>
+                  <span className={item.badge === 'ADMIN' ? 'badge-amber' : item.badge === 'All Years' ? 'badge-neon' : 'badge-crimson'} style={{ padding: '2px 6px', fontSize: '0.65rem' }}>
                     {item.badge}
                   </span>
                 )}
@@ -161,17 +155,12 @@ export default function Sidebar({
         {/* -----------------------------------------------------------------
            4. SIDEBAR FOOTER (Live System / Portal Status Indicator)
            ----------------------------------------------------------------- */}
-        <div 
-          className="sidebar-footer" 
-          onClick={() => onOpenAnalytics && onOpenAnalytics()}
-          style={{ cursor: 'pointer' }}
-          title="Click to view live visitor statistics"
-        >
+        <div className="sidebar-footer">
           <div className="live-auditorium-status">
             <div className="pulse-dot" />
             <div>
-              <div style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.82rem' }}>👁️ Live Traffic & Visitors</div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--neon-cyan)' }}>Tap to view real-time stats</div>
+              <div style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.82rem' }}>Academic Portal Active</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Semesters 1 through 8 Ready</div>
             </div>
           </div>
         </div>
