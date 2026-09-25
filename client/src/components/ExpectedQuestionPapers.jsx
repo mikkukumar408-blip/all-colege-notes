@@ -253,14 +253,8 @@ export default function ExpectedQuestionPapers({ currentUser }) {
     }
   });
 
-  // Initial Exam Selection Modal Dialog (opens first if user hasn't explicitly chosen yet)
-  const [showExamModal, setShowExamModal] = useState(() => {
-    try {
-      return !localStorage.getItem('acn_has_picked_exam_v2');
-    } catch (e) {
-      return true;
-    }
-  });
+  // Initial Exam Selection Modal Dialog (false by default so students land directly on papers)
+  const [showExamModal, setShowExamModal] = useState(false);
 
   // Live Exam Simulation Timer State
   const activeExamConfig = EXAM_TYPES[selectedExamType] || EXAM_TYPES['sessional-1'];

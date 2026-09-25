@@ -68,6 +68,39 @@ export const isSubjectCardActive = (sub) => {
   return false;
 };
 
+export const getSubjectPdf = (sub) => {
+  if (!sub) return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: 'BELE001_BEEE_Notes.pdf' };
+  const id = (sub.id || '').toLowerCase();
+  const code = (sub.code || '').toUpperCase();
+  const name = (sub.name || '').toLowerCase();
+
+  if (id.includes('beee') || code.includes('BELE') || name.includes('electrical')) {
+    return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: 'BELE001_BEEE_Notes.pdf' };
+  }
+  if (id.includes('aiml') || code.includes('BCSE-011') || code.includes('BCSE011') || name.includes('ai & ml')) {
+    return { url: '/AIML_notes_handwritten.pdf', name: 'BCSE011_AIML_Notes.pdf' };
+  }
+  if (id.includes('m1') || id.includes('math') || code.includes('BMAT') || name.includes('mathematics')) {
+    return { url: '/BMAT001_Mathematics_I_MMU_Handwritten_Notes.pdf', name: 'BMAT001_Maths_I_Notes.pdf' };
+  }
+  if (id.includes('c1') || id.includes('c-prog') || code.includes('BCSE-008') || code.includes('BCSE008') || name.includes('using c')) {
+    return { url: '/BCSE008_Computational_and_Problem_Solving_using_C_notes.pdf', name: 'BCSE008_C_Programming_Notes.pdf' };
+  }
+  if (id.includes('webtech') || code.includes('BCSE-012') || code.includes('BCSE012') || name.includes('web')) {
+    return { url: '/BCSE012_Fundamental_of_Web_Technologies_Long_Notes.pdf', name: 'BCSE012_Web_Technologies_Notes.pdf' };
+  }
+  if (id.includes('p1') || id.includes('phy') || code.includes('PHYS') || code.includes('BPHY') || name.includes('physics')) {
+    return { url: '/Applied_Physics_Master_Notes.pdf', name: 'Applied_Physics_Notes.pdf' };
+  }
+  if (id.includes('py') || code.includes('BCSE-004') || code.includes('BCSE004') || name.includes('python')) {
+    return { url: '/Python_Programming_Master_Notes.pdf', name: 'Python_Programming_Notes.pdf' };
+  }
+  if (id.includes('dsa') || code.includes('BCSE-007') || code.includes('BCSE007') || name.includes('data structure')) {
+    return { url: '/Data_Structures_Master_Notes.pdf', name: 'Data_Structures_Notes.pdf' };
+  }
+  return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: `${sub.code || 'College'}_Notes.pdf` };
+};
+
 export default function NowShowing({ onSelectSubject, onReadNotes }) {
   /* -----------------------------------------------------------------------
      STATE MANAGEMENT
@@ -162,12 +195,22 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
               >
                 <BookOpen size={16} /> Open Notes Reader <ChevronRight size={18} />
               </button>
-              <button 
-                className="btn-outline"
-                onClick={() => onSelectSubject && onSelectSubject(featuredSubject)}
-              >
-                <Download size={16} color="var(--neon-cyan)" /> Download Study Materials
-              </button>
+              {(() => {
+                const pdf = getSubjectPdf(featuredSubject);
+                return (
+                  <a 
+                    className="btn-outline"
+                    href={pdf.url}
+                    download={pdf.name}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Download size={16} color="var(--neon-cyan)" /> Download Study Materials
+                  </a>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -349,20 +392,30 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
                     >
                       <BookOpen size={14} /> Read Notes
                     </button>
-                    <button 
-                      className="btn-outline" 
-                      style={{ 
-                        padding: '8px 12px', 
-                        fontSize: '0.82rem'
-                      }}
-                      title="Download PDFs"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectSubject && onSelectSubject(sub);
-                      }}
-                    >
-                      <Download size={14} color="var(--neon-cyan)" />
-                    </button>
+                    {(() => {
+                      const pdf = getSubjectPdf(sub);
+                      return (
+                        <a 
+                          className="btn-outline" 
+                          href={pdf.url}
+                          download={pdf.name}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ 
+                            padding: '8px 12px', 
+                            fontSize: '0.82rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            textDecoration: 'none'
+                          }}
+                          title={`Download ${pdf.name}`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Download size={14} color="var(--neon-cyan)" />
+                        </a>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
