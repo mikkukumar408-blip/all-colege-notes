@@ -1011,8 +1011,7 @@ export default function SensoryLab({
   movieContext, 
   isUnitsCollapsed: controlledIsUnitsCollapsed, 
   setIsUnitsCollapsed: controlledSetIsUnitsCollapsed,
-  onNavigateTab,
-  theme = 'dark'
+  onNavigateTab
 }) {
   // Combine Physics, Python, DSA, C, Web Tech, BEEE, AIML, and Math 1 with other subjects
   const allSubjects = [
@@ -1034,7 +1033,7 @@ export default function SensoryLab({
     return 'sub-beee';
   });
   const [selectedUnitNum, setSelectedUnitNum] = useState(1);
-  const themeMode = theme === 'light' ? 'clean' : 'cyber';
+  const themeMode = 'cyber';
   const [internalUnitsCollapsed, setInternalUnitsCollapsed] = useState(false);
   
   const isUnitsCollapsed = controlledIsUnitsCollapsed !== undefined ? controlledIsUnitsCollapsed : internalUnitsCollapsed;
@@ -1656,7 +1655,7 @@ export default function SensoryLab({
         <div style={{ flex: '1 1 320px', minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
             <span className="badge-neon font-display">
-              {theme === 'light' ? '📖 LIGHT READER MODE' : '🌙 DARK READER MODE'}
+              ⚡ VERIFIED LECTURE NOTES
             </span>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>
               {activeSubject.code} • Semester {activeSubject.semester}

@@ -22,7 +22,8 @@ const SeatBooking = React.lazy(() => import('./components/SeatBooking'));
 const SuperAdminPanel = React.lazy(() => import('./components/SuperAdminPanel'));
 const QuickSearchPalette = React.lazy(() => import('./components/QuickSearchPalette'));
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, FileText, User, LogOut, Sparkles, Code2, ClipboardCheck, Search, Sun, Moon } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, FileText, User, LogOut, Sparkles, Code2, ClipboardCheck, Search } from 'lucide-react';
+import { App as CapApp } from '@capacitor/app';
 import { logSecurityEvent } from './utils/security';
 import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers, getApiUrl, pullCloudControls } from './utils/cloudSync';
 import './App.css';
@@ -43,33 +44,16 @@ export default function App() {
   });
 
   /* -----------------------------------------------------------------------
-     THEME STATE (Strictly Light or Dark)
+     THEME: PERMANENT DARK MODE ALWAYS
      ----------------------------------------------------------------------- */
-  const [theme, setTheme] = useState(() => {
-    try {
-      return localStorage.getItem('college_notes_theme') || 'dark';
-    } catch (e) {
-      return 'dark';
-    }
-  });
-
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    if (theme === 'light') {
-      document.body.classList.add('theme-light');
-      document.body.classList.remove('theme-dark');
-    } else {
-      document.body.classList.add('theme-dark');
-      document.body.classList.remove('theme-light');
-    }
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.body.classList.add('theme-dark');
+    document.body.classList.remove('theme-light');
     try {
-      localStorage.setItem('college_notes_theme', theme);
+      localStorage.setItem('college_notes_theme', 'dark');
     } catch (e) {}
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
-  };
+  }, []);
 
   // Zero-Trust Session Inactivity Timeout Guard (30 Minutes)
   const lastActivityRef = useRef(Date.now());
@@ -173,9 +157,95 @@ export default function App() {
       }
     };
 
-    window.addEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
+  /* -----------------------------------------------------------------------
+     1B. HARDWARE & GESTURE BACK BUTTON NAVIGATION HANDLER
+     Prevents accidental app exits:
+     - Closes open search palettes or sidebar drawer
+     - Returns to 'subjects-notes' (catalog home) if reading or viewing other tabs
+     - Requires double-tap within 2s to exit when on home screen
+     ----------------------------------------------------------------------- */
+  const activeTabRef = useRef(activeTab);
+  activeTabRef.current = activeTab;
+
+  const sidebarOpenRef = useRef(sidebarOpen);
+  sidebarOpenRef.current = sidebarOpen;
+
+  const quickSearchOpenRef = useRef(quickSearchOpen);
+  quickSearchOpenRef.current = quickSearchOpen;
+
+  const lastBackPressTimeRef = useRef(0);
+  const [backToastMessage, setBackToastMessage] = useState('');
+
+  // 1. Android Hardware / Gesture Back Button via Capacitor App Plugin
+  useEffect(() => {
+    let backListenerHandle = null;
+
+    const setupBackListener = async () => {
+      try {
+        backListenerHandle = await CapApp.addListener('backButton', () => {
+          if (quickSearchOpenRef.current) {
+            setQuickSearchOpen(false);
+            return;
+          }
+          if (sidebarOpenRef.current) {
+            setSidebarOpen(false);
+            return;
+          }
+          if (activeTabRef.current !== 'subjects-notes') {
+            setActiveTab('subjects-notes');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+          }
+
+          // If already on the home catalog tab, confirm before exit
+          const now = Date.now();
+          if (now - lastBackPressTimeRef.current < 2000) {
+            CapApp.exitApp().catch(() => {});
+          } else {
+            lastBackPressTimeRef.current = now;
+            setBackToastMessage('Press back again to exit');
+            setTimeout(() => setBackToastMessage(''), 2000);
+          }
+        });
+      } catch (e) {
+        // Not running in Capacitor native context
+      }
+    };
+
+    setupBackListener();
+
     return () => {
-      window.removeEventListener('keydown', handleGlobalKeyDown);
+      if (backListenerHandle && typeof backListenerHandle.remove === 'function') {
+        backListenerHandle.remove();
+      }
+    };
+  }, []);
+
+  // 2. Web Browser History / PopState Back Button Handler
+  useEffect(() => {
+    const handlePopState = () => {
+      if (quickSearchOpenRef.current) {
+        setQuickSearchOpen(false);
+        window.history.pushState(null, '', window.location.pathname);
+        return;
+      }
+      if (sidebarOpenRef.current) {
+        setSidebarOpen(false);
+        window.history.pushState(null, '', window.location.pathname);
+        return;
+      }
+      if (activeTabRef.current !== 'subjects-notes') {
+        setActiveTab('subjects-notes');
+        window.history.pushState(null, '', window.location.pathname);
+      }
+    };
+
+    window.history.pushState(null, '', window.location.pathname);
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
     };
   }, []);
 
@@ -231,7 +301,6 @@ export default function App() {
             movieContext={selectedSubject} 
             isUnitsCollapsed={isUnitsCollapsed}
             setIsUnitsCollapsed={setIsUnitsCollapsed}
-            theme={theme}
             onNavigateTab={(tab, sub) => {
               if (sub) setSelectedSubject(sub);
               setActiveTab(tab);
@@ -281,8 +350,6 @@ export default function App() {
   if (!currentUser) {
     return (
       <AuthPage 
-        theme={theme}
-        toggleTheme={toggleTheme}
         onLogin={(user) => {
           setCurrentUser(user);
           try {
@@ -308,8 +375,6 @@ export default function App() {
         setIsOpen={setSidebarOpen}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        theme={theme}
-        toggleTheme={toggleTheme}
       />
 
       <div className={`main-viewport ${isSidebarCollapsed ? 'collapsed' : ''}`}>
@@ -424,31 +489,6 @@ export default function App() {
               <kbd className="nav-search-kbd">Ctrl+K</kbd>
             </button>
 
-            {/* Universal Dark / Light Theme Toggle */}
-            <button 
-              className="nav-theme-toggle-btn"
-              onClick={toggleTheme}
-              title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-              aria-label="Toggle Theme"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                background: theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.07)',
-                border: '1px solid var(--border-dim)',
-                color: 'var(--text-main)',
-                cursor: 'pointer',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                transition: 'all 0.15s ease'
-              }}
-            >
-              {theme === 'dark' ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="#6366f1" />}
-              <span className="theme-toggle-label">{theme === 'dark' ? 'Light' : 'Dark'}</span>
-            </button>
-
 
 
             {/* Dedicated Sign Out Button */}
@@ -549,6 +589,30 @@ export default function App() {
           />
         )}
       </React.Suspense>
+
+      {/* Android Back Button Double-Tap Confirmation Toast */}
+      {backToastMessage && (
+        <div style={{
+          position: 'fixed',
+          bottom: '84px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(15, 23, 42, 0.94)',
+          border: '1px solid rgba(0, 240, 255, 0.4)',
+          color: '#f0f4fc',
+          padding: '8px 20px',
+          borderRadius: '24px',
+          fontSize: '0.82rem',
+          fontWeight: 600,
+          zIndex: 99999,
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.6)',
+          pointerEvents: 'none',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)'
+        }}>
+          {backToastMessage}
+        </div>
+      )}
     </div>
   );
 }

@@ -25,9 +25,7 @@ import {
   AlertCircle,
   Volume2,
   VolumeX,
-  GraduationCap,
-  Sun,
-  Moon
+  GraduationCap
 } from 'lucide-react';
 import { logUserActivity } from '../utils/activityTracker';
 import { hashPasswordPBKDF2, verifyPassword, evaluatePasswordStrength, logSecurityEvent, signSessionToken } from '../utils/security';
@@ -42,7 +40,7 @@ import {
   getDeviceName
 } from '../utils/cloudSync';
 
-export default function AuthPage({ onLogin, theme = 'dark', toggleTheme }) {
+export default function AuthPage({ onLogin }) {
   // First-time visit on any new device defaults to 'signup' (Create Account).
   // Once an account is created or logged into on this device, it defaults to 'signin' (Sign In).
   const [activeTab, setActiveTab] = useState(() => {
@@ -549,41 +547,6 @@ export default function AuthPage({ onLogin, theme = 'dark', toggleTheme }) {
       padding: '24px 16px'
     }}>
       
-      {/* Theme Toggle Button (Top Right Corner) */}
-      {toggleTheme && (
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          right: '24px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          zIndex: 20
-        }}>
-          <button
-            onClick={toggleTheme}
-            title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-            style={{
-              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
-              border: '1px solid var(--border-dim)',
-              color: 'var(--text-main)',
-              padding: '7px 14px',
-              borderRadius: '20px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              transition: 'all 0.15s ease'
-            }}
-          >
-            {theme === 'dark' ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="#6366f1" />}
-            <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
-          </button>
-        </div>
-      )}
-
       {/* Main Clean Modern Auth Card */}
       <div 
         className="glass-panel"
