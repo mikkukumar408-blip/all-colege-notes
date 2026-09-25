@@ -25,9 +25,10 @@ import {
   AlertCircle,
   Volume2,
   VolumeX,
-  GraduationCap
+  GraduationCap,
+  Sun,
+  Moon
 } from 'lucide-react';
-import Canvas4DX from './Canvas4DX';
 import { logUserActivity } from '../utils/activityTracker';
 import { hashPasswordPBKDF2, verifyPassword, evaluatePasswordStrength, logSecurityEvent, signSessionToken } from '../utils/security';
 import { 
@@ -41,7 +42,7 @@ import {
   getDeviceName
 } from '../utils/cloudSync';
 
-export default function AuthPage({ onLogin }) {
+export default function AuthPage({ onLogin, theme = 'dark', toggleTheme }) {
   // First-time visit on any new device defaults to 'signup' (Create Account).
   // Once an account is created or logged into on this device, it defaults to 'signin' (Sign In).
   const [activeTab, setActiveTab] = useState(() => {
@@ -535,7 +536,7 @@ export default function AuthPage({ onLogin }) {
   };
 
   return (
-    <div className={`auth-4dx-stage ${isRumbleActive ? 'rumble-shake' : ''}`} style={{
+    <div className="auth-stage" style={{
       minHeight: '100vh',
       width: '100%',
       position: 'relative',
@@ -543,240 +544,140 @@ export default function AuthPage({ onLogin }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'radial-gradient(ellipse at 50% 30%, #0c152e 0%, #060913 70%, #020408 100%)',
+      background: 'var(--bg-primary)',
       fontFamily: 'var(--font-body)',
       padding: '24px 16px'
     }}>
       
-      {/* 4DX Lightning Strobe Overlay */}
-      {isLightningActive && (
+      {/* Theme Toggle Button (Top Right Corner) */}
+      {toggleTheme && (
         <div style={{
           position: 'absolute',
-          inset: 0,
-          background: 'radial-gradient(circle, rgba(0, 240, 255, 0.45) 0%, rgba(255, 255, 255, 0.8) 50%, transparent 100%)',
-          zIndex: 40,
-          pointerEvents: 'none',
-          animation: 'flashBurst 0.25s ease-out'
-        }} />
+          top: '20px',
+          right: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          zIndex: 20
+        }}>
+          <button
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+            style={{
+              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
+              border: '1px solid var(--border-dim)',
+              color: 'var(--text-main)',
+              padding: '7px 14px',
+              borderRadius: '20px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              transition: 'all 0.15s ease'
+            }}
+          >
+            {theme === 'dark' ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="#6366f1" />}
+            <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+          </button>
+        </div>
       )}
 
-      {/* 4DX Environmental Wind Streaks */}
-      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 2 }}>
-        <div className="wind-streak" style={{ top: '15%', animationDuration: windSpeed === 'storm' ? '0.5s' : '1.2s' }} />
-        <div className="wind-streak" style={{ top: '35%', animationDuration: windSpeed === 'storm' ? '0.4s' : '1.6s', animationDelay: '0.4s' }} />
-        <div className="wind-streak" style={{ top: '65%', animationDuration: windSpeed === 'storm' ? '0.6s' : '1.4s', animationDelay: '0.8s' }} />
-        <div className="wind-streak" style={{ top: '85%', animationDuration: windSpeed === 'storm' ? '0.45s' : '1.0s', animationDelay: '0.2s' }} />
-      </div>
-
-      {/* Atmospheric Mist Floating Glows */}
-      <div style={{
-        position: 'absolute',
-        top: '-150px',
-        left: '-150px',
-        width: '550px',
-        height: '550px',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(0, 240, 255, 0.14) 0%, transparent 70%)',
-        pointerEvents: 'none',
-        zIndex: 1,
-        animation: 'pulseGlow 6s infinite ease-in-out'
-      }} />
-
-      <div style={{
-        position: 'absolute',
-        bottom: '-120px',
-        right: '-120px',
-        width: '500px',
-        height: '500px',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(255, 42, 109, 0.12) 0%, transparent 70%)',
-        pointerEvents: 'none',
-        zIndex: 1,
-        animation: 'pulseGlow 8s infinite ease-in-out reverse'
-      }} />
-
-      {/* Ambient Sound & 4DX Sensory Toggles (Top Right Corner) */}
-      <div style={{
-        position: 'absolute',
-        top: '20px',
-        right: '24px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        zIndex: 20
-      }}>
-        <button
-          onClick={() => {
-            setWindSpeed(windSpeed === 'normal' ? 'storm' : 'normal');
-            trigger4DXEffect();
-          }}
-          title="Toggle 4DX Wind & Atmosphere Intensity"
-          style={{
-            background: windSpeed === 'storm' ? 'rgba(0, 240, 255, 0.25)' : 'rgba(255, 255, 255, 0.06)',
-            border: windSpeed === 'storm' ? '1px solid #00f0ff' : '1px solid rgba(255, 255, 255, 0.12)',
-            color: windSpeed === 'storm' ? '#00f0ff' : '#94a3b8',
-            padding: '6px 12px',
-            borderRadius: '20px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            transition: 'all 0.2s ease'
-          }}
-        >
-          <Wind size={13} /> {windSpeed === 'storm' ? '4DX STORM ON' : 'WIND: NORMAL'}
-        </button>
-
-        <button
-          onClick={() => {
-            initAudio();
-            setAudioEnabled(!audioEnabled);
-            playCyberZap(700, 0.1);
-          }}
-          title="Toggle 4DX Audio Effects"
-          style={{
-            background: audioEnabled ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 255, 255, 0.06)',
-            border: audioEnabled ? '1px solid #22c55e' : '1px solid rgba(255, 255, 255, 0.12)',
-            color: audioEnabled ? '#86efac' : '#94a3b8',
-            padding: '6px 12px',
-            borderRadius: '20px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            transition: 'all 0.2s ease'
-          }}
-        >
-          {audioEnabled ? <Volume2 size={13} /> : <VolumeX size={13} />}
-          {audioEnabled ? '4DX SFX ON' : 'SFX MUTED'}
-        </button>
-      </div>
-
-      {/* Interactive 4DX Background Canvas & Cyber Grid Floor */}
-      <Canvas4DX stormMode={windSpeed === 'storm'} lightningTrigger={isLightningActive} />
-      <div className="cyber-grid-floor" />
-
-      {/* Main 4DX Holographic Glassmorphic Auth Card with 3D Tilt & Rotating Conic Glow */}
+      {/* Main Clean Modern Auth Card */}
       <div 
-        className="card-4dx-glow-wrap"
-        onMouseMove={handleCardMouseMove}
-        onMouseLeave={handleCardMouseLeave}
+        className="glass-panel"
         style={{
           width: '100%',
           maxWidth: '440px',
           position: 'relative',
           zIndex: 10,
-          transform: `perspective(1000px) rotateX(${cardTilt.x}deg) rotateY(${cardTilt.y}deg)`
+          padding: '36px 32px',
+          borderRadius: '16px',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-dim)',
+          boxShadow: 'var(--shadow-card)'
         }}
       >
-        <div className="card-4dx-content" style={{ padding: '36px 32px' }}>
-          {/* Holographic Scanning Laser Line */}
-          <div className="scanline-sweep" />
-
-          {/* Brand Header */}
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            {/* 3D Orbiting Gyroscope Rings around Core Logo */}
-            <div style={{ position: 'relative', display: 'inline-block', marginBottom: '14px' }}>
-              <div className="orbital-ring-1" />
-              <div className="orbital-ring-2" />
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '58px',
-                height: '58px',
-                borderRadius: '18px',
-                background: 'linear-gradient(135deg, #00f0ff 0%, #ff2a6d 100%)',
-                boxShadow: '0 0 35px rgba(0, 240, 255, 0.7), 0 0 15px rgba(255, 42, 109, 0.5)',
-                color: '#fff',
-                position: 'relative',
-                zIndex: 2
-              }}>
-                <GraduationCap size={32} />
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '6px' }}>
-              <span style={{
-                fontSize: '0.72rem',
-                fontWeight: 900,
-                letterSpacing: '1.5px',
-                textTransform: 'uppercase',
-                background: 'linear-gradient(90deg, #00f0ff, #ff2a6d)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
-                4DX EXPERIENCE LABS
-              </span>
-              <span style={{ fontSize: '0.65rem', background: 'rgba(0, 240, 255, 0.16)', color: '#00f0ff', padding: '2px 8px', borderRadius: '10px', border: '1px solid rgba(0, 240, 255, 0.3)' }}>
-                v2.0
-              </span>
-            </div>
-
-            <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '1.85rem',
-              fontWeight: 900,
-              color: '#fff',
-              letterSpacing: '0.5px',
-              margin: '0 0 6px 0'
-            }}>
-              All College Notes
-            </h2>
-            <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
-              Secure Student Gate • Semester 1 to 8 University Hub
-            </p>
-
-            {/* Cross-Device Cloud Sync Live Indicator */}
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              marginTop: '10px',
-              padding: '4px 12px',
-              borderRadius: '20px',
-              background: cloudSyncStatus === 'synced' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(0, 240, 255, 0.1)',
-              border: `1px solid ${cloudSyncStatus === 'synced' ? 'rgba(16, 185, 129, 0.35)' : 'rgba(0, 240, 255, 0.3)'}`,
-              fontSize: '0.72rem',
-              color: cloudSyncStatus === 'synced' ? '#34d399' : '#38bdf8',
-              fontWeight: 600,
-              letterSpacing: '0.02em'
-            }}>
-              <span style={{
-                width: '7px',
-                height: '7px',
-                borderRadius: '50%',
-                background: cloudSyncStatus === 'synced' ? '#10b981' : '#00f0ff',
-                boxShadow: `0 0 8px ${cloudSyncStatus === 'synced' ? '#10b981' : '#00f0ff'}`,
-                display: 'inline-block'
-              }}></span>
-              <span>{cloudSyncStatus === 'synced' ? '☁️ Cloud Synced • Max 2 Active Devices' : '☁️ Connecting Cloud DB...'}</span>
-            </div>
-
-            {/* 4DX Audio Frequency Waveform Visualizer */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', height: '20px', marginTop: '12px' }}>
-              <div className="eq-bar-1" style={{ width: '3px', background: '#00f0ff', borderRadius: '3px' }} />
-              <div className="eq-bar-2" style={{ width: '3px', background: '#38bdf8', borderRadius: '3px' }} />
-              <div className="eq-bar-3" style={{ width: '3px', background: '#ff2a6d', borderRadius: '3px' }} />
-              <div className="eq-bar-4" style={{ width: '3px', background: '#a855f7', borderRadius: '3px' }} />
-              <div className="eq-bar-2" style={{ width: '3px', background: '#00f0ff', borderRadius: '3px' }} />
-              <div className="eq-bar-1" style={{ width: '3px', background: '#ff2a6d', borderRadius: '3px' }} />
-              <div className="eq-bar-3" style={{ width: '3px', background: '#38bdf8', borderRadius: '3px' }} />
-            </div>
+        {/* Brand Header */}
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '54px',
+            height: '54px',
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #00f0ff 0%, #3b82f6 100%)',
+            color: '#07090e',
+            marginBottom: '12px'
+          }}>
+            <GraduationCap size={28} />
           </div>
 
-        {/* 4DX Interactive Section Switcher (Sign In vs Create Account) */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '6px' }}>
+            <span style={{
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              letterSpacing: '1px',
+              textTransform: 'uppercase',
+              color: 'var(--neon-cyan)'
+            }}>
+              ACADEMIC PORTAL
+            </span>
+            <span style={{ fontSize: '0.65rem', background: 'rgba(0, 240, 255, 0.12)', color: 'var(--neon-cyan)', padding: '2px 8px', borderRadius: '10px', border: '1px solid var(--border-dim)' }}>
+              Official
+            </span>
+          </div>
+
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '1.85rem',
+            fontWeight: 900,
+            color: 'var(--text-main)',
+            letterSpacing: '0.5px',
+            margin: '0 0 6px 0'
+          }}>
+            All College Notes
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
+            {activeTab === 'signin' ? 'Sign in to access verified college notes & syllabus' : 'Create a fast, secure student account'}
+          </p>
+
+          {/* Cross-Device Cloud Sync Live Indicator */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            marginTop: '10px',
+            padding: '4px 12px',
+            borderRadius: '20px',
+            background: cloudSyncStatus === 'synced' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(0, 240, 255, 0.1)',
+            border: `1px solid ${cloudSyncStatus === 'synced' ? 'rgba(16, 185, 129, 0.35)' : 'rgba(0, 240, 255, 0.3)'}`,
+            fontSize: '0.72rem',
+            color: cloudSyncStatus === 'synced' ? '#10b981' : 'var(--neon-cyan)',
+            fontWeight: 600,
+            letterSpacing: '0.02em'
+          }}>
+            <span style={{
+              width: '7px',
+              height: '7px',
+              borderRadius: '50%',
+              background: cloudSyncStatus === 'synced' ? '#10b981' : '#00f0ff',
+              display: 'inline-block'
+            }}></span>
+            <span>{cloudSyncStatus === 'synced' ? '☁️ Cloud Synced • Max 2 Active Devices' : '☁️ Connecting Cloud DB...'}</span>
+          </div>
+        </div>
+
+        {/* Section Switcher (Sign In vs Create Account) */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          background: 'rgba(7, 11, 22, 0.85)',
+          background: 'var(--bg-secondary)',
           padding: '5px',
           borderRadius: '12px',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          border: '1px solid var(--border-dim)',
           marginBottom: '24px',
           position: 'relative'
         }}>
@@ -786,14 +687,13 @@ export default function AuthPage({ onLogin }) {
               setActiveTab('signin');
               setErrorMessage('');
               setSuccessMessage('');
-              playCyberZap(800, 0.1);
             }}
             style={{
               padding: '10px',
               borderRadius: '9px',
               border: 'none',
               background: activeTab === 'signin' ? 'linear-gradient(135deg, #00f0ff, #2563eb)' : 'transparent',
-              color: activeTab === 'signin' ? '#040711' : '#94a3b8',
+              color: activeTab === 'signin' ? '#040711' : 'var(--text-muted)',
               fontWeight: 800,
               fontSize: '0.86rem',
               cursor: 'pointer',
@@ -801,8 +701,7 @@ export default function AuthPage({ onLogin }) {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              boxShadow: activeTab === 'signin' ? '0 4px 15px rgba(0, 240, 255, 0.4)' : 'none',
-              transition: 'all 0.25s ease'
+              transition: 'all 0.15s ease'
             }}
           >
             <Lock size={14} /> Sign In
@@ -814,14 +713,13 @@ export default function AuthPage({ onLogin }) {
               setActiveTab('signup');
               setErrorMessage('');
               setSuccessMessage('');
-              playCyberZap(1000, 0.1);
             }}
             style={{
               padding: '10px',
               borderRadius: '9px',
               border: 'none',
-              background: activeTab === 'signup' ? 'linear-gradient(135deg, #ff2a6d, #9333ea)' : 'transparent',
-              color: activeTab === 'signup' ? '#ffffff' : '#94a3b8',
+              background: activeTab === 'signup' ? 'linear-gradient(135deg, #3b82f6, #6366f1)' : 'transparent',
+              color: activeTab === 'signup' ? '#ffffff' : 'var(--text-muted)',
               fontWeight: 800,
               fontSize: '0.86rem',
               cursor: 'pointer',
@@ -829,8 +727,7 @@ export default function AuthPage({ onLogin }) {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              boxShadow: activeTab === 'signup' ? '0 4px 15px rgba(255, 42, 109, 0.4)' : 'none',
-              transition: 'all 0.25s ease'
+              transition: 'all 0.15s ease'
             }}
           >
             <Sparkles size={14} /> Create Account
@@ -971,7 +868,7 @@ export default function AuthPage({ onLogin }) {
             </div>
             
             <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}>
+              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }}>
                 <User size={18} />
               </div>
               <input
@@ -985,22 +882,22 @@ export default function AuthPage({ onLogin }) {
                 style={{
                   width: '100%',
                   boxSizing: 'border-box',
-                  background: 'rgba(9, 13, 26, 0.9)',
-                  border: '1.5px solid rgba(0, 240, 255, 0.3)',
+                  background: 'var(--bg-secondary)',
+                  border: '1.5px solid var(--border-dim)',
                   borderRadius: '12px',
                   padding: '13px 14px 13px 44px',
-                  color: '#fff',
+                  color: 'var(--text-main)',
                   fontSize: '0.95rem',
                   outline: 'none',
                   transition: 'all 0.2s ease',
                   opacity: lockoutRemaining > 0 ? 0.5 : 1
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#00f0ff';
-                  e.target.style.boxShadow = '0 0 16px rgba(0, 240, 255, 0.25)';
+                  e.target.style.borderColor = 'var(--neon-cyan)';
+                  e.target.style.boxShadow = '0 0 10px rgba(0, 240, 255, 0.2)';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = 'rgba(0, 240, 255, 0.3)';
+                  e.target.style.borderColor = 'var(--border-dim)';
                   e.target.style.boxShadow = 'none';
                 }}
               />
@@ -1010,16 +907,16 @@ export default function AuthPage({ onLogin }) {
           {/* PASSWORD FIELD */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <label style={{ fontSize: '0.78rem', fontWeight: 800, color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <label style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Password
               </label>
               {activeTab === 'signup' && (
-                <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>SHA-256 Encrypted</span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>PBKDF2-100k Encrypted</span>
               )}
             </div>
 
             <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}>
+              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }}>
                 <Lock size={18} />
               </div>
               <input
@@ -1036,22 +933,22 @@ export default function AuthPage({ onLogin }) {
                 style={{
                   width: '100%',
                   boxSizing: 'border-box',
-                  background: 'rgba(9, 13, 26, 0.9)',
-                  border: '1.5px solid rgba(0, 240, 255, 0.3)',
+                  background: 'var(--bg-secondary)',
+                  border: '1.5px solid var(--border-dim)',
                   borderRadius: '12px',
                   padding: '13px 44px 13px 44px',
-                  color: '#fff',
+                  color: 'var(--text-main)',
                   fontSize: '0.95rem',
                   outline: 'none',
                   transition: 'all 0.2s ease',
                   opacity: lockoutRemaining > 0 ? 0.5 : 1
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = activeTab === 'signup' ? '#ff2a6d' : '#00f0ff';
-                  e.target.style.boxShadow = activeTab === 'signup' ? '0 0 16px rgba(255, 42, 109, 0.25)' : '0 0 16px rgba(0, 240, 255, 0.25)';
+                  e.target.style.borderColor = 'var(--neon-cyan)';
+                  e.target.style.boxShadow = '0 0 10px rgba(0, 240, 255, 0.2)';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = 'rgba(0, 240, 255, 0.3)';
+                  e.target.style.borderColor = 'var(--border-dim)';
                   e.target.style.boxShadow = 'none';
                 }}
               />
@@ -1065,7 +962,7 @@ export default function AuthPage({ onLogin }) {
                   transform: 'translateY(-50%)',
                   background: 'transparent',
                   border: 'none',
-                  color: '#94a3b8',
+                  color: 'var(--text-dim)',
                   cursor: 'pointer',
                   padding: 0
                 }}
@@ -1074,24 +971,23 @@ export default function AuthPage({ onLogin }) {
               </button>
             </div>
 
-            {/* Password Entropy & Strength Meter (Create Account Only - No Email Needed) */}
+            {/* Password Entropy & Strength Meter (Create Account Only) */}
             {activeTab === 'signup' && password.length > 0 && (
               <div style={{ marginTop: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-                  <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Entropy Strength:
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Password Strength:
                   </span>
                   <span style={{ fontSize: '0.74rem', fontWeight: 800, color: pwStrength.color }}>
                     {pwStrength.label}
                   </span>
                 </div>
-                <div style={{ width: '100%', height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '10px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '5px', background: 'var(--bg-secondary)', borderRadius: '10px', overflow: 'hidden' }}>
                   <div style={{
                     width: `${pwStrength.percentage}%`,
                     height: '100%',
                     background: pwStrength.color,
-                    transition: 'all 0.3s ease',
-                    boxShadow: `0 0 10px ${pwStrength.color}`
+                    transition: 'all 0.3s ease'
                   }} />
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
@@ -1100,8 +996,8 @@ export default function AuthPage({ onLogin }) {
                     padding: '2px 8px',
                     borderRadius: '12px',
                     background: pwStrength.rules.minLen ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255,255,255,0.04)',
-                    color: pwStrength.rules.minLen ? '#86efac' : '#64748b',
-                    border: '1px solid ' + (pwStrength.rules.minLen ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255,255,255,0.08)')
+                    color: pwStrength.rules.minLen ? '#86efac' : 'var(--text-dim)',
+                    border: '1px solid ' + (pwStrength.rules.minLen ? 'rgba(34, 197, 94, 0.3)' : 'var(--border-dim)')
                   }}>
                     ✓ 8+ Chars
                   </span>
@@ -1110,8 +1006,8 @@ export default function AuthPage({ onLogin }) {
                     padding: '2px 8px',
                     borderRadius: '12px',
                     background: pwStrength.rules.hasUpper ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255,255,255,0.04)',
-                    color: pwStrength.rules.hasUpper ? '#86efac' : '#64748b',
-                    border: '1px solid ' + (pwStrength.rules.hasUpper ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255,255,255,0.08)')
+                    color: pwStrength.rules.hasUpper ? '#86efac' : 'var(--text-dim)',
+                    border: '1px solid ' + (pwStrength.rules.hasUpper ? 'rgba(34, 197, 94, 0.3)' : 'var(--border-dim)')
                   }}>
                     ✓ Uppercase
                   </span>
@@ -1120,8 +1016,8 @@ export default function AuthPage({ onLogin }) {
                     padding: '2px 8px',
                     borderRadius: '12px',
                     background: pwStrength.rules.hasNumber ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255,255,255,0.04)',
-                    color: pwStrength.rules.hasNumber ? '#86efac' : '#64748b',
-                    border: '1px solid ' + (pwStrength.rules.hasNumber ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255,255,255,0.08)')
+                    color: pwStrength.rules.hasNumber ? '#86efac' : 'var(--text-dim)',
+                    border: '1px solid ' + (pwStrength.rules.hasNumber ? 'rgba(34, 197, 94, 0.3)' : 'var(--border-dim)')
                   }}>
                     ✓ Number
                   </span>
@@ -1130,8 +1026,8 @@ export default function AuthPage({ onLogin }) {
                     padding: '2px 8px',
                     borderRadius: '12px',
                     background: pwStrength.rules.hasSpecial ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255,255,255,0.04)',
-                    color: pwStrength.rules.hasSpecial ? '#86efac' : '#64748b',
-                    border: '1px solid ' + (pwStrength.rules.hasSpecial ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255,255,255,0.08)')
+                    color: pwStrength.rules.hasSpecial ? '#86efac' : 'var(--text-dim)',
+                    border: '1px solid ' + (pwStrength.rules.hasSpecial ? 'rgba(34, 197, 94, 0.3)' : 'var(--border-dim)')
                   }}>
                     ✓ Symbol
                   </span>
@@ -1140,57 +1036,47 @@ export default function AuthPage({ onLogin }) {
             )}
           </div>
 
-          {/* Action Submit Button with Liquid Neon Shimmer */}
+          {/* Action Submit Button */}
           <button
             type="submit"
-            className="btn-shimmer-wrap"
+            className="btn-primary"
             disabled={lockoutRemaining > 0}
             style={{
               marginTop: '8px',
-              padding: '14px',
-              borderRadius: '12px',
+              padding: '13px',
+              borderRadius: '10px',
               border: 'none',
               background: lockoutRemaining > 0 
                 ? 'rgba(239, 68, 68, 0.3)'
                 : (activeTab === 'signin' 
                   ? 'linear-gradient(135deg, #00f0ff 0%, #2563eb 100%)' 
-                  : 'linear-gradient(135deg, #ff2a6d 0%, #9333ea 100%)'),
-              color: lockoutRemaining > 0 ? '#fca5a5' : (activeTab === 'signin' ? '#040711' : '#ffffff'),
-              fontSize: '0.98rem',
-              fontWeight: 900,
+                  : 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)'),
+              color: lockoutRemaining > 0 ? '#fca5a5' : '#07090e',
+              fontSize: '0.95rem',
+              fontWeight: 800,
               cursor: lockoutRemaining > 0 ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              boxShadow: lockoutRemaining > 0 ? 'none' : (activeTab === 'signin'
-                ? '0 6px 25px rgba(0, 240, 255, 0.45)'
-                : '0 6px 25px rgba(255, 42, 109, 0.45)'),
-              transition: 'all 0.2s ease',
-              letterSpacing: '0.5px',
+              transition: 'all 0.15s ease',
               opacity: lockoutRemaining > 0 ? 0.7 : 1
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'none';
-            }}
           >
-            <span>{activeTab === 'signin' ? 'ENTER 4DX PORTAL' : 'INITIALIZE ACCOUNT & ENTER'}</span>
+            <span>{activeTab === 'signin' ? 'Sign In to Portal' : 'Create Student Account'}</span>
             <ArrowRight size={18} />
           </button>
         </form>
 
         {/* Quick Demo Hint */}
-        <div style={{ marginTop: '20px', textAlign: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '14px' }}>
-          <p style={{ fontSize: '0.74rem', color: '#64748b', margin: 0 }}>
+        <div style={{ marginTop: '20px', textAlign: 'center', borderTop: '1px solid var(--border-dim)', paddingTop: '14px' }}>
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0 }}>
             {activeTab === 'signin' ? (
               <>
                 New student?{' '}
                 <span 
                   onClick={() => { setActiveTab('signup'); setErrorMessage(''); }}
-                  style={{ color: '#00f0ff', cursor: 'pointer', fontWeight: 800 }}
+                  style={{ color: 'var(--neon-cyan)', cursor: 'pointer', fontWeight: 700 }}
                 >
                   Create Account here
                 </span>
@@ -1200,7 +1086,7 @@ export default function AuthPage({ onLogin }) {
                 Already have an account?{' '}
                 <span 
                   onClick={() => { setActiveTab('signin'); setErrorMessage(''); }}
-                  style={{ color: '#ff2a6d', cursor: 'pointer', fontWeight: 800 }}
+                  style={{ color: 'var(--neon-cyan)', cursor: 'pointer', fontWeight: 700 }}
                 >
                   Sign in here
                 </span>
@@ -1209,8 +1095,7 @@ export default function AuthPage({ onLogin }) {
           </p>
         </div>
 
-        </div> {/* Closes .card-4dx-content */}
-      </div> {/* Closes .card-4dx-glow-wrap */}
+      </div> {/* Closes glass-panel auth card */}
     </div>
   );
 }

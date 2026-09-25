@@ -632,8 +632,15 @@ function simulateCodeExecution(code, langBadge = '') {
    Renders LaTeX math via KaTeX, colored callout cards (Traps, Mnemonics, Laws),
    headings (###, ####), and highlighters.
    ------------------------------------------------------------------------- */
+const noteContentCache = new Map();
+
 function formatNoteContent(content, activeRecallMode = false) {
   if (!content) return '';
+
+  const cacheKey = `${activeRecallMode ? '1' : '0'}_${content.length}_${content.slice(0, 32)}_${content.slice(-32)}`;
+  if (noteContentCache.has(cacheKey)) {
+    return noteContentCache.get(cacheKey);
+  }
 
   let html = content;
 
@@ -968,6 +975,12 @@ function formatNoteContent(content, activeRecallMode = false) {
     html = html.replace(`\x00CODEBLOCK_${i}\x00`, rendered);
   });
 
+  if (noteContentCache.size > 80) {
+    const firstKey = noteContentCache.keys().next().value;
+    noteContentCache.delete(firstKey);
+  }
+  noteContentCache.set(cacheKey, html);
+
   return html;
 }
 
@@ -998,7 +1011,8 @@ export default function SensoryLab({
   movieContext, 
   isUnitsCollapsed: controlledIsUnitsCollapsed, 
   setIsUnitsCollapsed: controlledSetIsUnitsCollapsed,
-  onNavigateTab
+  onNavigateTab,
+  theme = 'dark'
 }) {
   // Combine Physics, Python, DSA, C, Web Tech, BEEE, AIML, and Math 1 with other subjects
   const allSubjects = [
@@ -1020,22 +1034,8 @@ export default function SensoryLab({
     return 'sub-beee';
   });
   const [selectedUnitNum, setSelectedUnitNum] = useState(1);
-  const [themeMode, setThemeMode] = useState(() => {
-    try {
-      const saved = localStorage.getItem('notes_theme_mode');
-      if (saved && saved !== 'cyber') return saved;
-      return 'paper';
-    } catch (e) {
-      return 'paper';
-    }
-  });
+  const themeMode = theme === 'light' ? 'clean' : 'cyber';
   const [internalUnitsCollapsed, setInternalUnitsCollapsed] = useState(false);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('notes_theme_mode', themeMode);
-    } catch (e) {}
-  }, [themeMode]);
   
   const isUnitsCollapsed = controlledIsUnitsCollapsed !== undefined ? controlledIsUnitsCollapsed : internalUnitsCollapsed;
   const setIsUnitsCollapsed = controlledSetIsUnitsCollapsed || setInternalUnitsCollapsed;
@@ -1656,13 +1656,13 @@ export default function SensoryLab({
         <div style={{ flex: '1 1 320px', minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
             <span className="badge-neon font-display">
-              {themeMode === 'cyber' ? '⚡ CYBER NEON NOTES' : themeMode === 'paper' ? '📝 REAL COLLEGE NOTEBOOK' : '📖 CLEAN DIGITAL READER'}
+              {theme === 'light' ? '📖 LIGHT READER MODE' : '🌙 DARK READER MODE'}
             </span>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>
               {activeSubject.code} • Semester {activeSubject.semester}
             </span>
           </div>
-          <h1 style={{ fontSize: 'clamp(1.4rem, 2.4vw, 1.95rem)', fontWeight: 900, color: '#fff', wordBreak: 'break-word', lineHeight: 1.25 }}>
+          <h1 style={{ fontSize: 'clamp(1.4rem, 2.4vw, 1.95rem)', fontWeight: 900, color: 'var(--text-main)', wordBreak: 'break-word', lineHeight: 1.25 }}>
             {activeSubject.name} Notes
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', maxWidth: '750px', marginTop: '4px', lineHeight: 1.4 }}>
@@ -1670,80 +1670,8 @@ export default function SensoryLab({
           </p>
         </div>
 
-        {/* Action Controls & Multi-Theme Selector */}
+        {/* Action Controls */}
         <div className="sensory-action-bar" style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', flex: '1 1 auto', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
-          {/* 3 Theme Options */}
-          <div className="sensory-theme-toggle-group" style={{ 
-            display: 'flex', 
-            background: 'rgba(255,255,255,0.06)', 
-            borderRadius: '10px', 
-            padding: '4px', 
-            gap: '4px', 
-            border: '1px solid var(--border-dim)',
-            flexWrap: 'wrap'
-          }}>
-            <button 
-              onClick={() => setThemeMode('cyber')}
-              title="Dark theme with electric neon & gold ink"
-              style={{
-                padding: '8px 14px',
-                borderRadius: '8px',
-                border: themeMode === 'cyber' ? '1px solid #00f0ff' : '1px solid transparent',
-                background: themeMode === 'cyber' ? 'linear-gradient(135deg, #00f0ff, #3b82f6)' : 'transparent',
-                color: themeMode === 'cyber' ? '#07090e' : '#cbd5e1',
-                fontWeight: 800,
-                fontSize: '0.8rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <Sparkles size={14} /> ⚡ Cyber Neon
-            </button>
-
-            <button 
-              onClick={() => setThemeMode('paper')}
-              title="Crisp white notebook with margin and deep blue handwritten styling"
-              style={{
-                padding: '8px 14px',
-                borderRadius: '8px',
-                border: themeMode === 'paper' ? '1px solid #3b82f6' : '1px solid transparent',
-                background: themeMode === 'paper' ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : 'transparent',
-                color: themeMode === 'paper' ? '#ffffff' : '#cbd5e1',
-                fontWeight: 800,
-                fontSize: '0.8rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: themeMode === 'paper' ? '0 2px 10px rgba(37, 99, 235, 0.3)' : 'none'
-              }}
-            >
-              <PenTool size={14} /> 📝 Real Notebook
-            </button>
-
-            <button 
-              onClick={() => setThemeMode('clean')}
-              title="Modern crisp white textbook reading mode"
-              style={{
-                padding: '8px 14px',
-                borderRadius: '8px',
-                border: themeMode === 'clean' ? '1px solid #94a3b8' : '1px solid transparent',
-                background: themeMode === 'clean' ? '#ffffff' : 'transparent',
-                color: themeMode === 'clean' ? '#0f172a' : '#cbd5e1',
-                fontWeight: 800,
-                fontSize: '0.8rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: themeMode === 'clean' ? '0 2px 8px rgba(255,255,255,0.25)' : 'none'
-              }}
-            >
-              <BookOpen size={14} /> 📖 Clean Digital
-            </button>
-          </div>
 
           {/* Collapse / Expand Select Subject Column Toggle */}
           <button 

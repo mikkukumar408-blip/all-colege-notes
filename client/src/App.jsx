@@ -22,7 +22,7 @@ const SeatBooking = React.lazy(() => import('./components/SeatBooking'));
 const SuperAdminPanel = React.lazy(() => import('./components/SuperAdminPanel'));
 const QuickSearchPalette = React.lazy(() => import('./components/QuickSearchPalette'));
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, FileText, User, LogOut, Sparkles, Code2, ClipboardCheck, Search } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, GraduationCap, ShieldCheck, Download, BookOpen, FileText, User, LogOut, Sparkles, Code2, ClipboardCheck, Search, Sun, Moon } from 'lucide-react';
 import { logSecurityEvent } from './utils/security';
 import { removeDeviceSession, checkDeviceSessionActive, pullCloudUsers, getApiUrl, pullCloudControls } from './utils/cloudSync';
 import './App.css';
@@ -41,6 +41,35 @@ export default function App() {
       return null;
     }
   });
+
+  /* -----------------------------------------------------------------------
+     THEME STATE (Strictly Light or Dark)
+     ----------------------------------------------------------------------- */
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem('college_notes_theme') || 'dark';
+    } catch (e) {
+      return 'dark';
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'light') {
+      document.body.classList.add('theme-light');
+      document.body.classList.remove('theme-dark');
+    } else {
+      document.body.classList.add('theme-dark');
+      document.body.classList.remove('theme-light');
+    }
+    try {
+      localStorage.setItem('college_notes_theme', theme);
+    } catch (e) {}
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   // Zero-Trust Session Inactivity Timeout Guard (30 Minutes)
   const lastActivityRef = useRef(Date.now());
@@ -202,6 +231,7 @@ export default function App() {
             movieContext={selectedSubject} 
             isUnitsCollapsed={isUnitsCollapsed}
             setIsUnitsCollapsed={setIsUnitsCollapsed}
+            theme={theme}
             onNavigateTab={(tab, sub) => {
               if (sub) setSelectedSubject(sub);
               setActiveTab(tab);
@@ -247,10 +277,12 @@ export default function App() {
 
   const isSuperAdmin = (currentUser?.username?.toLowerCase() === 'bhavya mishra') || (currentUser?.role === 'superadmin') || (currentUser?.isSuperAdmin === true) || (currentUser?.role === 'admin');
 
-  // 4DX Authentication Guard: Show login/create account page if not signed in
+  // Authentication Guard: Show login/create account page if not signed in
   if (!currentUser) {
     return (
       <AuthPage 
+        theme={theme}
+        toggleTheme={toggleTheme}
         onLogin={(user) => {
           setCurrentUser(user);
           try {
@@ -276,6 +308,8 @@ export default function App() {
         setIsOpen={setSidebarOpen}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        theme={theme}
+        toggleTheme={toggleTheme}
       />
 
       <div className={`main-viewport ${isSidebarCollapsed ? 'collapsed' : ''}`}>
@@ -388,6 +422,31 @@ export default function App() {
               <Search size={14} color="var(--neon-cyan)" />
               <span className="search-text-desktop">Search</span>
               <kbd className="nav-search-kbd">Ctrl+K</kbd>
+            </button>
+
+            {/* Universal Dark / Light Theme Toggle */}
+            <button 
+              className="nav-theme-toggle-btn"
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+              aria-label="Toggle Theme"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '20px',
+                background: theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.07)',
+                border: '1px solid var(--border-dim)',
+                color: 'var(--text-main)',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {theme === 'dark' ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="#6366f1" />}
+              <span className="theme-toggle-label">{theme === 'dark' ? 'Light' : 'Dark'}</span>
             </button>
 
 

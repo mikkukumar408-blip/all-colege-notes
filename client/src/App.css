@@ -8,7 +8,7 @@
 /* Sidebar Styles */
 .sidebar {
   width: 270px;
-  background: #0e121d;
+  background: var(--bg-secondary);
   border-right: 1px solid var(--border-dim);
   display: flex;
   flex-direction: column;
@@ -74,7 +74,7 @@
   font-size: 1.3rem;
   font-weight: 900;
   letter-spacing: 2px;
-  color: #fff;
+  color: var(--text-main);
   line-height: 1.1;
 }
 
@@ -118,15 +118,20 @@
 }
 
 .nav-item:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+  background: var(--bg-card-hover);
 }
 
 .nav-item.active {
-  color: #fff;
+  color: var(--text-main);
   background: rgba(0, 240, 255, 0.09);
   border-color: rgba(0, 240, 255, 0.35);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+body.theme-light .nav-item.active {
+  color: var(--neon-cyan);
+  background: rgba(2, 132, 199, 0.09);
+  border-color: rgba(2, 132, 199, 0.3);
 }
 
 .nav-item.active .nav-icon {
@@ -201,7 +206,7 @@
   justify-content: space-between;
   padding: 0 24px;
   border-bottom: 1px solid var(--border-dim);
-  background: #0e121d;
+  background: var(--bg-secondary);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -219,7 +224,7 @@
   font-family: var(--font-display);
   font-size: clamp(0.95rem, 1.8vw, 1.12rem);
   font-weight: 800;
-  color: #fff;
+  color: var(--text-main);
   letter-spacing: 0.5px;
   white-space: nowrap;
   overflow: hidden;
@@ -589,9 +594,9 @@
     right: 0;
     height: calc(56px + env(safe-area-inset-bottom, 0px));
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    background: #0a0f1d;
-    border-top: 1px solid rgba(0, 240, 255, 0.2);
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 240, 255, 0.08);
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-dim);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     z-index: 999;
     align-items: center;
     justify-content: space-around;

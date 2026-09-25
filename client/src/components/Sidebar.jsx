@@ -21,7 +21,9 @@ import {
   Sparkles,
   Code2,
   ClipboardCheck,
-  X 
+  X,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function Sidebar({ 
@@ -31,7 +33,9 @@ export default function Sidebar({
   isOpen, 
   setIsOpen,
   isCollapsed = false,
-  onToggleCollapse
+  onToggleCollapse,
+  theme = 'dark',
+  toggleTheme
 }) {
   /* -----------------------------------------------------------------------
      1. THE CORE ACADEMIC SECTIONS (+ EXCLUSIVE SUPER ADMIN SECTION)
@@ -151,13 +155,42 @@ export default function Sidebar({
         </nav>
 
         {/* -----------------------------------------------------------------
-           4. SIDEBAR FOOTER (Live System / Portal Status Indicator)
+           4. SIDEBAR FOOTER (Live System / Portal Status & Theme Toggle)
            ----------------------------------------------------------------- */}
-        <div className="sidebar-footer">
+        <div className="sidebar-footer" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {toggleTheme && (
+            <button
+              onClick={toggleTheme}
+              className="sidebar-theme-toggle-btn"
+              title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: isCollapsed ? 'center' : 'flex-start',
+                gap: '10px',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-dim)',
+                color: 'var(--text-main)',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {theme === 'dark' ? <Sun size={16} color="#f59e0b" /> : <Moon size={16} color="#6366f1" />}
+              {!isCollapsed && (
+                <span>{theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
+              )}
+            </button>
+          )}
+
           <div className="live-auditorium-status">
             <div className="pulse-dot" />
             <div>
-              <div style={{ color: '#fff', fontWeight: 600, fontSize: '0.82rem' }}>Academic Portal Active</div>
+              <div style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.82rem' }}>Academic Portal Active</div>
               <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Semesters 1 through 8 Ready</div>
             </div>
           </div>
