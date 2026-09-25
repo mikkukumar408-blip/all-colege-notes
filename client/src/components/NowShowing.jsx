@@ -303,8 +303,9 @@ export default function NowShowing({ onSelectSubject, onReadNotes }) {
               <div 
                 key={sub.id}
                 className="glass-panel subject-catalog-card"
-                onClick={() => setFeaturedSubject(sub)}
+                onClick={() => onReadNotes && onReadNotes(sub)}
                 style={{ cursor: 'pointer', transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+                title={`Open Notes Reader for ${sub.name}`}
               >
                 {/* Subject Thumbnail Banner */}
                 <div style={{ position: 'relative', height: '140px', overflow: 'hidden' }}>

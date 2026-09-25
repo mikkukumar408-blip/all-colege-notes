@@ -11,7 +11,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import NowShowing from './components/NowShowing';
-import VisitorAnalyticsModal from './components/VisitorAnalyticsModal';
 const SensoryLab = React.lazy(() => import('./components/SensoryLab'));
 const TechGuide = React.lazy(() => import('./components/TechGuide'));
 const Theaters = React.lazy(() => import('./components/Theaters'));
@@ -38,9 +37,6 @@ export default function App() {
     } catch (e) {}
     return { username: 'Student', role: 'student', isSuperAdmin: false };
   });
-
-  // Real-Time Visitor Analytics Modal State
-  const [analyticsOpen, setAnalyticsOpen] = useState(false);
 
   /* -----------------------------------------------------------------------
      THEME: PERMANENT DARK MODE ALWAYS
@@ -339,7 +335,6 @@ export default function App() {
         setIsOpen={setSidebarOpen}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        onOpenAnalytics={() => setAnalyticsOpen(true)}
       />
 
       <div className={`main-viewport ${isSidebarCollapsed ? 'collapsed' : ''}`}>
@@ -487,12 +482,6 @@ export default function App() {
           />
         )}
       </React.Suspense>
-
-      {/* Real-time Visitor Traffic & Analytics Modal */}
-      <VisitorAnalyticsModal
-        isOpen={analyticsOpen}
-        onClose={() => setAnalyticsOpen(false)}
-      />
 
       {/* Android Back Button Double-Tap Confirmation Toast */}
       {backToastMessage && (

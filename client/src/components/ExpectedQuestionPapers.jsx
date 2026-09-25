@@ -253,9 +253,6 @@ export default function ExpectedQuestionPapers({ currentUser }) {
     }
   });
 
-  // Initial Exam Selection Modal Dialog (false by default so students land directly on papers)
-  const [showExamModal, setShowExamModal] = useState(false);
-
   // Live Exam Simulation Timer State
   const activeExamConfig = EXAM_TYPES[selectedExamType] || EXAM_TYPES['sessional-1'];
   const [timerSeconds, setTimerSeconds] = useState(activeExamConfig.timerSeconds);
@@ -303,7 +300,6 @@ export default function ExpectedQuestionPapers({ currentUser }) {
 
   const handleSelectExamType = (type) => {
     setSelectedExamType(type);
-    setShowExamModal(false);
     try {
       localStorage.setItem('acn_selected_exam_type', type);
       localStorage.setItem('acn_has_picked_exam_v2', 'true');
@@ -446,22 +442,6 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                 Total Marks
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowExamModal(true)}
-              className="btn-secondary"
-              style={{
-                padding: '10px 14px',
-                fontSize: '0.82rem',
-                gap: '6px',
-                display: 'flex',
-                alignItems: 'center',
-                cursor: 'pointer'
-              }}
-              title="Change your active examination"
-            >
-              <RotateCcw size={14} /> Switch Exam
-            </button>
           </div>
         </div>
 
@@ -1484,174 +1464,6 @@ export default function ExpectedQuestionPapers({ currentUser }) {
               }}>
                 *** END OF QUESTION PAPER — ALL THE BEST ***
               </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* -------------------------------------------------------------------
-         INITIAL / ON-DEMAND EXAM SELECTION MODAL
-         ------------------------------------------------------------------- */}
-      {showExamModal && createPortal(
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Select Examination Blueprint"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 1000000,
-            background: 'rgba(3, 7, 18, 0.94)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '16px',
-            animation: 'fadeIn 0.2s ease-out'
-          }}
-          onClick={() => setShowExamModal(false)}
-        >
-          <div
-            style={{
-              background: '#090e17',
-              border: '2px solid rgba(0, 240, 255, 0.45)',
-              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(0, 240, 255, 0.25)',
-              borderRadius: '18px',
-              maxWidth: '680px',
-              width: '100%',
-              padding: '28px 24px',
-              position: 'relative'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => setShowExamModal(false)}
-              style={{
-                position: 'absolute',
-                top: '16px',
-                right: '16px',
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                color: '#fff',
-                borderRadius: '8px',
-                width: '32px',
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer'
-              }}
-              title="Close Dialog"
-            >
-              <X size={16} />
-            </button>
-
-            <div style={{ textAlign: 'center', marginBottom: '22px' }}>
-              <div style={{
-                width: '54px',
-                height: '54px',
-                borderRadius: '50%',
-                background: 'rgba(245, 158, 11, 0.15)',
-                border: '1.5px solid rgba(245, 158, 11, 0.45)',
-                color: '#f59e0b',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 12px'
-              }}>
-                <ClipboardCheck size={28} />
-              </div>
-              <h2 style={{ fontSize: '1.45rem', fontWeight: 900, color: '#fff', margin: '0 0 6px 0' }}>
-                Select Examination to Practice
-              </h2>
-              <p style={{ color: '#94a3b8', fontSize: '0.88rem', margin: 0 }}>
-                Choose your upcoming exam to automatically load the exact syllabus-mapped papers, question format, and simulation timer.
-              </p>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {Object.values(EXAM_TYPES).map(et => {
-                const isSelected = selectedExamType === et.id;
-                return (
-                  <button
-                    key={et.id}
-                    type="button"
-                    onClick={() => handleSelectExamType(et.id)}
-                    style={{
-                      background: isSelected ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.03)',
-                      border: isSelected ? `2px solid ${et.color}` : '1px solid rgba(255, 255, 255, 0.1)',
-                      boxShadow: isSelected ? `0 0 20px ${et.border}` : 'none',
-                      borderRadius: '12px',
-                      padding: '16px',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: '12px',
-                      transition: 'all 0.15s'
-                    }}
-                  >
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
-                        <span style={{
-                          fontSize: '0.72rem',
-                          fontWeight: 800,
-                          padding: '2px 8px',
-                          borderRadius: '4px',
-                          background: et.bg,
-                          color: et.color,
-                          border: `1px solid ${et.border}`
-                        }}>
-                          {et.dateBadge}
-                        </span>
-                        <span style={{ fontSize: '1.02rem', fontWeight: 800, color: '#fff' }}>
-                          {et.name}
-                        </span>
-                        {et.id === 'sessional-1' && (
-                          <span style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>
-                            ★ Active This Week
-                          </span>
-                        )}
-                      </div>
-                      <div style={{ fontSize: '0.84rem', color: et.color, fontWeight: 700 }}>
-                        Syllabus: {et.syllabusTag}
-                      </div>
-                      <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '3px' }}>
-                        {et.timeAllowed} • {et.maxMarks} Marks ({et.secAMarks}M Section A + {et.secBMarks}M Section B)
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                      {isSelected ? (
-                        <span style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          color: et.color,
-                          fontWeight: 800,
-                          fontSize: '0.8rem'
-                        }}>
-                          <CheckCircle2 size={16} /> Selected
-                        </span>
-                      ) : (
-                        <ChevronRight size={18} color="#64748b" />
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div style={{ marginTop: '20px', textAlign: 'center' }}>
-              <button
-                type="button"
-                onClick={() => setShowExamModal(false)}
-                className="btn-primary"
-                style={{ width: '100%', padding: '10px', fontSize: '0.88rem' }}
-              >
-                Continue to Question Papers
-              </button>
             </div>
           </div>
         </div>,

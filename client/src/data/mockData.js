@@ -615,24 +615,6 @@ export const initialShortNotes = [
 
   // ==================== SEMESTER 3 ====================
   {
-    id: 'sn-dsa',
-    subject: 'Data Structures & Algorithms (CS301)',
-    code: 'CS301',
-    semester: 'Semester 3',
-    isDead: true,
-    category: 'Computer Science',
-    type: 'KaTeX Complexity Matrices, Trees & Graph Formula Sheet (Under Preparation)',
-    pdfUrl: '#',
-    downloadName: '',
-    fileSize: 'Under Prep',
-    pages: 'Under Preparation',
-    downloads: 0,
-    highlights: [
-      'Semester 3 Advanced DSA Syllabus currently under preparation',
-      'Please refer to Semester 2 Data Structures (BCSE-007) for active exam revision sheets'
-    ]
-  },
-  {
     id: 'sn-dld',
     subject: 'Digital Logic & Computer Design (CS302)',
     code: 'CS302',

@@ -578,7 +578,8 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
       lab.semester?.toLowerCase().includes(`sem ${labSemFilter}`.toLowerCase()) ||
       (labSemFilter === '1' && (lab.semester?.includes('1') || lab.semester?.includes('Semester 1'))) ||
       (labSemFilter === '2' && (lab.semester?.includes('2') || lab.semester?.includes('Semester 2'))) ||
-      (labSemFilter === '3' && (lab.semester?.includes('3') || lab.semester?.includes('Semester 3')));
+      (labSemFilter === '3' && (lab.semester?.includes('3') || lab.semester?.includes('Semester 3'))) ||
+      (labSemFilter === '4' && (lab.semester?.includes('4') || lab.semester?.includes('Semester 4')));
 
     return matchSearch && matchSem;
   });
@@ -689,7 +690,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
             {/* Filter Toolbar: Semester Tabs + Search */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', flexWrap: 'wrap', gap: '12px' }}>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                {['All', '1', '2', '3', '4', '5'].map(sem => {
+                {['All', '1', '2', '3', '4'].map(sem => {
                   const isSelected = labSemFilter === sem;
                   const count = sem === 'All'
                     ? labManuals.length
@@ -699,8 +700,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                         (sem === '1' && (l.semester?.includes('1') || l.semester?.includes('Semester 1'))) ||
                         (sem === '2' && (l.semester?.includes('2') || l.semester?.includes('Semester 2'))) ||
                         (sem === '3' && (l.semester?.includes('3') || l.semester?.includes('Semester 3'))) ||
-                        (sem === '4' && (l.semester?.includes('4') || l.semester?.includes('Semester 4'))) ||
-                        (sem === '5' && (l.semester?.includes('5') || l.semester?.includes('Semester 5')))
+                        (sem === '4' && (l.semester?.includes('4') || l.semester?.includes('Semester 4')))
                       ).length;
                   return (
                     <button

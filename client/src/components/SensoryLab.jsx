@@ -48,7 +48,6 @@ import { pythonUnitsData, pythonSubjectDetails } from '../data/pythonNotesData';
 import { dsaUnitsData, dsaSubjectDetails } from '../data/dsaNotesData';
 import HandwrittenDiagram from './HandwrittenDiagram';
 import InteractiveTheveninLab from './InteractiveTheveninLab';
-import CramAndRecallDeck from './CramAndRecallDeck';
 import katex from 'katex';
 import { triggerUniversalPrint } from '../utils/printHelper';
 

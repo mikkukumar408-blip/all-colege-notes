@@ -153,6 +153,7 @@ export default function Theaters({ currentUser, initialSubject }) {
 
   // ─── Filter Ultra-Short 2-Page Sheets ────────────────────────────────────
   const filteredShortNotes = shortNotes.filter(item => {
+    if (item.isDead || item.code === 'CS301') return false;
     const q = searchQuery.toLowerCase().trim();
     const matchesSearch = !q ||
       item.subject.toLowerCase().includes(q) ||

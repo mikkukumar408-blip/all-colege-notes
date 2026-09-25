@@ -32,8 +32,7 @@ export default function Sidebar({
   isOpen, 
   setIsOpen,
   isCollapsed = false,
-  onToggleCollapse,
-  onOpenAnalytics
+  onToggleCollapse
 }) {
   /* -----------------------------------------------------------------------
      1. THE CORE ACADEMIC SECTIONS (+ EXCLUSIVE SUPER ADMIN SECTION)
