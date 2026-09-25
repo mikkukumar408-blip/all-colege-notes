@@ -121,7 +121,7 @@ export default function Sidebar({
            ----------------------------------------------------------------- */}
         <nav className="nav-menu">
           <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-dim)', letterSpacing: '1px', padding: '0 8px 6px' }}>
-            {isSuperAdmin ? 'Academic & Admin • 7 Portals' : 'Academic Sections • 6 Portals'}
+            {isSuperAdmin ? 'Academic & Admin • 6 Portals' : 'Academic Sections • 5 Portals'}
           </div>
           {navSections.map((item) => {
             const Icon = item.icon;

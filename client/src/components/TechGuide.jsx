@@ -49,39 +49,47 @@ export default function TechGuide() {
       </div>
 
       {/* -------------------------------------------------------------------
-         PART B: SEMESTER SELECTOR BUTTONS (Sem 1 through Sem 8)
+         PART B: SEMESTER SELECTOR PILLS (Clean, active semesters only)
          ------------------------------------------------------------------- */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => {
-          const isDead = sem !== 1 && sem !== 2;
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+        {[
+          { num: 1, label: 'Semester 1', count: subjects.filter(s => s.semester === 1).length },
+          { num: 2, label: 'Semester 2', count: subjects.filter(s => s.semester === 2).length }
+        ].map(sem => {
+          const isSelected = selectedSem === sem.num;
           return (
             <button
-              key={sem}
-              disabled={isDead}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (isDead) {
-                  return false; // Dead button: clicking does nothing
-                }
-                setSelectedSem(sem);
-              }}
-              title={isDead ? `Semester ${sem} (Unavailable)` : undefined}
+              key={sem.num}
+              onClick={() => setSelectedSem(sem.num)}
               className="glass-panel"
               style={{
-                padding: '10px 18px',
-                borderRadius: '8px',
-                fontSize: '0.86rem',
-                fontWeight: 700,
-                cursor: isDead ? 'not-allowed' : 'pointer',
-                opacity: isDead ? 0.35 : 1,
-                color: (!isDead && selectedSem === sem) ? 'var(--neon-cyan)' : 'var(--text-muted)',
-                borderColor: (!isDead && selectedSem === sem) ? 'var(--neon-cyan)' : undefined,
-                background: (!isDead && selectedSem === sem) ? 'rgba(0, 240, 255, 0.12)' : undefined,
-                userSelect: 'none'
+                padding: '10px 22px',
+                borderRadius: '24px',
+                fontSize: '0.88rem',
+                fontWeight: isSelected ? 800 : 600,
+                cursor: 'pointer',
+                color: isSelected ? '#030a16' : '#e2e8f0',
+                background: isSelected ? 'var(--neon-cyan)' : 'rgba(255, 255, 255, 0.06)',
+                border: isSelected ? 'none' : '1px solid var(--border-dim)',
+                boxShadow: isSelected ? '0 0 16px rgba(0, 240, 255, 0.35)' : 'none',
+                userSelect: 'none',
+                transition: 'all 0.15s ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
               }}
             >
-              Semester {sem}
+              <span>{sem.label}</span>
+              <span style={{
+                fontSize: '0.75rem',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                background: isSelected ? 'rgba(3, 10, 22, 0.25)' : 'rgba(255, 255, 255, 0.1)',
+                color: isSelected ? '#030a16' : 'var(--neon-cyan)',
+                fontWeight: 700
+              }}>
+                {sem.count} Courses
+              </span>
             </button>
           );
         })}

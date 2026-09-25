@@ -426,17 +426,6 @@ export default function App() {
               <span className="search-text-desktop">Search</span>
               <kbd className="nav-search-kbd">Ctrl+K</kbd>
             </button>
-            
-            <button 
-              className="btn-primary main-download-btn" 
-              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
-              onClick={() => setActiveTab('downloads-lab')}
-              title="Download Notes & Lab Manuals"
-            >
-              <Download size={16} />
-              <span className="download-text-desktop">Download Notes</span>
-              <span className="download-text-mobile">Notes</span>
-            </button>
           </div>
         </header>
 

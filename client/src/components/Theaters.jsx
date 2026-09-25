@@ -40,6 +40,7 @@ import { initialShortNotes } from '../data/mockData';
 import { examRevisionNotes } from '../data/examRevisionNotesData';
 import { logUserActivity } from '../utils/activityTracker';
 import { MathFormula, MathText } from '../utils/mathRenderer';
+import { triggerUniversalPrint } from '../utils/printHelper';
 
 /* -------------------------------------------------------------------------
    ACADEMIC YEARS & SEMESTER CONFIGURATION
@@ -96,18 +97,6 @@ export default function Theaters({ currentUser, initialSubject }) {
   const [selectedRevisionNote, setSelectedRevisionNote] = useState(null);
   const [activeModalUnit, setActiveModalUnit] = useState(1);
   const [copiedFormula, setCopiedFormula] = useState(null);
-  const [isPrintReady, setIsPrintReady] = useState(false);
-
-  React.useEffect(() => {
-    const handleBeforePrint = () => setIsPrintReady(true);
-    const handleAfterPrint = () => setIsPrintReady(false);
-    window.addEventListener('beforeprint', handleBeforePrint);
-    window.addEventListener('afterprint', handleAfterPrint);
-    return () => {
-      window.removeEventListener('beforeprint', handleBeforePrint);
-      window.removeEventListener('afterprint', handleAfterPrint);
-    };
-  }, []);
 
   React.useEffect(() => {
     if (selectedRevisionNote) {
@@ -825,10 +814,8 @@ export default function Theaters({ currentUser, initialSubject }) {
                 <button
                   type="button"
                   onClick={() => {
-                    setIsPrintReady(true);
-                    setTimeout(() => {
-                      window.print();
-                    }, 50);
+                    const docTitle = `${selectedRevisionNote?.subject || 'Exam'}_${selectedRevisionNote?.code || 'Revision'}_Notes`.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim();
+                    triggerUniversalPrint(docTitle);
                   }}
                   style={{
                     background: 'rgba(255, 255, 255, 0.08)',
@@ -1324,11 +1311,10 @@ export default function Theaters({ currentUser, initialSubject }) {
           {/* End revision-screen-content */}
 
             {/* =============================================================
-               DEDICATED FULL PRINT DOCUMENT (Mounted dynamically ONLY when printing)
+               DEDICATED FULL PRINT DOCUMENT (Hidden on screen, revealed on print)
                Renders all Units (1-4), Solved Questions, Formulas & Traps sequentially
                ============================================================= */}
-            {isPrintReady && (
-              <div className="revision-print-document">
+            <div className="revision-print-document">
               {/* Document Master Header */}
               <div style={{ textAlign: 'center', borderBottom: '2px solid #0f172a', paddingBottom: '14px', marginBottom: '20px' }}>
                 <div style={{ fontSize: '0.85rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#475569' }}>
@@ -1544,7 +1530,6 @@ export default function Theaters({ currentUser, initialSubject }) {
                 *** END OF EXAM REVISION HANDBOOK — ALL THE BEST FOR YOUR EXAMINATIONS ***
               </div>
             </div>
-          )}
           </div>
         </div>,
         document.body

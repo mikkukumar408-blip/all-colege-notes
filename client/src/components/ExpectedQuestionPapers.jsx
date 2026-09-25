@@ -352,10 +352,9 @@ export default function ExpectedQuestionPapers({ currentUser }) {
     }));
   };
 
-  // Filter Papers according to Year, Semester, and Search, and map with selected exam type
+  // Filter Papers according to Semester and Search, and map with selected exam type
   const filteredPapers = expectedQuestionPapers
     .filter(paper => {
-      const matchesYear = selectedYear === 'All Years' || paper.year === selectedYear;
       const matchesSemester = selectedSemester === 'All' || paper.semester === selectedSemester;
       const query = searchQuery.toLowerCase().trim();
       const matchesSearch = !query || 
@@ -363,7 +362,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
         paper.code.toLowerCase().includes(query) ||
         paper.course.toLowerCase().includes(query) ||
         paper.instructions.some(i => i.toLowerCase().includes(query));
-      return matchesYear && matchesSemester && matchesSearch;
+      return matchesSemester && matchesSearch;
     })
     .map(paper => getExamPaperForType(paper, selectedExamType));
 
@@ -579,29 +578,39 @@ export default function ExpectedQuestionPapers({ currentUser }) {
       </div>
 
       {/* -------------------------------------------------------------------
-         FILTERS & SEARCH BAR
+         FILTERS & SEARCH BAR (Clean active semester pills, no dead filters)
          ------------------------------------------------------------------- */}
       <div className="glass-panel" style={{ padding: '18px 22px', marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', alignItems: 'center', justifyContent: 'space-between' }}>
-          {/* Year Buttons */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {YEARS.map(year => (
-              <button
-                key={year}
-                onClick={() => {
-                  setSelectedYear(year);
-                  setSelectedSemester('All');
-                }}
-                className={selectedYear === year ? 'btn-primary' : 'btn-secondary'}
-                style={{ 
-                  fontSize: '0.82rem', 
-                  padding: '7px 14px',
-                  borderRadius: '8px'
-                }}
-              >
-                {year}
-              </button>
-            ))}
+          {/* Active Semester Filter Pills */}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+            {[
+              { id: 'All', label: `All Papers (${expectedQuestionPapers.length})` },
+              { id: 'Semester 1', label: `Semester 1 (${expectedQuestionPapers.filter(p => p.semester === 'Semester 1').length} Papers)` },
+              { id: 'Semester 2', label: `Semester 2 (${expectedQuestionPapers.filter(p => p.semester === 'Semester 2').length} Papers)` }
+            ].map(tab => {
+              const isSelected = selectedSemester === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedSemester(tab.id)}
+                  style={{
+                    padding: '7px 16px',
+                    borderRadius: '20px',
+                    fontSize: '0.82rem',
+                    fontWeight: isSelected ? 800 : 600,
+                    cursor: 'pointer',
+                    background: isSelected ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.06)',
+                    color: isSelected ? '#030a16' : '#e2e8f0',
+                    border: isSelected ? 'none' : '1px solid var(--border-dim)',
+                    transition: 'all 0.15s ease',
+                    userSelect: 'none'
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* Search Box */}
@@ -634,30 +643,6 @@ export default function ExpectedQuestionPapers({ currentUser }) {
             )}
           </div>
         </div>
-
-        {/* Semester Sub-Filter when a specific year is picked */}
-        {selectedYear !== 'All Years' && YEAR_CONFIG[selectedYear] && (
-          <div style={{ marginTop: '14px', paddingTop: '14px', borderTop: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Filter Semester:</span>
-            <button
-              onClick={() => setSelectedSemester('All')}
-              className={selectedSemester === 'All' ? 'btn-primary' : 'btn-secondary'}
-              style={{ fontSize: '0.78rem', padding: '5px 12px', borderRadius: '6px' }}
-            >
-              All Semesters
-            </button>
-            {YEAR_CONFIG[selectedYear].semesters.map(sem => (
-              <button
-                key={sem.id}
-                onClick={() => setSelectedSemester(sem.id)}
-                className={selectedSemester === sem.id ? 'btn-primary' : 'btn-secondary'}
-                style={{ fontSize: '0.78rem', padding: '5px 12px', borderRadius: '6px' }}
-              >
-                {sem.title}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* -------------------------------------------------------------------
