@@ -179,23 +179,47 @@ export function formatMathText(text) {
   html = html.replace(/\\text\{\s*([^{}]+)\s*\}/g, '$1');
 
   const mathBlocks = [];
-  function addBlock(rendered, isDisplay = false) {
-    const key = `\x00M_${mathBlocks.length}\x00`;
-    mathBlocks.push(isDisplay ? `<div class="katex-display-wrapper">${rendered}</div>` : `<span class="katex-inline-wrapper">${rendered}</span>`);
+
+  function unwrapRaw(latex) {
+    let unrolled = latex;
+    let safety = 0;
+    while (safety++ < 20 && /\uFFF0\d+\uFFF1/.test(unrolled)) {
+      unrolled = unrolled.replace(/\uFFF0(\d+)\uFFF1/g, (_, id) => {
+        const blk = mathBlocks[parseInt(id, 10)];
+        return blk ? blk.rawLatex : '';
+      });
+    }
+    return unrolled;
+  }
+
+  function renderCleanKaTeX(latex, isDisplay = false) {
+    const clean = unwrapRaw(latex).trim();
+    return renderKaTeXSafe(clean, isDisplay);
+  }
+
+  function addBlock(rawLatex, isDisplay = false) {
+    const key = `\uFFF0${mathBlocks.length}\uFFF1`;
+    const cleanRaw = unwrapRaw(rawLatex);
+    const rendered = renderCleanKaTeX(cleanRaw, isDisplay);
+    const htmlWrapper = isDisplay
+      ? `<div class="katex-display-wrapper">${rendered}</div>`
+      : `<span class="katex-inline-wrapper">${rendered}</span>`;
+
+    mathBlocks.push({ rendered: htmlWrapper, rawLatex: cleanRaw });
     return key;
   }
 
   // 3. Extract $$...$$ display math blocks
   html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
-    return addBlock(renderKaTeXSafe(math, true), true);
+    return addBlock(math, true);
   });
 
   // 4. Extract $...$ inline math blocks
   html = html.replace(/\$([^\$\n]+?)\$/g, (_, math) => {
-    return addBlock(renderKaTeXSafe(math, false), false);
+    return addBlock(math, false);
   });
 
-  // 5. Extract unwrapped \sqrt{...} with balanced braces FIRST (so nested \frac inside \sqrt renders as a single KaTeX unit)
+  // 5. Extract unwrapped \sqrt{...} with balanced braces FIRST
   let sqrtSafety = 0;
   while (sqrtSafety++ < 40) {
     const idx = html.indexOf('\\sqrt{');
@@ -203,8 +227,7 @@ export function formatMathText(text) {
     const body = extractBalancedBraces(html, idx + 5);
     if (!body) break;
     const fullSqrt = html.slice(idx, body.endIndex + 1);
-    const rendered = renderKaTeXSafe(fullSqrt, false);
-    html = html.slice(0, idx) + addBlock(rendered, false) + html.slice(body.endIndex + 1);
+    html = html.slice(0, idx) + addBlock(fullSqrt, false) + html.slice(body.endIndex + 1);
   }
 
   // 6. Extract unwrapped \frac{...}{...} with balanced braces
@@ -219,56 +242,59 @@ export function formatMathText(text) {
     const den = extractBalancedBraces(html, denStart);
     if (!den) break;
     const fullFrac = html.slice(idx, den.endIndex + 1);
-    const rendered = renderKaTeXSafe(fullFrac, false);
-    html = html.slice(0, idx) + addBlock(rendered, false) + html.slice(den.endIndex + 1);
+    html = html.slice(0, idx) + addBlock(fullFrac, false) + html.slice(den.endIndex + 1);
   }
 
-  // 6. Numbers with Ohm unit: 10 \Omega, 12\Omega, 10 \,\Omega (Run BEFORE standalone Greek letters)
+  // 7. Numbers with Ohm unit: 10 \Omega, 12\Omega, 10 \,\Omega (Run BEFORE standalone Greek letters)
   html = html.replace(/(\d+(?:\.\d+)?)\s*(?:\\,|\\ )?(?:\\Omega|Ω)\b/g, (_, num) => {
-    return addBlock(renderKaTeXSafe(`${num}\\,\\Omega`, false), false);
+    return addBlock(`${num}\\,\\Omega`, false);
   });
 
-  // 7. Degree notations like 30^\circ or (30^\circ)
+  // 8. Degree notations like 30^\circ or (30^\circ)
   html = html.replace(/(\d+(?:\.\d+)?)\s*(?:\^\{?\\circ\}?|\\circ)/g, (_, num) => {
-    return addBlock(renderKaTeXSafe(`${num}^\\circ`, false), false);
+    return addBlock(`${num}^\\circ`, false);
   });
 
-  // 8. Trigonometric & function applications: \cos(30^\circ), \cos\phi, \sin\theta, etc.
+  // 9. Trigonometric & function applications: \cos(30^\circ), \cos\phi, \sin\theta, etc.
   html = html.replace(/\\(cos|sin|tan|sec|csc|cot|ln|log)\s*(?:\(?\s*\\?[a-zA-Z0-9\^\circ\_\{\}]+\s*\)?|[a-zA-Z0-9\\]+)/g, (match) => {
-    return addBlock(renderKaTeXSafe(match, false), false);
+    return addBlock(match, false);
   });
 
-  // 9. Subscripted variables: V_{dc}, V_{rms}, I_L, R_th, I_{ph}, V_L, etc. (No trailing \b so V_{dc}, works)
+  // 10. Subscripted variables: V_{dc}, V_{rms}, I_L, R_th, I_{ph}, V_L, etc.
   html = html.replace(/\b([A-Za-z]+)_(?:\{([^{}]+)\}|([a-zA-Z0-9]+))(?=[^a-zA-Z0-9_]|$)/g, (match) => {
-    return addBlock(renderKaTeXSafe(match, false), false);
+    return addBlock(match, false);
   });
 
-  // 10. Exponents: 10^{-3}, 10^6, x^2, (1.11)^2
+  // 11. Exponents: 10^{-3}, 10^6, x^2, (1.11)^2
   html = html.replace(/(\b[A-Za-z0-9]+|\([^\(\)]+\))\^(?:\{([^{}]+)\}|([0-9a-zA-Z\+\-]+))(?=[^a-zA-Z0-9_\^]|$)/g, (match) => {
-    return addBlock(renderKaTeXSafe(match, false), false);
+    return addBlock(match, false);
   });
 
-  // 11. Standalone Greek letters & math symbols: \eta, \gamma, \Delta, \Omega, \times, \cdot, etc.
+  // 12. Standalone Greek letters & math symbols: \eta, \gamma, \Delta, \Omega, \times, \cdot, etc.
   html = html.replace(/\\(eta|gamma|Delta|Omega|alpha|beta|theta|phi|psi|lambda|mu|pi|sigma|omega|tau|epsilon|cdot|times|approx|ne|neq|le|ge|pm|infty|parallel|to|implies|iff)\b/g, (match) => {
-    return addBlock(renderKaTeXSafe(match, false), false);
+    return addBlock(match, false);
   });
 
-  // 12. Clean up any stray thin spaces \, outside of math
+  // 13. Clean up any stray thin spaces \, outside of math
   html = html.replace(/\\,/g, ' ');
 
-  // 13. Format Markdown Bold **bold** and Italics *italic*
+  // 14. Format Markdown Bold **bold** and Italics *italic*
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #67e8f9; font-weight: 700;">$1</strong>');
   html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
 
-  // 12. Numbered list formatting: ensure clear visual separation
+  // 15. Numbered list formatting: ensure clear visual separation
   html = html.replace(/\n(?=(\d+[\.\)]|\([a-z0-9]+\))\s+)/gi, '\n\n');
   html = html.replace(/\n{2,}/g, '<div style="margin-top: 10px;"></div>');
   html = html.replace(/\n/g, '<br />');
 
-  // 13. Restore math blocks
-  mathBlocks.forEach((rendered, i) => {
-    html = html.replace(`\x00M_${i}\x00`, rendered);
-  });
+  // 16. Restore math blocks (unroll from outermost to innermost)
+  let restoreSafety = 0;
+  while (restoreSafety++ < 20 && /\uFFF0\d+\uFFF1/.test(html)) {
+    html = html.replace(/\uFFF0(\d+)\uFFF1/g, (_, id) => {
+      const blk = mathBlocks[parseInt(id, 10)];
+      return blk ? blk.rendered : '';
+    });
+  }
 
   setCacheEntry(textCache, text, html);
   return html;
