@@ -183,8 +183,8 @@ export default function TechGuide() {
               <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '4px' }}>
                 Prescribed University Textbooks:
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#fff', fontStyle: 'italic' }}>
-                1. Standard Text by Cormen / Galvin / Tanenbaum (Latest Edition)
+              <div style={{ fontSize: '0.78rem', color: '#fff', fontStyle: 'italic', lineHeight: 1.4 }}>
+                {sub.textbook || '1. Prescribed University Reference Text (Latest Edition)'}
               </div>
             </div>
           </div>

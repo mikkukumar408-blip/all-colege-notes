@@ -1027,7 +1027,6 @@ export default function SensoryLab({
   const isUnitsCollapsed = controlledIsUnitsCollapsed !== undefined ? controlledIsUnitsCollapsed : internalUnitsCollapsed;
   const setIsUnitsCollapsed = controlledSetIsUnitsCollapsed || setInternalUnitsCollapsed;
   
-  const [fontSize, setFontSize] = useState('normal'); // 'normal' | 'large'
   const [showFormulaSheet, setShowFormulaSheet] = useState(false);
 
   const [masteryData, setMasteryData] = useState(() => {

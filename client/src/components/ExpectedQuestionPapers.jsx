@@ -48,39 +48,6 @@ import { logUserActivity } from '../utils/activityTracker';
 import { MathText, MathFormula } from '../utils/mathRenderer';
 import { triggerUniversalPrint } from '../utils/printHelper';
 
-const YEARS = ['All Years', '1st Year', '2nd Year', '3rd Year', '4th Year'];
-
-const YEAR_CONFIG = {
-  '1st Year': {
-    label: '1st Year',
-    semesters: [
-      { id: 'Semester 1', num: 1, title: 'Semester 1', subtitle: 'BEEE, Calculus (Math I), C Programming, AI & ML, Web Tech' },
-      { id: 'Semester 2', num: 2, title: 'Semester 2', subtitle: 'Applied Physics, Python Programming, Data Structures, Math II' }
-    ]
-  },
-  '2nd Year': {
-    label: '2nd Year',
-    semesters: [
-      { id: 'Semester 3', num: 3, title: 'Semester 3', subtitle: 'Data Structures, DLD, Object Oriented Programming' },
-      { id: 'Semester 4', num: 4, title: 'Semester 4', subtitle: 'Operating Systems, DBMS, Theory of Computation' }
-    ]
-  },
-  '3rd Year': {
-    label: '3rd Year',
-    semesters: [
-      { id: 'Semester 5', num: 5, title: 'Semester 5', subtitle: 'Computer Networks, Software Engineering' },
-      { id: 'Semester 6', num: 6, title: 'Semester 6', subtitle: 'Compiler Design, Machine Learning' }
-    ]
-  },
-  '4th Year': {
-    label: '4th Year',
-    semesters: [
-      { id: 'Semester 7', num: 7, title: 'Semester 7', subtitle: 'Cloud Computing, Cyber Security' },
-      { id: 'Semester 8', num: 8, title: 'Semester 8', subtitle: 'Major Project & Capstone' }
-    ]
-  }
-};
-
 // =========================================================================
 // EXAMINATION BLUEPRINT CONFIGURATION (SESSIONAL-I, SESSIONAL-II, END-SEM)
 // =========================================================================
@@ -237,7 +204,6 @@ export function getExamPaperForType(rawPaper, examType = 'sessional-1') {
 }
 
 export default function ExpectedQuestionPapers({ currentUser }) {
-  const [selectedYear, setSelectedYear] = useState('All Years');
   const [selectedSemester, setSelectedSemester] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [activePaper, setActivePaper] = useState(null);
@@ -628,7 +594,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
             No expected question papers found matching your criteria.
           </p>
           <button 
-            onClick={() => { setSelectedYear('All Years'); setSelectedSemester('All'); setSearchQuery(''); }}
+            onClick={() => { setSelectedSemester('All'); setSearchQuery(''); }}
             className="btn-primary" 
             style={{ padding: '10px 24px' }}
           >
