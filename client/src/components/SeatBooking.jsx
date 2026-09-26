@@ -33,6 +33,7 @@ import {
   Play
 } from 'lucide-react';
 import { initialSubjects, initialLabManuals } from '../data/mockData';
+import { downloadPdf } from '../utils/pdfDownloadHelper';
 
 /* -------------------------------------------------------------------------
    ALL CURRICULUM SUBJECTS: HAND-CRAFTED MASTER NOTEBOOKS (SEMESTERS 1 - 8)
@@ -520,42 +521,9 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  // Robust PDF Downloader supporting Web Blob download with Fallbacks
+  // Robust Universal PDF Downloader (Native Android + Mobile Browser + Desktop)
   const handleDownloadPdf = async (url, downloadName) => {
-    if (!url || url === '#' || url === '') {
-      alert('This document is currently being finalized. Please check back shortly!');
-      return;
-    }
-    const safeName = downloadName || 'College_Notes_Document.pdf';
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('Fetch failed with status ' + res.status);
-      const blob = await res.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.setAttribute('download', safeName);
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 15000);
-    } catch (err) {
-      console.warn('Direct blob download error, triggering fallback:', err);
-      // Fallback: direct anchor trigger or window.open
-      try {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = safeName;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } catch (e) {
-        window.open(url, '_blank') || (window.location.href = url);
-      }
-    }
+    return downloadPdf(url, downloadName, downloadName);
   };
 
   const handleDownloadLab = (lab) => {
@@ -2084,10 +2052,14 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
                 type="button"
                 className="btn-outline"
                 onClick={() => {
-                  try {
-                    window.open(viewingPdf.url, '_blank') || window.open(viewingPdf.url, '_system');
-                  } catch (e) {
-                    window.location.href = viewingPdf.url;
+                  if (typeof window !== 'undefined' && window.AndroidDownloadBridge) {
+                    downloadPdf(viewingPdf.url, viewingPdf.downloadName, viewingPdf.title);
+                  } else {
+                    try {
+                      window.open(viewingPdf.url, '_blank') || window.open(viewingPdf.url, '_system');
+                    } catch (e) {
+                      window.location.href = viewingPdf.url;
+                    }
                   }
                 }}
                 style={{ padding: '7px 12px', fontSize: '0.8rem', gap: '6px' }}

@@ -23,6 +23,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { initialSubjects, academicYears } from '../data/mockData';
+import { downloadPdf } from '../utils/pdfDownloadHelper';
 
 /* -------------------------------------------------------------------------
    ACTIVE 5 CORE SUBJECTS (All other subject cards are inactive / dead)
@@ -196,17 +197,18 @@ export default function NowShowing({ onReadNotes }) {
               {(() => {
                 const pdf = getSubjectPdf(featuredSubject);
                 return (
-                  <a 
+                  <button 
+                    type="button"
                     className="btn-outline"
-                    href={pdf.url}
-                    download={pdf.name}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
-                    onClick={(e) => e.stopPropagation()}
+                    style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      downloadPdf(pdf.url, pdf.name, featuredSubject.name);
+                    }}
+                    title={`Download ${pdf.name}`}
                   >
                     <Download size={16} color="var(--neon-cyan)" /> Download Study Materials
-                  </a>
+                  </button>
                 );
               })()}
             </div>
@@ -394,25 +396,26 @@ export default function NowShowing({ onReadNotes }) {
                     {(() => {
                       const pdf = getSubjectPdf(sub);
                       return (
-                        <a 
+                        <button 
+                          type="button"
                           className="btn-outline" 
-                          href={pdf.url}
-                          download={pdf.name}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           style={{ 
                             padding: '8px 12px', 
                             fontSize: '0.82rem',
                             display: 'inline-flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            textDecoration: 'none'
+                            textDecoration: 'none',
+                            cursor: 'pointer'
                           }}
                           title={`Download ${pdf.name}`}
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            downloadPdf(pdf.url, pdf.name, sub.name);
+                          }}
                         >
                           <Download size={14} color="var(--neon-cyan)" />
-                        </a>
+                        </button>
                       );
                     })()}
                   </div>

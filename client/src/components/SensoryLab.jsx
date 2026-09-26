@@ -38,6 +38,7 @@ import {
   X 
 } from 'lucide-react';
 import { initialSubjects } from '../data/mockData';
+import { downloadPdf } from '../utils/pdfDownloadHelper';
 import { beeeUnitsData, beeeSubjectDetails } from '../data/beeeNotesData';
 import { aimlUnitsData, aimlSubjectDetails } from '../data/aimlNotesData';
 import { math1UnitsData, math1SubjectDetails } from '../data/math1NotesData';
@@ -1737,11 +1738,12 @@ export default function SensoryLab({
           </button>
 
           {/* 📥 1-Click Master Notes PDF Download */}
-          <a
-            href={getSubjectMasterPdf().url}
-            download={getSubjectMasterPdf().name}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => {
+              const pdf = getSubjectMasterPdf();
+              downloadPdf(pdf.url, pdf.name, activeSubject?.name);
+            }}
             className="btn-outline"
             style={{
               borderColor: '#38bdf8',
@@ -1754,12 +1756,13 @@ export default function SensoryLab({
               textDecoration: 'none',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px'
+              gap: '6px',
+              cursor: 'pointer'
             }}
             title={`Download Master Notes PDF for ${activeSubject.name}`}
           >
             <Download size={15} /> Download PDF
-          </a>
+          </button>
 
           {/* ⚡ 1-Click Formula & Theorem Cheat-Sheet Modal */}
           <button 

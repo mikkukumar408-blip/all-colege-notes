@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { initialShortNotes } from '../data/mockData';
 import { examRevisionNotes } from '../data/examRevisionNotesData';
+import { downloadPdf } from '../utils/pdfDownloadHelper';
 import { logUserActivity } from '../utils/activityTracker';
 import { MathFormula, MathText } from '../utils/mathRenderer';
 import { triggerUniversalPrint } from '../utils/printHelper';
@@ -567,17 +568,16 @@ export default function Theaters({ currentUser, initialSubject }) {
                       <BookOpen size={16} /> 📖 Read Exam Revision Notes
                     </button>
 
-                    <a
-                      href={item.pdfUrl === '#' ? undefined : item.pdfUrl}
-                      target={item.pdfUrl === '#' ? undefined : "_blank"}
-                      download={item.pdfUrl === '#' ? undefined : item.downloadName}
+                    <button
+                      type="button"
                       className="btn-outline"
                       onClick={() => {
-                        if (item.pdfUrl === '#') {
+                        if (item.pdfUrl === '#' || !item.pdfUrl) {
                           setSelectedRevisionNote(item);
                           setActiveModalUnit(item.units && item.units.length > 0 ? item.units[0].unitNum : 'overview');
                         } else {
                           handleDownloadClick(item, true);
+                          downloadPdf(item.pdfUrl, item.downloadName, item.subject);
                         }
                       }}
                       style={{ 
@@ -588,12 +588,13 @@ export default function Theaters({ currentUser, initialSubject }) {
                         gap: '6px',
                         textDecoration: 'none',
                         display: 'inline-flex',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        cursor: 'pointer'
                       }}
                       title="Download PDF Package or Read Online"
                     >
                       <Download size={15} /> Download PDF
-                    </a>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -703,15 +704,12 @@ export default function Theaters({ currentUser, initialSubject }) {
                     >
                       <Eye size={16} /> Open &amp; Review PDF
                     </a>
-                    <a 
-                      href={item.isDead || item.code === 'CS301' ? undefined : item.pdfUrl}
-                      download={item.isDead || item.code === 'CS301' ? undefined : item.downloadName}
-                      onClick={(e) => {
-                        if (item.isDead || item.code === 'CS301') {
-                          e.preventDefault();
-                          return;
-                        }
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        if (item.isDead || item.code === 'CS301') return;
                         handleDownloadClick(item);
+                        downloadPdf(item.pdfUrl, item.downloadName, item.subject);
                       }}
                       className={item.isDead || item.code === 'CS301' ? "btn-secondary" : "btn-primary"} 
                       style={{ 
@@ -729,7 +727,7 @@ export default function Theaters({ currentUser, initialSubject }) {
                       title={item.isDead || item.code === 'CS301' ? 'Under Preparation' : 'Download Short Notes'}
                     >
                       <Download size={16} /> Download Short Notes
-                    </a>
+                    </button>
                   </div>
                 </div>
               ))}
