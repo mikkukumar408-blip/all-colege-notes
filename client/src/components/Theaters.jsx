@@ -69,13 +69,6 @@ const YEAR_CONFIG = {
       { id: 'Semester 5', num: 5, title: 'Semester 5', subtitle: 'Computer Networks & Full Stack Web Development' },
       { id: 'Semester 6', num: 6, title: 'Semester 6', subtitle: 'Software Engineering & Artificial Intelligence' }
     ]
-  },
-  '4th Year': {
-    label: '4th Year',
-    semesters: [
-      { id: 'Semester 7', num: 7, title: 'Semester 7', subtitle: 'Cloud Computing & Distributed Systems' },
-      { id: 'Semester 8', num: 8, title: 'Semester 8', subtitle: 'DevOps Engineering & CI/CD Pipelines' }
-    ]
   }
 };
 
@@ -129,6 +122,9 @@ export default function Theaters({ currentUser, initialSubject }) {
 
   // ─── Filter Balanced Exam Revision Notes ─────────────────────────────────
   const filteredRevisionNotes = revisionNotes.filter(item => {
+    // Hide empty placeholder cards that have no units and no valid PDF
+    if ((!item.units || item.units.length === 0) && (!item.pdfUrl || item.pdfUrl === '#')) return false;
+
     const q = searchQuery.toLowerCase().trim();
     const matchesSearch = !q ||
       item.subject.toLowerCase().includes(q) ||
@@ -677,7 +673,7 @@ export default function Theaters({ currentUser, initialSubject }) {
 
                     <div style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                       <Award size={14} color="var(--neon-amber)" />
-                      <span>Verified Downloads: <strong style={{ color: '#fff' }}>{item.downloads.toLocaleString()} Students</strong></span>
+                      <span>Curriculum: <strong style={{ color: 'var(--neon-cyan)' }}>100% MMEC Syllabus Mapped</strong> • Exam Ready</span>
                     </div>
                   </div>
 

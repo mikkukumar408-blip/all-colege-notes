@@ -604,7 +604,7 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
             {/* Filter Toolbar: Semester Tabs + Search */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', flexWrap: 'wrap', gap: '12px' }}>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                {['All', '1', '2', '3', '4'].map(sem => {
+                {['All', '1', '2', '3'].map(sem => {
                   const isSelected = labSemFilter === sem;
                   const count = sem === 'All'
                     ? labManuals.length
@@ -2090,19 +2090,82 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
             </div>
           </div>
 
-          {/* Reader Body / Embedded Frame */}
-          <div style={{ flex: '1 1 0%', position: 'relative', background: '#0a0f1d', overflow: 'hidden' }}>
-            <iframe
-              src={viewingPdf.url}
-              title={viewingPdf.title}
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none',
-                display: 'block',
-                background: '#0a0f1d'
-              }}
-            />
+          {/* Reader Body / Embedded Frame (Desktop) vs Native Mobile Reader Card */}
+          <div style={{ flex: '1 1 0%', position: 'relative', background: '#0a0f1d', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            {typeof window !== 'undefined' && (window.innerWidth <= 768 || (typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent))) ? (
+              <div style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '24px',
+                textAlign: 'center',
+                gap: '18px',
+                background: 'radial-gradient(circle at center, rgba(14, 24, 48, 0.9) 0%, #07090e 100%)'
+              }}>
+                <div style={{
+                  width: '68px',
+                  height: '68px',
+                  borderRadius: '20px',
+                  background: 'rgba(0, 240, 255, 0.12)',
+                  border: '1.5px solid rgba(0, 240, 255, 0.35)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 0 25px rgba(0, 240, 255, 0.25)'
+                }}>
+                  <FileText size={34} color="var(--neon-cyan)" />
+                </div>
+
+                <div style={{ maxWidth: '340px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginBottom: '8px' }}>
+                    <span className="badge-neon" style={{ fontSize: '0.72rem' }}>{viewingPdf.code || 'VERIFIED MANUAL'}</span>
+                    {viewingPdf.pages && <span className="badge-amber" style={{ fontSize: '0.72rem' }}>{viewingPdf.pages}</span>}
+                  </div>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 900, color: '#fff', margin: '0 0 8px 0', lineHeight: 1.3 }}>
+                    {viewingPdf.title}
+                  </h3>
+                  <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                    Open directly in your device's native PDF reader (Google Drive, Adobe Acrobat, Files) or save to phone storage.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '300px' }}>
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={() => {
+                      downloadPdf(viewingPdf.url, viewingPdf.downloadName, viewingPdf.title);
+                    }}
+                    style={{ justifyContent: 'center', padding: '12px 18px', fontSize: '0.92rem', gap: '8px', boxShadow: '0 0 20px rgba(0, 240, 255, 0.4)' }}
+                  >
+                    <BookOpen size={18} /> Open &amp; Read Full PDF
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn-outline"
+                    onClick={() => handleDownloadPdf(viewingPdf.url, viewingPdf.downloadName)}
+                    style={{ justifyContent: 'center', padding: '11px 18px', fontSize: '0.88rem', gap: '8px' }}
+                  >
+                    <DownloadCloud size={16} /> Save to Device Downloads
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <iframe
+                src={viewingPdf.url}
+                title={viewingPdf.title}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                  display: 'block',
+                  background: '#0a0f1d'
+                }}
+              />
+            )}
           </div>
 
           {/* Mobile Helper Sub-bar */}
