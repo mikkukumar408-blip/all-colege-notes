@@ -653,6 +653,12 @@ function formatNoteContent(content, activeRecallMode = false) {
   html = html.replace(/\\sin\b/g, 'sin');
   html = html.replace(/\\cos\b/g, 'cos');
 
+  // Pre-clean 0D: Repair corrupted JS string escaped thin spaces (e.g. ",\text{" -> "~\text{", ",\Omega" -> "~\Omega")
+  html = html.replace(/,\s*\\*text\{/g, '~\\text{');
+  html = html.replace(/,\s*\\*(?:Omega|Ω)\b/g, '~\\Omega');
+  html = html.replace(/(\d+(?:\.\d+)?)\s*,\s*(V|A|W|Ω|Hz|mA|kV|mV|μA|pF|μF|nF|F|H|mH|kΩ|MΩ)\b/g, '$1 $2');
+  html = html.replace(/\bRL\s*=\s*(\d+(?:\.\d+)?)\s*(?:\\,|,\s*)?(?:\\Omega|Ω)?/g, '$R_L = $1\\,\\Omega$');
+
   // Step 0 (PRE-PASS): Extract triple-backtick code blocks FIRST before any other processing,
   // clean any embedded math notation inside them, and replace with unique placeholders.
   const codeBlocks = [];
@@ -938,12 +944,40 @@ function formatNoteContent(content, activeRecallMode = false) {
         .replace(/\by_2\b/g, 'y₂')
         .replace(/\bR_1\b/g, 'R₁')
         .replace(/\bR_2\b/g, 'R₂')
+        .replace(/\bR_3\b/g, 'R₃')
         .replace(/\bV_1\b/g, 'V₁')
         .replace(/\bV_2\b/g, 'V₂')
+        .replace(/\bV_3\b/g, 'V₃')
         .replace(/\bI_1\b/g, 'I₁')
         .replace(/\bI_2\b/g, 'I₂')
+        .replace(/\bI_3\b/g, 'I₃')
         .replace(/\bS_1\b/g, 'S₁')
         .replace(/\bS_2\b/g, 'S₂')
+        .replace(/\bR_se\b/g, 'Rₛₑ')
+        .replace(/\bR_L\b/g, 'Rₗ')
+        .replace(/\bV_L\b/g, 'Vₗ')
+        .replace(/\bI_L\b/g, 'Iₗ')
+        .replace(/\bP_L\b/g, 'Pₗ')
+        .replace(/\bR_th\b/g, 'Rₜₕ')
+        .replace(/\bV_th\b/g, 'Vₜₕ')
+        .replace(/\bR_eq\b/g, 'Rₑᵩ')
+        .replace(/\bR_p\b/g, 'Rₚ')
+        .replace(/\bR_s\b/g, 'Rₛ')
+        .replace(/\bI_s\b/g, 'Iₛ')
+        .replace(/\bV_s\b/g, 'Vₛ')
+        .replace(/\bR_a\b/g, 'Rₐ')
+        .replace(/\bR_b\b/g, 'Rᵦ')
+        .replace(/\bR_c\b/g, 'R꜀')
+        .replace(/\bI_a\b/g, 'Iₐ')
+        .replace(/\bE_b\b/g, 'Eᵦ')
+        .replace(/\bV_m\b/g, 'Vₘ')
+        .replace(/\bV_rms\b/g, 'Vᵣₘₛ')
+        .replace(/\bV_dc\b/g, 'Vdc')
+        .replace(/\bP_max\b/gi, 'Pₘₐₓ')
+        .replace(/\bI_sc\b/g, 'Iₛ꜀')
+        .replace(/\bV_oc\b/g, 'Vₒ꜀')
+        .replace(/\bI_in\b/g, 'Iᵢₙ')
+        .replace(/\bI_out\b/g, 'Iₒᵤₜ')
         // Purge any stray \left and \right outside KaTeX (never let literal "left" or "right" leak)
         .replace(/\\*left\s*([(\[{])/gi, '$1')
         .replace(/\\*right\s*([)\]}])/gi, '$1')

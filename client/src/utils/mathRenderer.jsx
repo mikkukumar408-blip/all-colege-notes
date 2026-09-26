@@ -59,6 +59,8 @@ export function renderKaTeXSafe(rawFormula, isDisplay = false) {
   clean = clean.replace(/⬆rac/g, '\\frac');
 
   // Auto-repair broken escaped tokens
+  clean = clean.replace(/,\s*\\*text\{/g, '\\,\\text{');
+  clean = clean.replace(/,\s*\\*(?:Omega|Ω)\b/g, '\\,\\Omega');
   clean = clean.replace(/(?<=\d|\s|^|[,\(\[])ext\{/g, '\\text{');
   clean = clean.replace(/(?<=\d|\s|^|[,\(\[])imes\b/g, '\\times');
   clean = clean.replace(/\\sin\s+heta/g, '\\sin\\theta');
@@ -175,8 +177,10 @@ export function formatMathText(text) {
   html = html.replace(/\\sin\s*\(?heta\)?/g, '\\sin\\theta');
   html = html.replace(/\\cos\s*\(?heta\)?/g, '\\cos\\theta');
 
-  // Convert raw \text{ ... } units in text (like "1.667 \text{ A}") to clean text "1.667 A"
-  html = html.replace(/\\text\{\s*([^{}]+)\s*\}/g, '$1');
+  // Pre-clean comma corruptions and escaped tokens
+  html = html.replace(/,\s*\\*text\{/g, '\\,\\text{');
+  html = html.replace(/,\s*\\*(?:Omega|Ω)\b/g, '\\,\\Omega');
+  html = html.replace(/\bRL\s*=\s*(\d+(?:\.\d+)?)\s*(?:\\,|,\s*)?(?:\\Omega|Ω)?/g, '$R_L = $1\\,\\Omega$');
 
   const mathBlocks = [];
 
@@ -274,6 +278,9 @@ export function formatMathText(text) {
   html = html.replace(/\\(eta|gamma|Delta|Omega|alpha|beta|theta|phi|psi|lambda|mu|pi|sigma|omega|tau|epsilon|cdot|times|approx|ne|neq|le|ge|pm|infty|parallel|to|implies|iff)\b/g, (match) => {
     return addBlock(match, false);
   });
+
+  // Convert any remaining raw \text{ ... } units in text (like "1.667 \text{ A}") to clean text "1.667 A"
+  html = html.replace(/\\text\{\s*([^{}]+)\s*\}/g, '$1');
 
   // 13. Clean up any stray thin spaces \, outside of math
   html = html.replace(/\\,/g, ' ');

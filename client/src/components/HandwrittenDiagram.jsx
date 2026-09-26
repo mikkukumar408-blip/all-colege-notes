@@ -162,7 +162,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               <text x="275" y="156" fill="#ef4444" fontSize="11" fontWeight="bold" textAnchor="end">I4 (Leaving)</text>
               <rect x="25" y="176" width="270" height="34" rx="6" fill={colors.badgeGreenBg} stroke={colors.badgeGreenBorder} strokeWidth="1" />
               <text x="160" y="198" fill={colors.badgeGreenText} textAnchor="middle" fontSize="12" fontWeight="bold">
-                Σ I_in = Σ I_out ⇒ I1 + I2 = I3 + I4
+                Σ Iᵢₙ = Σ Iₒᵤₜ ⇒ I1 + I2 = I3 + I4
               </text>
             </g>
             <g transform="translate(390, 15)">
@@ -433,7 +433,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               <line x1="225" y1="110" x2="225" y2="85" stroke={colors.resistor} strokeWidth="1" strokeDasharray="2 2" />
               <text x="225" y="125" fill={colors.resistor} textAnchor="middle" fontSize="10" fontWeight="bold">Vγ=0.7V (Si)</text>
               <path d="M 160 110 L 70 113 Q 55 115 50 145 L 45 180" fill="none" stroke="#ef4444" strokeWidth="2.5" />
-              <text x="50" y="140" fill="#ef4444" fontSize="9" fontWeight="bold">V_BR (Zener)</text>
+              <text x="50" y="140" fill="#ef4444" fontSize="9" fontWeight="bold">Vz (Breakdown)</text>
               <rect x="20" y="174" width="280" height="24" rx="5" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
               <text x="160" y="190" fill={colors.badgeAmberText} textAnchor="middle" fontSize="11" fontWeight="bold">
                 Knee Voltage: Si = 0.7V | Ge = 0.3V
@@ -837,7 +837,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             <rect x="530" y="45" width="180" height="135" rx="10" fill="rgba(16, 185, 129, 0.1)" stroke={colors.source} strokeWidth="2" />
             <text x="620" y="75" fill={colors.source} textAnchor="middle" fontSize="13" fontWeight="900">NORMAL FORM</text>
             <rect x="560" y="90" width="55" height="40" rx="4" fill={colors.source} fillOpacity="0.2" stroke={colors.source} strokeWidth="1.5" />
-            <text x="587" y="115" fill={colors.source} textAnchor="middle" fontSize="14" fontWeight="bold">I_r</text>
+            <text x="587" y="115" fill={colors.source} textAnchor="middle" fontSize="14" fontWeight="bold">Iᵣ</text>
             <text x="655" y="115" fill={colors.subtext} textAnchor="middle" fontSize="14">0</text>
             <text x="587" y="150" fill={colors.subtext} textAnchor="middle" fontSize="14">0</text>
             <text x="655" y="150" fill={colors.subtext} textAnchor="middle" fontSize="14">0</text>
@@ -845,7 +845,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             {/* Rank Result Ribbon */}
             <rect x="220" y="195" width="300" height="28" rx="14" fill={colors.source} fillOpacity="0.15" stroke={colors.source} strokeWidth="1.5" />
             <text x="370" y="214" fill={colors.source} textAnchor="middle" fontSize="12" fontWeight="bold">
-              ★ RANK: ρ(A) = r (Order of Non-Zero Identity Block I_r)
+              ★ RANK: ρ(A) = r (Order of Non-Zero Identity Block Iᵣ)
             </text>
           </svg>
         </div>
@@ -865,7 +865,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             {/* Step 1: Input */}
             <rect x="30" y="40" width="140" height="65" rx="8" fill="rgba(0, 240, 255, 0.08)" stroke={colors.wire} strokeWidth="2" />
             <text x="100" y="65" fill={colors.wire} textAnchor="middle" fontSize="12" fontWeight="bold">STEP 1: AUGMENT</text>
-            <text x="100" y="85" fill={colors.text} textAnchor="middle" fontSize="13" fontWeight="bold">[ A | I_n ]</text>
+            <text x="100" y="85" fill={colors.text} textAnchor="middle" fontSize="13" fontWeight="bold">[ A | Iₙ ]</text>
             <text x="100" y="98" fill={colors.subtext} textAnchor="middle" fontSize="9">Size: n × 2n</text>
 
             {/* Arrow 1 */}
@@ -895,7 +895,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             {/* Step 4: Output */}
             <rect x="610" y="35" width="105" height="75" rx="10" fill="rgba(16, 185, 129, 0.15)" stroke={colors.source} strokeWidth="2.5" />
             <text x="662" y="60" fill={colors.source} textAnchor="middle" fontSize="11" fontWeight="bold">STEP 4</text>
-            <text x="662" y="80" fill={colors.source} textAnchor="middle" fontSize="14" fontWeight="900">[ I_n | A⁻¹ ]</text>
+            <text x="662" y="80" fill={colors.source} textAnchor="middle" fontSize="14" fontWeight="900">[ Iₙ | A⁻¹ ]</text>
             <text x="662" y="98" fill={colors.source} textAnchor="middle" fontSize="10" fontWeight="bold">Inverse Found!</text>
 
             {/* Bottom Row: Detailed Example Matrix Partition Visual */}
@@ -1142,11 +1142,11 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               
               <rect x="15" y="42" width="220" height="50" rx="6" fill="rgba(245, 158, 11, 0.08)" stroke={colors.border} strokeWidth="1" />
               <text x="25" y="60" fill={colors.highlight} fontSize="10" fontWeight="bold">Lagrange's Form:</text>
-              <text x="25" y="80" fill={colors.text} fontSize="10">R_n = [hⁿ / n!] · fⁿ(a + θh)</text>
+              <text x="25" y="80" fill={colors.text} fontSize="10">Rₙ = [hⁿ / n!] · fⁿ(a + θh)</text>
 
               <rect x="15" y="102" width="220" height="50" rx="6" fill="rgba(0, 240, 255, 0.08)" stroke={colors.border} strokeWidth="1" />
               <text x="25" y="120" fill={colors.wire} fontSize="10" fontWeight="bold">Cauchy's Form:</text>
-              <text x="25" y="140" fill={colors.text} fontSize="10">R_n = [hⁿ(1−θ)ⁿ⁻¹ / (n−1)!] · fⁿ(a + θh)</text>
+              <text x="25" y="140" fill={colors.text} fontSize="10">Rₙ = [hⁿ(1−θ)ⁿ⁻¹ / (n−1)!] · fⁿ(a + θh)</text>
             </g>
           </svg>
         </div>
@@ -1342,7 +1342,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
 
               <rect x="15" y="100" width="280" height="52" rx="6" fill="rgba(236, 72, 153, 0.1)" stroke={colors.highlight} strokeWidth="1" />
               <text x="25" y="118" fill={colors.highlight} fontSize="11" fontWeight="bold">2nd Order Extension:</text>
-              <text x="25" y="138" fill={colors.text} fontSize="11" fontWeight="bold">x²u_xx + 2xy u_xy + y²u_yy = n(n−1) u</text>
+              <text x="25" y="138" fill={colors.text} fontSize="11" fontWeight="bold">x²uₓₓ + 2xy uₓᵧ + y²uᵧᵧ = n(n−1) u</text>
             </g>
           </svg>
         </div>
@@ -1413,7 +1413,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               {/* Determinant Box */}
               <rect x="20" y="125" width="270" height="42" rx="6" fill={colors.bg} stroke={colors.border} strokeWidth="1" />
               <text x="155" y="150" fill={colors.highlight} textAnchor="middle" fontSize="11" fontWeight="bold">
-                J = ∂(u, v) / ∂(x, y) = u_x · v_y − u_y · v_x
+                J = ∂(u, v) / ∂(x, y) = uₓ · vᵧ − uᵧ · vₓ
               </text>
             </g>
           </svg>
@@ -1499,9 +1499,9 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
           <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 250" className="handwritten-svg">
             <rect x="10" y="10" width="720" height="230" rx="14" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
             
-            {/* Root: Infinite Series sum(u_n) */}
+            {/* Root: Infinite Series sum(uₙ) */}
             <rect x="250" y="25" width="240" height="42" rx="8" fill="rgba(0, 240, 255, 0.1)" stroke={colors.wire} strokeWidth="2" />
-            <text x="370" y="51" fill={colors.wire} textAnchor="middle" fontSize="13" fontWeight="bold">GIVEN SERIES: Σ u_n</text>
+            <text x="370" y="51" fill={colors.wire} textAnchor="middle" fontSize="13" fontWeight="bold">GIVEN SERIES: Σ uₙ</text>
 
             {/* Test 1: n-th term limit */}
             <line x1="300" y1="67" x2="150" y2="95" stroke={colors.text} strokeWidth="1.5" />
@@ -1509,12 +1509,12 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
 
             {/* Left: Divergence Test */}
             <rect x="60" y="95" width="180" height="48" rx="8" fill="rgba(239, 68, 68, 0.1)" stroke={colors.highlight} strokeWidth="1.5" />
-            <text x="150" y="115" fill={colors.highlight} textAnchor="middle" fontSize="11" fontWeight="bold">lim (u_n) ≠ 0</text>
+            <text x="150" y="115" fill={colors.highlight} textAnchor="middle" fontSize="11" fontWeight="bold">lim (uₙ) ≠ 0</text>
             <text x="150" y="132" fill={colors.highlight} textAnchor="middle" fontSize="12" fontWeight="900">DIVERGES IMMEDIATELY!</text>
 
-            {/* Right: lim u_n = 0 */}
+            {/* Right: lim uₙ = 0 */}
             <rect x="420" y="95" width="200" height="40" rx="8" fill="rgba(16, 185, 129, 0.1)" stroke={colors.source} strokeWidth="1.5" />
-            <text x="520" y="120" fill={colors.source} textAnchor="middle" fontSize="11" fontWeight="bold">lim (u_n) = 0 (Apply specific test)</text>
+            <text x="520" y="120" fill={colors.source} textAnchor="middle" fontSize="11" fontWeight="bold">lim (uₙ) = 0 (Apply specific test)</text>
 
             {/* Split from specific test: Ratio vs Root vs p-Series */}
             <line x1="450" y1="135" x2="330" y2="165" stroke={colors.source} strokeWidth="1.5" />
@@ -1524,13 +1524,13 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             {/* Ratio Test */}
             <rect x="240" y="165" width="165" height="60" rx="6" fill={colors.bg} stroke={colors.resistor} strokeWidth="1.5" />
             <text x="322" y="185" fill={colors.resistor} textAnchor="middle" fontSize="11" fontWeight="bold">D'Alembert Ratio Test:</text>
-            <text x="322" y="200" fill={colors.text} textAnchor="middle" fontSize="10">lim |u_n+1 / u_n| = L</text>
+            <text x="322" y="200" fill={colors.text} textAnchor="middle" fontSize="10">lim |uₙ₊₁ / uₙ| = L</text>
             <text x="322" y="215" fill={colors.source} textAnchor="middle" fontSize="9" fontWeight="bold">L&lt;1 Conv | L&gt;1 Div</text>
 
             {/* Root Test */}
             <rect x="420" y="165" width="165" height="60" rx="6" fill={colors.bg} stroke={colors.secondary} strokeWidth="1.5" />
             <text x="502" y="185" fill={colors.secondary} textAnchor="middle" fontSize="11" fontWeight="bold">Cauchy's Root Test:</text>
-            <text x="502" y="200" fill={colors.text} textAnchor="middle" fontSize="10">lim (u_n)^(1/n) = L</text>
+            <text x="502" y="200" fill={colors.text} textAnchor="middle" fontSize="10">lim (uₙ)^(1/n) = L</text>
             <text x="502" y="215" fill={colors.source} textAnchor="middle" fontSize="9" fontWeight="bold">L&lt;1 Conv | L&gt;1 Div</text>
 
             {/* p-Series Test */}
@@ -1575,7 +1575,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               <text x="170" y="60" fill={colors.highlight} textAnchor="middle" fontSize="9">S₃</text>
 
               <text x="165" y="172" fill={colors.text} textAnchor="middle" fontSize="10">
-                1. u_n+1 ≤ u_n (Monotonic) & 2. lim u_n = 0 ⟹ CONVERGES!
+                1. uₙ₊₁ ≤ uₙ (Monotonic) & 2. lim uₙ = 0 ⟹ CONVERGES!
               </text>
             </g>
 
@@ -1586,11 +1586,11 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
 
               <rect x="20" y="45" width="290" height="52" rx="6" fill="rgba(16, 185, 129, 0.1)" stroke={colors.source} strokeWidth="1" />
               <text x="30" y="66" fill={colors.source} fontSize="11" fontWeight="bold">ABSOLUTE CONVERGENCE (Strongest):</text>
-              <text x="30" y="85" fill={colors.text} fontSize="10">Both Σ u_n and Σ |u_n| converge (e.g. Σ (-1)ⁿ/n²)</text>
+              <text x="30" y="85" fill={colors.text} fontSize="10">Both Σ uₙ and Σ |uₙ| converge (e.g. Σ (-1)ⁿ/n²)</text>
 
               <rect x="20" y="110" width="290" height="52" rx="6" fill="rgba(245, 158, 11, 0.1)" stroke={colors.resistor} strokeWidth="1" />
               <text x="30" y="131" fill={colors.resistor} fontSize="11" fontWeight="bold">CONDITIONAL CONVERGENCE:</text>
-              <text x="30" y="150" fill={colors.text} fontSize="10">Σ u_n converges, but Σ |u_n| diverges (e.g. Σ (-1)ⁿ/n)</text>
+              <text x="30" y="150" fill={colors.text} fontSize="10">Σ uₙ converges, but Σ |uₙ| diverges (e.g. Σ (-1)ⁿ/n)</text>
             </g>
           </svg>
         </div>
