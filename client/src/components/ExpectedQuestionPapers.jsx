@@ -57,7 +57,7 @@ export const EXAM_TYPES = {
     name: 'Sessional Exam - I',
     shortTitle: 'Sessional-I (Mid-Term)',
     paperTitle: 'B.Tech. SESSIONAL EXAMINATION - I (MID-TERM), 2026',
-    dateBadge: '🔥 Happening This 28th–30th',
+    dateBadge: '🔥 Mid-Term Exam 1',
     syllabusTag: 'Unit - I & Unit - II Only',
     unitsAllowed: ['Unit 1', 'Unit 2', 'UNIT I', 'UNIT II'],
     allowedUnitNumbers: ['UNIT I', 'UNIT II'],
@@ -70,7 +70,7 @@ export const EXAM_TYPES = {
     color: '#f59e0b',
     border: 'rgba(245, 158, 11, 0.45)',
     bg: 'rgba(245, 158, 11, 0.12)',
-    description: 'Scheduled on Sept 28th – 30th. Strictly covers Unit-I & Unit-II syllabus.'
+    description: 'Official Mid-Term Sessional Examination. Strictly covers Unit-I & Unit-II syllabus.'
   },
   'sessional-2': {
     id: 'sessional-2',
@@ -1027,7 +1027,7 @@ export default function ExpectedQuestionPapers({ currentUser }) {
                   fontWeight: 800,
                   letterSpacing: '0.04em'
                 }}>
-                  ⚡ SYLLABUS: {activePaper.syllabusTag?.toUpperCase()} {activePaper.examType === 'sessional-1' ? '• DATES: 28th – 30th' : ''}
+                  ⚡ SYLLABUS: {activePaper.syllabusTag?.toUpperCase()}
                 </div>
                 <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--neon-cyan)', marginTop: '2px' }}>
                   {activePaper.code} : {activePaper.subject.toUpperCase()}
