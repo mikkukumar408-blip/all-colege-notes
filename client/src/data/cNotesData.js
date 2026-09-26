@@ -259,7 +259,7 @@ while(n > 0) { rem = n % 10; sum += rem; n /= 10; }
 3. Decision Branches:
    - If $D > 0$: Real & Distinct roots: $r_1 = \\frac{-b + \sqrt{D}}{2a}, r_2 = \\frac{-b - \sqrt{D}}{2a}$.
    - If $D = 0$: Real & Equal roots: $r_1 = r_2 = \\frac{-b}{2a}$.
-   - If $D < 0$: Complex Conjugate roots: $	ext{Real} = \\frac{-b}{2a}, 	ext{Imag} = \\frac{\sqrt{-D}}{2a}$. Output: $	ext{Real} ± i·	ext{Imag}$.
+   - If $D < 0$: Complex Conjugate roots: $	\text{Real} = \\frac{-b}{2a}, 	\text{Imag} = \\frac{\sqrt{-D}}{2a}$. Output: $	\text{Real} ± i·	\text{Imag}$.
 
 \`\`\`c
 #include <stdio.h>
@@ -307,8 +307,8 @@ Tokens are the atomic lexical units recognized by the C compiler. They comprise:
 | **unsigned char** | 1 Byte | \`%c\`, \`%u\` | 0 to 255 | Pure binary magnitude |
 | **int** | 4 Bytes (32 bits) | \`%d\`, \`%i\` | -2,147,483,648 to 2,147,483,647 | Signed 2's Complement |
 | **unsigned int** | 4 Bytes | \`%u\` | 0 to 4,294,967,295 | Pure binary magnitude |
-| **float** | 4 Bytes | \`%f\` | $\\approx 3.4	imes 10^{-38}$ to $3.4	imes 10^{38}$ (6 decimals) | IEEE 754 Single Precision |
-| **double** | 8 Bytes | \`%lf\` | $\\approx 1.7	imes 10^{-308}$ to $1.7	imes 10^{308}$ (15 decimals) | IEEE 754 Double Precision |
+| **float** | 4 Bytes | \`%f\` | $\\approx 3.4	\times 10^{-38}$ to $3.4	\times 10^{38}$ (6 decimals) | IEEE 754 Single Precision |
+| **double** | 8 Bytes | \`%lf\` | $\\approx 1.7	\times 10^{-308}$ to $1.7	\times 10^{308}$ (15 decimals) | IEEE 754 Double Precision |
 | **void*** | 4 / 8 Bytes | \`%p\` | Valid Virtual Memory Addresses | Unsigned Hexadecimal |`
       },
       {
@@ -439,7 +439,7 @@ Under ANSI C rules for logical \`&&\`, if the left operand evaluates to \`0\` (f
 ---
 
 #### Question 18 (4 Marks): Nested Loop Matrix Multiplication
-**Question:** Explain the 3-tier nested loop structure required for multiplying matrices $A_{M 	imes K}$ and $B_{K 	imes N}$.
+**Question:** Explain the 3-tier nested loop structure required for multiplying matrices $A_{M 	\times K}$ and $B_{K 	\times N}$.
 
 **Step-by-Step Solution:**
 \`\`\`
@@ -460,7 +460,7 @@ void multiplyMatrices(int A[2][2], int B[2][2], int C[2][2]) {
     }
 }
 \`\`\`
-**Complexity:** Executes $M 	imes N 	imes K$ times, yielding time complexity $O(M · N · K)$ ($O(N^3)$ for square matrices).`
+**Complexity:** Executes $M 	\times N 	\times K$ times, yielding time complexity $O(M · N · K)$ ($O(N^3)$ for square matrices).`
       }
     ]
   },

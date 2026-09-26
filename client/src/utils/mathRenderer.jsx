@@ -3,21 +3,21 @@
    =========================================================================
    Converts raw LaTeX formulas, pseudo-math strings, derivations, and mixed
    notes text into crisp, authentic KaTeX mathematical typesetting.
+   Eliminates all raw symbols (^, _, $, {, }, \, etc.) from student view.
    ========================================================================= */
 
 import React from 'react';
 import katex from 'katex';
 
 // High-Performance In-Memory String Caches (Eliminates repeated KaTeX parsing & regex executions)
-const MAX_CACHE_SIZE = 2500;
+const MAX_CACHE_SIZE = 3000;
 const formulaCache = new Map();
 const textCache = new Map();
 
 function setCacheEntry(cache, key, value) {
   if (cache.size >= MAX_CACHE_SIZE) {
-    // Evict oldest 500 entries to prevent memory buildup
     const it = cache.keys();
-    for (let i = 0; i < 500; i++) {
+    for (let i = 0; i < 600; i++) {
       const nextKey = it.next().value;
       if (nextKey !== undefined) cache.delete(nextKey);
       else break;
@@ -58,13 +58,20 @@ export function renderKaTeXSafe(rawFormula, isDisplay = false) {
   clean = clean.replace(/\x0b/g, ' ');
   clean = clean.replace(/⬆rac/g, '\\frac');
 
+  // Auto-repair broken escaped tokens
+  clean = clean.replace(/(?<=\d|\s|^|[,\(\[])ext\{/g, '\\text{');
+  clean = clean.replace(/(?<=\d|\s|^|[,\(\[])imes\b/g, '\\times');
+  clean = clean.replace(/\\sin\s+heta/g, '\\sin\\theta');
+  clean = clean.replace(/\\cos\s+heta/g, '\\cos\\theta');
+  clean = clean.replace(/d\s*heta/g, 'd\\theta');
+
   // 2. Normalize double-escaped keywords (\\\\frac -> \\frac)
   clean = clean.replace(/\\\\([a-zA-Z]+)/g, '\\$1');
 
   // 3. Fix missing backslashes on common mathematical symbols & operators
   clean = clean.replace(/(?<!\\)\b(cos|sin|tan|sec|csc|cot|sinh|cosh|tanh|ln|log|lim|rho|theta|lambda|mu|pi|sigma|omega|phi|psi|Delta|nabla|partial|implies|iff|pm|le|ge|ne|neq|times|cdot|approx|kappa|Gamma|alpha|beta|eta)\b/g, '\\$1');
 
-  // 4. Common variable conventions in engineering (Vth -> V_{th}, Rth -> R_{th}, RL -> R_L, Pmax -> P_{\max})
+  // 4. Common variable conventions in engineering
   clean = clean.replace(/\bVth\b/g, 'V_{th}');
   clean = clean.replace(/\bRth\b/g, 'R_{th}');
   clean = clean.replace(/\bRL\b/g, 'R_L');
@@ -81,7 +88,7 @@ export function renderKaTeXSafe(rawFormula, isDisplay = false) {
   clean = clean.replace(/=>/g, '\\implies ');
   clean = clean.replace(/·/g, '\\cdot ');
 
-  // 6. Fix simple square roots like \sqrt(L*C) or \sqrt(R^2 + ...) -> \sqrt{...}
+  // 6. Fix simple square roots like \sqrt(L*C) -> \sqrt{L*C}
   clean = clean.replace(/\\sqrt\(([^)]+)\)/g, '\\sqrt{$1}');
 
   try {
@@ -133,53 +140,13 @@ function extractBalancedBraces(str, startIndex) {
   return null;
 }
 
-function extractUnwrappedFractions(str, inlineMathBlocks) {
-  let s = str;
-  let safety = 0;
-  while (safety++ < 60) {
-    const idx = s.indexOf('\\frac{');
-    if (idx === -1) break;
-    const num = extractBalancedBraces(s, idx + 5);
-    if (!num) break;
-    const denStart = num.endIndex + 1;
-    if (s[denStart] !== '{') break;
-    const den = extractBalancedBraces(s, denStart);
-    if (!den) break;
-
-    const fullFrac = s.slice(idx, den.endIndex + 1);
-    const rendered = renderKaTeXSafe(fullFrac, false);
-    const placeholder = `\x00IM_${inlineMathBlocks.length}\x00`;
-    inlineMathBlocks.push(`<span class="katex-inline-wrapper">${rendered}</span>`);
-    s = s.slice(0, idx) + placeholder + s.slice(den.endIndex + 1);
-  }
-  return s;
-}
-
-function extractUnwrappedSqrt(str, inlineMathBlocks) {
-  let s = str;
-  let safety = 0;
-  while (safety++ < 60) {
-    const idx = s.indexOf('\\sqrt{');
-    if (idx === -1) break;
-    const body = extractBalancedBraces(s, idx + 5);
-    if (!body) break;
-
-    const fullSqrt = s.slice(idx, body.endIndex + 1);
-    const rendered = renderKaTeXSafe(fullSqrt, false);
-    const placeholder = `\x00IM_${inlineMathBlocks.length}\x00`;
-    inlineMathBlocks.push(`<span class="katex-inline-wrapper">${rendered}</span>`);
-    s = s.slice(0, idx) + placeholder + s.slice(body.endIndex + 1);
-  }
-  return s;
-}
-
 /**
  * Formats a block of text, detecting:
  * - $$display math$$
  * - $inline math$
  * - Unwrapped LaTeX expressions like \frac{...}{...}, \sqrt{...}, etc.
+ * - Subscripted variables like V_{dc}, V_{rms}, I_L, R_{th}, I_{ph}
  * - Bold markdown (**text**)
- * - Line breaks (\n or \\n)
  * - Numbered lists (1. , 2. ) with proper paragraph spacing
  */
 export function formatMathText(text) {
@@ -194,60 +161,113 @@ export function formatMathText(text) {
     .replace(/\\r\\n/g, '\n')
     // Convert literal \n when not a LaTeX command starting with \n
     .replace(/\\n(?!(?:abla|eq|e\b|eg\b|otin|u\b|atural|earrow|warrow|obreak|olimits|norm|normalsize|null|phantom|space))/g, '\n')
-    .replace(/\\t/g, ' ')
+    .replace(/\t/g, ' ')
+    // Protect \text, \times, \theta, \tau, \tan, \to from having \t stripped
+    .replace(/\\t(?!(?:ext|imes|heta|au|an|o\b|riangle|ilde))/g, ' ')
     .trim();
 
-  // 2. Extract $$...$$ display math blocks
-  const displayMathBlocks = [];
+  // 2. Auto-repair broken escaped tokens
+  html = html.replace(/(?<=\d|\s|^|[,\(\[])ext\{/g, '\\text{');
+  html = html.replace(/(?<=\d|\s|^|[,\(\[])imes\b/g, '\\times');
+  html = html.replace(/\\sin\s+heta/g, '\\sin\\theta');
+  html = html.replace(/\\cos\s+heta/g, '\\cos\\theta');
+  html = html.replace(/d\s*heta/g, 'd\\theta');
+  html = html.replace(/\\sin\s*\(?heta\)?/g, '\\sin\\theta');
+  html = html.replace(/\\cos\s*\(?heta\)?/g, '\\cos\\theta');
+
+  // Convert raw \text{ ... } units in text (like "1.667 \text{ A}") to clean text "1.667 A"
+  html = html.replace(/\\text\{\s*([^{}]+)\s*\}/g, '$1');
+
+  const mathBlocks = [];
+  function addBlock(rendered, isDisplay = false) {
+    const key = `\x00M_${mathBlocks.length}\x00`;
+    mathBlocks.push(isDisplay ? `<div class="katex-display-wrapper">${rendered}</div>` : `<span class="katex-inline-wrapper">${rendered}</span>`);
+    return key;
+  }
+
+  // 3. Extract $$...$$ display math blocks
   html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
-    const rendered = renderKaTeXSafe(math, true);
-    const placeholder = `\x00DM_${displayMathBlocks.length}\x00`;
-    displayMathBlocks.push(`<div class="katex-display-wrapper">${rendered}</div>`);
-    return placeholder;
+    return addBlock(renderKaTeXSafe(math, true), true);
   });
 
-  // 3. Extract $...$ inline math blocks
-  const inlineMathBlocks = [];
+  // 4. Extract $...$ inline math blocks
   html = html.replace(/\$([^\$\n]+?)\$/g, (_, math) => {
-    const rendered = renderKaTeXSafe(math, false);
-    const placeholder = `\x00IM_${inlineMathBlocks.length}\x00`;
-    inlineMathBlocks.push(`<span class="katex-inline-wrapper">${rendered}</span>`);
-    return placeholder;
+    return addBlock(renderKaTeXSafe(math, false), false);
   });
 
-  // 4. Extract unwrapped balanced-brace \frac{...}{...}
-  html = extractUnwrappedFractions(html, inlineMathBlocks);
+  // 5. Extract unwrapped \sqrt{...} with balanced braces FIRST (so nested \frac inside \sqrt renders as a single KaTeX unit)
+  let sqrtSafety = 0;
+  while (sqrtSafety++ < 40) {
+    const idx = html.indexOf('\\sqrt{');
+    if (idx === -1) break;
+    const body = extractBalancedBraces(html, idx + 5);
+    if (!body) break;
+    const fullSqrt = html.slice(idx, body.endIndex + 1);
+    const rendered = renderKaTeXSafe(fullSqrt, false);
+    html = html.slice(0, idx) + addBlock(rendered, false) + html.slice(body.endIndex + 1);
+  }
 
-  // 5. Extract unwrapped balanced-brace \sqrt{...}
-  html = extractUnwrappedSqrt(html, inlineMathBlocks);
+  // 6. Extract unwrapped \frac{...}{...} with balanced braces
+  let fracSafety = 0;
+  while (fracSafety++ < 40) {
+    const idx = html.indexOf('\\frac{');
+    if (idx === -1) break;
+    const num = extractBalancedBraces(html, idx + 5);
+    if (!num) break;
+    const denStart = num.endIndex + 1;
+    if (html[denStart] !== '{') break;
+    const den = extractBalancedBraces(html, denStart);
+    if (!den) break;
+    const fullFrac = html.slice(idx, den.endIndex + 1);
+    const rendered = renderKaTeXSafe(fullFrac, false);
+    html = html.slice(0, idx) + addBlock(rendered, false) + html.slice(den.endIndex + 1);
+  }
 
-  // 6. Standalone LaTeX math symbols & operators outside $...$
-  html = html.replace(/\\(approx|propto|implies|to|pm|mp|times|cdot|neq|le|ge|ll|gg|alpha|beta|gamma|delta|epsilon|theta|lambda|mu|pi|rho|sigma|tau|phi|psi|omega|Delta|Phi|Omega|sum|int|infty|parallel|degree)\b/g, (match) => {
-    const rendered = renderKaTeXSafe(match, false);
-    const placeholder = `\x00IM_${inlineMathBlocks.length}\x00`;
-    inlineMathBlocks.push(`<span class="katex-inline-wrapper">${rendered}</span>`);
-    return placeholder;
+  // 6. Numbers with Ohm unit: 10 \Omega, 12\Omega, 10 \,\Omega (Run BEFORE standalone Greek letters)
+  html = html.replace(/(\d+(?:\.\d+)?)\s*(?:\\,|\\ )?(?:\\Omega|Ω)\b/g, (_, num) => {
+    return addBlock(renderKaTeXSafe(`${num}\\,\\Omega`, false), false);
   });
 
-  // 7. Format Markdown Bold **bold** and Italics *italic*
+  // 7. Degree notations like 30^\circ or (30^\circ)
+  html = html.replace(/(\d+(?:\.\d+)?)\s*(?:\^\{?\\circ\}?|\\circ)/g, (_, num) => {
+    return addBlock(renderKaTeXSafe(`${num}^\\circ`, false), false);
+  });
+
+  // 8. Trigonometric & function applications: \cos(30^\circ), \cos\phi, \sin\theta, etc.
+  html = html.replace(/\\(cos|sin|tan|sec|csc|cot|ln|log)\s*(?:\(?\s*\\?[a-zA-Z0-9\^\circ\_\{\}]+\s*\)?|[a-zA-Z0-9\\]+)/g, (match) => {
+    return addBlock(renderKaTeXSafe(match, false), false);
+  });
+
+  // 9. Subscripted variables: V_{dc}, V_{rms}, I_L, R_th, I_{ph}, V_L, etc. (No trailing \b so V_{dc}, works)
+  html = html.replace(/\b([A-Za-z]+)_(?:\{([^{}]+)\}|([a-zA-Z0-9]+))(?=[^a-zA-Z0-9_]|$)/g, (match) => {
+    return addBlock(renderKaTeXSafe(match, false), false);
+  });
+
+  // 10. Exponents: 10^{-3}, 10^6, x^2, (1.11)^2
+  html = html.replace(/(\b[A-Za-z0-9]+|\([^\(\)]+\))\^(?:\{([^{}]+)\}|([0-9a-zA-Z\+\-]+))(?=[^a-zA-Z0-9_\^]|$)/g, (match) => {
+    return addBlock(renderKaTeXSafe(match, false), false);
+  });
+
+  // 11. Standalone Greek letters & math symbols: \eta, \gamma, \Delta, \Omega, \times, \cdot, etc.
+  html = html.replace(/\\(eta|gamma|Delta|Omega|alpha|beta|theta|phi|psi|lambda|mu|pi|sigma|omega|tau|epsilon|cdot|times|approx|ne|neq|le|ge|pm|infty|parallel|to|implies|iff)\b/g, (match) => {
+    return addBlock(renderKaTeXSafe(match, false), false);
+  });
+
+  // 12. Clean up any stray thin spaces \, outside of math
+  html = html.replace(/\\,/g, ' ');
+
+  // 13. Format Markdown Bold **bold** and Italics *italic*
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #67e8f9; font-weight: 700;">$1</strong>');
   html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
 
-  // 8. Numbered list formatting: ensure clear visual separation
-  // Add extra spacing before numbered items (e.g. \n2. or \n(b))
+  // 12. Numbered list formatting: ensure clear visual separation
   html = html.replace(/\n(?=(\d+[\.\)]|\([a-z0-9]+\))\s+)/gi, '\n\n');
-  
-  // Format double newlines into margin-spaced blocks
   html = html.replace(/\n{2,}/g, '<div style="margin-top: 10px;"></div>');
   html = html.replace(/\n/g, '<br />');
 
-  // 9. Restore inline and display math blocks
-  inlineMathBlocks.forEach((rendered, i) => {
-    html = html.replace(`\x00IM_${i}\x00`, rendered);
-  });
-
-  displayMathBlocks.forEach((rendered, i) => {
-    html = html.replace(`\x00DM_${i}\x00`, rendered);
+  // 13. Restore math blocks
+  mathBlocks.forEach((rendered, i) => {
+    html = html.replace(`\x00M_${i}\x00`, rendered);
   });
 
   setCacheEntry(textCache, text, html);
