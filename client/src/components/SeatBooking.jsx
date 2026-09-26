@@ -320,10 +320,68 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
   const [selectedLang, setSelectedLang] = useState('C'); // Language for code viewer
   const [viewingPdf, setViewingPdf] = useState(null); // In-App PDF Reader Modal State
 
+  // ─── Code String Sanitizer & Repairer (Ensures 100% syntactically valid code copy) ──
+  const repairCodeString = (code) => {
+    if (!code) return '';
+    let s = String(code);
+    // 1. Repair broken char literal '\n'
+    s = s.replace(/'\r?\n'/g, "'\\n'");
+
+    // 2. Repair broken string literals line by line
+    const lines = s.split(/\r?\n/);
+    const result = [];
+    let inString = false;
+    let currentString = '';
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      if (inString) {
+        let quoteCount = 0;
+        for (let c = 0; c < line.length; c++) {
+          if (line[c] === '"' && (c === 0 || line[c - 1] !== '\\')) {
+            quoteCount++;
+          }
+        }
+
+        if (quoteCount % 2 === 1) {
+          currentString += '\\n' + line;
+          result.push(currentString);
+          currentString = '';
+          inString = false;
+        } else {
+          currentString += '\\n' + line;
+        }
+      } else {
+        let quoteCount = 0;
+        for (let c = 0; c < line.length; c++) {
+          if (line[c] === '"' && (c === 0 || line[c - 1] !== '\\')) {
+            quoteCount++;
+          }
+        }
+
+        if (quoteCount % 2 === 1) {
+          inString = true;
+          currentString = line;
+        } else {
+          result.push(line);
+        }
+      }
+    }
+
+    if (inString) {
+      result.push(currentString);
+    }
+
+    return result.join('\n');
+  };
+
   // ─── Multi-Language Code Translator ─────────────────────────────────────────
   const translateCode = (rawCode, lang) => {
-    if (!rawCode || lang === 'C') return rawCode;
-    const c = typeof rawCode === 'string' ? rawCode : String(rawCode);
+    if (!rawCode) return rawCode;
+    const cleanRaw = repairCodeString(rawCode);
+    if (lang === 'C') return cleanRaw;
+    const c = cleanRaw;
     // Decode escaped sequences (same as formatDisplayCode)
     const decode = (s) => s
       .replace(/\\\\n/g, '__NL__').replace(/\\\\t/g, '__TAB__').replace(/\\\\"/g, '__DQ__').replace(/\\\\'/g, '__SQ__')
@@ -424,31 +482,33 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
   const formatDisplayCode = (raw) => {
     if (!raw) return '';
     let s = String(raw);
-    if (!s.includes('\\n') && !s.includes('\\t') && !s.includes('\\"')) return s;
 
-    // Protect double-escaped sequences (e.g. \\n in C string literal printf("...\n"))
-    s = s
-      .replace(/\\\\n/g, '__LITERAL_ESC_N__')
-      .replace(/\\\\t/g, '__LITERAL_ESC_T__')
-      .replace(/\\\\"/g, '__LITERAL_ESC_QUOTE__')
-      .replace(/\\\\'/g, '__LITERAL_ESC_SQUOTE__');
+    // If s contains literal escaped sequences (like \n, \t) representing lines
+    if (s.includes('\\n') || s.includes('\\t') || s.includes('\\"')) {
+      // Protect double-escaped sequences (e.g. \\n in C string literal printf("...\n"))
+      s = s
+        .replace(/\\\\n/g, '__LITERAL_ESC_N__')
+        .replace(/\\\\t/g, '__LITERAL_ESC_T__')
+        .replace(/\\\\"/g, '__LITERAL_ESC_QUOTE__')
+        .replace(/\\\\'/g, '__LITERAL_ESC_SQUOTE__');
 
-    // Convert escaped newlines, tabs, and quotes to actual characters
-    s = s
-      .replace(/\\r\\n/g, '\n')
-      .replace(/\\n/g, '\n')
-      .replace(/\\t/g, '    ')
-      .replace(/\\"/g, '"')
-      .replace(/\\'/g, "'");
+      // Convert escaped newlines, tabs, and quotes to actual characters
+      s = s
+        .replace(/\\r\\n/g, '\n')
+        .replace(/\\n/g, '\n')
+        .replace(/\\t/g, '    ')
+        .replace(/\\"/g, '"')
+        .replace(/\\'/g, "'");
 
-    // Restore protected in-code literal escapes
-    s = s
-      .replace(/__LITERAL_ESC_N__/g, '\\n')
-      .replace(/__LITERAL_ESC_T__/g, '\\t')
-      .replace(/__LITERAL_ESC_QUOTE__/g, '\\"')
-      .replace(/__LITERAL_ESC_SQUOTE__/g, "\\'");
+      // Restore protected in-code literal escapes
+      s = s
+        .replace(/__LITERAL_ESC_N__/g, '\\n')
+        .replace(/__LITERAL_ESC_T__/g, '\\t')
+        .replace(/__LITERAL_ESC_QUOTE__/g, '\\"')
+        .replace(/__LITERAL_ESC_SQUOTE__/g, "\\'");
+    }
 
-    return s;
+    return repairCodeString(s);
   };
 
   const handleCopyCode = (codeText) => {

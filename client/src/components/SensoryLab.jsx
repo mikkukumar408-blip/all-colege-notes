@@ -1145,7 +1145,39 @@ export default function SensoryLab({
         if (box) {
           const rawCode = decodeURIComponent(box.getAttribute('data-code') || '');
           if (rawCode) {
-            navigator.clipboard.writeText(rawCode).then(() => {
+            // Repair any unclosed string literals or broken char literals
+            let cleanCode = rawCode.replace(/'\r?\n'/g, "'\\n'");
+            const lines = cleanCode.split(/\r?\n/);
+            const result = [];
+            let inString = false, currentString = '';
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              let quoteCount = 0;
+              for (let c = 0; c < line.length; c++) {
+                if (line[c] === '"' && (c === 0 || line[c - 1] !== '\\')) quoteCount++;
+              }
+              if (inString) {
+                if (quoteCount % 2 === 1) {
+                  currentString += '\\n' + line;
+                  result.push(currentString);
+                  currentString = '';
+                  inString = false;
+                } else {
+                  currentString += '\\n' + line;
+                }
+              } else {
+                if (quoteCount % 2 === 1) {
+                  inString = true;
+                  currentString = line;
+                } else {
+                  result.push(line);
+                }
+              }
+            }
+            if (inString) result.push(currentString);
+            cleanCode = result.join('\n');
+
+            navigator.clipboard.writeText(cleanCode).then(() => {
               btn.classList.add('copied');
               const textSpan = btn.querySelector('.copy-text');
               if (textSpan) textSpan.textContent = 'Copied!';
