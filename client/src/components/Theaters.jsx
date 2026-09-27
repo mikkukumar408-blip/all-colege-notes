@@ -46,28 +46,14 @@ import { triggerUniversalPrint } from '../utils/printHelper';
 /* -------------------------------------------------------------------------
    ACADEMIC YEARS & SEMESTER CONFIGURATION
    ------------------------------------------------------------------------- */
-const YEARS = ['1st Year', '2nd Year', '3rd Year', 'All Years'];
+const YEARS = ['1st Year'];
 
 const YEAR_CONFIG = {
   '1st Year': {
-    label: '1st Year',
+    label: '1st Year Foundation',
     semesters: [
       { id: 'Semester 1', num: 1, title: 'Semester 1', subtitle: 'Calculus, BEEE, C Programming, Web Tech & AI' },
       { id: 'Semester 2', num: 2, title: 'Semester 2', subtitle: 'Applied Physics, Python & Data Structures' }
-    ]
-  },
-  '2nd Year': {
-    label: '2nd Year',
-    semesters: [
-      { id: 'Semester 3', num: 3, title: 'Semester 3', subtitle: 'Data Structures & Algorithms, Digital Logic Design' },
-      { id: 'Semester 4', num: 4, title: 'Semester 4', subtitle: 'Operating Systems & Database Management Systems' }
-    ]
-  },
-  '3rd Year': {
-    label: '3rd Year',
-    semesters: [
-      { id: 'Semester 5', num: 5, title: 'Semester 5', subtitle: 'Computer Networks & Full Stack Web Development' },
-      { id: 'Semester 6', num: 6, title: 'Semester 6', subtitle: 'Software Engineering & Artificial Intelligence' }
     ]
   }
 };
@@ -311,46 +297,10 @@ export default function Theaters({ currentUser, initialSubject }) {
       </div>
 
       {/* -------------------------------------------------------------------
-         PART C: YEAR SELECTOR BUTTONS (1st Year, 2nd Year, 3rd Year, 4th Year)
+         PART C: SEMESTER SELECTOR (Semester 1 & Semester 2)
          ------------------------------------------------------------------- */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.86rem', color: 'var(--text-muted)', fontWeight: 700, marginRight: '2px' }}>
-            Select Year:
-          </span>
-          {YEARS.map(yr => {
-            const isSelected = selectedYear === yr;
-            return (
-              <button
-                key={yr}
-                onClick={() => {
-                  setSelectedYear(yr);
-                  setSelectedSemester('All'); // Reset semester filter on year switch
-                }}
-                style={{
-                  padding: '9px 20px',
-                  borderRadius: '10px',
-                  fontSize: '0.86rem',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  background: isSelected ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.05)',
-                  color: isSelected ? '#07090e' : '#cbd5e1',
-                  border: isSelected ? 'none' : '1px solid var(--border-dim)',
-                  boxShadow: isSelected ? '0 0 16px rgba(0, 240, 255, 0.3)' : 'none',
-                  transition: 'all 0.2s ease',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                {yr}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Semester Boxes: Appear when specific Year is clicked */}
-        {selectedYear !== 'All Years' && YEAR_CONFIG[selectedYear] && (
+        {YEAR_CONFIG['1st Year'] && (
           <div 
             style={{ 
               display: 'flex', 
@@ -364,7 +314,7 @@ export default function Theaters({ currentUser, initialSubject }) {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--neon-cyan)', fontSize: '0.9rem', fontWeight: 800 }}>⚡ {selectedYear} Semesters</span>
+                <span style={{ color: 'var(--neon-cyan)', fontSize: '0.9rem', fontWeight: 800 }}>⚡ 1st Year Semesters</span>
                 <span style={{ color: 'var(--text-dim)', fontSize: '0.8rem' }}>• Click a semester box to filter notes</span>
               </div>
               {selectedSemester !== 'All' && (
@@ -389,7 +339,7 @@ export default function Theaters({ currentUser, initialSubject }) {
 
             {/* The Two Distinct Semester Boxes */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
-              {YEAR_CONFIG[selectedYear].semesters.map(sem => {
+              {YEAR_CONFIG['1st Year'].semesters.map(sem => {
                 const isSelected = selectedSemester === sem.id;
                 const relevantCount = activeTabMode === 'balanced'
                   ? revisionNotes.filter(n => n.semester === sem.id).length

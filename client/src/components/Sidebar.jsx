@@ -44,7 +44,6 @@ export default function Sidebar({
     { id: 'short-notes', label: 'Exam Revision & Short Notes', icon: Sparkles, badge: 'Fast Track' },
     { id: 'question-papers', label: 'Expected Question Papers', icon: ClipboardCheck, badge: '2026 Exams' },
     { id: 'downloads-lab', label: 'Lab Manuals & Practical Codes', icon: Code2, badge: 'Lab & Viva' },
-    { id: 'syllabus', label: 'Syllabus & Curriculum', icon: GraduationCap },
     ...(isSuperAdmin ? [
       { id: 'admin-panel', label: 'Super Admin Panel', icon: Crown, badge: 'ADMIN' }
     ] : [])
@@ -120,7 +119,7 @@ export default function Sidebar({
            ----------------------------------------------------------------- */}
         <nav className="nav-menu">
           <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-dim)', letterSpacing: '1px', padding: '0 8px 6px' }}>
-            {isSuperAdmin ? 'Academic & Admin • 6 Portals' : 'Academic Sections • 5 Portals'}
+            {isSuperAdmin ? 'Academic & Admin • 5 Portals' : 'Academic Sections • 4 Portals'}
           </div>
           {navSections.map((item) => {
             const Icon = item.icon;

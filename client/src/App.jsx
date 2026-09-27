@@ -12,7 +12,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import NowShowing from './components/NowShowing';
 const SensoryLab = React.lazy(() => import('./components/SensoryLab'));
-const TechGuide = React.lazy(() => import('./components/TechGuide'));
 const Theaters = React.lazy(() => import('./components/Theaters'));
 const ExpectedQuestionPapers = React.lazy(() => import('./components/ExpectedQuestionPapers'));
 const SeatBooking = React.lazy(() => import('./components/SeatBooking'));
@@ -279,8 +278,6 @@ export default function App() {
             }}
           />
         );
-      case 'syllabus':
-        return <TechGuide />;
       case 'short-notes':
         return <Theaters currentUser={currentUser} initialSubject={selectedSubject} />;
       case 'question-papers':
@@ -305,7 +302,6 @@ export default function App() {
     switch (activeTab) {
       case 'subjects-notes': return 'Semester Notes & Subjects';
       case 'notes-reader': return 'Interactive Notes Reader';
-      case 'syllabus': return 'Syllabus & Curriculum';
       case 'short-notes': return 'Exam Revision & Short Notes';
       case 'question-papers': return 'Expected University Question Papers';
       case 'downloads-lab': return 'Practical Lab Manuals & Codes';

@@ -6,9 +6,6 @@
    ========================================================================= */
 
 export const VERCEL_PROD_ORIGIN = 'https://all-colege-notes.vercel.app';
-export const USERS_BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0ae98a56225a3';
-export const TELEMETRY_BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0d35e5ced077a';
-export const CONTROLS_BACKUP_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0d35e9d47077b';
 
 export const getApiUrl = (endpointPath) => {
   const path = endpointPath.startsWith('/') ? endpointPath : '/' + endpointPath;
@@ -73,18 +70,6 @@ export async function pullCloudControls() {
     }
   } catch (e) {}
 
-  // 2. Direct Cloud KV Store
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch(CONTROLS_BACKUP_URL, { signal: controller.signal });
-    clearTimeout(timeout);
-    if (res.ok) {
-      const json = await res.json();
-      if (json && json.data) return json.data;
-    }
-  } catch (e) {}
-
   return null;
 }
 
@@ -94,24 +79,11 @@ export async function pushCloudControls(controls) {
     updatedAt: new Date().toISOString()
   };
 
-  await Promise.allSettled([
-    // Primary sync to Vercel API
-    fetch(getApiUrl('/api/controls'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedControls)
-    }).catch(() => {}),
-
-    // Dual-redundancy direct sync to KV Backup
-    fetch(CONTROLS_BACKUP_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: 'college_notes_system_controls_v1',
-        data: updatedControls
-      })
-    }).catch(() => {})
-  ]);
+  await fetch(getApiUrl('/api/controls'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updatedControls)
+  }).catch(() => {});
 
   return updatedControls;
 }
@@ -259,28 +231,7 @@ export async function pullCloudUsers() {
     }
   } catch (err) {}
 
-  // 2. Dual fallback: Direct KV Cloud Store
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3500);
-    const res = await fetch(USERS_BACKUP_URL, { signal: controller.signal });
-    clearTimeout(timeout);
-    if (res.ok) {
-      const json = await res.json();
-      if (json && json.data && Array.isArray(json.data.users) && json.data.users.length > 0) {
-        backupUsers = json.data.users;
-      }
-    }
-  } catch (err) {}
-
-  let combinedCloud = [];
-  if (serverUsers && backupUsers) {
-    combinedCloud = mergeUsers(serverUsers, backupUsers);
-  } else if (serverUsers) {
-    combinedCloud = serverUsers;
-  } else if (backupUsers) {
-    combinedCloud = backupUsers;
-  }
+  const combinedCloud = serverUsers || [];
 
   const local = getLocalUsers();
   const merged = mergeUsers(local, combinedCloud);
@@ -301,21 +252,11 @@ export async function pushCloudUsers(usersList) {
     }
   };
 
-  await Promise.allSettled([
-    // Primary sync to Vercel API
-    fetch(getApiUrl('/api/users/sync'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ users: usersList })
-    }).catch(() => {}),
-
-    // Dual-redundancy direct sync to KV Backup
-    fetch(USERS_BACKUP_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).catch(() => {})
-  ]);
+  await fetch(getApiUrl('/api/users/sync'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ users: usersList })
+  }).catch(() => {});
 }
 
 export async function syncNewUserToCloud(newUser) {
