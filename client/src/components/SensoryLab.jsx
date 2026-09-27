@@ -50,7 +50,6 @@ import { dsaUnitsData, dsaSubjectDetails } from '../data/dsaNotesData';
 import HandwrittenDiagram from './HandwrittenDiagram';
 import InteractiveTheveninLab from './InteractiveTheveninLab';
 import katex from 'katex';
-import { triggerUniversalPrint } from '../utils/printHelper';
 
 /* -------------------------------------------------------------------------
    MATHEMATICAL & ADVANCED MARKDOWN CONTENT FORMATTER
@@ -1511,7 +1510,6 @@ export default function SensoryLab({
                   : (activeSubject.units?.find(u => (u.unitNum || u.num) === selectedUnitNum) || activeSubject.units?.[0] || {});
 
   const notesPanelRef = useRef(null);
-  const [isPrinting, setIsPrinting] = useState(false);
 
   const getSubjectMasterPdf = () => {
     if (isBEEE) return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: 'BELE001_BEEE_Notes.pdf' };
@@ -1523,22 +1521,6 @@ export default function SensoryLab({
     if (isPython) return { url: '/Python_Programming_Master_Notes.pdf', name: 'Python_Programming_Notes.pdf' };
     if (isDSA) return { url: '/Data_Structures_Master_Notes.pdf', name: 'Data_Structures_Notes.pdf' };
     return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: 'College_Notes.pdf' };
-  };
-
-  const handlePrint = () => {
-    setIsPrinting(true);
-    document.body.classList.add('sensory-printing');
-    setTimeout(() => {
-      try {
-        const docTitle = `${activeSubject?.name || 'Notes'}_Unit_${selectedUnitNum}`.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim();
-        triggerUniversalPrint(docTitle);
-      } finally {
-        setTimeout(() => {
-          document.body.classList.remove('sensory-printing');
-          setIsPrinting(false);
-        }, 800);
-      }
-    }, 150);
   };
 
   const getSubjectFormulas = () => {
@@ -1819,31 +1801,6 @@ export default function SensoryLab({
             title="Open Interactive 1-Page Formula & Theorem Cheat-Sheet for this Unit"
           >
             <Zap size={15} /> Formula Sheet
-          </button>
-
-          {/* 🖨️ Clean University Print / Save as PDF */}
-          <button 
-            type="button"
-            className="btn-outline" 
-            onClick={handlePrint}
-            disabled={isPrinting}
-            style={{
-              cursor: isPrinting ? 'wait' : 'pointer',
-              opacity: isPrinting ? 0.75 : 1,
-              borderColor: 'var(--neon-cyan)',
-              color: 'var(--neon-cyan)',
-              background: 'rgba(0, 240, 255, 0.1)',
-              fontWeight: 800,
-              fontSize: '0.82rem',
-              padding: '7px 14px',
-              borderRadius: '8px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-            title="Print Full Unit Notes or Save as PDF"
-          >
-            <Printer size={15} /> {isPrinting ? 'Opening Print...' : 'Print Notes'}
           </button>
         </div>
       </div>
