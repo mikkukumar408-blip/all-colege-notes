@@ -261,6 +261,110 @@ while(n > 0) { rem = n % 10; sum += rem; n /= 10; }
    - If $D = 0$: Real & Equal roots: $r_1 = r_2 = \\frac{-b}{2a}$.
    - If $D < 0$: Complex Conjugate roots: $	\text{Real} = \\frac{-b}{2a}, 	\text{Imag} = \\frac{\sqrt{-D}}{2a}$. Output: $	\text{Real} ± i·	\text{Imag}$.
 
+<div class="circuit-diagram-card flowchart-card" style="background:#0b1329; border:1.5px solid #0284c7; border-radius:12px; padding:16px; margin:20px 0;">
+  <svg class="circuit-svg flowchart-svg" viewBox="0 0 720 460" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="flow-arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#38bdf8" />
+      </marker>
+      <marker id="flow-arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#10b981" />
+      </marker>
+      <marker id="flow-arr-rose" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#f43f5e" />
+      </marker>
+    </defs>
+    
+    <rect x="5" y="5" width="710" height="450" rx="12" fill="rgba(15,23,42,0.7)" stroke="#0284c7" stroke-width="1.2" stroke-dasharray="4 4" />
+    <text x="360" y="28" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="bold" letter-spacing="1">ANSI FLOWCHART: QUADRATIC EQUATION ROOTS RESOLUTION (ax² + bx + c = 0)</text>
+
+    <!-- Start Terminal -->
+    <rect x="305" y="42" width="110" height="30" rx="15" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="2" />
+    <text x="360" y="62" text-anchor="middle" fill="#34d399" font-size="12" font-weight="bold">START</text>
+    
+    <line x1="360" y1="72" x2="360" y2="92" stroke="#38bdf8" stroke-width="2" marker-end="url(#flow-arr)" />
+
+    <!-- Input Parallelogram -->
+    <polygon points="275,122 425,122 445,92 295,92" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" stroke-width="1.8" />
+    <text x="360" y="112" text-anchor="middle" fill="#e0f2fe" font-size="11" font-weight="bold">Input Coefficients a, b, c</text>
+
+    <line x1="360" y1="122" x2="360" y2="142" stroke="#38bdf8" stroke-width="2" marker-end="url(#flow-arr)" />
+
+    <!-- Decision: a == 0? -->
+    <polygon points="360,142 420,167 360,192 300,167" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="2" />
+    <text x="360" y="171" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="bold">Is a == 0?</text>
+
+    <!-- Branch: a == 0 YES (Linear) -->
+    <line x1="420" y1="167" x2="570" y2="167" stroke="#f43f5e" stroke-width="2" marker-end="url(#flow-arr-rose)" />
+    <text x="465" y="160" fill="#fda4af" font-size="10" font-weight="bold">YES (Linear)</text>
+    
+    <polygon points="510,195 640,195 655,167 525,167" fill="rgba(244,63,94,0.15)" stroke="#f43f5e" stroke-width="1.5" />
+    <text x="585" y="185" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="bold">Output: "Not Quadratic"</text>
+
+    <line x1="360" y1="192" x2="360" y2="212" stroke="#38bdf8" stroke-width="2" marker-end="url(#flow-arr)" />
+    <text x="368" y="206" fill="#86efac" font-size="10" font-weight="bold">NO</text>
+
+    <!-- Process Box: D = b² - 4ac -->
+    <rect x="280" y="212" width="160" height="32" rx="6" fill="rgba(129,140,248,0.15)" stroke="#818cf8" stroke-width="1.8" />
+    <text x="360" y="232" text-anchor="middle" fill="#c7d2fe" font-size="11" font-weight="bold">Calculate D = b² − 4ac</text>
+
+    <line x1="360" y1="244" x2="360" y2="264" stroke="#38bdf8" stroke-width="2" marker-end="url(#flow-arr)" />
+
+    <!-- Decision: D > 0? -->
+    <polygon points="360,264 425,289 360,314 295,289" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="2" />
+    <text x="360" y="293" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="bold">Is D &gt; 0?</text>
+
+    <!-- Branch D > 0 YES: Real & Distinct -->
+    <line x1="295" y1="289" x2="160" y2="289" stroke="#10b981" stroke-width="2" marker-end="url(#flow-arr-green)" />
+    <text x="215" y="282" fill="#86efac" font-size="10" font-weight="bold">YES (Real &amp; Distinct)</text>
+
+    <rect x="50" y="325" width="200" height="48" rx="6" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="1.5" />
+    <line x1="160" y1="289" x2="160" y2="325" stroke="#10b981" stroke-width="2" />
+    <text x="150" y="344" text-anchor="middle" fill="#86efac" font-size="10" font-weight="bold">r₁ = (−b + √D) / 2a</text>
+    <text x="150" y="362" text-anchor="middle" fill="#86efac" font-size="10" font-weight="bold">r₂ = (−b − √D) / 2a</text>
+
+    <!-- Branch D > 0 NO: Check D == 0 -->
+    <line x1="425" y1="289" x2="520" y2="289" stroke="#38bdf8" stroke-width="2" marker-end="url(#flow-arr)" />
+    <text x="450" y="282" fill="#cbd5e1" font-size="10" font-weight="bold">NO</text>
+
+    <!-- Decision: D == 0? -->
+    <polygon points="520,289 575,310 520,331 465,310" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="1.8" />
+    <text x="520" y="314" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="bold">Is D == 0?</text>
+
+    <!-- D == 0 YES: Real & Equal -->
+    <line x1="465" y1="310" x2="380" y2="310" stroke="#38bdf8" stroke-width="2" />
+    <line x1="380" y1="310" x2="380" y2="335" stroke="#38bdf8" stroke-width="2" marker-end="url(#flow-arr)" />
+    <text x="415" y="304" fill="#38bdf8" font-size="9" font-weight="bold">YES (Equal)</text>
+
+    <rect x="290" y="335" width="180" height="38" rx="6" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" stroke-width="1.5" />
+    <text x="380" y="352" text-anchor="middle" fill="#e0f2fe" font-size="10" font-weight="bold">r₁ = r₂ = −b / 2a</text>
+    <text x="380" y="367" text-anchor="middle" fill="#94a3b8" font-size="9" font-style="italic">(Two Identical Real Roots)</text>
+
+    <!-- D == 0 NO: Complex Roots -->
+    <line x1="575" y1="310" x2="620" y2="310" stroke="#f43f5e" stroke-width="2" />
+    <line x1="620" y1="310" x2="620" y2="335" stroke="#f43f5e" stroke-width="2" marker-end="url(#flow-arr-rose)" />
+    <text x="585" y="304" fill="#fda4af" font-size="9" font-weight="bold">NO (Complex)</text>
+
+    <rect x="510" y="335" width="200" height="38" rx="6" fill="rgba(244,63,94,0.15)" stroke="#f43f5e" stroke-width="1.5" />
+    <text x="610" y="351" text-anchor="middle" fill="#fca5a5" font-size="9.5" font-weight="bold">Real = −b / 2a | Imag = √(-D)/2a</text>
+    <text x="610" y="366" text-anchor="middle" fill="#fca5a5" font-size="9.5" font-weight="bold">Roots: Real ± i · Imag</text>
+
+    <!-- Convergence lines to STOP -->
+    <line x1="150" y1="373" x2="150" y2="400" stroke="#38bdf8" stroke-width="1.5" />
+    <line x1="380" y1="373" x2="380" y2="400" stroke="#38bdf8" stroke-width="1.5" />
+    <line x1="610" y1="373" x2="610" y2="400" stroke="#38bdf8" stroke-width="1.5" />
+    <line x1="150" y1="400" x2="610" y2="400" stroke="#38bdf8" stroke-width="1.5" />
+    <line x1="360" y1="400" x2="360" y2="415" stroke="#38bdf8" stroke-width="2" marker-end="url(#flow-arr)" />
+
+    <!-- Stop Terminal -->
+    <rect x="315" y="415" width="90" height="26" rx="13" fill="rgba(239,68,68,0.2)" stroke="#ef4444" stroke-width="2" />
+    <text x="360" y="432" text-anchor="middle" fill="#fca5a5" font-size="11" font-weight="bold">STOP</text>
+  </svg>
+  <div class="circuit-diagram-caption" style="text-align:center; font-size:10pt; font-weight:bold; color:#38bdf8; margin-top:8px;">
+    Fig 1.1: Complete ANSI Standard Decision Flowchart for Quadratic Equation Roots (Discriminant Analysis)
+  </div>
+</div>
+
 \`\`\`c
 #include <stdio.h>
 #include <math.h>
@@ -397,6 +501,108 @@ switch (grade) {
 | **\`for\` Loop** | Entry-Controlled (Condition evaluated before body) | 0 times | Deterministic iterations with known step bounds. |
 | **\`while\` Loop** | Entry-Controlled (Condition evaluated before body) | 0 times | Event-driven loops where termination depends on runtime state. |
 | **\`do-while\` Loop** | **Exit-Controlled** (Condition evaluated after body) | **1 time** | Interactive menu loops requiring at least one display pass. |
+
+<div class="circuit-diagram-card flowchart-card" style="background:#0b1329; border:1.5px solid #0284c7; border-radius:12px; padding:16px; margin:20px 0;">
+  <svg class="circuit-svg flowchart-svg" viewBox="0 0 720 380" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="loop-arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#38bdf8" />
+      </marker>
+      <marker id="loop-arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#10b981" />
+      </marker>
+      <marker id="loop-arr-rose" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#f43f5e" />
+      </marker>
+    </defs>
+    
+    <rect x="5" y="5" width="710" height="370" rx="12" fill="rgba(15,23,42,0.7)" stroke="#0284c7" stroke-width="1.2" stroke-dasharray="4 4" />
+    <text x="360" y="28" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="bold" letter-spacing="1">ANSI ARCHITECTURAL FLOWCHART: WHILE LOOP (ENTRY-CONTROLLED) VS DO-WHILE (EXIT-CONTROLLED)</text>
+
+    <!-- LEFT PANEL: WHILE LOOP -->
+    <rect x="25" y="45" width="325" height="315" rx="8" fill="rgba(56,189,248,0.04)" stroke="#38bdf8" stroke-width="1.2" />
+    <text x="187" y="68" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="bold">1. WHILE LOOP (PRE-TEST / ENTRY)</text>
+
+    <!-- Start Entry -->
+    <rect x="142" y="85" width="90" height="24" rx="12" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="1.8" />
+    <text x="187" y="101" text-anchor="middle" fill="#86efac" font-size="10" font-weight="bold">START / ENTRY</text>
+    
+    <line x1="187" y1="109" x2="187" y2="135" stroke="#38bdf8" stroke-width="2" marker-end="url(#loop-arr)" />
+
+    <!-- Decision: Condition True? -->
+    <polygon points="187,135 247,157 187,179 127,157" fill="rgba(245,158,11,0.18)" stroke="#f59e0b" stroke-width="2" />
+    <text x="187" y="161" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="bold">Condition True?</text>
+
+    <!-- TRUE: Body -->
+    <line x1="187" y1="179" x2="187" y2="215" stroke="#10b981" stroke-width="2" marker-end="url(#loop-arr-green)" />
+    <text x="195" y="200" fill="#86efac" font-size="10" font-weight="bold">TRUE</text>
+
+    <rect x="117" y="215" width="140" height="34" rx="6" fill="rgba(56,189,248,0.18)" stroke="#38bdf8" stroke-width="1.8" />
+    <text x="187" y="235" text-anchor="middle" fill="#e0f2fe" font-size="11" font-weight="bold">Loop Body Statement(s)</text>
+
+    <!-- Loopback to Condition -->
+    <line x1="117" y1="232" x2="65" y2="232" stroke="#10b981" stroke-width="2" />
+    <line x1="65" y1="232" x2="65" y2="122" stroke="#10b981" stroke-width="2" />
+    <line x1="65" y1="122" x2="187" y2="122" stroke="#10b981" stroke-width="2" />
+    <line x1="187" y1="122" x2="187" y2="135" stroke="#10b981" stroke-width="2" marker-end="url(#loop-arr-green)" />
+    <text x="85" y="180" fill="#86efac" font-size="9" font-style="italic">Re-evaluate</text>
+
+    <!-- FALSE: Exit -->
+    <line x1="247" y1="157" x2="300" y2="157" stroke="#f43f5e" stroke-width="2" />
+    <line x1="300" y1="157" x2="300" y2="280" stroke="#f43f5e" stroke-width="2" />
+    <line x1="300" y1="280" x2="237" y2="280" stroke="#f43f5e" stroke-width="2" marker-end="url(#loop-arr-rose)" />
+    <text x="255" y="150" fill="#fda4af" font-size="10" font-weight="bold">FALSE</text>
+
+    <!-- Next Statement -->
+    <rect x="127" y="265" width="110" height="28" rx="6" fill="rgba(148,163,184,0.15)" stroke="#94a3b8" stroke-width="1.5" />
+    <text x="182" y="283" text-anchor="middle" fill="#cbd5e1" font-size="10" font-weight="bold">Next Statement</text>
+    
+    <text x="187" y="320" text-anchor="middle" fill="#38bdf8" font-size="10" font-weight="bold">★ Minimum Executions: 0 Times</text>
+    <text x="187" y="338" text-anchor="middle" fill="#94a3b8" font-size="9" font-style="italic">If condition is initially false, body is NEVER entered.</text>
+
+
+    <!-- RIGHT PANEL: DO-WHILE LOOP -->
+    <rect x="370" y="45" width="325" height="315" rx="8" fill="rgba(168,85,247,0.04)" stroke="#a855f7" stroke-width="1.2" />
+    <text x="532" y="68" text-anchor="middle" fill="#c084fc" font-size="12" font-weight="bold">2. DO-WHILE LOOP (POST-TEST / EXIT)</text>
+
+    <!-- Start Entry -->
+    <rect x="487" y="85" width="90" height="24" rx="12" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="1.8" />
+    <text x="532" y="101" text-anchor="middle" fill="#86efac" font-size="10" font-weight="bold">START / ENTRY</text>
+    
+    <line x1="532" y1="109" x2="532" y2="135" stroke="#a855f7" stroke-width="2" marker-end="url(#loop-arr)" />
+
+    <!-- Body FIRST -->
+    <rect x="462" y="135" width="140" height="34" rx="6" fill="rgba(168,85,247,0.18)" stroke="#a855f7" stroke-width="1.8" />
+    <text x="532" y="155" text-anchor="middle" fill="#f3e8ff" font-size="11" font-weight="bold">Loop Body Statement(s)</text>
+
+    <line x1="532" y1="169" x2="532" y2="200" stroke="#a855f7" stroke-width="2" marker-end="url(#loop-arr)" />
+
+    <!-- Decision: Condition True? (Evaluated at End) -->
+    <polygon points="532,200 592,222 532,244 472,222" fill="rgba(245,158,11,0.18)" stroke="#f59e0b" stroke-width="2" />
+    <text x="532" y="226" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="bold">Condition True?</text>
+
+    <!-- TRUE: Loop Back UP to Body -->
+    <line x1="472" y1="222" x2="415" y2="222" stroke="#10b981" stroke-width="2" />
+    <line x1="415" y1="222" x2="415" y2="152" stroke="#10b981" stroke-width="2" />
+    <line x1="415" y1="152" x2="462" y2="152" stroke="#10b981" stroke-width="2" marker-end="url(#loop-arr-green)" />
+    <text x="440" y="215" fill="#86efac" font-size="10" font-weight="bold">TRUE</text>
+    <text x="425" y="185" fill="#86efac" font-size="9" font-style="italic">Repeat</text>
+
+    <!-- FALSE: Exit -->
+    <line x1="532" y1="244" x2="532" y2="275" stroke="#f43f5e" stroke-width="2" marker-end="url(#loop-arr-rose)" />
+    <text x="542" y="260" fill="#fda4af" font-size="10" font-weight="bold">FALSE</text>
+
+    <!-- Next Statement -->
+    <rect x="477" y="275" width="110" height="28" rx="6" fill="rgba(148,163,184,0.15)" stroke="#94a3b8" stroke-width="1.5" />
+    <text x="532" y="293" text-anchor="middle" fill="#cbd5e1" font-size="10" font-weight="bold">Next Statement</text>
+    
+    <text x="532" y="320" text-anchor="middle" fill="#c084fc" font-size="10" font-weight="bold">★ Minimum Executions: Strictly 1 Time</text>
+    <text x="532" y="338" text-anchor="middle" fill="#94a3b8" font-size="9" font-style="italic">Even if condition is immediately false, body executes once.</text>
+  </svg>
+  <div class="circuit-diagram-caption" style="text-align:center; font-size:10pt; font-weight:bold; color:#a855f7; margin-top:8px;">
+    Fig 2.1: Architectural Control-Flow Comparison: Pre-Tested While Loop vs Post-Tested Do-While Loop
+  </div>
+</div>
 
 **Jump Statements:**
 - \`break;\`: Instantly aborts the innermost enclosing loop or switch block.
