@@ -1908,6 +1908,7 @@ export default function SensoryLab({
                 {unitsList.map(u => {
                   const num = u.unitNum || u.num;
                   const isSelected = selectedUnitNum === num;
+                  const uStatus = masteryData[`${currentSubjectId}_u${num}`];
                   return (
                     <button
                       key={num}
@@ -1926,15 +1927,21 @@ export default function SensoryLab({
                         transition: 'all 0.15s ease'
                       }}
                     >
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>
-                          Unit {num}: {u.title}
+                      <div style={{ flex: 1, minWidth: 0, paddingRight: '8px' }}>
+                        <div style={{ fontWeight: 700, fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span>Unit {num}: {u.title}</span>
+                          {uStatus === 'mastered' && (
+                            <span style={{ fontSize: '0.65rem', padding: '1px 5px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', fontWeight: 800 }}>✓ Done</span>
+                          )}
+                          {uStatus === 'revision' && (
+                            <span style={{ fontSize: '0.65rem', padding: '1px 5px', borderRadius: '4px', background: 'rgba(245, 158, 11, 0.2)', color: '#f59e0b', fontWeight: 800 }}>⚡ Revise</span>
+                          )}
                         </div>
-                        <div style={{ fontSize: '0.72rem', color: isSelected ? 'var(--neon-amber)' : 'var(--text-dim)' }}>
+                        <div style={{ fontSize: '0.72rem', color: isSelected ? 'var(--neon-amber)' : 'var(--text-dim)', marginTop: '2px' }}>
                           {u.examWeightage ? `Weightage: ${u.examWeightage}` : `${u.pages} Pages • Verified`}
                         </div>
                       </div>
-                      {isSelected && <CheckCircle2 size={16} color="var(--neon-cyan)" />}
+                      {isSelected && <CheckCircle2 size={16} color="var(--neon-cyan)" style={{ flexShrink: 0 }} />}
                     </button>
                   );
                 })}
@@ -2027,6 +2034,7 @@ export default function SensoryLab({
               {unitsList.map(u => {
                 const num = u.unitNum || u.num;
                 const isSelected = selectedUnitNum === num;
+                const uStatus = masteryData[`${currentSubjectId}_u${num}`];
                 return (
                   <button
                     key={num}
@@ -2053,7 +2061,13 @@ export default function SensoryLab({
                       transition: 'all 0.15s ease'
                     }}
                   >
-                    Unit {num}: {u.title}
+                    <span>Unit {num}: {u.title}</span>
+                    {uStatus === 'mastered' && (
+                      <span style={{ fontSize: '0.65rem', padding: '1px 5px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', fontWeight: 800 }}>✓ Done</span>
+                    )}
+                    {uStatus === 'revision' && (
+                      <span style={{ fontSize: '0.65rem', padding: '1px 5px', borderRadius: '4px', background: 'rgba(245, 158, 11, 0.2)', color: '#f59e0b', fontWeight: 800 }}>⚡ Revise</span>
+                    )}
                   </button>
                 );
               })}
@@ -2075,6 +2089,45 @@ export default function SensoryLab({
               }}>
                 Reading Time: {beeeUnit.readingTime || '35 mins'}
               </span>
+
+              {/* Unit Mastery Status Toggle */}
+              <button
+                type="button"
+                onClick={toggleUnitMastery}
+                style={{
+                  marginLeft: 'auto',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '5px 12px',
+                  borderRadius: '20px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: currentUnitMastery === 'mastered' 
+                    ? '1.5px solid #10b981' 
+                    : currentUnitMastery === 'revision'
+                      ? '1.5px solid #f59e0b'
+                      : '1.5px solid rgba(255, 255, 255, 0.2)',
+                  background: currentUnitMastery === 'mastered'
+                    ? 'rgba(16, 185, 129, 0.15)'
+                    : currentUnitMastery === 'revision'
+                      ? 'rgba(245, 158, 11, 0.15)'
+                      : 'rgba(255, 255, 255, 0.05)',
+                  color: currentUnitMastery === 'mastered'
+                    ? '#34d399'
+                    : currentUnitMastery === 'revision'
+                      ? '#f59e0b'
+                      : '#94a3b8',
+                  transition: 'all 0.2s ease'
+                }}
+                title="Click to toggle: Unread → Mastered → Need Revision"
+              >
+                <CheckCircle2 size={14} color={currentUnitMastery === 'mastered' ? '#10b981' : currentUnitMastery === 'revision' ? '#f59e0b' : '#64748b'} />
+                <span>
+                  {currentUnitMastery === 'mastered' ? '✓ Mastered' : currentUnitMastery === 'revision' ? '⚡ Need Revision' : 'Mark as Studied'}
+                </span>
+              </button>
             </div>
 
             <h2 className={themeMode !== 'clean' ? 'handwritten-heading' : ''} style={{ 
