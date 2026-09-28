@@ -1448,6 +1448,42 @@ export const expectedQuestionPapers = [
           keyMarkingPoints: ['1 Mark for 1/e decay definition', '1 Mark for delta = sqrt(2 / omega mu sigma) formula']
         },
         {
+          qNum: 'Q1 (b2)',
+          unit: 'Unit 1',
+          marks: 2,
+          question: 'State the conditions for constructive and destructive interference of light in a thin film of thickness $t$ and refractive index $\\\\mu$.',
+          expectedFrequency: 'High Frequency Wave Optics Question',
+          modelAnswer: '**Thin Film Interference Conditions** (for reflected rays, one phase reversal):\\\\n\\\\n**Constructive Interference (Bright Fringe):**\\\\n$$2\\\\mu t \\\\cos r = (2n-1)\\\\frac{\\\\lambda}{2}, \\\\quad n = 1, 2, 3, \\\\ldots$$\\\\n\\\\n**Destructive Interference (Dark Fringe):**\\\\n$$2\\\\mu t \\\\cos r = n\\\\lambda, \\\\quad n = 0, 1, 2, \\\\ldots$$\\\\n\\\\nwhere $r$ = angle of refraction inside the film and $\\\\lambda$ = wavelength of light in air.',
+          keyMarkingPoints: ['1 Mark for constructive condition 2μt cos r = (2n−1)λ/2', '1 Mark for destructive condition 2μt cos r = nλ']
+        },
+        {
+          qNum: 'Q1 (b3)',
+          unit: 'Unit 1',
+          marks: 2,
+          question: 'List any four characteristic properties of LASER light that distinguish it from ordinary light.',
+          expectedFrequency: 'Very High Frequency LASER Question',
+          modelAnswer: '**Four Characteristic Properties of LASER Light:**\\\\n\\\\n1. **Monochromaticity:** LASER light has a single, well-defined wavelength (very narrow spectral width), unlike ordinary light which spans many wavelengths.\\\\n\\\\n2. **Coherence:** All photons in a LASER beam are in phase (spatial and temporal coherence), enabling interference over large path differences.\\\\n\\\\n3. **Directionality (Low Divergence):** The LASER beam has extremely low divergence (nearly parallel), allowing it to travel long distances without spreading.\\\\n\\\\n4. **High Intensity (Brightness):** LASER light is highly concentrated and can deliver enormous power density at a point due to the coherent, collimated nature of the beam.',
+          keyMarkingPoints: ['1 Mark for any two correct properties named accurately', '1 Mark for brief correct explanation of each named property']
+        },
+        {
+          qNum: 'Q1 (d2)',
+          unit: 'Unit 2',
+          marks: 2,
+          question: "What is displacement current? Why did Maxwell introduce it to modify Ampere\'s Circuital Law?",
+          expectedFrequency: 'High Frequency Electromagnetism Question',
+          modelAnswer: '**Displacement Current:**\\\\nMaxwell introduced the concept of displacement current $I_D$ defined as:\\\\n$$I_D = \\\\epsilon_0 \\\\frac{d\\\\Phi_E}{dt}$$\\\\nwhere $\\\\Phi_E = \\\\int \\\\vec{E} \\\\cdot d\\\\vec{A}$ is the electric flux through the surface.\\\\n\\\\n**Reason for Introduction:**\\\\nAmpere\'s original law $\\\\oint \\\\vec{B} \\\\cdot d\\\\vec{l} = \\\\mu_0 I_{enc}$ was inconsistent for surfaces that cut through the gap of a charging capacitor (where no conduction current flows but the electric field changes). Maxwell added $I_D$ to make the law self-consistent:\\\\n$$\\\\oint \\\\vec{B} \\\\cdot d\\\\vec{l} = \\\\mu_0 (I_C + I_D)$$',
+          keyMarkingPoints: ['1 Mark for definition ID = ε₀ dΦE/dt', '1 Mark for the inconsistency in capacitor problem and modified Ampere law']
+        },
+        {
+          qNum: 'Q1 (d3)',
+          unit: 'Unit 2',
+          marks: 2,
+          question: 'Define the Poynting vector. What is its physical significance in the context of electromagnetic waves?',
+          expectedFrequency: 'High Frequency EM Waves Question',
+          modelAnswer: '**Poynting Vector ($\\\\vec{S}$):**\\\\nThe Poynting vector is defined as:\\\\n$$\\\\vec{S} = \\\\frac{1}{\\\\mu_0}(\\\\vec{E} \\\\times \\\\vec{B}) \\\\quad \\\\text{(in free space)}$$\\\\nIts SI unit is $\\\\text{W/m}^2$ (watts per square metre).\\\\n\\\\n**Physical Significance:**\\\\n1. It represents the **instantaneous power per unit area** (energy flux density) transported by an electromagnetic wave.\\\\n2. The direction of $\\\\vec{S}$ gives the direction of propagation of the electromagnetic energy.\\\\n3. The magnitude $|\\\\vec{S}|$ is called the **intensity** of the EM wave.',
+          keyMarkingPoints: ['1 Mark for definition S = (1/μ₀)(E × B) with unit W/m²', '1 Mark for physical significance: energy flux density and direction of EM energy transport']
+        },
+        {
           qNum: 'Q1 (e)',
           unit: 'Unit 3',
           marks: 2,
@@ -1757,6 +1793,42 @@ export const expectedQuestionPapers = [
           expectedFrequency: 'High Frequency Standard',
           modelAnswer: 'When a variable name is referenced, Python searches four concentric scope namespaces in the strict order:\\n1. L (Local): Inside the current function body.\\n2. E (Enclosing): In enclosing nested/closure functions from inner to outer.\\n3. G (Global): At the top module level (global variables).\\n4. B (Built-in): Predefined names in the builtins module (e.g. range, len, print).',
           keyMarkingPoints: ['0.5 Marks each for explaining Local, Enclosing, Global, and Built-in']
+        },
+        {
+          qNum: 'Q1 (b2)',
+          unit: 'Unit 1',
+          marks: 2,
+          question: 'What is PEP 8? List any four PEP 8 coding conventions followed in Python.',
+          expectedFrequency: 'High Frequency Python Standards Question',
+          modelAnswer: '**PEP 8** (Python Enhancement Proposal 8) is the official **style guide for Python code**, promoting readability and consistency across Python projects.\\\\n\\\\n**Four PEP 8 Coding Conventions:**\\\\n1. **Indentation:** Use 4 spaces per indentation level (never mix tabs and spaces).\\\\n2. **Line Length:** Limit all lines to a maximum of **79 characters**.\\\\n3. **Naming Conventions:** Use `snake_case` for variable and function names, `CamelCase` for class names, and `UPPER_CASE` for constants.\\\\n4. **Blank Lines:** Surround top-level function and class definitions with **two blank lines**; method definitions inside a class with **one blank line**.',
+          keyMarkingPoints: ['1 Mark for correct definition of PEP 8 as the official Python style guide', '1 Mark for any two correctly stated PEP 8 conventions with examples']
+        },
+        {
+          qNum: 'Q1 (b3)',
+          unit: 'Unit 1',
+          marks: 2,
+          question: 'Differentiate between a compiled language and an interpreted language. Why is Python considered an interpreted language?',
+          expectedFrequency: 'High Frequency Fundamentals Question',
+          modelAnswer: '**Compiled Language:** Source code is translated entirely into machine code by a compiler **before** execution. The resulting binary runs directly on hardware without re-translation (e.g., C, C++). Fast execution but platform-dependent binary.\\\\n\\\\n**Interpreted Language:** Source code is translated and executed **line-by-line** at runtime by an interpreter. No separate compilation step is needed (e.g., Python, JavaScript). Slower execution but highly portable.\\\\n\\\\n**Why Python is Interpreted:**\\\\nPython\'s CPython interpreter reads `.py` source, compiles it to bytecode (`.pyc`), and then the **Python Virtual Machine (PVM)** interprets and executes each bytecode instruction at runtime — no standalone native binary is produced.',
+          keyMarkingPoints: ['1 Mark for correct distinction: compiled (pre-execution translation) vs interpreted (runtime line-by-line)', '1 Mark for correct explanation of Python\'s interpreter/PVM execution model']
+        },
+        {
+          qNum: 'Q1 (d2)',
+          unit: 'Unit 2',
+          marks: 2,
+          question: 'What is a closure in Python? Write a small example to demonstrate it.',
+          expectedFrequency: 'High Frequency Functions Question',
+          modelAnswer: '**Closure:** A closure is an inner function that **remembers the variables from its enclosing (outer) function\'s scope** even after the outer function has returned. It "closes over" the free variables from the enclosing scope.\\\\n\\\\n**Example:**\\\\n```python\\\\ndef outer(x):\\\\n    def inner(y):\\\\n        return x + y   # x is a free variable "closed over"\\\\n    return inner\\\\n\\\\nadd5 = outer(5)   # outer() returns inner, x=5 is captured\\\\nprint(add5(3))    # Output: 8\\\\n```\\\\n`add5` is a closure; it retains access to `x = 5` even though `outer()` has finished executing.',
+          keyMarkingPoints: ['1 Mark for correct definition: inner function retaining enclosing scope after outer returns', '1 Mark for a syntactically correct and logically sound example demonstrating closure behavior']
+        },
+        {
+          qNum: 'Q1 (d3)',
+          unit: 'Unit 2',
+          marks: 2,
+          question: 'Differentiate between recursion and iteration with a suitable example for each.',
+          expectedFrequency: 'High Frequency Standard Question',
+          modelAnswer: '**Recursion:** A function calls itself to break a problem into smaller sub-problems until a base case is reached.\\\\n```python\\\\ndef factorial(n):\\\\n    if n == 0: return 1          # base case\\\\n    return n * factorial(n - 1)  # recursive call\\\\n```\\\\n\\\\n**Iteration:** A loop repeatedly executes a block of code until a condition is false.\\\\n```python\\\\ndef factorial(n):\\\\n    result = 1\\\\n    for i in range(1, n + 1):\\\\n        result *= i\\\\n    return result\\\\n```\\\\n\\\\n**Key Differences:**\\\\n| Feature | Recursion | Iteration |\\\\n|---|---|---|\\\\n| Mechanism | Function calls itself | Loop (for/while) |\\\\n| Memory | Stack frame per call | Constant extra memory |\\\\n| Speed | Slower (overhead) | Generally faster |\\\\n| Termination | Base case | Loop condition |',
+          keyMarkingPoints: ['1 Mark for correct definition and example of recursion with base case', '1 Mark for correct definition and example of iteration with loop']
         },
         {
           qNum: 'Q1 (e)',
@@ -2070,6 +2142,42 @@ export const expectedQuestionPapers = [
           keyMarkingPoints: ['1 Mark for stack trace steps', '1 Mark for final value 288']
         },
         {
+          qNum: 'Q1 (b2)',
+          unit: 'Unit 1',
+          marks: 2,
+          question: 'What is the Divide and Conquer paradigm? Name two well-known algorithms that use this strategy.',
+          expectedFrequency: 'High Frequency Algorithm Design Question',
+          modelAnswer: '**Divide and Conquer** is an algorithm design paradigm that solves a problem by recursively applying three steps:\\\\n\\\\n1. **Divide:** Break the original problem into two or more smaller sub-problems of the same type.\\\\n2. **Conquer:** Solve each sub-problem recursively. When a sub-problem is small enough (base case), solve it directly.\\\\n3. **Combine:** Merge the solutions of sub-problems to construct the solution to the original problem.\\\\n\\\\n**Two Algorithms Using Divide and Conquer:**\\\\n1. **Merge Sort** — divides array into two halves, sorts each half, merges sorted halves.\\\\n2. **Quick Sort** — selects a pivot, partitions array around the pivot, recursively sorts the partitions.',
+          keyMarkingPoints: ['1 Mark for correct three-step definition of Divide and Conquer (Divide, Conquer, Combine)', '1 Mark for naming any two correct algorithms: Merge Sort, Quick Sort, Binary Search, etc.']
+        },
+        {
+          qNum: 'Q1 (b3)',
+          unit: 'Unit 1',
+          marks: 2,
+          question: 'State the best-case, worst-case, and average-case time complexities of Bubble Sort. When does the best case occur?',
+          expectedFrequency: 'High Frequency Sorting Complexity Question',
+          modelAnswer: '**Bubble Sort Time Complexities:**\\\\n\\\\n| Case | Time Complexity | Condition |\\\\n|---|---|---|\\\\n| Best Case | $O(n)$ | Array is already sorted (with early exit flag) |\\\\n| Average Case | $O(n^2)$ | Elements are in random order |\\\\n| Worst Case | $O(n^2)$ | Array is sorted in reverse order |\\\\n\\\\n**Best Case Explanation:** With a flag variable, if no swap occurs in an entire pass, the algorithm detects that the array is already sorted and terminates early after $O(n)$ comparisons.\\\\n\\\\n**Space Complexity:** $O(1)$ — in-place sorting algorithm.',
+          keyMarkingPoints: ['1 Mark for correctly stating O(n) best, O(n²) average, O(n²) worst with conditions', '1 Mark for explaining the early-exit flag mechanism that enables O(n) best case']
+        },
+        {
+          qNum: 'Q1 (d2)',
+          unit: 'Unit 2',
+          marks: 2,
+          question: 'Differentiate between tail recursion and head recursion. Which one is preferred from a memory optimization perspective and why?',
+          expectedFrequency: 'High Frequency Recursion Question',
+          modelAnswer: '**Head Recursion:** The recursive call is made **before** any processing in the function body. The result of the current call depends on the result returned by the recursive call.\\\\n```c\\\\nvoid headRecursion(int n) {\\\\n    if (n > 0) {\\\\n        headRecursion(n - 1);  // recursive call FIRST\\\\n        printf(\"%d \", n);       // processing AFTER\\\\n    }\\\\n}\\\\n```\\\\n\\\\n**Tail Recursion:** The recursive call is the **very last operation** performed in the function — nothing is done after it returns.\\\\n```c\\\\nvoid tailRecursion(int n) {\\\\n    if (n > 0) {\\\\n        printf(\"%d \", n);       // processing FIRST\\\\n        tailRecursion(n - 1);  // recursive call LAST\\\\n    }\\\\n}\\\\n```\\\\n\\\\n**Memory Optimization:** **Tail recursion** is preferred. Many compilers/interpreters apply **Tail Call Optimization (TCO)** — the compiler reuses the same stack frame for each recursive call instead of creating a new one, reducing stack space from $O(n)$ to $O(1)$.',
+          keyMarkingPoints: ['1 Mark for correct definition and code example of both head and tail recursion', '1 Mark for explaining Tail Call Optimization and O(1) space advantage of tail recursion']
+        },
+        {
+          qNum: 'Q1 (d3)',
+          unit: 'Unit 2',
+          marks: 2,
+          question: 'What is the balanced parenthesis problem? Explain how a stack is used to solve it.',
+          expectedFrequency: 'High Frequency Stack Application Question',
+          modelAnswer: '**Balanced Parenthesis Problem:** Given a string of brackets (e.g., `{[()]}` or `[(])`), determine whether every opening bracket has a corresponding closing bracket in the correct nesting order.\\\\n\\\\n**Stack-Based Algorithm:**\\\\n1. Scan the expression left to right character by character.\\\\n2. If the character is an **opening bracket** `(`, `[`, or `{` → **push** it onto the stack.\\\\n3. If the character is a **closing bracket** `)`, `]`, or `}` →\\\\n   - If stack is **empty** → **unbalanced** (extra closing bracket).\\\\n   - Pop the top element. If it does not match the corresponding opening bracket → **unbalanced**.\\\\n4. After scanning all characters, if the **stack is empty** → **balanced**; otherwise → **unbalanced**.\\\\n\\\\n**Example:** `{[()]}` → Push `{`, `[`, `(` → Pop `)` matches `(` ✓ → Pop `]` matches `[` ✓ → Pop `}` matches `{` ✓ → Stack empty → **Balanced**.',
+          keyMarkingPoints: ['1 Mark for clear problem statement and stack-push-on-open / pop-and-match-on-close algorithm', '1 Mark for correct end condition: stack empty ↔ balanced, with a valid example trace']
+        },
+        {
           qNum: 'Q1 (e)',
           unit: 'Unit 3',
           marks: 2,
@@ -2371,6 +2479,42 @@ export const expectedQuestionPapers = [
           expectedFrequency: 'High Frequency Question',
           modelAnswer: 'If $\\mathcal{L}^{-1}\\{F(s)\\} = f(t)$ and $\\mathcal{L}^{-1}\\{G(s)\\} = g(t)$, then:\\n$$\\mathcal{L}^{-1}\\{F(s) \\cdot G(s)\\} = f(t) * g(t) = \\int_0^t f(u) g(t - u) \\, du$$',
           keyMarkingPoints: ['1 Mark for convolution definition', '1 Mark for definite integral formula 0 to t']
+        },
+        {
+          qNum: 'Q1 (b2)',
+          unit: 'Unit 1',
+          marks: 2,
+          question: 'Define the Wronskian of two functions $y_1$ and $y_2$. What does it indicate about the linear independence of solutions of an ODE?',
+          expectedFrequency: 'High Frequency ODE Question',
+          modelAnswer: '**Wronskian** of two differentiable functions $y_1(x)$ and $y_2(x)$ is the determinant:\\\\n$$W(y_1, y_2) = \\\\begin{vmatrix} y_1 & y_2 \\\\ y_1\' & y_2\' \\end{vmatrix} = y_1 y_2\' - y_2 y_1\'$\\\\n\\\\n**Significance for Linear Independence:**\\\\n- If $W(y_1, y_2) \\\\neq 0$ at **even one point** in the interval, then $y_1$ and $y_2$ are **linearly independent** and form a fundamental set of solutions (a valid basis for the general solution).\\\\n- If $W(y_1, y_2) = 0$ **throughout** the interval, then $y_1$ and $y_2$ are **linearly dependent** (one is a scalar multiple of the other).',
+          keyMarkingPoints: ['1 Mark for correct determinant definition W = y1 y2\' − y2 y1\'', '1 Mark for the correct interpretation: W ≠ 0 ↔ linearly independent (valid fundamental set)']
+        },
+        {
+          qNum: 'Q1 (b3)',
+          unit: 'Unit 1',
+          marks: 2,
+          question: 'What is the Method of Undetermined Coefficients? State the types of right-hand side functions for which it is applicable.',
+          expectedFrequency: 'High Frequency ODE Particular Integral Question',
+          modelAnswer: '**Method of Undetermined Coefficients** is a technique to find the Particular Integral (P.I.) of a linear ODE with **constant coefficients** by assuming a trial solution of the same form as the non-homogeneous right-hand side $f(x)$, then substituting it into the equation to determine the unknown constant coefficients.\\\\n\\\\n**Applicable When $f(x)$ is:**\\\\n1. A polynomial: $f(x) = a_n x^n + \\\\cdots + a_1 x + a_0$\\\\n2. An exponential: $f(x) = e^{\\\\alpha x}$\\\\n3. A sine or cosine: $f(x) = \\\\sin(\\\\beta x)$ or $\\\\cos(\\\\beta x)$\\\\n4. A finite product/sum of the above types (e.g., $x^2 e^{3x}$, $e^x \\\\sin(2x)$)\\\\n\\\\n**Not Applicable When:** $f(x)$ is a rational function, logarithm, or $\\\\tan x$, $\\\\sec x$ — for such cases, the method of **Variation of Parameters** is used.',
+          keyMarkingPoints: ['1 Mark for correct definition: assume trial solution of same form as RHS, substitute to find coefficients', '1 Mark for correctly listing at least 3 applicable function types and stating when it is not applicable']
+        },
+        {
+          qNum: 'Q1 (d2)',
+          unit: 'Unit 2',
+          marks: 2,
+          question: 'State the Initial Value Theorem (IVT) of the Laplace Transform with its formula.',
+          expectedFrequency: 'High Frequency Laplace Theorems Question',
+          modelAnswer: '**Initial Value Theorem (IVT):**\\\\nIf $f(t)$ and $f\'(t)$ are Laplace transformable and the limit exists, then the value of $f(t)$ as $t \\\\to 0^+$ can be found directly from $F(s) = \\\\mathcal{L}\\\\{f(t)\\\\}$ without performing the inverse Laplace transform:\\\\n$$\\\\lim_{t \\\\to 0^+} f(t) = \\\\lim_{s \\\\to \\\\infty} s \\\\cdot F(s)$$\\\\n\\\\n**Example:** If $F(s) = \\\\dfrac{5s}{s^2 + 4}$, then\\\\n$$f(0^+) = \\\\lim_{s \\\\to \\\\infty} s \\\\cdot \\\\frac{5s}{s^2 + 4} = \\\\lim_{s \\\\to \\\\infty} \\\\frac{5s^2}{s^2 + 4} = 5$$',
+          keyMarkingPoints: ['1 Mark for correct IVT formula: lim(t→0⁺) f(t) = lim(s→∞) sF(s)', '1 Mark for correct numerical example demonstrating application of the theorem']
+        },
+        {
+          qNum: 'Q1 (d3)',
+          unit: 'Unit 2',
+          marks: 2,
+          question: 'State the Final Value Theorem (FVT) of the Laplace Transform with its formula. State the condition for its validity.',
+          expectedFrequency: 'High Frequency Laplace Theorems Question',
+          modelAnswer: '**Final Value Theorem (FVT):**\\\\nIf $f(t)$ and $f\'(t)$ are Laplace transformable and $\\\\lim_{t \\\\to \\\\infty} f(t)$ exists (i.e., the system is **stable** — all poles of $s \\\\cdot F(s)$ lie in the **left half of the $s$-plane**), then:\\\\n$$\\\\lim_{t \\\\to \\\\infty} f(t) = \\\\lim_{s \\\\to 0} s \\\\cdot F(s)$$\\\\n\\\\n**Condition for Validity:** $s \\\\cdot F(s)$ must have **no poles on the imaginary axis or in the right half $s$-plane**. If poles exist there (e.g., oscillatory or growing $f(t)$), the FVT gives an incorrect result.\\\\n\\\\n**Example:** If $F(s) = \\\\dfrac{3}{s(s+2)}$, then $\\\\lim_{t\\\\to\\\\infty} f(t) = \\\\lim_{s\\\\to 0} s \\\\cdot \\\\dfrac{3}{s(s+2)} = \\\\dfrac{3}{2}$.',
+          keyMarkingPoints: ['1 Mark for correct FVT formula: lim(t→∞) f(t) = lim(s→0) sF(s)', '1 Mark for correctly stating the stability/left-half-plane pole condition with an example']
         },
         {
           qNum: 'Q1 (e)',
@@ -2691,6 +2835,33 @@ export const expectedQuestionPapers = [
           expectedFrequency: 'HTML Interactive Feature',
           modelAnswer: 'A Client-Side Image Map is an interactive image with multiple clickable hyperlinked coordinate hotspot zones. The browser calculates click coordinates directly without contacting server. Tags: (1) <img> with usemap attribute, (2) <map name="...">, and (3) <area shape="rect|circle|poly" coords="..." href="...">.',
           keyMarkingPoints: ['1 Mark for clickable hotspot zones definition', '1 Mark for listing <img>, <map>, and <area> tags']
+        },
+        {
+          qNum: 'Q1 (c2)',
+          unit: 'Unit 1',
+          marks: 2,
+          question: 'What is a URL (Uniform Resource Locator)? Identify and explain its four main components using the example: https://www.mmumullana.org/admissions?year=2024.',
+          expectedFrequency: 'High Frequency Web Fundamentals Question',
+          modelAnswer: '**URL (Uniform Resource Locator)** is a standardized address used to locate a resource on the Internet or a local network.\\\\n\\\\n**Four Main Components:**\\\\n1. **Scheme (Protocol):** `https` — specifies the communication protocol used to access the resource (HTTP, HTTPS, FTP, etc.).\\\\n2. **Host (Domain Name/IP):** `www.mmumullana.org` — identifies the server on which the resource is hosted; DNS resolves this to an IP address.\\\\n3. **Path:** `/admissions` — specifies the exact location of the resource on the server, like a directory path in a file system.\\\\n4. **Query String:** `?year=2024` — optional key-value pairs (after `?`) passed to the server as parameters, separated by `&` for multiple values.\\\\n\\\\n**Optional Component — Fragment:** `#section-id` — refers to a specific section within the page (processed client-side, not sent to server).',
+          keyMarkingPoints: ['1 Mark for correct definition of URL', '1 Mark for correctly identifying and explaining all 4 components (scheme, host, path, query string) with the example']
+        },
+        {
+          qNum: 'Q1 (e2)',
+          unit: 'Unit 2',
+          marks: 2,
+          question: 'Differentiate between block-level elements and inline elements in HTML. Give two examples of each.',
+          expectedFrequency: 'High Frequency HTML Fundamentals Question',
+          modelAnswer: '**Block-Level Elements:**\\\\n- Always start on a **new line** and take up the **full width** available (stretch from left to right margin).\\\\n- Create a "block" or rectangular box in the flow of the document.\\\\n- They **can contain** inline elements and other block elements.\\\\n- **Examples:** `<div>`, `<p>`, `<h1>`–`<h6>`, `<ul>`, `<table>`\\\\n\\\\n**Inline Elements:**\\\\n- Do **not** start on a new line; they flow within the text and only take up **as much width as their content** requires.\\\\n- They **cannot contain** block-level elements (only other inline elements or text).\\\\n- **Examples:** `<span>`, `<a>`, `<strong>`, `<em>`, `<img>`, `<input>`\\\\n\\\\n**Key Difference:** Block elements create a new "line break" before and after; inline elements do not.',
+          keyMarkingPoints: ['1 Mark for correct distinction (new line + full width vs inline flow + content width)', '1 Mark for 2 correct examples of each (at least 4 total)']
+        },
+        {
+          qNum: 'Q1 (e3)',
+          unit: 'Unit 2',
+          marks: 2,
+          question: 'What are HTML5 `data-*` attributes? Why are they used? Give a code example.',
+          expectedFrequency: 'High Frequency HTML5 Question',
+          modelAnswer: '**HTML5 `data-*` attributes** (custom data attributes) allow developers to **embed custom, private data** directly in HTML elements without using non-standard attributes or hidden inputs. They are prefixed with `data-` followed by any developer-chosen name.\\\\n\\\\n**Why They Are Used:**\\\\n1. Store extra information that the HTML element represents but that doesn\'t need to be displayed visually.\\\\n2. Pass structured data from the HTML/server to JavaScript cleanly without using global variables or hidden fields.\\\\n3. They do **not** affect the element\'s rendering or semantics — ignored by browsers and screen readers unless explicitly read by JS.\\\\n\\\\n**Code Example:**\\\\n```html\\\\n<button id="buy-btn"\\\\n        data-product-id="P1042"\\\\n        data-price="499"\\\\n        data-category="electronics">\\\\n  Buy Now\\\\n</button>\\\\n```\\\\n```javascript\\\\nconst btn = document.getElementById(\'buy-btn\');\\\\nconsole.log(btn.dataset.productId);  // "P1042"\\\\nconsole.log(btn.dataset.price);       // "499"\\\\n```',
+          keyMarkingPoints: ['1 Mark for correct definition: custom data storage attributes prefixed with data-, invisible to display', '1 Mark for a valid code example showing data-* in HTML and dataset access in JavaScript']
         },
         {
           qNum: 'Q1 (f)',
