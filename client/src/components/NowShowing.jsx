@@ -20,7 +20,8 @@ import {
   Clock, 
   Layers, 
   ChevronRight,
-  Sparkles
+  Sparkles,
+  ClipboardCheck
 } from 'lucide-react';
 import { initialSubjects, academicYears } from '../data/mockData';
 import { downloadPdf } from '../utils/pdfDownloadHelper';
@@ -102,7 +103,7 @@ export const getSubjectPdf = (sub) => {
   return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: `${sub.code || 'College'}_Notes.pdf` };
 };
 
-export default function NowShowing({ onReadNotes }) {
+export default function NowShowing({ onReadNotes, onOpenPapers }) {
   /* -----------------------------------------------------------------------
      STATE MANAGEMENT
      - selectedSem: Active Semester filter ('All', '1', '2')
@@ -194,6 +195,26 @@ export default function NowShowing({ onReadNotes }) {
               >
                 <BookOpen size={16} /> Open Notes Reader <ChevronRight size={18} />
               </button>
+              {onOpenPapers && (
+                <button 
+                  type="button"
+                  className="btn-outline"
+                  style={{ 
+                    borderColor: '#10b981', 
+                    color: '#34d399', 
+                    background: 'rgba(16, 185, 129, 0.14)',
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '8px', 
+                    cursor: 'pointer',
+                    fontWeight: 700 
+                  }}
+                  onClick={() => onOpenPapers(featuredSubject)}
+                  title={`View 2026 Expected Question Paper for ${featuredSubject.name}`}
+                >
+                  <ClipboardCheck size={16} /> 2026 Solved Papers
+                </button>
+              )}
               {(() => {
                 const pdf = getSubjectPdf(featuredSubject);
                 return (
@@ -393,6 +414,31 @@ export default function NowShowing({ onReadNotes }) {
                     >
                       <BookOpen size={14} /> Read Notes
                     </button>
+                    {onOpenPapers && (
+                      <button 
+                        type="button"
+                        className="btn-outline" 
+                        style={{ 
+                          padding: '8px 10px', 
+                          fontSize: '0.82rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          borderColor: '#10b981',
+                          color: '#34d399',
+                          background: 'rgba(16, 185, 129, 0.1)',
+                          fontWeight: 700
+                        }}
+                        title={`View 2026 Expected Question Paper for ${sub.name}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenPapers(sub);
+                        }}
+                      >
+                        <ClipboardCheck size={14} /> Papers
+                      </button>
+                    )}
                     {(() => {
                       const pdf = getSubjectPdf(sub);
                       return (

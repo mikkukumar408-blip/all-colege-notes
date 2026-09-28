@@ -61,12 +61,10 @@ const YEAR_CONFIG = {
 export default function Theaters({ currentUser, initialSubject }) {
   /* -----------------------------------------------------------------------
      STATE MANAGEMENT
-     - activeTabMode: 'balanced' (Exam Revision Notes) | 'ultraShort' (2-Page Summaries)
      - searchQuery: Filter notes by typed query
-     - selectedYear: Active Year filter ('1st Year', '2nd Year', '3rd Year', '4th Year', 'All Years')
+     - selectedYear: Active Year filter ('1st Year')
      - selectedSemester: Active Semester filter ('All' or specific 'Semester X')
      ----------------------------------------------------------------------- */
-  const [activeTabMode, setActiveTabMode] = useState('balanced'); // 'balanced' | 'ultraShort'
   const [shortNotes] = useState(initialShortNotes);
   const [revisionNotes] = useState(examRevisionNotes);
   const [searchQuery, setSearchQuery] = useState('');
@@ -134,32 +132,6 @@ export default function Theaters({ currentUser, initialSubject }) {
     return matchesSearch && matchesYear && matchesSemester;
   });
 
-  // ─── Filter Ultra-Short 2-Page Sheets ────────────────────────────────────
-  const filteredShortNotes = shortNotes.filter(item => {
-    if (item.isDead || item.code === 'CS301') return false;
-    const q = searchQuery.toLowerCase().trim();
-    const matchesSearch = !q ||
-      item.subject.toLowerCase().includes(q) ||
-      item.code.toLowerCase().includes(q) ||
-      item.type.toLowerCase().includes(q) ||
-      (item.highlights && item.highlights.some(h => h.toLowerCase().includes(q)));
-      
-    // Year filter
-    let matchesYear = true;
-    if (selectedYear !== 'All Years') {
-      const allowedSems = YEAR_CONFIG[selectedYear]?.semesters.map(s => s.id) || [];
-      matchesYear = allowedSems.includes(item.semester);
-    }
-
-    // Semester filter
-    let matchesSemester = true;
-    if (selectedSemester !== 'All') {
-      matchesSemester = item.semester === selectedSemester;
-    }
-
-    return matchesSearch && matchesYear && matchesSemester;
-  });
-
   const handleDownloadClick = (item, isRevision = false) => {
     try {
       logUserActivity(
@@ -190,16 +162,16 @@ export default function Theaters({ currentUser, initialSubject }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-            <span className="badge-neon font-display">⚡ BALANCED FAST-TRACK HUB</span>
+            <span className="badge-neon font-display">⚡ EXAM REVISION &amp; SHORT NOTES</span>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>
-              100% MMEC Syllabus • Not Too Long, Not Too Short
+              Verified University Curriculum • Complete Units 1–4 Theories, Derivations &amp; Formulas
             </span>
           </div>
           <h1 style={{ fontSize: '2.1rem', fontWeight: 900, color: '#fff', margin: 0 }}>
             Exam Revision &amp; Short Notes
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', maxWidth: '780px', marginTop: '6px', lineHeight: '1.5' }}>
-            Specially engineered university cram guides: balanced length covering complete syllabus units, core theories, step-by-step derivations, essential formulas, and verified university exam questions with model answers.
+            Specially engineered university cram guides: covering complete syllabus units, core theories, step-by-step derivations, essential formulas, and verified university exam questions with model answers.
           </p>
         </div>
 
@@ -228,72 +200,28 @@ export default function Theaters({ currentUser, initialSubject }) {
       </div>
 
       {/* -------------------------------------------------------------------
-         PART B: TOP VIEW SWITCHER (Balanced Exam Revision vs Ultra-Short)
+         PART B: UNIFIED FAST-TRACK EXAM REVISION BANNER
          ------------------------------------------------------------------- */}
       <div 
         className="glass-panel" 
         style={{ 
-          padding: '6px', 
-          display: 'inline-flex', 
-          gap: '8px', 
+          padding: '12px 18px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '12px', 
           borderRadius: '12px', 
           background: 'rgba(11, 15, 25, 0.75)',
           border: '1px solid rgba(0, 240, 255, 0.25)',
-          width: 'fit-content',
           flexWrap: 'wrap'
         }}
       >
-        <button
-          type="button"
-          onClick={() => setActiveTabMode('balanced')}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '9px 20px',
-            borderRadius: '8px',
-            fontSize: '0.88rem',
-            fontWeight: 800,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            border: activeTabMode === 'balanced' ? '1px solid var(--neon-cyan)' : 'none',
-            background: activeTabMode === 'balanced' ? 'rgba(0, 240, 255, 0.22)' : 'transparent',
-            color: activeTabMode === 'balanced' ? '#fff' : 'var(--text-dim)',
-            boxShadow: activeTabMode === 'balanced' ? '0 0 16px rgba(0, 240, 255, 0.35)' : 'none'
-          }}
-        >
-          <Sparkles size={16} color={activeTabMode === 'balanced' ? 'var(--neon-cyan)' : 'currentColor'} />
-          <span>⚡ Exam Revision Notes (Balanced Length • 8-12 Pages)</span>
-          <span style={{ fontSize: '0.75rem', padding: '2px 7px', borderRadius: '12px', background: 'rgba(0,240,255,0.2)', color: 'var(--neon-cyan)' }}>
-            {filteredRevisionNotes.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTabMode('ultraShort')}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '9px 20px',
-            borderRadius: '8px',
-            fontSize: '0.88rem',
-            fontWeight: 800,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            border: activeTabMode === 'ultraShort' ? '1px solid #c084fc' : 'none',
-            background: activeTabMode === 'ultraShort' ? 'rgba(192, 132, 252, 0.22)' : 'transparent',
-            color: activeTabMode === 'ultraShort' ? '#fff' : 'var(--text-dim)',
-            boxShadow: activeTabMode === 'ultraShort' ? '0 0 16px rgba(192, 132, 252, 0.35)' : 'none'
-          }}
-        >
-          <FileText size={16} color={activeTabMode === 'ultraShort' ? '#c084fc' : 'currentColor'} />
-          <span>📄 Ultra-Short Cheat Sheets (2-Page Formulas)</span>
-          <span style={{ fontSize: '0.75rem', padding: '2px 7px', borderRadius: '12px', background: 'rgba(192,132,252,0.2)', color: '#c084fc' }}>
-            {filteredShortNotes.length}
-          </span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--neon-cyan)', fontWeight: 800, fontSize: '0.88rem' }}>
+          <Sparkles size={18} />
+          <span>Complete 4-Unit Cram Guides &amp; 2-Page Formula Summaries</span>
+        </div>
+        <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+          Each subject includes core theories, step-by-step derivations, verified university exam questions, and rapid formula sheets.
+        </span>
       </div>
 
       {/* -------------------------------------------------------------------
@@ -341,9 +269,7 @@ export default function Theaters({ currentUser, initialSubject }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
               {YEAR_CONFIG['1st Year'].semesters.map(sem => {
                 const isSelected = selectedSemester === sem.id;
-                const relevantCount = activeTabMode === 'balanced'
-                  ? revisionNotes.filter(n => n.semester === sem.id).length
-                  : shortNotes.filter(n => n.semester === sem.id).length;
+                const relevantCount = revisionNotes.filter(n => n.semester === sem.id).length;
 
                 return (
                   <div
@@ -406,10 +332,9 @@ export default function Theaters({ currentUser, initialSubject }) {
       </div>
 
       {/* -------------------------------------------------------------------
-         PART D: BALANCED EXAM REVISION NOTES GRID (GOLDEN MEDIUM)
+         PART D: EXAM REVISION NOTES & FORMULA SHEETS GRID
          ------------------------------------------------------------------- */}
-      {activeTabMode === 'balanced' && (
-        <div>
+      <div>
           {filteredRevisionNotes.length === 0 ? (
             <div className="glass-panel" style={{ padding: '48px 24px', textAlign: 'center' }}>
               <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', marginBottom: '16px' }}>
@@ -514,6 +439,42 @@ export default function Theaters({ currentUser, initialSubject }) {
                       <BookOpen size={16} /> 📖 Read Exam Revision Notes
                     </button>
 
+                    {(() => {
+                      const sn = shortNotes.find(s => 
+                        (s.code && item.code && s.code.toLowerCase().includes(item.code.toLowerCase())) ||
+                        (s.id && item.id && s.id.includes(item.id.replace('rev-', '')))
+                      );
+                      if (sn && sn.pdfUrl && sn.pdfUrl !== '#') {
+                        return (
+                          <button
+                            type="button"
+                            className="btn-outline"
+                            onClick={() => {
+                              handleDownloadClick(sn, false);
+                              downloadPdf(sn.pdfUrl, sn.downloadName, `${sn.subject} Formula Sheet`);
+                            }}
+                            style={{
+                              padding: '10px 14px',
+                              fontSize: '0.84rem',
+                              borderColor: '#c084fc',
+                              color: '#c084fc',
+                              background: 'rgba(192, 132, 252, 0.1)',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              cursor: 'pointer',
+                              fontWeight: 700
+                            }}
+                            title={`Download 2-Page Formula Cheat Sheet for ${item.subject}`}
+                          >
+                            <FileText size={15} /> Formula Sheet
+                          </button>
+                        );
+                      }
+                      return null;
+                    })()}
+
                     <button
                       type="button"
                       className="btn-outline"
@@ -547,140 +508,6 @@ export default function Theaters({ currentUser, initialSubject }) {
             </div>
           )}
         </div>
-      )}
-
-      {/* -------------------------------------------------------------------
-         PART E: ULTRA-SHORT 2-PAGE CHEAT SHEETS (FORMULA REVISION)
-         ------------------------------------------------------------------- */}
-      {activeTabMode === 'ultraShort' && (
-        <div>
-          {filteredShortNotes.length === 0 ? (
-            <div className="glass-panel" style={{ padding: '48px 24px', textAlign: 'center' }}>
-              <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', marginBottom: '16px' }}>
-                No ultra-short formula sheets found matching your selected filters.
-              </p>
-              <button 
-                onClick={() => { setSelectedYear('1st Year'); setSelectedSemester('All'); setSearchQuery(''); }}
-                className="btn-primary" 
-                style={{ padding: '10px 22px', fontSize: '0.88rem' }}
-              >
-                Reset Filters
-              </button>
-            </div>
-          ) : (
-            <div className="short-notes-cards-grid">
-              {filteredShortNotes.map(item => (
-                <div 
-                  key={item.id} 
-                  className="glass-panel" 
-                  style={{ 
-                    padding: '24px', 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    gap: '16px',
-                    border: '1px solid rgba(192, 132, 252, 0.3)',
-                    background: 'linear-gradient(135deg, rgba(7, 15, 30, 0.85) 0%, rgba(20, 10, 45, 0.7) 100%)'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <span className="badge-neon" style={{ marginBottom: '6px', background: 'rgba(192, 132, 252, 0.15)', color: '#c084fc', border: '1px solid #c084fc' }}>
-                        {item.category} • {item.pages}
-                      </span>
-                      <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', marginTop: '6px' }}>
-                        {item.subject}
-                      </h3>
-                      <div style={{ fontSize: '0.8rem', color: '#c084fc', marginTop: '2px', fontWeight: 600 }}>
-                        {item.code} • {item.semester}
-                      </div>
-                    </div>
-                    <span className="badge-amber">{item.fileSize}</span>
-                  </div>
-
-                  <div style={{
-                    background: 'rgba(7, 9, 14, 0.65)',
-                    padding: '14px',
-                    borderRadius: '10px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px',
-                    border: '1px solid var(--border-dim)'
-                  }}>
-                    <div style={{ fontSize: '0.84rem', color: '#38bdf8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Zap size={15} color="#c084fc" />
-                      <span>Format: {item.type}</span>
-                    </div>
-
-                    {/* Syllabus Highlights */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '2px' }}>
-                      {item.highlights && item.highlights.map((point, idx) => (
-                        <div key={idx} style={{ fontSize: '0.8rem', color: '#d0d8e8', display: 'flex', alignItems: 'flex-start', gap: '8px', lineHeight: 1.4 }}>
-                          <CheckCircle size={14} color="var(--neon-green)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                          <span>{point}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                      <Award size={14} color="var(--neon-amber)" />
-                      <span>Curriculum: <strong style={{ color: 'var(--neon-cyan)' }}>100% MMEC Syllabus Mapped</strong> • Exam Ready</span>
-                    </div>
-                  </div>
-
-                  {/* Direct Open & Download Actions */}
-                  <div className="short-note-card-actions">
-                    <a 
-                      href={item.isDead || item.code === 'CS301' ? undefined : item.pdfUrl}
-                      target={item.isDead || item.code === 'CS301' ? undefined : "_blank"}
-                      rel="noopener noreferrer"
-                      className={item.isDead || item.code === 'CS301' ? "btn-secondary" : "btn-review-glow"} 
-                      style={{ 
-                        flex: 1, 
-                        justifyContent: 'center', 
-                        textDecoration: 'none', 
-                        display: 'inline-flex', 
-                        alignItems: 'center', 
-                        gap: '6px',
-                        fontSize: '0.84rem',
-                        padding: '10px 12px',
-                        opacity: item.isDead || item.code === 'CS301' ? 0.35 : 1,
-                        cursor: item.isDead || item.code === 'CS301' ? 'not-allowed' : 'pointer'
-                      }}
-                      title={item.isDead || item.code === 'CS301' ? 'Under Preparation' : 'Open & Review PDF'}
-                    >
-                      <Eye size={16} /> Open &amp; Review PDF
-                    </a>
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        if (item.isDead || item.code === 'CS301') return;
-                        handleDownloadClick(item);
-                        downloadPdf(item.pdfUrl, item.downloadName, item.subject);
-                      }}
-                      className={item.isDead || item.code === 'CS301' ? "btn-secondary" : "btn-primary"} 
-                      style={{ 
-                        flex: 1.2, 
-                        justifyContent: 'center', 
-                        textDecoration: 'none', 
-                        display: 'inline-flex', 
-                        alignItems: 'center', 
-                        gap: '6px',
-                        fontSize: '0.84rem',
-                        padding: '10px 12px',
-                        opacity: item.isDead || item.code === 'CS301' ? 0.35 : 1,
-                        cursor: item.isDead || item.code === 'CS301' ? 'not-allowed' : 'pointer'
-                      }}
-                      title={item.isDead || item.code === 'CS301' ? 'Under Preparation' : 'Download Short Notes'}
-                    >
-                      <Download size={16} /> Download Short Notes
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* -------------------------------------------------------------------
          PART F: INTERACTIVE IN-APP EXAM REVISION READER MODAL (FULL EXPERIENCE)

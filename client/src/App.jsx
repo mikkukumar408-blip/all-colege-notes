@@ -18,7 +18,7 @@ const SeatBooking = React.lazy(() => import('./components/SeatBooking'));
 const SuperAdminPanel = React.lazy(() => import('./components/SuperAdminPanel'));
 const QuickSearchPalette = React.lazy(() => import('./components/QuickSearchPalette'));
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, BookOpen, Sparkles, Code2, ClipboardCheck, Search, Crown } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, BookOpen, Sparkles, Code2, ClipboardCheck, Search, Crown, ArrowUp } from 'lucide-react';
 import { App as CapApp } from '@capacitor/app';
 import { pullCloudUsers, getApiUrl, pullCloudControls } from './utils/cloudSync';
 import { recordVisit } from './utils/visitorTracker';
@@ -36,6 +36,16 @@ export default function App() {
     } catch (e) {}
     return { username: 'Student', role: 'student', isSuperAdmin: false };
   });
+
+  // Universal Floating Scroll-to-Top State (triggers when scrolled > 350px)
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const handleWindowScroll = () => {
+      setShowScrollTop(window.scrollY > 350);
+    };
+    window.addEventListener('scroll', handleWindowScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleWindowScroll);
+  }, []);
 
   /* -----------------------------------------------------------------------
      THEME: PERMANENT DARK MODE ALWAYS
@@ -261,7 +271,12 @@ export default function App() {
       case 'subjects-notes':
         return (
           <NowShowing 
-            onReadNotes={handleOpenNotesReader} 
+            onReadNotes={handleOpenNotesReader}
+            onOpenPapers={(sub) => {
+              if (sub) setSelectedSubject(sub);
+              setActiveTab('question-papers');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         );
       case 'notes-reader':
@@ -281,7 +296,7 @@ export default function App() {
       case 'short-notes':
         return <Theaters currentUser={currentUser} initialSubject={selectedSubject} />;
       case 'question-papers':
-        return <ExpectedQuestionPapers currentUser={currentUser} />;
+        return <ExpectedQuestionPapers currentUser={currentUser} initialSubject={selectedSubject} />;
       case 'downloads-lab':
         return <SeatBooking currentUser={currentUser} preselectedMovie={selectedSubject} />;
       case 'admin-panel':
@@ -469,6 +484,18 @@ export default function App() {
           />
         )}
       </React.Suspense>
+
+      {/* Universal Floating Scroll-to-Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="universal-scroll-top-btn"
+          aria-label="Scroll back to top"
+          title="Scroll back to top"
+        >
+          <ArrowUp size={20} />
+        </button>
+      )}
 
       {/* Android Back Button Double-Tap Confirmation Toast */}
       {backToastMessage && (

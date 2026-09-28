@@ -35,6 +35,7 @@ import {
   EyeOff,
   Award,
   ExternalLink,
+  ClipboardCheck,
   X 
 } from 'lucide-react';
 import { initialSubjects } from '../data/mockData';
@@ -1801,6 +1802,29 @@ export default function SensoryLab({
             title="Open Interactive 1-Page Formula & Theorem Cheat-Sheet for this Unit"
           >
             <Zap size={15} /> Formula Sheet
+          </button>
+
+          {/* 🎯 Direct 1-Click Link to Expected University Question Paper */}
+          <button 
+            type="button"
+            className="btn-outline" 
+            onClick={() => onNavigateTab && onNavigateTab('question-papers', activeSubject)}
+            style={{
+              borderColor: '#10b981',
+              color: '#34d399',
+              background: 'rgba(16, 185, 129, 0.14)',
+              fontWeight: 800,
+              fontSize: '0.82rem',
+              padding: '7px 14px',
+              borderRadius: '8px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer'
+            }}
+            title={`Open 2026 Solved Question Paper for ${activeSubject.name}`}
+          >
+            <ClipboardCheck size={15} /> 2026 Solved Paper
           </button>
         </div>
       </div>

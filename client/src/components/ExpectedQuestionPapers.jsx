@@ -203,12 +203,28 @@ export function getExamPaperForType(rawPaper, examType = 'sessional-1') {
   };
 }
 
-export default function ExpectedQuestionPapers({ currentUser }) {
+export default function ExpectedQuestionPapers({ currentUser, initialSubject }) {
   const [selectedSemester, setSelectedSemester] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [activePaper, setActivePaper] = useState(null);
   const [viewMode, setViewMode] = useState('solutions'); // 'questions-only' | 'solutions'
   const [revealedAnswers, setRevealedAnswers] = useState({});
+
+  // Auto-select paper matching initialSubject if provided from Notes Reader
+  useEffect(() => {
+    if (initialSubject) {
+      const targetCode = (initialSubject.code || '').toLowerCase().trim();
+      const targetName = (initialSubject.name || '').toLowerCase().trim();
+      const matched = expectedQuestionPapers.find(p => 
+        (targetCode && p.code.toLowerCase().includes(targetCode)) ||
+        (targetName && p.subject.toLowerCase().includes(targetName)) ||
+        (initialSubject.id && p.id === initialSubject.id)
+      );
+      if (matched) {
+        setActivePaper(matched);
+      }
+    }
+  }, [initialSubject]);
 
   // Active Exam Type State (defaults to sessional-1 since it's happening on 28-30!)
   const [selectedExamType, setSelectedExamType] = useState(() => {
