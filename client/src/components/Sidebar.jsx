@@ -9,6 +9,7 @@
    ========================================================================= */
 
 import React from 'react';
+import { Capacitor } from '@capacitor/core';
 import { 
   BookOpen, 
   FileText, 
@@ -40,12 +41,17 @@ export default function Sidebar({
      ----------------------------------------------------------------------- */
   const isSuperAdmin = (currentUser?.username?.toLowerCase() === 'bhavya mishra') || (currentUser?.role === 'superadmin') || (currentUser?.isSuperAdmin === true);
 
+  // true when running inside the native Android app — hide "Download App" there
+  const isNative = Capacitor.isNativePlatform();
+
   const navSections = [
     { id: 'subjects-notes', label: 'Semester Notes & Subjects', icon: BookOpen, badge: 'Core Notes' },
     { id: 'short-notes', label: 'Exam Revision & Short Notes', icon: Sparkles, badge: 'Fast Track' },
     { id: 'question-papers', label: 'Expected Question Papers', icon: ClipboardCheck, badge: '2026 Exams' },
     { id: 'downloads-lab', label: 'Lab Manuals & Practical Codes', icon: Code2, badge: 'Lab & Viva' },
-    { id: 'download-app', label: 'Download Android App', icon: Smartphone, badge: 'APK' },
+    ...(!isNative ? [
+      { id: 'download-app', label: 'Download Android App', icon: Smartphone, badge: 'APK' }
+    ] : []),
     ...(isSuperAdmin ? [
       { id: 'admin-panel', label: 'Super Admin Panel', icon: Crown, badge: 'ADMIN' }
     ] : [])

@@ -21,6 +21,7 @@ const DownloadApp = React.lazy(() => import('./components/DownloadApp'));
 import { initialSubjects } from './data/mockData';
 import { Menu, ChevronLeft, ChevronRight, BookOpen, Sparkles, Code2, ClipboardCheck, Search, Crown, ArrowUp, Smartphone } from 'lucide-react';
 import { App as CapApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { pullCloudUsers, getApiUrl, pullCloudControls } from './utils/cloudSync';
 import { recordVisit } from './utils/visitorTracker';
 import './App.css';
@@ -303,6 +304,11 @@ export default function App() {
       case 'admin-panel':
         return <SuperAdminPanel />;
       case 'download-app':
+        // Only available on web — redirect native app to home
+        if (Capacitor.isNativePlatform()) {
+          setActiveTab('subjects-notes');
+          return null;
+        }
         return <DownloadApp />;
       default:
         return (
