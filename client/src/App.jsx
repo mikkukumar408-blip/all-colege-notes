@@ -18,7 +18,7 @@ const SeatBooking = React.lazy(() => import('./components/SeatBooking'));
 const SuperAdminPanel = React.lazy(() => import('./components/SuperAdminPanel'));
 const QuickSearchPalette = React.lazy(() => import('./components/QuickSearchPalette'));
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, BookOpen, FileText, Sparkles, Code2, ClipboardCheck, Search, Crown } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, BookOpen, Sparkles, Code2, ClipboardCheck, Search, Crown } from 'lucide-react';
 import { App as CapApp } from '@capacitor/app';
 import { pullCloudUsers, getApiUrl, pullCloudControls } from './utils/cloudSync';
 import { recordVisit } from './utils/visitorTracker';
@@ -427,18 +427,17 @@ export default function App() {
 
       {/* -----------------------------------------------------------------
          6. MOBILE BOTTOM NAVIGATION DOCK (Phones & Small Tablets <= 768px)
-         Streamlined 5-tab core navigation: Subjects, Reader, Revision, Papers, Labs
+         Streamlined 4-tab core navigation: Subjects, Revision, Papers, Labs
          ----------------------------------------------------------------- */}
       <nav className="mobile-bottom-nav" aria-label="Mobile Navigation">
         {[
-          { id: 'subjects-notes', label: 'Subjects', icon: BookOpen },
-          { id: 'notes-reader', label: 'Reader', icon: FileText },
-          { id: 'short-notes', label: 'Revision', icon: Sparkles },
-          { id: 'question-papers', label: 'Papers', icon: ClipboardCheck },
-          { id: 'downloads-lab', label: 'Labs', icon: Code2 },
+          { id: 'subjects-notes', label: 'Subjects', icon: BookOpen, matchActive: (tab) => tab === 'subjects-notes' || tab === 'notes-reader' },
+          { id: 'short-notes', label: 'Revision', icon: Sparkles, matchActive: (tab) => tab === 'short-notes' },
+          { id: 'question-papers', label: 'Papers', icon: ClipboardCheck, matchActive: (tab) => tab === 'question-papers' },
+          { id: 'downloads-lab', label: 'Labs', icon: Code2, matchActive: (tab) => tab === 'downloads-lab' },
         ].map((tab) => {
           const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
+          const isActive = tab.matchActive(activeTab);
           return (
             <button
               key={tab.id}
