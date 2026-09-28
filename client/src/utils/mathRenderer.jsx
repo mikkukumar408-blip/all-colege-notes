@@ -186,10 +186,73 @@ export function formatMathText(text) {
   html = html.replace(/\\sin\s*\(?heta\)?/g, '\\sin\\theta');
   html = html.replace(/\\cos\s*\(?heta\)?/g, '\\cos\\theta');
 
-  // Pre-clean comma corruptions and escaped tokens
-  html = html.replace(/,\s*\\*text\{/g, '\\,\\text{');
-  html = html.replace(/,\s*\\*(?:Omega|Ω)\b/g, '\\,\\Omega');
-  html = html.replace(/\bRL\s*=\s*(\d+(?:\.\d+)?)\s*(?:\\,|,\s*)?(?:\\Omega|Ω)?/g, '$R_L = $1\\,\\Omega$');
+  // Auto-detect and wrap unadorned C/C++ code blocks starting with #include
+  if (!html.includes('```') && html.includes('#include')) {
+    html = html.replace(/(#include\s*<[^\n]+>[\s\S]*?)(?=(?:\n\s*(?:Trace|Output|Explanation|Marking|Complexit|Sample Run)|$))/i, (match) => {
+      return `\`\`\`c\n${match.trim()}\n\`\`\``;
+    });
+  }
+
+  // Protect C/C++ #include <header.h> from being parsed as unclosed HTML elements
+  html = html.replace(/#include\s*<([^>]+)>/g, '#include &lt;$1&gt;');
+  html = html.replace(/<([a-zA-Z0-9_\.]+\.h)>/g, '&lt;$1&gt;');
+
+  // Protect Markdown code blocks ```lang ... ```
+  const codePlaceholders = [];
+  html = html.replace(/```([a-zA-Z0-9_]*)\n?([\s\S]*?)```/g, (match, lang, code) => {
+    const key = `@@@ACN_CODE_${codePlaceholders.length}@@@`;
+    const isTerminal = ['terminal', 'output', 'text', 'sh', 'bash', 'console'].includes((lang || '').toLowerCase());
+    const escapedCode = code
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    let blockHtml = '';
+    if (isTerminal) {
+      blockHtml = `<div class="terminal-editor-box" style="margin: 14px 0; border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; overflow: hidden; background: #030712; box-shadow: 0 4px 16px rgba(0,0,0,0.6);">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 6px 12px; background: rgba(6, 78, 59, 0.4); border-bottom: 1px solid rgba(16, 185, 129, 0.2);">
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#10b981; display:inline-block;"></span>
+            <span style="font-size:0.75rem; color:#6ee7b7; font-family:monospace; font-weight:700;">💻 Terminal Execution &amp; Output</span>
+          </div>
+          <span style="font-size:0.68rem; color:#34d399; font-weight:700; text-transform:uppercase;">CLI TRACE</span>
+        </div>
+        <div style="padding: 12px 14px; font-family: 'Fira Code', Consolas, Monaco, monospace; font-size: 0.82rem; line-height: 1.55; overflow-x: auto; background: #030712; color: #a7f3d0;">
+          <pre style="margin:0; white-space:pre; font-family:inherit;"><code>${escapedCode}</code></pre>
+        </div>
+      </div>`;
+    } else {
+      const codeLines = escapedCode.split('\n');
+      const lineGutter = codeLines.map((_, i) => `<div style="color: #475569; user-select: none; text-align: right; padding-right: 12px; font-size: 0.78rem;">${i + 1}</div>`).join('');
+      const formattedLines = codeLines.map(line => `<div style="white-space: pre;">${line || ' '}</div>`).join('');
+      
+      const fileBadge = lang ? (lang === 'c' ? 'solution.c' : (lang === 'cpp' ? 'solution.cpp' : (lang === 'py' || lang === 'python' ? 'solution.py' : (lang === 'java' ? 'Solution.java' : `solution.${lang}`)))) : 'solution.c';
+      const langBadge = lang ? (lang === 'c' ? 'C11 STANDARD' : (lang === 'cpp' ? 'C++17' : lang.toUpperCase())) : 'C SOURCE';
+
+      blockHtml = `<div class="code-editor-box" style="margin: 14px 0; border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 8px; overflow: hidden; background: #070c14; box-shadow: 0 6px 24px rgba(0,0,0,0.6);">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 7px 14px; background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span style="width:10px; height:10px; border-radius:50%; background:#ff5f56; display:inline-block;"></span>
+            <span style="width:10px; height:10px; border-radius:50%; background:#ffbd2e; display:inline-block;"></span>
+            <span style="width:10px; height:10px; border-radius:50%; background:#27c93f; display:inline-block;"></span>
+            <span style="font-size:0.75rem; color:#94a3b8; font-family:monospace; margin-left:8px; font-weight:600;">📁 ${fileBadge}</span>
+          </div>
+          <span style="font-size:0.7rem; color:#00f0ff; font-weight:800; letter-spacing:0.05em; text-transform:uppercase;">${langBadge}</span>
+        </div>
+        <div style="display:flex; padding: 12px 14px; font-family: 'Fira Code', Consolas, Monaco, monospace; font-size: 0.83rem; line-height: 1.6; overflow-x: auto; background: #070c14;">
+          <div style="min-width: 28px; border-right: 1px solid rgba(255, 255, 255, 0.1); margin-right: 14px;">
+            ${lineGutter}
+          </div>
+          <div style="color: #e2e8f0; font-family: inherit; flex: 1;">
+            ${formattedLines}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    codePlaceholders.push({ key, html: blockHtml });
+    return key;
+  });
 
   const mathBlocks = [];
 
@@ -337,6 +400,12 @@ export function formatMathText(text) {
   for (let i = 0; i < mathBlocks.length; i++) {
     const { key, rendered } = mathBlocks[i];
     html = html.replace(key, rendered);
+  }
+
+  // 20. Restore code blocks safely
+  for (let i = 0; i < codePlaceholders.length; i++) {
+    const { key, html: blockHtml } = codePlaceholders[i];
+    html = html.replace(key, blockHtml);
   }
 
   setCacheEntry(textCache, text, html);

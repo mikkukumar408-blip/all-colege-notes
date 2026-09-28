@@ -41,7 +41,9 @@ import {
   BookOpen, 
   Compass, 
   Share2, 
-  AlertCircle 
+  AlertCircle,
+  Copy,
+  Check
 } from 'lucide-react';
 import { expectedQuestionPapers } from '../data/questionPapersData';
 import { logUserActivity } from '../utils/activityTracker';
@@ -65,12 +67,14 @@ export const EXAM_TYPES = {
     timerSeconds: 90 * 60, // 5400s
     maxMarks: 30,
     passingMarks: 12,
-    secAMarks: 10,
-    secBMarks: 20,
+    secAMarks: 6,
+    secBMarks: 4,
+    secCMarks: 8,
+    secDMarks: 12,
     color: '#f59e0b',
     border: 'rgba(245, 158, 11, 0.45)',
     bg: 'rgba(245, 158, 11, 0.12)',
-    description: 'Official Mid-Term Sessional Examination. Strictly covers Unit-I & Unit-II syllabus.'
+    description: 'Official Mid-Term Sessional Examination. Strictly 30 Marks across 4 Sections: Section A (6×1M = 6M), Section B (2×2M = 4M), Section C (Attempt 2 of 4×4M = 8M), and Section D (Attempt 2 of 4×6M = 12M).'
   },
   'sessional-2': {
     id: 'sessional-2',
@@ -85,12 +89,14 @@ export const EXAM_TYPES = {
     timerSeconds: 90 * 60, // 5400s
     maxMarks: 30,
     passingMarks: 12,
-    secAMarks: 10,
-    secBMarks: 20,
+    secAMarks: 6,
+    secBMarks: 4,
+    secCMarks: 8,
+    secDMarks: 12,
     color: '#a78bfa',
     border: 'rgba(167, 139, 250, 0.45)',
     bg: 'rgba(167, 139, 250, 0.12)',
-    description: 'Upcoming mid-term evaluation. Strictly covers Unit-III & Unit-IV syllabus.'
+    description: 'Upcoming Mid-Term Sessional Examination. Strictly 30 Marks across 4 Sections: Section A (6×1M = 6M), Section B (2×2M = 4M), Section C (Attempt 2 of 4×4M = 8M), and Section D (Attempt 2 of 4×6M = 12M).'
   },
   'end-sem': {
     id: 'end-sem',
@@ -123,6 +129,7 @@ export function getExamPaperForType(rawPaper, examType = 'sessional-1') {
     return {
       ...rawPaper,
       examType,
+      isFourSectionFormat: false,
       examConfig: config,
       examTitle: config.paperTitle,
       examShortTitle: config.name,
@@ -139,68 +146,310 @@ export function getExamPaperForType(rawPaper, examType = 'sessional-1') {
   }
 
   // Sessional-I (Unit 1 & 2) or Sessional-II (Unit 3 & 4)
+  // Strictly 30 Marks across 4 Sections:
+  // - Section A: 6 questions x 1 Mark each = 6 Marks (Compulsory)
+  // - Section B: 2 questions x 2 Marks each = 4 Marks (Compulsory)
+  // - Section C: 4 questions x 4 Marks each (Attempt any 2) = 8 Marks (~1 Page model answer)
+  // - Section D: 4 questions x 6 Marks each (Attempt any 2) = 12 Marks (~1.5 - 2 Pages model answer)
+  // Total Attempt Marks: 6 + 4 + 8 + 12 = 30 Marks (Passing: 12 Marks, 40%, Time: 1 Hour 30 Minutes)
   const isSessional1 = examType === 'sessional-1';
   const targetUnits = isSessional1 ? ['unit 1', 'unit 2'] : ['unit 3', 'unit 4'];
   const targetBUnits = isSessional1 ? ['UNIT I', 'UNIT II'] : ['UNIT III', 'UNIT IV'];
 
-  // Filter Section A questions for target units
+  // All Section A questions matching target units
   const secAFiltered = (rawPaper.sectionA?.questions || []).filter(q => {
     const u = (q.unit || '').toLowerCase();
     return targetUnits.some(tu => u.includes(tu));
   });
 
-  const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-  const formattedSecA = secAFiltered.map((q, idx) => ({
-    ...q,
-    qNum: `Q1 (${letters[idx] || (idx + 1)})`,
-    marks: 2
-  }));
-
-  const secAMarks = formattedSecA.length * 2;
-
-  // Filter Section B units
+  // Extract 4M (Section C) and 6M (Section D) questions from target Section B units
   const secBUnitsFiltered = (rawPaper.sectionB?.units || []).filter(u => {
     const un = (u.unitNumber || '').toUpperCase();
     return targetBUnits.some(tu => un.includes(tu));
   });
 
-  const secBMarks = secBUnitsFiltered.length * 10;
-  const totalMarks = secAMarks + secBMarks;
+  const fourMarkQs = [];
+  const sixMarkQs = [];
+
+  secBUnitsFiltered.forEach(u => {
+    (u.questions || []).forEach(q => {
+      (q.subParts || []).forEach(sp => {
+        if (sp.marks === 4) fourMarkQs.push({ ...sp, unitTitle: u.syllabusTopic || u.unitTitle, unitNumber: u.unitNumber });
+        if (sp.marks === 6) sixMarkQs.push({ ...sp, unitTitle: u.syllabusTopic || u.unitTitle, unitNumber: u.unitNumber });
+      });
+    });
+  });
+
+  // Section C: 4 questions of 4 marks each, attempt any 2 (2 x 4 = 8 Marks)
+  const secCQuestions = fourMarkQs.slice(0, 4).map((q, idx) => ({
+    ...q,
+    qNum: `Q${idx + 4}`,
+    marks: 4,
+    requiredPages: 'Approx. 1 Page',
+    modelAnswer: q.solution
+  }));
+
+  // Section D: 4 questions of 6 marks each, attempt any 2 (2 x 6 = 12 Marks)
+  const secDQuestions = sixMarkQs.slice(0, 4).map((q, idx) => ({
+    ...q,
+    qNum: `Q${idx + 8}`,
+    marks: 6,
+    requiredPages: 'Approx. 1.5 - 2 Pages',
+    modelAnswer: q.solution
+  }));
+
+  // Pool for Section A (6 questions x 1M = 6M) and Section B (2 questions x 2M = 4M)
+  const pool = [...secAFiltered];
+  if (pool.length < 8) {
+    const remaining = (rawPaper.sectionA?.questions || []).filter(q => !pool.includes(q));
+    pool.push(...remaining);
+  }
+
+  const letters = ['a', 'b', 'c', 'd', 'e', 'f'];
+  const secAQuestions = pool.slice(0, 6).map((q, idx) => ({
+    ...q,
+    qNum: `Q1 (${letters[idx] || (idx + 1)})`,
+    marks: 1
+  }));
+
+  const secBQuestions = pool.slice(6, 8).map((q, idx) => ({
+    ...q,
+    qNum: `Q${idx - 4}`, // Q2, Q3
+    marks: 2
+  }));
 
   const instructions = [
-    `Question No. 1 in Section A is COMPULSORY and carries ${secAMarks} marks (${config.syllabusTag}).`,
-    `Attempt any TWO questions from Section B, selecting ONE question from each Unit (10 marks each).`,
+    'Section A: Question No. 1 has 6 parts of 1 Mark each. ALL are COMPULSORY (Total = 6 Marks).',
+    'Section B: Question Nos. 2 & 3 are COMPULSORY and carry 2 Marks each (Total = 4 Marks).',
+    'Section C: Contains 4 questions of 4 Marks each. Attempt any TWO (2) questions (2 × 4 = 8 Marks; write approx. 1 page answer per question).',
+    'Section D: Contains 4 questions of 6 Marks each. Attempt any TWO (2) questions (2 × 6 = 12 Marks; write approx. 1.5 to 2 pages in-depth answer per question).',
+    'Total Attempt: 30 Marks. Passing Cutoff: 12 Marks (40%). Time Allowed: 1 Hour 30 Minutes.',
     'Assume suitable missing data if any and state it clearly.',
-    'Use of non-programmable scientific calculators is permitted.',
-    'Neat, labeled circuit/block diagrams and step-by-step mathematical steps carry significant weightage.'
+    'Neat, labeled diagrams, trace tables, step-by-step mathematical steps and proper indentation carry significant weightage.'
   ];
 
   return {
     ...rawPaper,
     examType,
+    isFourSectionFormat: true,
     examConfig: config,
     examTitle: config.paperTitle,
     examShortTitle: config.name,
     syllabusTag: config.syllabusTag,
     dateBadge: config.dateBadge,
     timeAllowed: config.timeAllowed,
-    maxMarks: totalMarks || config.maxMarks,
-    passingMarks: Math.round((totalMarks || config.maxMarks) * 0.4),
+    maxMarks: 30,
+    passingMarks: 12,
     timerSeconds: config.timerSeconds,
     instructions,
     sectionA: {
-      title: `SECTION A (COMPULSORY - ${config.syllabusTag.toUpperCase()})`,
-      marks: secAMarks,
-      note: `Answer ALL ${formattedSecA.length} questions from ${config.syllabusTag}. Each question carries 2 marks.`,
-      questions: formattedSecA
+      title: 'SECTION A (COMPULSORY SHORT CONCEPTUAL - 6 MARKS)',
+      marks: 6,
+      note: 'Answer ALL SIX (6) sub-questions. Each question carries 1 Mark.',
+      questions: secAQuestions
     },
     sectionB: {
-      title: `SECTION B (UNIT-WISE LONG QUESTIONS)`,
-      marks: secBMarks,
-      note: `Attempt ONE question from EACH Unit below. Each question carries 10 marks.`,
-      units: secBUnitsFiltered
+      title: 'SECTION B (COMPULSORY CORE TECHNICAL - 4 MARKS)',
+      marks: 4,
+      note: 'Answer BOTH questions. Each question carries 2 Marks.',
+      questions: secBQuestions
+    },
+    sectionC: {
+      title: 'SECTION C (MEDIUM DESCRIPTIVE / CODE / NUMERICAL - 8 MARKS)',
+      marks: 8,
+      totalMarks: 16,
+      note: 'Attempt any TWO (2) questions out of 4. Each question carries 4 Marks (Target: Approx. 1 Page Model Answer).',
+      questions: secCQuestions
+    },
+    sectionD: {
+      title: 'SECTION D (LONG COMPREHENSIVE / DERIVATION / ARCHITECTURE - 12 MARKS)',
+      marks: 12,
+      totalMarks: 24,
+      note: 'Attempt any TWO (2) questions out of 4. Each question carries 6 Marks (Target: Approx. 1.5 - 2 Pages In-Depth Model Answer).',
+      questions: secDQuestions
     }
   };
+}
+
+// Sub-component: SolutionCardViewer for authentic exam-standard model answers
+export function SolutionCardViewer({
+  questionKey,
+  questionNumber,
+  questionText,
+  marks,
+  solution,
+  markingScheme,
+  targetPages,
+  unit,
+  frequency,
+  viewMode,
+  isRevealed,
+  onToggle
+}) {
+  const [copied, setCopied] = useState(false);
+  const showSolution = viewMode === 'solutions' || isRevealed;
+
+  const handleCopy = () => {
+    if (!solution) return;
+    try {
+      navigator.clipboard.writeText(solution.replace(/```[a-zA-Z0-9]*\n?/g, ''));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        background: 'rgba(15, 23, 42, 0.55)',
+        border: '1px solid rgba(255, 255, 255, 0.09)',
+        borderRadius: '10px',
+        padding: '16px 18px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px'
+      }}
+    >
+      {/* Question Header Row */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flex: 1 }}>
+          <span style={{
+            fontWeight: 900,
+            color: 'var(--neon-cyan)',
+            fontSize: '0.94rem',
+            minWidth: '55px',
+            paddingTop: '2px'
+          }}>
+            {questionNumber}
+          </span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '0.94rem', color: '#f1f5f9', fontWeight: 600, lineHeight: 1.55 }}>
+              <MathText text={questionText} as="span" />
+            </div>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '8px', flexWrap: 'wrap' }}>
+              {unit && (
+                <span style={{ fontSize: '0.72rem', background: 'rgba(255, 255, 255, 0.06)', padding: '2px 8px', borderRadius: '4px', color: '#94a3b8' }}>
+                  {unit}
+                </span>
+              )}
+              {targetPages && (
+                <span style={{
+                  fontSize: '0.72rem',
+                  background: marks === 6 ? 'rgba(167, 139, 250, 0.16)' : 'rgba(245, 158, 11, 0.16)',
+                  color: marks === 6 ? '#c084fc' : '#fbbf24',
+                  border: `1px solid ${marks === 6 ? 'rgba(167, 139, 250, 0.35)' : 'rgba(245, 158, 11, 0.35)'}`,
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  fontWeight: 700
+                }}>
+                  {marks === 6 ? '📑' : '📄'} Target Length: {targetPages}
+                </span>
+              )}
+              {frequency && (
+                <span style={{ fontSize: '0.72rem', background: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
+                  ⚡ {frequency}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          <span style={{
+            fontWeight: 800,
+            fontSize: '0.88rem',
+            color: '#fff',
+            background: marks === 6 ? 'rgba(167, 139, 250, 0.2)' : (marks === 4 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(0, 240, 255, 0.15)'),
+            border: `1px solid ${marks === 6 ? 'rgba(167, 139, 250, 0.4)' : (marks === 4 ? 'rgba(245, 158, 11, 0.4)' : 'rgba(0, 240, 255, 0.3)')}`,
+            padding: '2px 8px',
+            borderRadius: '4px'
+          }}>
+            [{marks}M]
+          </span>
+          {viewMode === 'questions-only' && (
+            <button
+              type="button"
+              onClick={onToggle}
+              style={{
+                background: showSolution ? 'rgba(16, 185, 129, 0.15)' : 'rgba(0, 240, 255, 0.1)',
+                border: `1px solid ${showSolution ? 'rgba(16, 185, 129, 0.4)' : 'rgba(0, 240, 255, 0.3)'}`,
+                borderRadius: '6px',
+                color: showSolution ? '#10b981' : 'var(--neon-cyan)',
+                padding: '4px 10px',
+                fontSize: '0.74rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontWeight: 600
+              }}
+            >
+              {showSolution ? <EyeOff size={12} /> : <Eye size={12} />}
+              <span>{showSolution ? 'Hide Solution' : 'Model Answer'}</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Model Solution Box */}
+      {showSolution && (
+        <div style={{
+          marginTop: '6px',
+          background: 'rgba(6, 78, 59, 0.12)',
+          border: '1px solid rgba(16, 185, 129, 0.25)',
+          borderRadius: '8px',
+          padding: '14px 16px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#10b981', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <CheckCircle2 size={14} color="#10b981" />
+              <span>Model Answer &amp; Step-by-Step Working:</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleCopy}
+              style={{
+                background: copied ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255, 255, 255, 0.06)',
+                border: `1px solid ${copied ? '#10b981' : 'rgba(255, 255, 255, 0.15)'}`,
+                borderRadius: '6px',
+                padding: '3px 9px',
+                color: copied ? '#10b981' : '#cbd5e1',
+                fontSize: '0.72rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontWeight: 600
+              }}
+              title="Copy Model Answer"
+            >
+              {copied ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
+              <span>{copied ? 'Copied!' : 'Copy Answer'}</span>
+            </button>
+          </div>
+
+          <div style={{ fontSize: '0.88rem', color: '#e2e8f0', lineHeight: 1.65 }}>
+            <MathText text={solution} />
+          </div>
+
+          {/* Marking Scheme Points */}
+          {markingScheme && (
+            <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <div style={{ fontSize: '0.74rem', color: '#f59e0b', fontWeight: 800, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Award size={13} color="#f59e0b" />
+                <span>Official Evaluation &amp; Marking Scheme Rubric:</span>
+              </div>
+              <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: 1.5, background: 'rgba(0, 0, 0, 0.25)', padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                <MathText text={markingScheme} as="span" />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ExpectedQuestionPapers({ currentUser, initialSubject }) {
@@ -710,14 +959,37 @@ export default function ExpectedQuestionPapers({ currentUser, initialSubject }) 
                     <span>📊 Total: <strong style={{ color: paper.examConfig?.color || 'var(--neon-cyan)' }}>{paper.maxMarks} Marks</strong></span>
                     <span>🎯 Passing: <strong style={{ color: '#10b981' }}>{paper.passingMarks} M (40%)</strong></span>
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle size={13} color="#10b981" />
-                    <span><strong>Section A:</strong> {paper.sectionA?.questions?.length || 0} Compulsory Qs ({paper.sectionA?.marks || 0}M)</span>
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle size={13} color="#10b981" />
-                    <span><strong>Section B:</strong> {paper.sectionB?.units?.length || 0} Units with Choice ({paper.sectionB?.marks || 0}M)</span>
-                  </div>
+                  {paper.isFourSectionFormat ? (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '8px' }}>
+                      <div style={{ fontSize: '0.74rem', color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <CheckCircle size={12} color="#00f0ff" />
+                        <span><strong>Sec A:</strong> 6 Qs (6M Comp.)</span>
+                      </div>
+                      <div style={{ fontSize: '0.74rem', color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <CheckCircle size={12} color="#00f0ff" />
+                        <span><strong>Sec B:</strong> 2 Qs (4M Comp.)</span>
+                      </div>
+                      <div style={{ fontSize: '0.74rem', color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <CheckCircle size={12} color="#f59e0b" />
+                        <span><strong>Sec C:</strong> Att. 2/4 (8M, ~1pg)</span>
+                      </div>
+                      <div style={{ fontSize: '0.74rem', color: '#c084fc', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <CheckCircle size={12} color="#a78bfa" />
+                        <span><strong>Sec D:</strong> Att. 2/4 (12M, ~2pg)</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ fontSize: '0.78rem', color: '#94a3b8', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <CheckCircle size={13} color="#10b981" />
+                        <span><strong>Section A:</strong> {paper.sectionA?.questions?.length || 0} Compulsory Qs ({paper.sectionA?.marks || 0}M)</span>
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <CheckCircle size={13} color="#10b981" />
+                        <span><strong>Section B:</strong> {paper.sectionB?.units?.length || 0} Units with Choice ({paper.sectionB?.marks || 0}M)</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -1092,346 +1364,402 @@ export default function ExpectedQuestionPapers({ currentUser, initialSubject }) 
               </div>
 
               {/* =============================================================
-                 SECTION A (COMPULSORY - 20 MARKS)
+                 RENDER PAPERS: 4-SECTION BLUEPRINT (SESSIONAL) VS 2-SECTION (END-SEM)
                  ============================================================= */}
-              <div style={{ marginBottom: '36px' }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  background: 'linear-gradient(90deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 240, 255, 0.03) 100%)',
-                  padding: '10px 16px',
-                  borderRadius: '6px',
-                  borderLeft: '4px solid var(--neon-cyan)',
-                  marginBottom: '16px'
-                }}>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 900, color: '#fff' }}>
-                      {activePaper.sectionA.title}
-                    </h3>
-                    <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                      {activePaper.sectionA.note}
+              {activePaper.isFourSectionFormat ? (
+                <>
+                  {/* =========================================================
+                     SECTION A (COMPULSORY SHORT CONCEPTUAL - 6 MARKS)
+                     ========================================================= */}
+                  <div style={{ marginBottom: '32px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: 'linear-gradient(90deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 240, 255, 0.03) 100%)',
+                      padding: '10px 16px',
+                      borderRadius: '6px',
+                      borderLeft: '4px solid var(--neon-cyan)',
+                      marginBottom: '16px'
+                    }}>
+                      <div>
+                        <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 900, color: '#fff' }}>
+                          {activePaper.sectionA?.title}
+                        </h3>
+                        <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                          {activePaper.sectionA?.note}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--neon-cyan)' }}>
+                        [{activePaper.sectionA?.marks} Marks]
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      {activePaper.sectionA?.questions.map((q, idx) => {
+                        const qKey = `secA_${idx}`;
+                        return (
+                          <SolutionCardViewer
+                            key={idx}
+                            questionKey={qKey}
+                            questionNumber={q.qNum}
+                            questionText={q.question}
+                            marks={q.marks}
+                            solution={q.modelAnswer || q.solution}
+                            markingScheme={q.markingScheme || (q.keyMarkingPoints ? q.keyMarkingPoints.join(' • ') : '')}
+                            targetPages={q.requiredPages || 'Key Points / Definition'}
+                            unit={q.unit}
+                            frequency={q.expectedFrequency}
+                            viewMode={viewMode}
+                            isRevealed={!!revealedAnswers[qKey]}
+                            onToggle={() => toggleSingleAnswer(qKey)}
+                          />
+                        );
+                      })}
                     </div>
                   </div>
-                  <span style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--neon-cyan)' }}>
-                    [{activePaper.sectionA.marks} Marks]
-                  </span>
-                </div>
 
-                {/* 10 Sub-questions */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {activePaper.sectionA.questions.map((q, idx) => {
-                    const qKey = `secA_${idx}`;
-                    const showAnswer = viewMode === 'solutions' || revealedAnswers[qKey];
-
-                    return (
-                      <div 
-                        key={idx}
-                        style={{
-                          background: 'rgba(15, 23, 42, 0.45)',
-                          border: '1px solid rgba(255, 255, 255, 0.08)',
-                          borderRadius: '8px',
-                          padding: '14px 18px'
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
-                          <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flex: 1 }}>
-                            <span style={{ 
-                              fontWeight: 800, 
-                              color: 'var(--neon-cyan)', 
-                              fontSize: '0.9rem', 
-                              minWidth: '55px', 
-                              paddingTop: '1px' 
-                            }}>
-                              {q.qNum}
-                            </span>
-                            <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: '0.92rem', color: '#f1f5f9', fontWeight: 600, lineHeight: 1.5 }}>
-                                <MathText text={q.question} as="span" />
-                              </div>
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px', flexWrap: 'wrap' }}>
-                                <span style={{ fontSize: '0.72rem', background: 'rgba(255, 255, 255, 0.06)', padding: '2px 6px', borderRadius: '4px', color: '#94a3b8' }}>
-                                  {q.unit}
-                                </span>
-                                {q.expectedFrequency && (
-                                  <span style={{ fontSize: '0.72rem', background: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
-                                    ⚡ {q.expectedFrequency}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ fontWeight: 800, fontSize: '0.88rem', color: '#fff', background: 'rgba(255, 255, 255, 0.08)', padding: '2px 8px', borderRadius: '4px' }}>
-                              [{q.marks}M]
-                            </span>
-                            {viewMode === 'questions-only' && (
-                              <button
-                                type="button"
-                                onClick={() => toggleSingleAnswer(qKey)}
-                                style={{
-                                  background: 'none',
-                                  border: '1px solid rgba(0, 240, 255, 0.3)',
-                                  borderRadius: '6px',
-                                  color: 'var(--neon-cyan)',
-                                  padding: '4px 8px',
-                                  fontSize: '0.74rem',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px'
-                                }}
-                              >
-                                {showAnswer ? <EyeOff size={12} /> : <Eye size={12} />}
-                                <span>{showAnswer ? 'Hide' : 'Answer'}</span>
-                              </button>
-                            )}
-                          </div>
+                  {/* =========================================================
+                     SECTION B (COMPULSORY CORE TECHNICAL - 4 MARKS)
+                     ========================================================= */}
+                  <div style={{ marginBottom: '32px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.03) 100%)',
+                      padding: '10px 16px',
+                      borderRadius: '6px',
+                      borderLeft: '4px solid #10b981',
+                      marginBottom: '16px'
+                    }}>
+                      <div>
+                        <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 900, color: '#fff' }}>
+                          {activePaper.sectionB?.title}
+                        </h3>
+                        <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                          {activePaper.sectionB?.note}
                         </div>
+                      </div>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 900, color: '#10b981' }}>
+                        [{activePaper.sectionB?.marks} Marks]
+                      </span>
+                    </div>
 
-                        {/* Model Solution Box */}
-                        {showAnswer && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      {activePaper.sectionB?.questions.map((q, idx) => {
+                        const qKey = `secB_${idx}`;
+                        return (
+                          <SolutionCardViewer
+                            key={idx}
+                            questionKey={qKey}
+                            questionNumber={q.qNum}
+                            questionText={q.question}
+                            marks={q.marks}
+                            solution={q.modelAnswer || q.solution}
+                            markingScheme={q.markingScheme || (q.keyMarkingPoints ? q.keyMarkingPoints.join(' • ') : '')}
+                            targetPages={q.requiredPages || 'Approx. 0.5 Page'}
+                            unit={q.unit}
+                            frequency={q.expectedFrequency}
+                            viewMode={viewMode}
+                            isRevealed={!!revealedAnswers[qKey]}
+                            onToggle={() => toggleSingleAnswer(qKey)}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* =========================================================
+                     SECTION C (MEDIUM DESCRIPTIVE / CODE / NUMERICAL - 8 MARKS)
+                     ========================================================= */}
+                  <div style={{ marginBottom: '32px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.03) 100%)',
+                      padding: '10px 16px',
+                      borderRadius: '6px',
+                      borderLeft: '4px solid #f59e0b',
+                      marginBottom: '16px'
+                    }}>
+                      <div>
+                        <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 900, color: '#fff' }}>
+                          {activePaper.sectionC?.title}
+                        </h3>
+                        <div style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 700 }}>
+                          ⚡ {activePaper.sectionC?.note}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 900, color: '#f59e0b' }}>
+                        [{activePaper.sectionC?.marks} Marks Attempt]
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      {activePaper.sectionC?.questions.map((q, idx) => {
+                        const qKey = `secC_${idx}`;
+                        return (
+                          <SolutionCardViewer
+                            key={idx}
+                            questionKey={qKey}
+                            questionNumber={q.qNum}
+                            questionText={q.question}
+                            marks={q.marks}
+                            solution={q.modelAnswer || q.solution}
+                            markingScheme={q.markingScheme}
+                            targetPages={q.requiredPages || 'Approx. 1 Page'}
+                            unit={q.unitTitle || q.unitNumber}
+                            viewMode={viewMode}
+                            isRevealed={!!revealedAnswers[qKey]}
+                            onToggle={() => toggleSingleAnswer(qKey)}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* =========================================================
+                     SECTION D (LONG COMPREHENSIVE / DERIVATION / CODE - 12 MARKS)
+                     ========================================================= */}
+                  <div style={{ marginBottom: '32px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: 'linear-gradient(90deg, rgba(167, 139, 250, 0.18) 0%, rgba(167, 139, 250, 0.03) 100%)',
+                      padding: '10px 16px',
+                      borderRadius: '6px',
+                      borderLeft: '4px solid #a78bfa',
+                      marginBottom: '16px'
+                    }}>
+                      <div>
+                        <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 900, color: '#fff' }}>
+                          {activePaper.sectionD?.title}
+                        </h3>
+                        <div style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700 }}>
+                          ⚡ {activePaper.sectionD?.note}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 900, color: '#a78bfa' }}>
+                        [{activePaper.sectionD?.marks} Marks Attempt]
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                      {activePaper.sectionD?.questions.map((q, idx) => {
+                        const qKey = `secD_${idx}`;
+                        return (
+                          <SolutionCardViewer
+                            key={idx}
+                            questionKey={qKey}
+                            questionNumber={q.qNum}
+                            questionText={q.question}
+                            marks={q.marks}
+                            solution={q.modelAnswer || q.solution}
+                            markingScheme={q.markingScheme}
+                            targetPages={q.requiredPages || 'Approx. 1.5 - 2 Pages'}
+                            unit={q.unitTitle || q.unitNumber}
+                            viewMode={viewMode}
+                            isRevealed={!!revealedAnswers[qKey]}
+                            onToggle={() => toggleSingleAnswer(qKey)}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                /* END-SEMESTER UNIVERSITY EXAMINATION FORMAT (SECTION A 20M + SECTION B 40M) */
+                <>
+                  <div style={{ marginBottom: '36px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: 'linear-gradient(90deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 240, 255, 0.03) 100%)',
+                      padding: '10px 16px',
+                      borderRadius: '6px',
+                      borderLeft: '4px solid var(--neon-cyan)',
+                      marginBottom: '16px'
+                    }}>
+                      <div>
+                        <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 900, color: '#fff' }}>
+                          {activePaper.sectionA?.title}
+                        </h3>
+                        <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                          {activePaper.sectionA?.note}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--neon-cyan)' }}>
+                        [{activePaper.sectionA?.marks} Marks]
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      {activePaper.sectionA?.questions.map((q, idx) => {
+                        const qKey = `secA_${idx}`;
+                        return (
+                          <SolutionCardViewer
+                            key={idx}
+                            questionKey={qKey}
+                            questionNumber={q.qNum}
+                            questionText={q.question}
+                            marks={q.marks}
+                            solution={q.modelAnswer || q.solution}
+                            markingScheme={q.markingScheme || (q.keyMarkingPoints ? q.keyMarkingPoints.join(' • ') : '')}
+                            targetPages="Short Answer (2 Marks)"
+                            unit={q.unit}
+                            frequency={q.expectedFrequency}
+                            viewMode={viewMode}
+                            isRevealed={!!revealedAnswers[qKey]}
+                            onToggle={() => toggleSingleAnswer(qKey)}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.03) 100%)',
+                      padding: '10px 16px',
+                      borderRadius: '6px',
+                      borderLeft: '4px solid #10b981',
+                      marginBottom: '20px'
+                    }}>
+                      <div>
+                        <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 900, color: '#fff' }}>
+                          {activePaper.sectionB?.title}
+                        </h3>
+                        <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                          {activePaper.sectionB?.note}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 900, color: '#10b981' }}>
+                        [{activePaper.sectionB?.marks} Marks]
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
+                      {activePaper.sectionB?.units.map((unitItem, uIdx) => (
+                        <div 
+                          key={uIdx}
+                          style={{
+                            background: 'rgba(15, 23, 42, 0.5)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            borderRadius: '10px',
+                            overflow: 'hidden'
+                          }}
+                        >
                           <div style={{
-                            marginTop: '12px',
-                            paddingTop: '12px',
-                            borderTop: '1px dashed rgba(16, 185, 129, 0.3)',
-                            background: 'rgba(6, 78, 59, 0.12)',
-                            borderRadius: '6px',
-                            padding: '12px 14px'
+                            padding: '10px 18px',
+                            background: 'rgba(255, 255, 255, 0.04)',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
                           }}>
-                            <div style={{ fontSize: '0.76rem', fontWeight: 800, color: '#10b981', textTransform: 'uppercase', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <CheckCircle2 size={13} color="#10b981" />
-                              <span>Model Answer &amp; Key Points:</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <span style={{
+                                fontSize: '0.78rem',
+                                fontWeight: 800,
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                background: 'rgba(0, 240, 255, 0.15)',
+                                color: 'var(--neon-cyan)'
+                              }}>
+                                {unitItem.unitNumber}
+                              </span>
+                              <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff' }}>
+                                {unitItem.syllabusTopic}
+                              </span>
                             </div>
-                            <div style={{ fontSize: '0.86rem', color: '#e2e8f0', lineHeight: 1.55 }}>
-                              <MathText text={q.modelAnswer || q.solution} />
-                            </div>
-
-                            {/* Marking Scheme Points */}
-                            {q.keyMarkingPoints && q.keyMarkingPoints.length > 0 && (
-                              <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                                <div style={{ fontSize: '0.72rem', color: '#f59e0b', fontWeight: 700, marginBottom: '4px' }}>
-                                  🎯 Marking Scheme Rubric:
-                                </div>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                  {q.keyMarkingPoints.map((pt, pIdx) => (
-                                    <span key={pIdx} style={{ fontSize: '0.74rem', background: 'rgba(0,0,0,0.3)', padding: '2px 8px', borderRadius: '4px', color: '#cbd5e1', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
-                                      ✓ {pt}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
+                            <span style={{ fontSize: '0.76rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                              Attempt Any ONE Question (10 Marks)
+                            </span>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
 
-              {/* =============================================================
-                 SECTION B (UNIT-WISE LONG QUESTIONS - 40 MARKS)
-                 ============================================================= */}
-              <div>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.03) 100%)',
-                  padding: '10px 16px',
-                  borderRadius: '6px',
-                  borderLeft: '4px solid #10b981',
-                  marginBottom: '20px'
-                }}>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 900, color: '#fff' }}>
-                      {activePaper.sectionB.title}
-                    </h3>
-                    <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                      {activePaper.sectionB.note}
+                          <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                            {unitItem.questions.map((q, qIdx) => {
+                              const isOr = qIdx > 0;
+
+                              return (
+                                <React.Fragment key={qIdx}>
+                                  {isOr && (
+                                    <div style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      margin: '4px 0'
+                                    }}>
+                                      <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.15)', flex: 1 }} />
+                                      <span style={{
+                                        padding: '2px 14px',
+                                        fontSize: '0.8rem',
+                                        fontWeight: 900,
+                                        color: '#f59e0b',
+                                        background: 'rgba(245, 158, 11, 0.12)',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(245, 158, 11, 0.3)',
+                                        letterSpacing: '0.1em'
+                                      }}>
+                                        OR
+                                      </span>
+                                      <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.15)', flex: 1 }} />
+                                    </div>
+                                  )}
+
+                                  <div style={{
+                                    background: 'rgba(7, 12, 22, 0.6)',
+                                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                                    borderRadius: '8px',
+                                    padding: '14px 16px'
+                                  }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                      <span style={{ fontWeight: 800, fontSize: '0.94rem', color: isOr ? '#f59e0b' : 'var(--neon-cyan)' }}>
+                                        {q.qNum}
+                                      </span>
+                                      <span style={{ fontWeight: 800, fontSize: '0.86rem', color: '#fff', background: 'rgba(255, 255, 255, 0.08)', padding: '2px 8px', borderRadius: '4px' }}>
+                                        [{q.marks} Marks]
+                                      </span>
+                                    </div>
+
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                      {q.subParts.map((sub, sIdx) => {
+                                        const subKey = `u${uIdx}_q${qIdx}_s${sIdx}`;
+                                        return (
+                                          <SolutionCardViewer
+                                            key={sIdx}
+                                            questionKey={subKey}
+                                            questionNumber={sub.part}
+                                            questionText={sub.question}
+                                            marks={sub.marks}
+                                            solution={sub.solution}
+                                            markingScheme={sub.markingScheme}
+                                            targetPages={sub.marks === 6 ? 'Approx. 1.5 - 2 Pages' : (sub.marks === 4 ? 'Approx. 1 Page' : '')}
+                                            viewMode={viewMode}
+                                            isRevealed={!!revealedAnswers[subKey]}
+                                            onToggle={() => toggleSingleAnswer(subKey)}
+                                          />
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                </React.Fragment>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  <span style={{ fontSize: '0.95rem', fontWeight: 900, color: '#10b981' }}>
-                    [{activePaper.sectionB.marks} Marks]
-                  </span>
-                </div>
-
-                {/* 4 Units */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
-                  {activePaper.sectionB.units.map((unitItem, uIdx) => (
-                    <div 
-                      key={uIdx}
-                      style={{
-                        background: 'rgba(15, 23, 42, 0.5)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '10px',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      {/* Unit Title Bar */}
-                      <div style={{
-                        padding: '10px 18px',
-                        background: 'rgba(255, 255, 255, 0.04)',
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{
-                            fontSize: '0.78rem',
-                            fontWeight: 800,
-                            padding: '2px 8px',
-                            borderRadius: '4px',
-                            background: 'rgba(0, 240, 255, 0.15)',
-                            color: 'var(--neon-cyan)'
-                          }}>
-                            {unitItem.unitNumber}
-                          </span>
-                          <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff' }}>
-                            {unitItem.syllabusTopic}
-                          </span>
-                        </div>
-                        <span style={{ fontSize: '0.76rem', color: '#94a3b8', fontStyle: 'italic' }}>
-                          Attempt Any ONE Question (10 Marks)
-                        </span>
-                      </div>
-
-                      {/* Questions within the Unit (Choice 1 vs Choice 2) */}
-                      <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                        {unitItem.questions.map((q, qIdx) => {
-                          const isOr = qIdx > 0;
-
-                          return (
-                            <React.Fragment key={qIdx}>
-                              {isOr && (
-                                <div style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  margin: '4px 0'
-                                }}>
-                                  <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.15)', flex: 1 }} />
-                                  <span style={{
-                                    padding: '2px 14px',
-                                    fontSize: '0.8rem',
-                                    fontWeight: 900,
-                                    color: '#f59e0b',
-                                    background: 'rgba(245, 158, 11, 0.12)',
-                                    borderRadius: '12px',
-                                    border: '1px solid rgba(245, 158, 11, 0.3)',
-                                    letterSpacing: '0.1em'
-                                  }}>
-                                    OR
-                                  </span>
-                                  <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.15)', flex: 1 }} />
-                                </div>
-                              )}
-
-                              <div style={{
-                                background: 'rgba(7, 12, 22, 0.6)',
-                                border: '1px solid rgba(255, 255, 255, 0.06)',
-                                borderRadius: '8px',
-                                padding: '14px 16px'
-                              }}>
-                                {/* Question Title */}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                                  <span style={{ fontWeight: 800, fontSize: '0.94rem', color: isOr ? '#f59e0b' : 'var(--neon-cyan)' }}>
-                                    {q.qNum}
-                                  </span>
-                                  <span style={{ fontWeight: 800, fontSize: '0.86rem', color: '#fff', background: 'rgba(255, 255, 255, 0.08)', padding: '2px 8px', borderRadius: '4px' }}>
-                                    [{q.marks} Marks]
-                                  </span>
-                                </div>
-
-                                {/* Sub-parts (a), (b), etc. */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                                  {q.subParts.map((sub, sIdx) => {
-                                    const subKey = `u${uIdx}_q${qIdx}_s${sIdx}`;
-                                    const showSubAnswer = viewMode === 'solutions' || revealedAnswers[subKey];
-
-                                    return (
-                                      <div key={sIdx} style={{ paddingLeft: '8px', borderLeft: '2px solid rgba(0, 240, 255, 0.25)' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
-                                          <div style={{ flex: 1 }}>
-                                            <div style={{ fontSize: '0.9rem', color: '#f1f5f9', fontWeight: 600, lineHeight: 1.5 }}>
-                                              <strong style={{ color: 'var(--neon-cyan)', marginRight: '6px' }}>{sub.part}</strong>
-                                              <MathText text={sub.question} as="span" />
-                                            </div>
-                                          </div>
-                                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#94a3b8' }}>
-                                              [{sub.marks}M]
-                                            </span>
-                                            {viewMode === 'questions-only' && (
-                                              <button
-                                                type="button"
-                                                onClick={() => toggleSingleAnswer(subKey)}
-                                                style={{
-                                                  background: 'none',
-                                                  border: '1px solid rgba(0, 240, 255, 0.3)',
-                                                  borderRadius: '4px',
-                                                  color: 'var(--neon-cyan)',
-                                                  padding: '2px 6px',
-                                                  fontSize: '0.72rem',
-                                                  cursor: 'pointer'
-                                                }}
-                                              >
-                                                {showSubAnswer ? 'Hide' : 'Solution'}
-                                              </button>
-                                            )}
-                                          </div>
-                                        </div>
-
-                                        {/* Step-by-Step Solution & Marking Scheme */}
-                                        {showSubAnswer && (
-                                          <div style={{
-                                            marginTop: '10px',
-                                            background: 'rgba(6, 78, 59, 0.14)',
-                                            border: '1px solid rgba(16, 185, 129, 0.25)',
-                                            borderRadius: '6px',
-                                            padding: '12px 14px'
-                                          }}>
-                                            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#10b981', textTransform: 'uppercase', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                              <CheckCircle2 size={13} color="#10b981" />
-                                              <span>Step-by-Step Solution:</span>
-                                            </div>
-                                            <div style={{ fontSize: '0.85rem', color: '#e2e8f0', lineHeight: 1.6 }}>
-                                              <MathText text={sub.solution} />
-                                            </div>
-
-                                            {/* Marking Scheme */}
-                                            {sub.markingScheme && (
-                                              <div style={{
-                                                marginTop: '10px',
-                                                paddingTop: '8px',
-                                                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                                                fontSize: '0.74rem',
-                                                color: '#f59e0b',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '6px'
-                                              }}>
-                                                <span>🎯 <strong>Official Rubric:</strong> <MathText text={sub.markingScheme} as="span" /></span>
-                                              </div>
-                                            )}
-                                          </div>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                </>
+              )}
 
               {/* End of Examination Watermark */}
               <div style={{

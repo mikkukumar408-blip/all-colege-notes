@@ -797,15 +797,136 @@ export const expectedQuestionPapers = [
                   part: '(a)',
                   marks: 6,
                   question: 'Explain the C preprocessor directives: (i) File inclusion (#include <file> vs #include "file"), (ii) Macro definition (#define), and (iii) Conditional compilation (#ifndef, #define, #endif Header Guards). Write code demonstrating a macro with arguments.',
-                  solution: '1. File Inclusion:\\n- #include <stdio.h>: Searches standard system compiler library directories first.\\n- #include "myheader.h": Searches the current working directory first, then falls back to system paths.\\n2. Macro Substitution:\\n#define MAX(a, b) (((a) > (b)) ? (a) : (b))\\nPreprocessor textually substitutes tokens before compilation begins. Always enclose arguments in parentheses to avoid operator precedence bugs.\\n3. Header Guards (Anti-Multi-Inclusion):\\n#ifndef MY_HEADER_H\\n#define MY_HEADER_H\\n// declarations\\n#endif\\nPrevents duplicate type declarations when a header is included transitively multiple times.',
-                  markingScheme: '2 Marks for <> vs "" explanation | 2 Marks for macro with arguments and parenthesis warning | 2 Marks for header guard mechanism'
+                  solution: '**1. PREPROCESSOR OVERVIEW & COMPILATION STAGE:**\\n' +
+                    'The C Preprocessor (`cpp`) is a macro processor that textually transforms source code before the actual C compilation begins. It handles all directives beginning with the `#` symbol.\\n\\n' +
+                    '**2. DIRECTIVE (i): FILE INCLUSION (#include):**\\n' +
+                    '- **#include <filename.h> (Standard System Library):** Tells the preprocessor to search strictly within standard system library directories (e.g., `/usr/include`, MSVC include directories). Used for standard headers like `<stdio.h>`, `<stdlib.h>`, `<math.h>`. Never searches local folder first.\\n' +
+                    '- **#include "filename.h" (User-Defined Local Header):** Instructs the preprocessor to search the current working directory of the source file first. If not found locally, it falls back to standard system search paths. Used for custom headers like `"my_header.h"`.\\n\\n' +
+                    '**3. DIRECTIVE (ii): MACRO DEFINITIONS (#define):**\\n' +
+                    'Performs token-based textual substitution before compilation.\\n' +
+                    '- **Object-Like Macro:** `#define PI 3.14159265`\\n' +
+                    '- **Function-Like Macro with Arguments:** `#define MAX(a, b) (((a) > (b)) ? (a) : (b))`\\n' +
+                    '- **Precedence Bug Warning:** In function-like macros, every argument and the outer expression MUST be enclosed in parentheses. If defined as `#define SQUARE(x) x * x`, the call `SQUARE(2 + 3)` expands to `2 + 3 * 2 + 3 = 11`, NOT 25! With parentheses `#define SQUARE(x) ((x) * (x))`, it safely evaluates to `((2 + 3) * (2 + 3)) = 25`.\\n\\n' +
+                    '**4. DIRECTIVE (iii): CONDITIONAL COMPILATION & HEADER GUARDS:**\\n' +
+                    'Prevents duplicate declaration errors when a header is transitively included multiple times (`A.h` included in both `B.h` and `C.h`, and both included in `main.c`).\\n' +
+                    '- **Standard Header Guard Idiom:**\\n' +
+                    '```c\\n' +
+                    '#ifndef MATRIX_MATH_H\\n' +
+                    '#define MATRIX_MATH_H\\n\\n' +
+                    '// Prototypes, structs, and constants safely isolated\\n' +
+                    'struct Matrix {\\n' +
+                    '    int rows, cols;\\n' +
+                    '    double data[10][10];\\n' +
+                    '};\\n' +
+                    'void multiplyMatrix(struct Matrix *a, struct Matrix *b, struct Matrix *res);\\n\\n' +
+                    '#endif /* MATRIX_MATH_H */\\n' +
+                    '```\\n\\n' +
+                    '**5. VERIFIED C PROGRAM DEMONSTRATING MACROS & CONDITIONAL COMPILATION:**\\n' +
+                    '```c\\n' +
+                    '#include <stdio.h>\\n\\n' +
+                    '// Function-like macro with defensive parenthesization\\n' +
+                    '#define MAX(a, b) (((a) > (b)) ? (a) : (b))\\n' +
+                    '#define SQUARE(x) ((x) * (x))\\n\\n' +
+                    '// Stringification (#) and Token-Pasting (##) macros\\n' +
+                    '#define PRINT_VAR(var) printf(#var " = %d\\n", var)\\n' +
+                    '#define JOIN(a, b) a##b\\n\\n' +
+                    '// Feature flag for conditional compilation\\n' +
+                    '#define ENABLE_LOGS 1\\n\\n' +
+                    'int main(void) {\\n' +
+                    '    int x = 12, y = 25;\\n' +
+                    '    int maxVal = MAX(x, y);\\n' +
+                    '    int sqVal = SQUARE(x + 3); // Evaluates ((12 + 3) * (12 + 3)) = 225\\n\\n' +
+                    '    printf("--- PREPROCESSOR DIRECTIVES DEMO ---\\n");\\n' +
+                    '    PRINT_VAR(maxVal);\\n' +
+                    '    PRINT_VAR(sqVal);\\n\\n' +
+                    '    int JOIN(student_, roll) = 101; // Expands to student_roll = 101;\\n' +
+                    '    PRINT_VAR(student_roll);\\n\\n' +
+                    '#if ENABLE_LOGS\\n' +
+                    '    printf("[LOG]: Conditional block executed: macros parsed correctly.\\n");\\n' +
+                    '#else\\n' +
+                    '    printf("[RELEASE]: Production build without logs.\\n");\\n' +
+                    '#endif\\n\\n' +
+                    '    return 0;\\n' +
+                    '}\\n' +
+                    '```\\n\\n' +
+                    '**SAMPLE EXECUTION & TERMINAL TRACE:**\\n' +
+                    '```terminal\\n' +
+                    '$ gcc -Wall -O2 preprocessor_demo.c -o preprocessor_demo\\n' +
+                    '$ ./preprocessor_demo\\n' +
+                    '--- PREPROCESSOR DIRECTIVES DEMO ---\\n' +
+                    'maxVal = 25\\n' +
+                    'sqVal = 225\\n' +
+                    'student_roll = 101\\n' +
+                    '[LOG]: Conditional block executed: macros parsed correctly.\\n' +
+                    '```',
+                  markingScheme: '2.0 Marks for <> vs "" include search paths | 2.0 Marks for Macro definitions & parenthesization pitfalls | 2.0 Marks for Header Guards and code'
                 },
                 {
                   part: '(b)',
                   marks: 4,
                   question: 'Write a C program to convert a decimal integer into its binary equivalent using bitwise operators (& and >>).',
-                  solution: '#include <stdio.h>\\nvoid printBinary(int n) {\\n    int bits = sizeof(int) * 8;\\n    int leadingZero = 1;\\n    printf("Binary: ");\\n    for (int i = bits - 1; i >= 0; i--) {\\n        int bit = (n >> i) & 1;\\n        if (bit == 1) leadingZero = 0;\\n        if (!leadingZero || i == 0) {\\n            printf("%d", bit);\\n        }\\n    }\\n    printf("\\n");\\n}\\nint main() {\\n    int num;\\n    printf("Enter integer: ");\\n    scanf("%d", &num);\\n    printBinary(num);\\n    return 0;\\n}',
-                  markingScheme: '1 Mark for bitwise shift and mask ((n >> i) & 1) | 2 Marks for 32-bit loop | 1 Mark for main and clean output'
+                  solution: '**AIM & PRINCIPLE:**\\n' +
+                    'To convert a decimal integer $N$ into binary without using division (`/`) or modulo (`%`) arithmetic, we inspect each bit directly using bitwise right-shift (`>>`) and bitwise AND (`&`).\\n\\n' +
+                    '**BITWISE WORKING MECHANISM:**\\n' +
+                    '1. **Right Shift (`n >> i`):** Shifts the $i$-th bit of number $n$ to the 0th bit position (LSB).\\n' +
+                    '2. **Bitwise AND (`(n >> i) & 1`):** Masking with `1` isolates the bit. If the $i$-th bit is 1, `(n >> i) & 1` yields `1`; otherwise `0`.\\n' +
+                    '3. **Left-to-Right Iteration:** Standard `int` has 32 bits ($i = 31$ down to $0$). Iterating from MSB to LSB ensures digits print in authentic positional order.\\n' +
+                    '4. **Leading Zero Suppression:** An active flag `started` skips the 28 redundant leading zeros so that $13$ prints as `1101` rather than `00000000000000000000000000001101`. If $N = 0$, `0` is printed explicitly.\\n\\n' +
+                    '**COMPLETE VERIFIED C PROGRAM:**\\n' +
+                    '```c\\n' +
+                    '#include <stdio.h>\\n\\n' +
+                    '/**\\n' +
+                    ' * Converts decimal integer to binary using bitwise operators\\n' +
+                    ' * Uses >> (right shift) to position bit, and & 1 to isolate bit value\\n' +
+                    ' */\\n' +
+                    'void printDecimalToBinary(int n) {\\n' +
+                    '    if (n == 0) {\\n' +
+                    '        printf("0\\n");\\n' +
+                    '        return;\\n' +
+                    '    }\\n\\n' +
+                    '    int totalBits = sizeof(int) * 8; // 32 bits\\n' +
+                    '    int started = 0; // Suppresses leading zeros\\n\\n' +
+                    '    for (int i = totalBits - 1; i >= 0; i--) {\\n' +
+                    '        int bit = (n >> i) & 1; // Extract i-th bit\\n\\n' +
+                    '        if (bit == 1) {\\n' +
+                    '            started = 1;\\n' +
+                    '        }\\n\\n' +
+                    '        if (started) {\\n' +
+                    '            printf("%d", bit);\\n' +
+                    '        }\\n' +
+                    '    }\\n' +
+                    '    printf("\\n");\\n' +
+                    '}\\n\\n' +
+                    'int main(void) {\\n' +
+                    '    int num;\\n' +
+                    '    printf("Enter a decimal integer: ");\\n' +
+                    '    if (scanf("%d", &num) != 1) {\\n' +
+                    '        printf("Invalid input!\\n");\\n' +
+                    '        return 1;\\n' +
+                    '    }\\n\\n' +
+                    '    printf("Binary representation of %d is: ", num);\\n' +
+                    '    printDecimalToBinary(num);\\n\\n' +
+                    '    return 0;\\n' +
+                    '}\\n' +
+                    '```\\n\\n' +
+                    '**STEP-BY-STEP TRACE TABLE FOR INPUT $N = 13$ ($1101_2$):**\\n' +
+                    '- $i = 31 \\text{ down to } 4$: $(13 \\gg i) = 0 \\implies$ Mask with $1$ gives `0` (Suppressed by `started = 0`)\\n' +
+                    '- $i = 3$: $(13 \\gg 3) = 1 \\implies 1 \\& 1 = \\mathbf{1} \\implies$ Output: **1** (`started` becomes 1)\\n' +
+                    '- $i = 2$: $(13 \\gg 2) = 3 \\implies 3 \\& 1 = \\mathbf{1} \\implies$ Output: **1**\\n' +
+                    '- $i = 1$: $(13 \\gg 1) = 6 \\implies 6 \\& 1 = \\mathbf{0} \\implies$ Output: **0**\\n' +
+                    '- $i = 0$: $(13 \\gg 0) = 13 \\implies 13 \\& 1 = \\mathbf{1} \\implies$ Output: **1**\\n' +
+                    'Final Output on Console: `1101`\\n\\n' +
+                    '**SAMPLE EXECUTION & TERMINAL TRACE:**\\n' +
+                    '```terminal\\n' +
+                    '$ gcc -Wall -O2 decimal_to_binary.c -o decimal_to_binary\\n' +
+                    '$ ./decimal_to_binary\\n' +
+                    'Enter a decimal integer: 13\\n' +
+                    'Binary representation of 13 is: 1101\\n' +
+                    '```\\n\\n' +
+                    '**TIME & SPACE COMPLEXITY:**\\n' +
+                    '- **Time Complexity:** $O(1)$ constant time (exactly 32 bit iterations irrespective of number value).\\n' +
+                    '- **Space Complexity:** $O(1)$ auxiliary space (operates directly in CPU registers without array buffers).',
+                  markingScheme: '1.0 Mark for Bitwise shift and mask logic | 1.5 Marks for Verified C code with loop | 1.5 Marks for N=13 Trace Table & Output'
                 }
               ]
             }

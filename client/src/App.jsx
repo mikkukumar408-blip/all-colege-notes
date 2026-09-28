@@ -17,8 +17,9 @@ const ExpectedQuestionPapers = React.lazy(() => import('./components/ExpectedQue
 const SeatBooking = React.lazy(() => import('./components/SeatBooking'));
 const SuperAdminPanel = React.lazy(() => import('./components/SuperAdminPanel'));
 const QuickSearchPalette = React.lazy(() => import('./components/QuickSearchPalette'));
+const DownloadApp = React.lazy(() => import('./components/DownloadApp'));
 import { initialSubjects } from './data/mockData';
-import { Menu, ChevronLeft, ChevronRight, BookOpen, Sparkles, Code2, ClipboardCheck, Search, Crown, ArrowUp } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, BookOpen, Sparkles, Code2, ClipboardCheck, Search, Crown, ArrowUp, Smartphone } from 'lucide-react';
 import { App as CapApp } from '@capacitor/app';
 import { pullCloudUsers, getApiUrl, pullCloudControls } from './utils/cloudSync';
 import { recordVisit } from './utils/visitorTracker';
@@ -301,6 +302,8 @@ export default function App() {
         return <SeatBooking currentUser={currentUser} preselectedMovie={selectedSubject} />;
       case 'admin-panel':
         return <SuperAdminPanel />;
+      case 'download-app':
+        return <DownloadApp />;
       default:
         return (
           <NowShowing 
@@ -321,6 +324,7 @@ export default function App() {
       case 'question-papers': return 'Expected University Question Papers';
       case 'downloads-lab': return 'Practical Lab Manuals & Codes';
       case 'admin-panel': return 'Super Admin Control Center';
+      case 'download-app': return 'Download Campus Notes App';
       default: return 'College Academic Portal';
     }
   };

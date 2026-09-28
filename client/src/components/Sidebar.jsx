@@ -22,6 +22,7 @@ import {
   Code2,
   ClipboardCheck,
   Activity,
+  Smartphone,
   X 
 } from 'lucide-react';
 
@@ -44,6 +45,7 @@ export default function Sidebar({
     { id: 'short-notes', label: 'Exam Revision & Short Notes', icon: Sparkles, badge: 'Fast Track' },
     { id: 'question-papers', label: 'Expected Question Papers', icon: ClipboardCheck, badge: '2026 Exams' },
     { id: 'downloads-lab', label: 'Lab Manuals & Practical Codes', icon: Code2, badge: 'Lab & Viva' },
+    { id: 'download-app', label: 'Download Android App', icon: Smartphone, badge: 'APK' },
     ...(isSuperAdmin ? [
       { id: 'admin-panel', label: 'Super Admin Panel', icon: Crown, badge: 'ADMIN' }
     ] : [])
