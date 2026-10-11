@@ -7,4 +7,5 @@ dist/
 
 .vercel
 *.apk
+!client/public/downloads/campus-notes.apk
 scratch/
