@@ -2135,72 +2135,44 @@ export default function SensoryLab({
                 Reading Time: {beeeUnit.readingTime || '35 mins'}
               </span>
 
-              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                {/* Direct Unit PDF Download Pill */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    const unitPdf = getUnitPdf(selectedUnitNum);
-                    downloadPdf(unitPdf.url, unitPdf.name, `${activeSubject?.name} - Unit ${selectedUnitNum}`);
-                  }}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '5px 12px',
-                    borderRadius: '20px',
-                    fontSize: '0.78rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    border: '1.5px solid #38bdf8',
-                    background: 'rgba(56, 189, 248, 0.14)',
-                    color: '#38bdf8',
-                    transition: 'all 0.2s ease'
-                  }}
-                  title={`Download only Unit ${selectedUnitNum} PDF`}
-                >
-                  <Download size={13} />
-                  <span>Unit {selectedUnitNum} PDF</span>
-                </button>
-
-                {/* Unit Mastery Status Toggle */}
-                <button
-                  type="button"
-                  onClick={toggleUnitMastery}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '5px 12px',
-                    borderRadius: '20px',
-                    fontSize: '0.78rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    border: currentUnitMastery === 'mastered' 
-                      ? '1.5px solid #10b981' 
-                      : currentUnitMastery === 'revision'
-                        ? '1.5px solid #f59e0b'
-                        : '1.5px solid rgba(255, 255, 255, 0.2)',
-                    background: currentUnitMastery === 'mastered'
-                      ? 'rgba(16, 185, 129, 0.15)'
-                      : currentUnitMastery === 'revision'
-                        ? 'rgba(245, 158, 11, 0.15)'
-                        : 'rgba(255, 255, 255, 0.05)',
-                    color: currentUnitMastery === 'mastered'
-                      ? '#34d399'
-                      : currentUnitMastery === 'revision'
-                        ? '#f59e0b'
-                        : '#94a3b8',
-                    transition: 'all 0.2s ease'
-                  }}
-                  title="Click to toggle: Unread → Mastered → Need Revision"
-                >
-                  <CheckCircle2 size={14} color={currentUnitMastery === 'mastered' ? '#10b981' : currentUnitMastery === 'revision' ? '#f59e0b' : '#64748b'} />
-                  <span>
-                    {currentUnitMastery === 'mastered' ? '✓ Mastered' : currentUnitMastery === 'revision' ? '⚡ Need Revision' : 'Mark as Studied'}
-                  </span>
-                </button>
-              </div>
+              {/* Unit Mastery Status Toggle */}
+              <button
+                type="button"
+                onClick={toggleUnitMastery}
+                style={{
+                  marginLeft: 'auto',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '5px 12px',
+                  borderRadius: '20px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: currentUnitMastery === 'mastered' 
+                    ? '1.5px solid #10b981' 
+                    : currentUnitMastery === 'revision'
+                      ? '1.5px solid #f59e0b'
+                      : '1.5px solid rgba(255, 255, 255, 0.2)',
+                  background: currentUnitMastery === 'mastered'
+                    ? 'rgba(16, 185, 129, 0.15)'
+                    : currentUnitMastery === 'revision'
+                      ? 'rgba(245, 158, 11, 0.15)'
+                      : 'rgba(255, 255, 255, 0.05)',
+                  color: currentUnitMastery === 'mastered'
+                    ? '#34d399'
+                    : currentUnitMastery === 'revision'
+                      ? '#f59e0b'
+                      : '#94a3b8',
+                  transition: 'all 0.2s ease'
+                }}
+                title="Click to toggle: Unread → Mastered → Need Revision"
+              >
+                <CheckCircle2 size={14} color={currentUnitMastery === 'mastered' ? '#10b981' : currentUnitMastery === 'revision' ? '#f59e0b' : '#64748b'} />
+                <span>
+                  {currentUnitMastery === 'mastered' ? '✓ Mastered' : currentUnitMastery === 'revision' ? '⚡ Need Revision' : 'Mark as Studied'}
+                </span>
+              </button>
             </div>
 
             <h2 className={themeMode !== 'clean' ? 'handwritten-heading' : ''} style={{ 
