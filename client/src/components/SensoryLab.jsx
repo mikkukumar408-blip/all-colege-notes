@@ -636,10 +636,10 @@ function simulateCodeExecution(code, langBadge = '') {
    ------------------------------------------------------------------------- */
 const noteContentCache = new Map();
 
-function formatNoteContent(content, activeRecallMode = false) {
+function formatNoteContent(content, activeRecallMode = false, sectionId = 'sec') {
   if (!content) return '';
 
-  const cacheKey = `${activeRecallMode ? '1' : '0'}_${content.length}_${content.slice(0, 32)}_${content.slice(-32)}`;
+  const cacheKey = `${sectionId}_${activeRecallMode ? '1' : '0'}_${content.length}_${content.slice(0, 32)}_${content.slice(-32)}`;
   if (noteContentCache.has(cacheKey)) {
     return noteContentCache.get(cacheKey);
   }
@@ -844,7 +844,10 @@ function formatNoteContent(content, activeRecallMode = false) {
   });
 
   // Step 3.5: Multi-line Worked Numerical Examples with Graded Difficulty (Easy, Medium, Hard)
+  let exIdx = 0;
   html = html.replace(/<example\b([^>]*)>([\s\S]*?)<\/example>/g, (match, attrs, body) => {
+    exIdx++;
+    const anchorId = `roadmap-${sectionId}-ex-${exIdx}`;
     const titleMatch = attrs.match(/title="([^"]*)"/);
     const levelMatch = attrs.match(/level="([^"]*)"/);
     const title = titleMatch ? titleMatch[1] : 'UNIVERSITY WORKED EXAMPLE';
@@ -866,7 +869,7 @@ function formatNoteContent(content, activeRecallMode = false) {
         <span style="font-size:0.75rem; color:#94a3b8; margin-top:6px;">Try solving on rough paper before looking!</span>
       </div>` : '';
 
-    return `<div class="worked-example-box ${badgeClass} ${activeRecallMode ? 'active-recall-masked' : ''}">
+    return `<div id="${anchorId}" style="scroll-margin-top: 90px;" class="worked-example-box ${badgeClass} ${activeRecallMode ? 'active-recall-masked' : ''}">
       <div class="example-tag-header">
         <span class="difficulty-pill ${badgeClass}">${badgeLabel}</span>
         <span>📘 ${title}</span>
@@ -877,7 +880,10 @@ function formatNoteContent(content, activeRecallMode = false) {
   });
 
   // Step 3.6: Multi-line Formal Academic Derivations & University Proofs
+  let derIdx = 0;
   html = html.replace(/<derivation\b([^>]*)>([\s\S]*?)<\/derivation>/g, (match, attrs, body) => {
+    derIdx++;
+    const anchorId = `roadmap-${sectionId}-der-${derIdx}`;
     const titleMatch = attrs.match(/title="([^"]*)"/);
     const marksMatch = attrs.match(/marks="([^"]*)"/);
     const title = titleMatch ? titleMatch[1] : 'ANALYTICAL MATHEMATICAL PROOF';
@@ -889,7 +895,7 @@ function formatNoteContent(content, activeRecallMode = false) {
         <span style="font-size:0.75rem; color:#94a3b8; margin-top:6px;">Test your derivation memory before verifying!</span>
       </div>` : '';
 
-    return `<div class="academic-derivation-box ${activeRecallMode ? 'active-recall-masked' : ''}">
+    return `<div id="${anchorId}" style="scroll-margin-top: 90px;" class="academic-derivation-box ${activeRecallMode ? 'active-recall-masked' : ''}">
       <div class="derivation-header">
         <span class="derivation-pill">📐 FORMAL UNIVERSITY DERIVATION</span>
         <span class="derivation-title">🎓 ${title}</span>
@@ -902,11 +908,16 @@ function formatNoteContent(content, activeRecallMode = false) {
     </div>`;
   });
 
-  // Step 4: Markdown Headings
+  // Step 4: Markdown Headings (with deterministic roadmap anchor IDs)
+  let hIdx = 0;
   html = html
-    .replace(/^#### (.*?)$/gm, '<h5 class="note-h5">⚡ $1</h5>')
-    .replace(/^### (.*?)$/gm, '<h4 class="note-h4">$1</h4>')
-    .replace(/^## (.*?)$/gm, '<h3 class="note-h3">$1</h3>')
+    .replace(/^(#{2,4}) (.*?)$/gm, (m, hashes, text) => {
+      hIdx++;
+      const anchorId = `roadmap-${sectionId}-h-${hIdx}`;
+      if (hashes.length === 4) return `<h5 id="${anchorId}" style="scroll-margin-top: 90px;" class="note-h5">⚡ ${text}</h5>`;
+      if (hashes.length === 3) return `<h4 id="${anchorId}" style="scroll-margin-top: 90px;" class="note-h4">${text}</h4>`;
+      return `<h3 id="${anchorId}" style="scroll-margin-top: 90px;" class="note-h3">${text}</h3>`;
+    })
     .replace(/^---$/gm, '<hr style="border:none; border-top:1.5px dashed rgba(148,163,184,0.4); margin:24px 0;" />');
 
   // Step 5: Bold Highlighting
@@ -1012,6 +1023,108 @@ function formatNoteContent(content, activeRecallMode = false) {
   noteContentCache.set(cacheKey, html);
 
   return html;
+}
+
+function cleanRoadmapLabel(raw) {
+  if (!raw) return '';
+  return raw
+    .replace(/<pill[^>]*>([\s\S]*?)<\/pill>/g, '$1')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\$([^$]+)\$/g, '$1')
+    .replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, '($1/$2)')
+    .replace(/\\(?:times|cdot)/g, '×')
+    .replace(/\\(?:rightarrow|to|implies)/g, '→')
+    .replace(/\\[a-zA-Z]+/g, '')
+    .replace(/[{}]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function buildUnitRoadmap(unit) {
+  if (!unit || !Array.isArray(unit.sections)) {
+    return { sections: [], totalTopics: 0, totalPages: 1 };
+  }
+  const CHARS_PER_PAGE = 2100;
+  let cumChars = 900; // Page 1 starts with Unit Header + Roadmap Menu
+  let totalTopics = 0;
+
+  const sections = unit.sections.map((sec, sIdx) => {
+    const secNum = sIdx + 1;
+    const rawContent = sec.content || '';
+    const startPage = Math.max(1, Math.ceil(cumChars / CHARS_PER_PAGE));
+
+    // Mask code blocks with same-length spaces so # comments inside code aren't matched as headings
+    const masked = rawContent.replace(/```[\s\S]*?```/g, (m) => ' '.repeat(m.length));
+
+    let hIdx = 0;
+    let derIdx = 0;
+    let exIdx = 0;
+    const items = [];
+
+    const tokenRx = /(?:^(#{2,4}) (.*?)$|<derivation\b([^>]*)>|<example\b([^>]*)>)/gm;
+    let match;
+    while ((match = tokenRx.exec(masked)) !== null) {
+      const itemPage = Math.max(startPage, Math.ceil((cumChars + match.index) / CHARS_PER_PAGE));
+      if (match[1]) {
+        hIdx++;
+        const label = cleanRoadmapLabel(match[2]);
+        if (label && !/^MMDU Official University Solved/i.test(label)) {
+          items.push({
+            id: `roadmap-${sec.sectionId}-h-${hIdx}`,
+            subNum: `${secNum}.${items.length + 1}`,
+            type: match[1].length === 4 ? 'subtopic' : 'topic',
+            badge: '📖 Topic',
+            label,
+            page: itemPage
+          });
+        }
+      } else if (match[3] !== undefined) {
+        derIdx++;
+        const titleMatch = match[3].match(/title="([^"]*)"/);
+        const marksMatch = match[3].match(/marks="([^"]*)"/);
+        const label = cleanRoadmapLabel(titleMatch ? titleMatch[1] : 'University Mathematical Proof');
+        items.push({
+          id: `roadmap-${sec.sectionId}-der-${derIdx}`,
+          subNum: `${secNum}.${items.length + 1}`,
+          type: 'derivation',
+          badge: marksMatch ? `📐 Proof (${marksMatch[1]})` : '📐 Proof',
+          label,
+          page: itemPage
+        });
+      } else if (match[4] !== undefined) {
+        exIdx++;
+        const titleMatch = match[4].match(/title="([^"]*)"/);
+        const label = cleanRoadmapLabel(titleMatch ? titleMatch[1] : 'Solved Numerical Problem');
+        items.push({
+          id: `roadmap-${sec.sectionId}-ex-${exIdx}`,
+          subNum: `${secNum}.${items.length + 1}`,
+          type: 'example',
+          badge: '📘 Solved Q',
+          label,
+          page: itemPage
+        });
+      }
+    }
+
+    cumChars += rawContent.length + 500;
+    const endPage = Math.max(startPage, Math.ceil(cumChars / CHARS_PER_PAGE));
+    totalTopics += items.length;
+
+    return {
+      secNum,
+      sectionId: sec.sectionId,
+      anchorId: `section-${sec.sectionId}`,
+      title: cleanRoadmapLabel(sec.title),
+      startPage,
+      endPage,
+      items
+    };
+  });
+
+  const totalPages = sections.length > 0 ? sections[sections.length - 1].endPage : 1;
+  return { sections, totalTopics, totalPages };
 }
 
 const ALLOWED_SUBJECT_IDS = [
@@ -2185,14 +2298,227 @@ export default function SensoryLab({
             }}>
               {beeeUnit.title}
             </h2>
-            <p style={{ 
-              color: themeMode === 'clean' ? '#475569' : themeMode === 'paper' ? '#1e293b' : '#c0c8db', 
-              fontSize: '0.96rem', 
-              marginTop: '6px', 
-              lineHeight: 1.6 
-            }}>
-              {beeeUnit.summary}
-            </p>
+
+            {/* 🗺️ UNIT SYLLABUS ROADMAP & TABLE OF CONTENTS MENU (WITH PAGE NUMBERS) */}
+            {(() => {
+              const roadmap = buildUnitRoadmap(beeeUnit);
+              if (!roadmap.sections.length) return null;
+              return (
+                <div style={{
+                  marginTop: '16px',
+                  background: 'rgba(9, 14, 26, 0.82)',
+                  border: '1.5px solid rgba(56, 189, 248, 0.3)',
+                  borderRadius: '14px',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 28px rgba(0, 0, 0, 0.35)'
+                }}>
+                  {/* Roadmap Header Bar */}
+                  <div style={{
+                    padding: '12px 18px',
+                    background: 'linear-gradient(90deg, rgba(14, 165, 233, 0.16) 0%, rgba(124, 58, 237, 0.14) 100%)',
+                    borderBottom: '1px solid rgba(56, 189, 248, 0.22)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '10px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Layers size={17} color="#38bdf8" />
+                      <span style={{ fontSize: '0.86rem', fontWeight: 900, color: '#f8fafc', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                        🗺️ Unit {selectedUnitNum} Syllabus Roadmap &amp; Topic Index
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <span style={{
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        background: 'rgba(56, 189, 248, 0.14)',
+                        color: '#38bdf8',
+                        border: '1px solid rgba(56, 189, 248, 0.3)'
+                      }}>
+                        {roadmap.sections.length} Modules &bull; {roadmap.totalTopics} Topics
+                      </span>
+                      <span style={{
+                        fontSize: '0.74rem',
+                        fontWeight: 800,
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        background: 'rgba(16, 185, 129, 0.15)',
+                        color: '#34d399',
+                        border: '1px solid rgba(16, 185, 129, 0.3)'
+                      }}>
+                        📄 Pages 1 – {roadmap.totalPages}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Roadmap Sections & Sub-Topics Table of Contents */}
+                  <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {roadmap.sections.map((sec) => (
+                      <div
+                        key={sec.sectionId}
+                        style={{
+                          background: 'rgba(15, 23, 42, 0.65)',
+                          border: '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: '10px',
+                          padding: '10px 14px'
+                        }}
+                      >
+                        {/* Main Module Header Row */}
+                        <div
+                          onClick={() => {
+                            const el = document.getElementById(sec.anchorId);
+                            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }}
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            gap: '10px',
+                            cursor: 'pointer',
+                            paddingBottom: sec.items.length > 0 ? '8px' : '0',
+                            borderBottom: sec.items.length > 0 ? '1px dashed rgba(148, 163, 184, 0.2)' : 'none'
+                          }}
+                          title={`Click to jump to ${sec.title}`}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                            <span style={{
+                              fontSize: '0.7rem',
+                              fontWeight: 800,
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              background: 'rgba(0, 240, 255, 0.15)',
+                              color: 'var(--neon-cyan)',
+                              border: '1px solid rgba(0, 240, 255, 0.3)',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              MODULE {sec.secNum}
+                            </span>
+                            <span style={{
+                              fontSize: '0.9rem',
+                              fontWeight: 800,
+                              color: '#fef08a',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis'
+                            }}>
+                              {sec.title}
+                            </span>
+                          </div>
+                          <span style={{
+                            fontSize: '0.74rem',
+                            fontWeight: 800,
+                            padding: '2px 9px',
+                            borderRadius: '6px',
+                            background: 'rgba(245, 158, 11, 0.15)',
+                            color: '#fbbf24',
+                            border: '1px solid rgba(245, 158, 11, 0.3)',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0
+                          }}>
+                            {sec.startPage === sec.endPage ? `Page ${sec.startPage}` : `Pages ${sec.startPage} – ${sec.endPage}`}
+                          </span>
+                        </div>
+
+                        {/* Sub-Topics List with Dotted Leaders & Page Numbers */}
+                        {sec.items.length > 0 && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '8px' }}>
+                            {sec.items.map((item) => {
+                              const isDerivation = item.type === 'derivation';
+                              const isExample = item.type === 'example';
+                              return (
+                                <div
+                                  key={item.id}
+                                  onClick={() => {
+                                    const el = document.getElementById(item.id);
+                                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                  }}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    padding: '3px 6px',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.82rem',
+                                    transition: 'background 0.15s ease'
+                                  }}
+                                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(56, 189, 248, 0.1)'; }}
+                                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                                  title={`Jump to ${item.label} (Page ${item.page})`}
+                                >
+                                  <span style={{
+                                    fontFamily: 'monospace',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    color: '#94a3b8',
+                                    minWidth: '32px'
+                                  }}>
+                                    {item.subNum}
+                                  </span>
+                                  <span style={{
+                                    fontSize: '0.68rem',
+                                    fontWeight: 700,
+                                    padding: '1px 6px',
+                                    borderRadius: '4px',
+                                    whiteSpace: 'nowrap',
+                                    background: isDerivation
+                                      ? 'rgba(168, 85, 247, 0.18)'
+                                      : isExample
+                                        ? 'rgba(16, 185, 129, 0.16)'
+                                        : 'rgba(56, 189, 248, 0.12)',
+                                    color: isDerivation
+                                      ? '#d8b4fe'
+                                      : isExample
+                                        ? '#6ee7b7'
+                                        : '#7dd3fc',
+                                    border: isDerivation
+                                      ? '1px solid rgba(168, 85, 247, 0.35)'
+                                      : isExample
+                                        ? '1px solid rgba(16, 185, 129, 0.3)'
+                                        : '1px solid rgba(56, 189, 248, 0.25)'
+                                  }}>
+                                    {item.badge}
+                                  </span>
+                                  <span style={{
+                                    color: '#e2e8f0',
+                                    fontWeight: isDerivation ? 700 : 500,
+                                    minWidth: 0,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                  }}>
+                                    {item.label}
+                                  </span>
+                                  <div style={{
+                                    flex: '1 1 20px',
+                                    borderBottom: '1px dotted rgba(148, 163, 184, 0.3)',
+                                    height: '1px',
+                                    margin: '0 4px'
+                                  }} />
+                                  <span style={{
+                                    fontFamily: 'monospace',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 800,
+                                    color: '#38bdf8',
+                                    whiteSpace: 'nowrap',
+                                    flexShrink: 0
+                                  }}>
+                                    Pg. {item.page}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Sticky Margin Topper Tip */}
@@ -2221,7 +2547,8 @@ export default function SensoryLab({
           {beeeUnit.sections ? (
             beeeUnit.sections.map(section => (
               <div key={section.sectionId} style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
-                <h3 className={themeMode !== 'clean' ? 'handwritten-heading' : ''} style={{ 
+                <h3 id={`section-${section.sectionId}`} className={themeMode !== 'clean' ? 'handwritten-heading' : ''} style={{ 
+                  scrollMarginTop: '90px',
                   fontSize: '1.45rem', 
                   fontWeight: 900, 
                   color: themeMode === 'clean' ? '#0f172a' : themeMode === 'paper' ? '#0369a1' : 'var(--neon-cyan)', 
@@ -2251,7 +2578,7 @@ export default function SensoryLab({
                     boxSizing: 'border-box'
                   }}
                   dangerouslySetInnerHTML={{
-                    __html: formatNoteContent(section.content, false)
+                    __html: formatNoteContent(section.content, false, section.sectionId)
                   }}
                 />
 

@@ -190,6 +190,19 @@ const commonStyles = `
     .unit-title-text { font-size: 16pt; font-weight: 800; color: #14532d; margin: 0 0 6px; }
     .unit-meta-bar { font-size: 9pt; color: #4b5563; margin-bottom: 6px; }
     .unit-summary-text { font-size: 9.5pt; color: #374151; margin: 0; font-style: italic; }
+    .roadmap-box { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; page-break-inside: avoid; }
+    .roadmap-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 10px; }
+    .roadmap-title { font-size: 10.5pt; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; }
+    .roadmap-stats { font-size: 8.5pt; font-weight: 700; color: #0369a1; background: #e0f2fe; padding: 3px 10px; border-radius: 12px; }
+    .roadmap-mod { margin-bottom: 8px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 12px; page-break-inside: avoid; }
+    .roadmap-mod-head { display: flex; justify-content: space-between; align-items: baseline; font-weight: 800; font-size: 9.5pt; color: #0f172a; margin-bottom: 4px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 3px; }
+    .roadmap-mod-pg { font-size: 8.5pt; font-weight: 800; color: #15803d; background: #dcfce7; padding: 1px 8px; border-radius: 10px; font-family: Consolas, monospace; }
+    .roadmap-item { display: flex; justify-content: space-between; align-items: baseline; font-size: 8.5pt; color: #334155; padding: 2px 0 2px 10px; }
+    .roadmap-item-type { font-size: 7.5pt; font-weight: 700; padding: 0 5px; border-radius: 4px; margin-right: 6px; text-transform: uppercase; }
+    .type-topic { background: #e0f2fe; color: #0369a1; }
+    .type-proof { background: #f3e8ff; color: #7e22ce; }
+    .type-solved { background: #dcfce7; color: #15803d; }
+    .roadmap-item-pg { font-family: Consolas, monospace; font-weight: 700; color: #475569; font-size: 8pt; margin-left: 8px; white-space: nowrap; }
     .section-card { margin-bottom: 22px; }
     .section-card-title { font-size: 12.5pt; font-weight: 700; color: #0369a1; border-bottom: 1.5px solid #e0f2fe; padding-bottom: 5px; margin: 18px 0 10px; page-break-after: avoid; }
     .section-card-content { font-size: 10pt; color: #1e293b; }
@@ -220,6 +233,80 @@ const commonStyles = `
     .page-break { page-break-after: always; }
     .katex { font-size: 1.05em !important; }
 `;
+
+function cleanRoadmapText(raw) {
+  if (!raw) return '';
+  return raw
+    .replace(/\$\$([\s\S]*?)\$\$/g, '$1')
+    .replace(/\$([^$\n]+?)\$/g, '$1')
+    .replace(/\\(?:text|mathrm|mathbf|mathcal)\{([^}]+)\}/g, '$1')
+    .replace(/\\[a-zA-Z]+/g, ' ')
+    .replace(/[{}]/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/`/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function buildUnitRoadmapHtml(unit) {
+  if (!unit || !Array.isArray(unit.sections)) return '';
+  const CHARS_PER_PAGE = 2200;
+  let cumulativeChars = 650;
+  let totalSubTopics = 0;
+
+  let modsHtml = '';
+  unit.sections.forEach((sec, idx) => {
+    const startPage = Math.max(1, Math.floor(cumulativeChars / CHARS_PER_PAGE) + 1);
+    const content = sec.content || '';
+    const tokenRegex = /(?:^(#{2,4})\s+(.+)$)|(?:<derivation\s+title="([^"]+)">)|(?:<example\s+title="([^"]+)">)/gm;
+    let match;
+    let itemsHtml = '';
+    while ((match = tokenRegex.exec(content)) !== null) {
+      const itemPage = Math.max(1, Math.floor((cumulativeChars + match.index) / CHARS_PER_PAGE) + 1);
+      if (match[1]) {
+        const cleanText = cleanRoadmapText(match[2]);
+        if (cleanText) {
+          totalSubTopics++;
+          itemsHtml += `<div class="roadmap-item"><span><span class="roadmap-item-type type-topic">Topic</span>${cleanText}</span><span class="roadmap-item-pg">Pg. ${itemPage}</span></div>`;
+        }
+      } else if (match[3]) {
+        const cleanTitle = cleanRoadmapText(match[3]);
+        totalSubTopics++;
+        itemsHtml += `<div class="roadmap-item"><span><span class="roadmap-item-type type-proof">Proof</span>${cleanTitle}</span><span class="roadmap-item-pg">Pg. ${itemPage}</span></div>`;
+      } else if (match[4]) {
+        const cleanTitle = cleanRoadmapText(match[4]);
+        totalSubTopics++;
+        itemsHtml += `<div class="roadmap-item"><span><span class="roadmap-item-type type-solved">Solved Q</span>${cleanTitle}</span><span class="roadmap-item-pg">Pg. ${itemPage}</span></div>`;
+      }
+    }
+    cumulativeChars += content.length + 350;
+    const endPage = Math.max(startPage, Math.floor(cumulativeChars / CHARS_PER_PAGE) + 1);
+    const pageLabel = startPage === endPage ? `Pg. ${startPage}` : `Pg. ${startPage}–${endPage}`;
+
+    modsHtml += `
+      <div class="roadmap-mod">
+        <div class="roadmap-mod-head">
+          <span>${idx + 1}. ${cleanRoadmapText(sec.title)}</span>
+          <span class="roadmap-mod-pg">${pageLabel}</span>
+        </div>
+        ${itemsHtml}
+      </div>
+    `;
+  });
+
+  const totalPages = Math.max(1, Math.floor(cumulativeChars / CHARS_PER_PAGE) + 1);
+  const uNum = unit.unitNum || unit.num || 1;
+
+  return `
+    <div class="roadmap-box">
+      <div class="roadmap-header">
+        <span class="roadmap-title">🗺️ Unit ${uNum} Syllabus Roadmap &amp; Topic Index (Table of Contents)</span>
+        <span class="roadmap-stats">${unit.sections.length} Modules &bull; ${totalSubTopics} Topics &bull; Pages 1–${totalPages}</span>
+      </div>
+      ${modsHtml}
+    </div>
+  `;
+}
 
 function generateSingleUnitHtml({ subjectTitle, courseCode, unit }) {
   const uNum = unit.unitNum || unit.num || 1;
@@ -252,8 +339,8 @@ function generateSingleUnitHtml({ subjectTitle, courseCode, unit }) {
         <span><strong>Exam Weightage:</strong> ${unit.examWeightage || '15 Marks'}</span> &bull;
         <span><strong>Study Time:</strong> ${unit.readingTime || '45 mins'}</span>
       </div>
-      ${unit.summary ? `<p class="unit-summary-text">${unit.summary}</p>` : ''}
     </div>
+    ${buildUnitRoadmapHtml(unit)}
     ${sectionsHtml}
   </div>
 </body>
@@ -273,8 +360,8 @@ function generateMasterHtml({ subjectTitle, courseCode, unitsData }) {
             <span><strong>Exam Weightage:</strong> ${unit.examWeightage || '15 Marks'}</span> &bull;
             <span><strong>Estimated Study Time:</strong> ${unit.readingTime || '45 mins'}</span>
           </div>
-          ${unit.summary ? `<p class="unit-summary-text">${unit.summary}</p>` : ''}
         </div>
+        ${buildUnitRoadmapHtml(unit)}
     `;
     (unit.sections || []).forEach((sec) => {
       unitsHtml += `
