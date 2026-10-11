@@ -257,11 +257,15 @@ function renderKaTeXSafe(formula, isDisplay = false) {
     .replace(/\\?∈/g, '\\in ')
     .replace(/\\?∂/g, '\\partial ')
     .replace(/(?<!\\)%/g, '\\%')
-    .replace(/₁/g, '_1')
-    .replace(/₂/g, '_2')
-    .replace(/₃/g, '_3')
-    .replace(/ᵣ/g, '_r')
     .replace(/ₙ₋₁/g, '_{n-1}')
+    .replace(/₀/g, '_0').replace(/₁/g, '_1').replace(/₂/g, '_2').replace(/₃/g, '_3')
+    .replace(/₄/g, '_4').replace(/₅/g, '_5').replace(/₆/g, '_6').replace(/₇/g, '_7')
+    .replace(/₈/g, '_8').replace(/₉/g, '_9')
+    .replace(/ₐ/g, '_a').replace(/ₑ/g, '_e').replace(/ₕ/g, '_h').replace(/ᵢ/g, '_i')
+    .replace(/ⱼ/g, '_j').replace(/ₖ/g, '_k').replace(/ₗ/g, '_l').replace(/ₘ/g, '_m')
+    .replace(/ₙ/g, '_n').replace(/ₒ/g, '_o').replace(/ₚ/g, '_p').replace(/ᵣ/g, '_r')
+    .replace(/ₛ/g, '_s').replace(/ₜ/g, '_t').replace(/ᵤ/g, '_u').replace(/ᵥ/g, '_v')
+    .replace(/ₓ/g, '_x')
     .replace(/\\text\{"([^"]+)"\}/g, '\\text{$1}')
     .replace(/"([^"]+)"/g, '\\text{$1}');
 
@@ -303,10 +307,12 @@ function renderKaTeXSafe(formula, isDisplay = false) {
       .replace(/\\*(?:left|right)\s*([(\[{])/gi, '$1')
       .replace(/\\*(?:left|right)\s*([)\]}])/gi, '$1')
       .replace(/\\*(?:left|right)\b(?!\s*[-]?\s*hand)/gi, '')
+      .replace(/%/g, ' percent ')
       .replace(/[{}\\]/g, ' ');
     return katex.renderToString(`\\text{${cleanFallback}}`, {
       displayMode: isDisplay,
-      throwOnError: false
+      throwOnError: false,
+      strict: 'ignore'
     });
   } catch (e) {
     return clean
@@ -1513,15 +1519,27 @@ export default function SensoryLab({
   const notesPanelRef = useRef(null);
 
   const getSubjectMasterPdf = () => {
-    if (isBEEE) return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: 'BELE001_BEEE_Notes.pdf' };
-    if (isAIML) return { url: '/AIML_notes_handwritten.pdf', name: 'BCSE011_AIML_Notes.pdf' };
-    if (isMath1) return { url: '/BMAT001_Mathematics_I_MMU_Handwritten_Notes.pdf', name: 'BMAT001_Maths_I_Notes.pdf' };
-    if (isC) return { url: '/BCSE008_Computational_and_Problem_Solving_using_C_notes.pdf', name: 'BCSE008_C_Programming_Notes.pdf' };
-    if (isWebTech) return { url: '/BCSE012_Fundamental_of_Web_Technologies_Long_Notes.pdf', name: 'BCSE012_Web_Technologies_Notes.pdf' };
-    if (isPhysics) return { url: '/Applied_Physics_Master_Notes.pdf', name: 'Applied_Physics_Notes.pdf' };
-    if (isPython) return { url: '/Python_Programming_Master_Notes.pdf', name: 'Python_Programming_Notes.pdf' };
-    if (isDSA) return { url: '/Data_Structures_Master_Notes.pdf', name: 'Data_Structures_Notes.pdf' };
-    return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: 'College_Notes.pdf' };
+    if (isBEEE) return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: 'BELE001_BEEE_All_Units_Notes.pdf' };
+    if (isAIML) return { url: '/AIML_notes_handwritten.pdf', name: 'BCSE011_AIML_All_Units_Notes.pdf' };
+    if (isMath1) return { url: '/BMAT001_Mathematics_I_MMU_Handwritten_Notes.pdf', name: 'BMAT001_Maths_I_All_Units_Notes.pdf' };
+    if (isC) return { url: '/BCSE008_Computational_and_Problem_Solving_using_C_notes.pdf', name: 'BCSE008_C_Programming_All_Units_Notes.pdf' };
+    if (isWebTech) return { url: '/BCSE012_Fundamental_of_Web_Technologies_Long_Notes.pdf', name: 'BCSE012_Web_Technologies_All_Units_Notes.pdf' };
+    if (isPhysics) return { url: '/Applied_Physics_Master_Notes.pdf', name: 'BPHY001_Applied_Physics_All_Units_Notes.pdf' };
+    if (isPython) return { url: '/Python_Programming_Master_Notes.pdf', name: 'BCSE004_Python_Programming_All_Units_Notes.pdf' };
+    if (isDSA) return { url: '/Data_Structures_Master_Notes.pdf', name: 'BCSE007_Data_Structures_All_Units_Notes.pdf' };
+    return { url: '/BELE001_Basic_Electrical_and_Electronics_Engineering_notes.pdf', name: 'College_Notes_All_Units.pdf' };
+  };
+
+  const getUnitPdf = (uNum = selectedUnitNum) => {
+    if (isBEEE) return { url: `/pdfs/units/BELE-001_Unit_${uNum}.pdf`, name: `BELE001_BEEE_Unit_${uNum}_Notes.pdf` };
+    if (isAIML) return { url: `/pdfs/units/BCSE-011_Unit_${uNum}.pdf`, name: `BCSE011_AIML_Unit_${uNum}_Notes.pdf` };
+    if (isMath1) return { url: `/pdfs/units/BMAT-001_Unit_${uNum}.pdf`, name: `BMAT001_Maths_I_Unit_${uNum}_Notes.pdf` };
+    if (isC) return { url: `/pdfs/units/BCSE-008_Unit_${uNum}.pdf`, name: `BCSE008_C_Programming_Unit_${uNum}_Notes.pdf` };
+    if (isWebTech) return { url: `/pdfs/units/BCSE-012_Unit_${uNum}.pdf`, name: `BCSE012_Web_Technologies_Unit_${uNum}_Notes.pdf` };
+    if (isPhysics) return { url: `/pdfs/units/BPHY-001_Unit_${uNum}.pdf`, name: `BPHY001_Applied_Physics_Unit_${uNum}_Notes.pdf` };
+    if (isPython) return { url: `/pdfs/units/BCSE-004_Unit_${uNum}.pdf`, name: `BCSE004_Python_Programming_Unit_${uNum}_Notes.pdf` };
+    if (isDSA) return { url: `/pdfs/units/BCSE-007_Unit_${uNum}.pdf`, name: `BCSE007_Data_Structures_Unit_${uNum}_Notes.pdf` };
+    return { url: `/pdfs/units/BELE-001_Unit_${uNum}.pdf`, name: `Unit_${uNum}_Notes.pdf` };
   };
 
   const getSubjectFormulas = () => {
@@ -1559,7 +1577,7 @@ export default function SensoryLab({
         { name: "Euler's 2nd Order Derivative Form", eq: "x^2 \\frac{\\partial^2 u}{\\partial x^2} + 2xy \\frac{\\partial^2 u}{\\partial x\\partial y} + y^2 \\frac{\\partial^2 u}{\\partial y^2} = n(n-1)u", tip: "Frequent university 6-mark problem" },
         { name: "Taylor Series (1-Variable Power Expansion)", eq: "f(x) = \\sum_{n=0}^\\infty \\frac{f^{(n)}(a)}{n!} (x - a)^n", tip: "Power series expansion about point x = a" },
         { name: "Maclaurin Series (Expansion about a = 0)", eq: "f(x) = \\sum_{n=0}^\\infty \\frac{f^{(n)}(0)}{n!} x^n", tip: "Special case of Taylor series when a = 0" },
-        { name: "Jacobian Coordinate Transformation", eq: "J = \\frac{\\partial(x, y)}{\\partial(u, v)} = \\begin{vmatrix} \\frac{\\partial x}{\\partial u} & \\frac{\\partial x}{\\partial v} \\\\[4pt] \\frac{\\partial y}{\\partial u} & \\frac{\\partial y}{\\partial v} \\end{vmatrix}, \\quad J \\cdot J' = 1", tip: "Coordinate substitution multiplier in multiple integrals" },
+        { name: "Maxima & Minima (2 Variables Hessian Test)", eq: "rt - s^2 > 0 \\implies \\text{Extremum } (r < 0: \\text{Max}, \\; r > 0: \\text{Min})", tip: "r = f_xx, s = f_xy, t = f_yy at stationary point" },
         { name: "Lagrange's Mean Value Theorem (LMVT)", eq: "f'(c) = \\frac{f(b) - f(a)}{b - a} \\quad \\text{for } c \\in (a, b)", tip: "f must be continuous in [a,b] and differentiable in (a,b)" },
         { name: "Cayley-Hamilton Theorem Statement", eq: "p(A) = A^n + c_{n-1}A^{n-1} + \\dots + c_0 I = 0", tip: "Every square matrix satisfies its own characteristic polynomial" },
         { name: "Eigenvalues Sum & Determinant Relations", eq: "\\sum_{i=1}^n \\lambda_i = \\text{Trace}(A), \\quad \\prod_{i=1}^n \\lambda_i = \\det(A)", tip: "Quickest check for eigenvalue calculations" }
@@ -1611,7 +1629,7 @@ export default function SensoryLab({
     const rows = formulas.map(f => {
       let eqHtml = '';
       try {
-        eqHtml = katex.renderToString(f.eq, { displayMode: true, throwOnError: false });
+        eqHtml = katex.renderToString(f.eq, { displayMode: true, throwOnError: false, strict: 'ignore' });
       } catch (e) {
         eqHtml = `<div style="font-family:monospace;font-weight:bold;text-align:center;">${f.eq}</div>`;
       }
@@ -1754,12 +1772,12 @@ export default function SensoryLab({
             <span>{isUnitsCollapsed ? 'Show Units' : 'Hide Units'}</span>
           </button>
 
-          {/* 📥 1-Click Master Notes PDF Download */}
+          {/* 📥 1-Click Current Unit PDF Download */}
           <button
             type="button"
             onClick={() => {
-              const pdf = getSubjectMasterPdf();
-              downloadPdf(pdf.url, pdf.name, activeSubject?.name);
+              const unitPdf = getUnitPdf(selectedUnitNum);
+              downloadPdf(unitPdf.url, unitPdf.name, `${activeSubject?.name} - Unit ${selectedUnitNum}`);
             }}
             className="btn-outline"
             style={{
@@ -1776,9 +1794,36 @@ export default function SensoryLab({
               gap: '6px',
               cursor: 'pointer'
             }}
-            title={`Download Master Notes PDF for ${activeSubject.name}`}
+            title={`Download Unit ${selectedUnitNum} Notes PDF (${beeeUnit.title || 'Current Unit'})`}
           >
-            <Download size={15} /> Download PDF
+            <Download size={15} /> Download Unit {selectedUnitNum} PDF
+          </button>
+
+          {/* 📚 1-Click Complete 4-Unit Master Notes PDF Download */}
+          <button
+            type="button"
+            onClick={() => {
+              const pdf = getSubjectMasterPdf();
+              downloadPdf(pdf.url, pdf.name, `${activeSubject?.name} (All 4 Units)`);
+            }}
+            className="btn-outline"
+            style={{
+              borderColor: '#a855f7',
+              color: '#c084fc',
+              background: 'rgba(168, 85, 247, 0.12)',
+              fontWeight: 800,
+              fontSize: '0.82rem',
+              padding: '7px 14px',
+              borderRadius: '8px',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer'
+            }}
+            title={`Download Complete 4-Unit Master Notes PDF for ${activeSubject.name}`}
+          >
+            <FileText size={15} /> All 4 Units PDF
           </button>
 
           {/* ⚡ 1-Click Formula & Theorem Cheat-Sheet Modal */}
@@ -2090,44 +2135,72 @@ export default function SensoryLab({
                 Reading Time: {beeeUnit.readingTime || '35 mins'}
               </span>
 
-              {/* Unit Mastery Status Toggle */}
-              <button
-                type="button"
-                onClick={toggleUnitMastery}
-                style={{
-                  marginLeft: 'auto',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '5px 12px',
-                  borderRadius: '20px',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  border: currentUnitMastery === 'mastered' 
-                    ? '1.5px solid #10b981' 
-                    : currentUnitMastery === 'revision'
-                      ? '1.5px solid #f59e0b'
-                      : '1.5px solid rgba(255, 255, 255, 0.2)',
-                  background: currentUnitMastery === 'mastered'
-                    ? 'rgba(16, 185, 129, 0.15)'
-                    : currentUnitMastery === 'revision'
-                      ? 'rgba(245, 158, 11, 0.15)'
-                      : 'rgba(255, 255, 255, 0.05)',
-                  color: currentUnitMastery === 'mastered'
-                    ? '#34d399'
-                    : currentUnitMastery === 'revision'
-                      ? '#f59e0b'
-                      : '#94a3b8',
-                  transition: 'all 0.2s ease'
-                }}
-                title="Click to toggle: Unread → Mastered → Need Revision"
-              >
-                <CheckCircle2 size={14} color={currentUnitMastery === 'mastered' ? '#10b981' : currentUnitMastery === 'revision' ? '#f59e0b' : '#64748b'} />
-                <span>
-                  {currentUnitMastery === 'mastered' ? '✓ Mastered' : currentUnitMastery === 'revision' ? '⚡ Need Revision' : 'Mark as Studied'}
-                </span>
-              </button>
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {/* Direct Unit PDF Download Pill */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const unitPdf = getUnitPdf(selectedUnitNum);
+                    downloadPdf(unitPdf.url, unitPdf.name, `${activeSubject?.name} - Unit ${selectedUnitNum}`);
+                  }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '5px 12px',
+                    borderRadius: '20px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    border: '1.5px solid #38bdf8',
+                    background: 'rgba(56, 189, 248, 0.14)',
+                    color: '#38bdf8',
+                    transition: 'all 0.2s ease'
+                  }}
+                  title={`Download only Unit ${selectedUnitNum} PDF`}
+                >
+                  <Download size={13} />
+                  <span>Unit {selectedUnitNum} PDF</span>
+                </button>
+
+                {/* Unit Mastery Status Toggle */}
+                <button
+                  type="button"
+                  onClick={toggleUnitMastery}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '5px 12px',
+                    borderRadius: '20px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    border: currentUnitMastery === 'mastered' 
+                      ? '1.5px solid #10b981' 
+                      : currentUnitMastery === 'revision'
+                        ? '1.5px solid #f59e0b'
+                        : '1.5px solid rgba(255, 255, 255, 0.2)',
+                    background: currentUnitMastery === 'mastered'
+                      ? 'rgba(16, 185, 129, 0.15)'
+                      : currentUnitMastery === 'revision'
+                        ? 'rgba(245, 158, 11, 0.15)'
+                        : 'rgba(255, 255, 255, 0.05)',
+                    color: currentUnitMastery === 'mastered'
+                      ? '#34d399'
+                      : currentUnitMastery === 'revision'
+                        ? '#f59e0b'
+                        : '#94a3b8',
+                    transition: 'all 0.2s ease'
+                  }}
+                  title="Click to toggle: Unread → Mastered → Need Revision"
+                >
+                  <CheckCircle2 size={14} color={currentUnitMastery === 'mastered' ? '#10b981' : currentUnitMastery === 'revision' ? '#f59e0b' : '#64748b'} />
+                  <span>
+                    {currentUnitMastery === 'mastered' ? '✓ Mastered' : currentUnitMastery === 'revision' ? '⚡ Need Revision' : 'Mark as Studied'}
+                  </span>
+                </button>
+              </div>
             </div>
 
             <h2 className={themeMode !== 'clean' ? 'handwritten-heading' : ''} style={{ 
@@ -2756,7 +2829,7 @@ export default function SensoryLab({
               {getSubjectFormulas().map((item, idx) => {
                 let mathHtml = '';
                 try {
-                  mathHtml = katex.renderToString(item.eq, { displayMode: true, throwOnError: false });
+                  mathHtml = katex.renderToString(item.eq, { displayMode: true, throwOnError: false, strict: 'ignore' });
                 } catch (e) {
                   mathHtml = `<div style="font-family:monospace;font-weight:bold;color:#f59e0b;">${item.eq}</div>`;
                 }
