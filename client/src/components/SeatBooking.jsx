@@ -119,32 +119,26 @@ export default function SeatBooking({ currentUser, preselectedMovie }) {
     if (!raw) return '';
     let s = String(raw);
 
-    // If s contains literal escaped sequences (like \n, \t) representing lines
-    if (s.includes('\\n') || s.includes('\\t') || s.includes('\\"')) {
-      // Protect double-escaped sequences (e.g. \\n in C string literal printf("...\n"))
+    // Only unescape literal \n / \t if the string is single-line serialized JSON without real newlines
+    if (!s.includes('\n') && (s.includes('\\n') || s.includes('\\t') || s.includes('\\"'))) {
       s = s
         .replace(/\\\\n/g, '__LITERAL_ESC_N__')
         .replace(/\\\\t/g, '__LITERAL_ESC_T__')
         .replace(/\\\\"/g, '__LITERAL_ESC_QUOTE__')
-        .replace(/\\\\'/g, '__LITERAL_ESC_SQUOTE__');
-
-      // Convert escaped newlines, tabs, and quotes to actual characters
-      s = s
+        .replace(/\\\\'/g, '__LITERAL_ESC_SQUOTE__')
         .replace(/\\r\\n/g, '\n')
         .replace(/\\n/g, '\n')
         .replace(/\\t/g, '    ')
         .replace(/\\"/g, '"')
-        .replace(/\\'/g, "'");
-
-      // Restore protected in-code literal escapes
-      s = s
+        .replace(/\\'/g, "'")
         .replace(/__LITERAL_ESC_N__/g, '\\n')
         .replace(/__LITERAL_ESC_T__/g, '\\t')
         .replace(/__LITERAL_ESC_QUOTE__/g, '\\"')
         .replace(/__LITERAL_ESC_SQUOTE__/g, "\\'");
+      return repairCodeString(s);
     }
 
-    return repairCodeString(s);
+    return s;
   };
 
   const handleCopyCode = (codeText) => {

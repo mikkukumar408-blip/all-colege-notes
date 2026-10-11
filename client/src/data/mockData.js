@@ -85,17 +85,17 @@ export const initialSubjects = [
     name: 'Mathematics I (BMAT-001)',
     code: 'BMAT-001',
     credits: 4,
-    instructor: 'Department of Mathematics & Humanities (MMU)',
+    instructor: 'Department of Mathematics & Humanities (MMDU, Mullana)',
     notesCount: '4 Units Exhaustive Notes & Solved Numericals',
     rating: 5.0,
-    description: 'Maharishi Markandeshwar University (MMU) official syllabus: Matrices & Gauss-Jordan Inversion, Mean Value Theorems, Curvature, Indeterminate Forms, Beta-Gamma Functions, Multivariable Calculus, Vector Differentiation, Sequences & Series, and Fourier Series.',
+    description: 'Official MMDU syllabus (BMAT-001 — Common for all Branches except Biotech | L:3, T:1, P:0 | 60M Theory + 40M Sessional | 4.0 Credits): Matrices & Gauss-Jordan Inversion, Mean Value Theorems, Curvature, Indeterminate Forms, Beta-Gamma Functions, Multivariable Calculus (Maxima-Minima & Lagrange Multipliers), Vector Differentiation, Sequences & Series, and Fourier Series.',
     banner: '/images/math1.jpg',
     textbook: '1. Higher Engineering Mathematics by B. S. Grewal | 2. Advanced Engineering Mathematics by Erwin Kreyszig',
     units: [
-      { num: 1, title: 'Matrices, Rank & Gauss-Jordan Inversion', pages: 34, status: 'Verified' },
-      { num: 2, title: 'Calculus, Curvature & Beta-Gamma Functions', pages: 46, status: 'Verified' },
-      { num: 3, title: 'Multivariable Calculus & Vector Differentiation', pages: 38, status: 'Verified' },
-      { num: 4, title: 'Sequences & Series and Fourier Series', pages: 44, status: 'Verified' }
+      { num: 1, title: 'Matrices, Rank, Gauss-Jordan & Eigenvalues (10 Hrs)', pages: 34, status: 'Verified' },
+      { num: 2, title: 'Calculus, Curvature, L\'Hospital & Beta-Gamma (10 Hrs)', pages: 46, status: 'Verified' },
+      { num: 3, title: 'Multivariable Calculus (Differentiation) & Vectors (10 Hrs)', pages: 38, status: 'Verified' },
+      { num: 4, title: 'Sequences & Series (05 Hrs) and Fourier Series (05 Hrs)', pages: 44, status: 'Verified' }
     ]
   },
   {
@@ -104,7 +104,7 @@ export const initialSubjects = [
     year: '1st Year',
     name: 'Computational and Problem Solving using C',
     code: 'BCSE-008',
-    credits: 4,
+    credits: 2,
     instructor: 'Department of Computer Science & Engineering (MMDU)',
     notesCount: '4 Units Comprehensive Long Notes & Solved Questions',
     rating: 5.0,
@@ -124,8 +124,8 @@ export const initialSubjects = [
     year: '1st Year',
     name: 'Fundamentals of AI & ML',
     code: 'BCSE-011',
-    credits: 4,
-    instructor: 'AI & ML Department Faculty',
+    credits: 3,
+    instructor: 'AI & ML Department Faculty (MMDU)',
     notesCount: '4 Units Comprehensive Notes & University Numericals',
     rating: 5.0,
     description: 'Foundations of AI, Agent architectures, PEAS framework, State Space Search, A* trace, Logic, CNF, Resolution Refutation, Semantic Nets, Frames, Scripts, Expert Systems, Decision Trees ID3, SVM, Clustering, and Apriori algorithm with solved numericals.',
@@ -460,7 +460,7 @@ export const initialShortNotes = [
   // ==================== SEMESTER 1 ====================
   {
     id: 'sn-math1',
-    subject: 'Engineering Mathematics I (BMAT-001)',
+    subject: 'Mathematics I (BMAT-001)',
     code: 'BMAT-001',
     semester: 'Semester 1',
     category: 'Mathematics',
@@ -471,10 +471,10 @@ export const initialShortNotes = [
     pages: '2 Pages KaTeX Revision',
     downloads: 4820,
     highlights: [
-      'Matrices, Rank, Echelon Form & Cayley-Hamilton Theorem',
-      'Rolle\'s, LMVT, Cauchy MVT & Radius of Curvature ρ',
-      'Euler\'s Homogeneous Theorem, Beta-Gamma Function Proofs',
-      'Fourier Series Dirichlet Conditions & Euler Formulas'
+      'Unit I: Rank, Gauss-Jordan Inverse, Normal Form & Cayley-Hamilton',
+      'Unit II: Rolle\'s/MVT, Curvature (Cartesian/Polar), L\'Hospital & Beta-Gamma',
+      'Unit III: Euler\'s Theorem, Maxima-Minima, Lagrange Multipliers, Grad/Div/Curl',
+      'Unit IV: Ratio/Raabe/Cauchy/Leibnitz Tests & Half-Range Fourier Series'
     ]
   },
   {

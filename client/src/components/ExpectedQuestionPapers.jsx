@@ -103,7 +103,7 @@ export const EXAM_TYPES = {
     name: 'End-Semester Examination',
     shortTitle: 'End-Semester (Finals)',
     paperTitle: 'B.Tech. END-SEMESTER UNIVERSITY EXAMINATION, 2026',
-    dateBadge: '🏛️ University Finals',
+    dateBadge: '🏛️ MMDU Finals (60M)',
     syllabusTag: 'Complete Syllabus (Units I, II, III & IV)',
     unitsAllowed: ['Unit 1', 'Unit 2', 'Unit 3', 'Unit 4', 'UNIT I', 'UNIT II', 'UNIT III', 'UNIT IV'],
     allowedUnitNumbers: ['UNIT I', 'UNIT II', 'UNIT III', 'UNIT IV'],
@@ -111,12 +111,14 @@ export const EXAM_TYPES = {
     timerSeconds: 180 * 60, // 10800s
     maxMarks: 60,
     passingMarks: 24,
-    secAMarks: 20,
-    secBMarks: 40,
+    secAMarks: 12,
+    secBMarks: 8,
+    secCMarks: 16,
+    secDMarks: 24,
     color: '#00f0ff',
     border: 'rgba(0, 240, 255, 0.45)',
     bg: 'rgba(0, 240, 255, 0.12)',
-    description: 'Official university final examination covering 100% syllabus (all 4 units).'
+    description: 'Official MMDU End-Semester Examination (60 Marks across 4 Sections): Section A (12×1M = 12M Compulsory, 3 from each unit), Section B (4×2M = 8M Compulsory, 1 from each unit), Section C (4×4M = 16M with internal choice), and Section D (4×6M = 24M with internal choice).'
   }
 };
 
@@ -126,22 +128,143 @@ export function getExamPaperForType(rawPaper, examType = 'sessional-1') {
   const config = EXAM_TYPES[examType] || EXAM_TYPES['sessional-1'];
 
   if (examType === 'end-sem') {
+    // Official MMDU End-Semester Pattern (Screenshots 2311, 2314, 2316, 2318):
+    // - Section A: 12 questions x 1 Mark each = 12 Marks (3 from each unit, Compulsory, no one-word/MCQ answers)
+    // - Section B: 4 questions x 2 Marks each = 8 Marks (1 from each unit, Compulsory)
+    // - Section C: 4 questions x 4 Marks each = 16 Marks (1 from each unit, internal choice: attempt 4 out of 8)
+    // - Section D: 4 questions x 6 Marks each = 24 Marks (1 from each unit, internal choice: attempt 4 out of 8)
+    // Total Marks: 12 + 8 + 16 + 24 = 60 Marks (Time: 3 Hours, Passing: 24 Marks)
+    const allUnits = rawPaper.sectionB?.units || [];
+    const fourMarkQs = [];
+    const sixMarkQs = [];
+    const synthesizedShortByUnit = { 1: [], 2: [], 3: [], 4: [] };
+
+    allUnits.forEach((u, uIdx) => {
+      const unitNum = uIdx + 1;
+      const unitLabel = `Unit ${unitNum}`;
+      (u.questions || []).forEach(q => {
+        (q.subParts || []).forEach(sp => {
+          if (sp.marks === 4) {
+            fourMarkQs.push({ ...sp, unitTitle: u.syllabusTopic || u.unitTitle, unitNumber: u.unitNumber, unit: unitLabel });
+          }
+          if (sp.marks === 6) {
+            sixMarkQs.push({ ...sp, unitTitle: u.syllabusTopic || u.unitTitle, unitNumber: u.unitNumber, unit: unitLabel });
+          }
+          // Create concise conceptual short questions from unit subtopics to ensure >=4 short questions per unit
+          const firstSentence = (sp.question || '').split(/\.\s+|\?\s+/)[0] + '.';
+          const shortSolution = (sp.solution || '').split('\\n\\n').slice(0, 2).join('\\n\\n');
+          synthesizedShortByUnit[unitNum].push({
+            unit: unitLabel,
+            question: `Briefly explain the core principle/formula required for: ${firstSentence}`,
+            expectedFrequency: 'MMDU Syllabus Core Concept',
+            modelAnswer: shortSolution || sp.solution,
+            keyMarkingPoints: ['1 Mark for exact definition / principle', '1 Mark for governing formula or syntax']
+          });
+        });
+      });
+    });
+
+    const secAQuestions = [];
+    const secBQuestions = [];
+    const letters12 = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'];
+
+    for (let uNum = 1; uNum <= 4; uNum++) {
+      const unitTag = `unit ${uNum}`;
+      const existingUnitQs = (rawPaper.sectionA?.questions || []).filter(q =>
+        (q.unit || '').toLowerCase().includes(unitTag)
+      );
+      const combinedUnitPool = [...existingUnitQs, ...(synthesizedShortByUnit[uNum] || [])];
+      // First 3 questions go to Section A (1 Mark each, 3 per unit = 12 total)
+      for (let i = 0; i < 3; i++) {
+        const item = combinedUnitPool[i] || existingUnitQs[0] || (rawPaper.sectionA?.questions || [])[0];
+        if (item) {
+          const idx = secAQuestions.length;
+          secAQuestions.push({
+            ...item,
+            unit: `Unit ${uNum}`,
+            qNum: `Q1 (${letters12[idx] || (idx + 1)})`,
+            marks: 1
+          });
+        }
+      }
+      // 4th question of this unit goes to Section B (2 Marks each, 1 per unit = 4 total)
+      const secBItem = combinedUnitPool[3] || existingUnitQs[existingUnitQs.length - 1] || (rawPaper.sectionA?.questions || [])[uNum];
+      if (secBItem) {
+        const bIdx = secBQuestions.length;
+        secBQuestions.push({
+          ...secBItem,
+          unit: `Unit ${uNum}`,
+          qNum: `Q${bIdx + 2}`, // Q2, Q3, Q4, Q5
+          marks: 2
+        });
+      }
+    }
+
+    const secCQuestions = fourMarkQs.slice(0, 8).map((q, idx) => ({
+      ...q,
+      qNum: `Q${idx + 6}`, // Q6 to Q13
+      marks: 4,
+      requiredPages: 'Approx. 1 Page',
+      modelAnswer: q.solution
+    }));
+
+    const secDQuestions = sixMarkQs.slice(0, 8).map((q, idx) => ({
+      ...q,
+      qNum: `Q${idx + 14}`, // Q14 to Q21
+      marks: 6,
+      requiredPages: 'Approx. 1.5 - 2 Pages',
+      modelAnswer: q.solution
+    }));
+
+    const endSemInstructions = [
+      'All Questions are compulsory as per official MMDU question paper instructions. The Question paper is divided into four sections A, B, C and D.',
+      'Section A: Question No. 1 contains 12 compulsory questions of 1 Mark each (3 from each unit = 12 Marks). Questions are strictly conceptual/analytical (no one-word/MCQ answers).',
+      'Section B: Question Nos. 2 to 5 contain 4 compulsory questions of 2 Marks each (1 from each unit = 8 Marks).',
+      'Section C: Contains 4 questions of 4 Marks each (1 from each unit with internal choice — Attempt any 4 out of 8 = 16 Marks).',
+      'Section D: Contains 4 questions of 6 Marks each (1 from each unit with internal choice — Attempt any 4 out of 8 = 24 Marks).',
+      'Total Marks: 60 Marks (12 + 8 + 16 + 24). Passing Cutoff: 24 Marks (40%). Time Allowed: 3 Hours.'
+    ];
+
     return {
       ...rawPaper,
       examType,
-      isFourSectionFormat: false,
+      isFourSectionFormat: true,
       examConfig: config,
       examTitle: config.paperTitle,
       examShortTitle: config.name,
       syllabusTag: config.syllabusTag,
       dateBadge: config.dateBadge,
       timeAllowed: config.timeAllowed,
-      maxMarks: config.maxMarks,
-      passingMarks: config.passingMarks,
+      maxMarks: 60,
+      passingMarks: 24,
       timerSeconds: config.timerSeconds,
-      instructions: rawPaper.instructions,
-      sectionA: rawPaper.sectionA,
-      sectionB: rawPaper.sectionB
+      instructions: endSemInstructions,
+      sectionA: {
+        title: 'SECTION A (COMPULSORY SHORT CONCEPTUAL — 12×1 = 12 MARKS)',
+        marks: 12,
+        note: 'Answer ALL TWELVE (12) sub-questions (3 from each Unit). Each question carries 1 Mark.',
+        questions: secAQuestions
+      },
+      sectionB: {
+        title: 'SECTION B (COMPULSORY CORE TECHNICAL — 4×2 = 8 MARKS)',
+        marks: 8,
+        note: 'Answer ALL FOUR (4) questions (1 from each Unit). Each question carries 2 Marks.',
+        questions: secBQuestions
+      },
+      sectionC: {
+        title: 'SECTION C (UNIT-WISE MEDIUM DESCRIPTIVE / CODE — 4×4 = 16 MARKS)',
+        marks: 16,
+        totalMarks: 32,
+        note: 'Attempt FOUR (4) questions out of 8 (selecting 1 from each Unit with internal choice). Each question carries 4 Marks (~1 Page Model Answer).',
+        questions: secCQuestions
+      },
+      sectionD: {
+        title: 'SECTION D (UNIT-WISE LONG COMPREHENSIVE / DERIVATION — 4×6 = 24 MARKS)',
+        marks: 24,
+        totalMarks: 48,
+        note: 'Attempt FOUR (4) questions out of 8 (selecting 1 from each Unit with internal choice). Each question carries 6 Marks (~1.5 - 2 Pages In-Depth Model Answer).',
+        questions: secDQuestions
+      }
     };
   }
 
@@ -214,7 +337,7 @@ export function getExamPaperForType(rawPaper, examType = 'sessional-1') {
 
   const secBQuestions = pool.slice(6, 8).map((q, idx) => ({
     ...q,
-    qNum: `Q${idx - 4}`, // Q2, Q3
+    qNum: `Q${idx + 2}`, // Q2, Q3
     marks: 2
   }));
 
@@ -459,6 +582,15 @@ export default function ExpectedQuestionPapers({ currentUser, initialSubject }) 
   const [viewMode, setViewMode] = useState('solutions'); // 'questions-only' | 'solutions'
   const [revealedAnswers, setRevealedAnswers] = useState({});
 
+  // Active Exam Type State
+  const [selectedExamType, setSelectedExamType] = useState(() => {
+    try {
+      return localStorage.getItem('acn_selected_exam_type') || 'sessional-1';
+    } catch (e) {
+      return 'sessional-1';
+    }
+  });
+
   // Auto-select paper matching initialSubject if provided from Notes Reader
   useEffect(() => {
     if (initialSubject) {
@@ -470,19 +602,10 @@ export default function ExpectedQuestionPapers({ currentUser, initialSubject }) 
         (initialSubject.id && p.id === initialSubject.id)
       );
       if (matched) {
-        setActivePaper(matched);
+        setActivePaper(getExamPaperForType(matched, selectedExamType));
       }
     }
-  }, [initialSubject]);
-
-  // Active Exam Type State (defaults to sessional-1 since it's happening on 28-30!)
-  const [selectedExamType, setSelectedExamType] = useState(() => {
-    try {
-      return localStorage.getItem('acn_selected_exam_type') || 'sessional-1';
-    } catch (e) {
-      return 'sessional-1';
-    }
-  });
+  }, [initialSubject, selectedExamType]);
 
   // Live Exam Simulation Timer State
   const activeExamConfig = EXAM_TYPES[selectedExamType] || EXAM_TYPES['sessional-1'];
@@ -963,19 +1086,19 @@ export default function ExpectedQuestionPapers({ currentUser, initialSubject }) 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '8px' }}>
                       <div style={{ fontSize: '0.74rem', color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '5px' }}>
                         <CheckCircle size={12} color="#00f0ff" />
-                        <span><strong>Sec A:</strong> 6 Qs (6M Comp.)</span>
+                        <span><strong>Sec A:</strong> {paper.examType === 'end-sem' ? '12 Qs (12M Comp.)' : '6 Qs (6M Comp.)'}</span>
                       </div>
                       <div style={{ fontSize: '0.74rem', color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '5px' }}>
                         <CheckCircle size={12} color="#00f0ff" />
-                        <span><strong>Sec B:</strong> 2 Qs (4M Comp.)</span>
+                        <span><strong>Sec B:</strong> {paper.examType === 'end-sem' ? '4 Qs (8M Comp.)' : '2 Qs (4M Comp.)'}</span>
                       </div>
                       <div style={{ fontSize: '0.74rem', color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '5px' }}>
                         <CheckCircle size={12} color="#f59e0b" />
-                        <span><strong>Sec C:</strong> Att. 2/4 (8M, ~1pg)</span>
+                        <span><strong>Sec C:</strong> {paper.examType === 'end-sem' ? 'Att. 4/8 (16M, ~1pg)' : 'Att. 2/4 (8M, ~1pg)'}</span>
                       </div>
                       <div style={{ fontSize: '0.74rem', color: '#c084fc', display: 'flex', alignItems: 'center', gap: '5px' }}>
                         <CheckCircle size={12} color="#a78bfa" />
-                        <span><strong>Sec D:</strong> Att. 2/4 (12M, ~2pg)</span>
+                        <span><strong>Sec D:</strong> {paper.examType === 'end-sem' ? 'Att. 4/8 (24M, ~2pg)' : 'Att. 2/4 (12M, ~2pg)'}</span>
                       </div>
                     </div>
                   ) : (

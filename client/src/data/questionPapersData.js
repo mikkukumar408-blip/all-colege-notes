@@ -331,128 +331,183 @@ export const expectedQuestionPapers = [
   },
 
   // =========================================================================
-  // 2. BMAT-001: Engineering Mathematics I
+  // 2. BMAT-001: Mathematics I
   // =========================================================================
   {
     id: 'qp-math1-001',
     code: 'BMAT-001',
-    subject: 'Engineering Mathematics I',
+    subject: 'Mathematics I',
     semester: 'Semester 1',
     semNumber: 1,
     year: '1st Year',
-    course: 'B.Tech (All Branches)',
+    course: 'B.Tech (Common for all Branches except Biotech)',
     university: 'Maharishi Markandeshwar (Deemed to be University), Mullana',
     timeAllowed: '3 Hours',
     maxMarks: 60,
     passingMarks: 24,
-    probability: '99% High-Yield Match',
+    probability: '100% Official MMDU Syllabus Match',
     instructions: [
-      'Question No. 1 in Section A is COMPULSORY (20 marks).',
-      'Attempt any FOUR questions from Section B, selecting ONE question from each Unit (10 marks each).',
-      'All parts of a question should be answered together.',
-      'Use of non-programmable scientific calculators is permitted.'
+      'The Question paper is divided into four sections A, B, C and D.',
+      'Section A is compulsory and comprises 12 questions of 1 mark each (3 from each unit).',
+      'Section B comprises 4 compulsory questions of 2 marks each (1 from each unit).',
+      'Section C comprises 4 questions of 4 marks each (1 from each unit with internal choice).',
+      'Section D comprises 4 questions of 6 marks each (1 from each unit with internal choice).'
     ],
     sectionA: {
-      title: 'SECTION A (COMPULSORY)',
+      title: 'SECTION A & B (SHORT ANSWER POOL — 4 PER UNIT)',
       marks: 20,
-      note: 'Answer ALL ten questions. Each question carries 2 marks.',
+      note: 'Covers all 4 Units (3×1M = 12M in Section A + 1×2M = 8M in Section B).',
       questions: [
         {
           qNum: 'Q1 (a)',
           unit: 'Unit 1',
-          marks: 2,
+          marks: 1,
           question: 'Define the Rank of a Matrix. What is the rank of a non-zero row echelon matrix?',
           expectedFrequency: 'Every Year (2020-2024)',
           modelAnswer: 'The Rank of a matrix $A$, denoted by $\\rho(A)$, is the maximum number of linearly independent row (or column) vectors, or equivalently, the maximum order of a non-zero minor of $A$.\\n\\nIn a row echelon matrix, the rank is strictly equal to the number of non-zero rows.',
-          keyMarkingPoints: ['1 Mark for linearly independent rows/minor definition', '1 Mark for number of non-zero rows in echelon form']
+          keyMarkingPoints: ['0.5 Mark for linearly independent rows/minor definition', '0.5 Mark for number of non-zero rows in echelon form']
         },
         {
           qNum: 'Q1 (b)',
           unit: 'Unit 1',
+          marks: 1,
+          question: 'What is the Normal (Canonical) Form of a matrix $A$ of order $m \\times n$ and rank $r$?',
+          expectedFrequency: 'High Frequency (1M)',
+          modelAnswer: 'By applying a sequence of elementary row and column transformations, any matrix $A$ of rank $r$ can be reduced to the Normal (Canonical) Form:\\n$$N = \\begin{bmatrix} I_r & 0 \\\\ 0 & 0 \\end{bmatrix}$$\\nwhere $I_r$ is the identity matrix of order $r \\times r$ and $0$ represents zero blocks.',
+          keyMarkingPoints: ['1 Mark for writing [I_r 0; 0 0] normal form and defining r = rank(A)']
+        },
+        {
+          qNum: 'Q1 (c)',
+          unit: 'Unit 1',
+          marks: 1,
+          question: 'State the condition for consistency of a non-homogeneous system of linear equations $AX = B$ (Rouché–Capelli Theorem).',
+          expectedFrequency: 'Every Year Standard',
+          modelAnswer: 'A non-homogeneous linear system $AX = B$ in $n$ unknowns is **consistent** if and only if the rank of the coefficient matrix equals the rank of the augmented matrix:\\n$$\\rho(A) = \\rho([A \\mid B]) = r$$\\n• If $r = n$: **Unique solution**.\\n• If $r < n$: **Infinitely many solutions** with $(n - r)$ free parameters.',
+          keyMarkingPoints: ['0.5 Mark for rho(A) = rho([A|B])', '0.5 Mark for unique (r=n) vs infinite (r<n) condition']
+        },
+        {
+          qNum: 'Q1 (d)',
+          unit: 'Unit 1',
           marks: 2,
           question: 'State Cayley-Hamilton Theorem. If $A$ is a $2 \\times 2$ matrix such that $A^2 - 4A + 3I = 0$, find $A^{-1}$.',
-          expectedFrequency: 'High Frequency Question',
+          expectedFrequency: 'High Frequency Question (2M)',
           modelAnswer: '• **Statement:** Every square matrix satisfies its own characteristic equation:\\n$$|A - \\lambda I| = 0 \\implies p(A) = 0$$\\n\\n• **Inverse Calculation:**\\nGiven $A^2 - 4A + 3I = 0$. Pre-multiplying both sides by $A^{-1}$:\\n$$A - 4I + 3A^{-1} = 0 \\implies 3A^{-1} = 4I - A \\implies A^{-1} = \\frac{1}{3}(4I - A)$$',
           keyMarkingPoints: ['1 Mark for stating Cayley-Hamilton theorem', '1 Mark for deriving A^-1 = (4I - A)/3']
         },
         {
-          qNum: 'Q1 (c)',
+          qNum: 'Q1 (e)',
           unit: 'Unit 2',
-          marks: 2,
+          marks: 1,
           question: 'State the hypotheses and conclusion of Rolle\'s Theorem for a real function $f(x)$.',
           expectedFrequency: 'Every Year Standard',
           modelAnswer: '• **Hypotheses:**\\n1. $f(x)$ is continuous on the closed interval $[a, b]$\\n2. $f(x)$ is differentiable on the open interval $(a, b)$\\n3. $f(a) = f(b)$\\n\\n• **Conclusion:**\\nThere exists at least one point $c \\in (a, b)$ such that:\\n$$f\'(c) = 0$$',
-          keyMarkingPoints: ['1 Mark for the three hypotheses', '1 Mark for f\'(c) = 0 with c in open interval (a, b)']
-        },
-        {
-          qNum: 'Q1 (d)',
-          unit: 'Unit 2',
-          marks: 2,
-          question: 'Define the Radius of Curvature ($\\rho$) and write its formula for a Cartesian curve $y = f(x)$.',
-          expectedFrequency: 'High Frequency',
-          modelAnswer: '• **Definition:** The Radius of Curvature $\\rho$ is the reciprocal of curvature $\\kappa$:\\n$$\\rho = \\frac{1}{\\kappa} = \\left|\\frac{ds}{d\\psi}\\right|$$\\nIt represents the radius of the osculating circle at the given point.\\n\\n• **Cartesian Formula:**\\n$$\\rho = \\frac{\\left[1 + \\left(\\frac{dy}{dx}\\right)^2\\right]^{3/2}}{\\left|\\frac{d^2y}{dx^2}\\right|} = \\frac{[1 + y_1^2]^{3/2}}{|y_2|}$$',
-          keyMarkingPoints: ['1 Mark for reciprocal of curvature definition', '1 Mark for exact Cartesian formula']
-        },
-        {
-          qNum: 'Q1 (e)',
-          unit: 'Unit 2',
-          marks: 2,
-          question: 'State the relation between Beta and Gamma functions: $B(m, n) = \\frac{\\Gamma(m)\\Gamma(n)}{\\Gamma(m+n)}$. Calculate the value of $\\Gamma(1/2)$.',
-          expectedFrequency: 'Every Year (2021, 2023, 2024)',
-          modelAnswer: '• **Relation:**\\n$$B(m, n) = \\frac{\\Gamma(m)\\Gamma(n)}{\\Gamma(m+n)} \\quad (m > 0, \\; n > 0)$$\\n\\n• **Evaluation of $\\Gamma(1/2)$:**\\nUsing Euler\'s reflection formula $\\Gamma(n)\\Gamma(1-n) = \\frac{\\pi}{\\sin(n\\pi)}$, setting $n = \\frac{1}{2}$:\\n$$\\left[\\Gamma\\left(\\frac{1}{2}\\right)\\right]^2 = \\frac{\\pi}{\\sin(\\pi/2)} = \\frac{\\pi}{1} = \\pi \\implies \\Gamma\\left(\\frac{1}{2}\\right) = \\sqrt{\\pi}$$',
-          keyMarkingPoints: ['1 Mark for stating Beta-Gamma relation', '1 Mark for showing Gamma(1/2) = sqrt(pi)']
+          keyMarkingPoints: ['0.5 Mark for the three hypotheses', '0.5 Mark for f\'(c) = 0 with c in open interval (a, b)']
         },
         {
           qNum: 'Q1 (f)',
-          unit: 'Unit 3',
-          marks: 2,
-          question: 'State Euler\'s Theorem on Homogeneous Functions for two variables $x$ and $y$.',
-          expectedFrequency: 'Frequent Exam Question',
-          modelAnswer: 'If $u = f(x, y)$ is a homogeneous function of degree $n$ in $x$ and $y$ (i.e. $f(tx, ty) = t^n f(x, y)$), then:\\n$$x \\frac{\\partial u}{\\partial x} + y \\frac{\\partial u}{\\partial y} = n \\cdot u$$',
-          keyMarkingPoints: ['1 Mark for homogeneous function condition', '1 Mark for partial derivative summation identity']
+          unit: 'Unit 2',
+          marks: 1,
+          question: 'Define the Radius of Curvature ($\\rho$) and write its formula for a Cartesian curve $y = f(x)$ and a Polar curve $r = f(\\theta)$.',
+          expectedFrequency: 'High Frequency',
+          modelAnswer: '• **Definition:** The Radius of Curvature $\\rho = \\frac{1}{\\kappa} = \\left|\\frac{ds}{d\\psi}\\right|$ is the reciprocal of curvature.\\n• **Cartesian Formula:**\\n$$\\rho = \\frac{(1 + y_1^2)^{3/2}}{|y_2|}$$\\n• **Polar Formula:**\\n$$\\rho = \\frac{(r^2 + r_1^2)^{3/2}}{r^2 + 2r_1^2 - r r_2}$$',
+          keyMarkingPoints: ['0.5 Mark for Cartesian formula', '0.5 Mark for Polar formula']
         },
         {
           qNum: 'Q1 (g)',
-          unit: 'Unit 3',
-          marks: 2,
-          question: 'Define Solenoidal and Irrotational vector fields in terms of the vector differential operator $\\nabla$.',
-          expectedFrequency: 'Every Alternate Year',
-          modelAnswer: '1. **Solenoidal Vector Field:** A vector field $\\vec{F}$ is solenoidal if its divergence is identically zero (no net source or sink):\\n$$\\nabla \\cdot \\vec{F} = 0$$\\n\\n2. **Irrotational (Conservative) Vector Field:** A vector field $\\vec{F}$ is irrotational if its curl is zero:\\n$$\\nabla \\times \\vec{F} = \\vec{0} \\implies \\vec{F} = \\nabla \\phi \\quad (\\text{where } \\phi \\text{ is a scalar potential})$$',
-          keyMarkingPoints: ['1 Mark for div F = 0 (solenoidal)', '1 Mark for curl F = 0 (irrotational)']
+          unit: 'Unit 2',
+          marks: 1,
+          question: 'List the seven standard indeterminate forms and state when L\'Hospital\'s Rule is directly applicable.',
+          expectedFrequency: 'Frequent 1M Question',
+          modelAnswer: '• **Seven Indeterminate Forms:**\\n$$\\frac{0}{0}, \\quad \\frac{\\infty}{\\infty}, \\quad 0 \\times \\infty, \\quad \\infty - \\infty, \\quad 0^0, \\quad 1^\\infty, \\quad \\infty^0$$\\n• **Direct Applicability:** L\'Hospital\'s Rule $\\lim_{x \\to a} \\frac{f(x)}{g(x)} = \\lim_{x \\to a} \\frac{f\'(x)}{g\'(x)}$ applies directly to the fractional forms $\\frac{0}{0}$ and $\\frac{\\infty}{\\infty}$.',
+          keyMarkingPoints: ['0.5 Mark for listing the 7 indeterminate forms', '0.5 Mark for 0/0 and inf/inf direct condition']
         },
         {
           qNum: 'Q1 (h)',
-          unit: 'Unit 4',
+          unit: 'Unit 2',
           marks: 2,
-          question: 'State D\'Alembert\'s Ratio Test for testing the convergence of an infinite series of positive terms.',
-          expectedFrequency: 'Every Year Standard',
-          modelAnswer: 'Let $\\sum u_n$ be an infinite series of positive terms and let:\\n$$L = \\lim_{n \\to \\infty} \\frac{u_n}{u_{n+1}} \\quad \\left(\\text{or } \\lambda = \\lim_{n \\to \\infty} \\frac{u_{n+1}}{u_n} = \\frac{1}{L}\\right)$$\\n\\n• If $L > 1$ (or $\\lambda < 1$), the series is **CONVERGENT**.\\n• If $L < 1$ (or $\\lambda > 1$), the series is **DIVERGENT**.\\n• If $L = 1$ (or $\\lambda = 1$), the test **FAILS**.',
-          keyMarkingPoints: ['1 Mark for limit statement', '1 Mark for all three convergence/divergence/failure conditions']
+          question: 'State the relation between Beta and Gamma functions: $B(m, n) = \\frac{\\Gamma(m)\\Gamma(n)}{\\Gamma(m+n)}$. Calculate the value of $\\Gamma(1/2)$ and $\\Gamma(7/2)$.',
+          expectedFrequency: 'Every Year (2021, 2023, 2024)',
+          modelAnswer: '• **Relation:**\\n$$B(m, n) = \\frac{\\Gamma(m)\\Gamma(n)}{\\Gamma(m+n)} \\quad (m > 0, \\; n > 0)$$\\n\\n• **Evaluation of $\\Gamma(1/2)$ and $\\Gamma(7/2)$:**\\n$$\\Gamma\\left(\\frac{1}{2}\\right) = \\sqrt{\\pi}$$\\n$$\\Gamma\\left(\\frac{7}{2}\\right) = \\frac{5}{2} \\cdot \\frac{3}{2} \\cdot \\frac{1}{2} \\Gamma\\left(\\frac{1}{2}\\right) = \\frac{15\\sqrt{\\pi}}{8}$$',
+          keyMarkingPoints: ['1 Mark for stating Beta-Gamma relation & Gamma(1/2) = sqrt(pi)', '1 Mark for Gamma(7/2) = 15*sqrt(pi)/8']
         },
         {
           qNum: 'Q1 (i)',
-          unit: 'Unit 4',
-          marks: 2,
-          question: 'State Dirichlet\'s Conditions for the Fourier expansion of a periodic function $f(x)$ of period $2\\pi$.',
-          expectedFrequency: 'High Frequency Question',
-          modelAnswer: 'A function $f(x)$ defined in $(-\\pi, \\pi)$ can be expanded in a convergent Fourier series if:\\n1. $f(x)$ is single-valued and periodic with period $2\\pi$.\\n2. $f(x)$ is piecewise continuous (has at most a finite number of finite discontinuities in any single period).\\n3. $f(x)$ has at most a finite number of local maxima and minima in any single period.',
-          keyMarkingPoints: ['1 Mark for single-valued periodic condition', '1 Mark for piecewise continuous and finite extrema']
+          unit: 'Unit 3',
+          marks: 1,
+          question: 'State Euler\'s Theorem on Homogeneous Functions for two variables $x$ and $y$ (both first and second order).',
+          expectedFrequency: 'Frequent Exam Question',
+          modelAnswer: 'If $u = f(x, y)$ is a homogeneous function of degree $n$ in $x$ and $y$ (i.e. $f(tx, ty) = t^n f(x, y)$), then:\\n1. **First Order:** $x \\frac{\\partial u}{\\partial x} + y \\frac{\\partial u}{\\partial y} = n u$\\n2. **Second Order:** $x^2 \\frac{\\partial^2 u}{\\partial x^2} + 2xy \\frac{\\partial^2 u}{\\partial x \\partial y} + y^2 \\frac{\\partial^2 u}{\\partial y^2} = n(n-1)u$',
+          keyMarkingPoints: ['0.5 Mark for first-order Euler identity', '0.5 Mark for second-order Euler identity']
         },
         {
           qNum: 'Q1 (j)',
+          unit: 'Unit 3',
+          marks: 1,
+          question: 'Write the formula for the Total Derivative $\\frac{du}{dt}$ if $u = f(x, y)$ where $x = \\phi(t)$ and $y = \\psi(t)$.',
+          expectedFrequency: 'High Frequency 1M',
+          modelAnswer: 'By the multivariable chain rule, the **Total Derivative** of $u = f(x, y)$ with respect to parameter $t$ is:\\n$$\\frac{du}{dt} = \\frac{\\partial u}{\\partial x} \\cdot \\frac{dx}{dt} + \\frac{\\partial u}{\\partial y} \\cdot \\frac{dy}{dt}$$',
+          keyMarkingPoints: ['1 Mark for exact chain rule total derivative formula']
+        },
+        {
+          qNum: 'Q1 (k)',
+          unit: 'Unit 3',
+          marks: 1,
+          question: 'Define Solenoidal and Irrotational vector fields in terms of the vector differential operator $\\nabla$.',
+          expectedFrequency: 'Every Alternate Year',
+          modelAnswer: '1. **Solenoidal Vector Field:** A vector field $\\vec{F}$ is solenoidal if its divergence is identically zero:\\n$$\\nabla \\cdot \\vec{F} = 0$$\\n\\n2. **Irrotational (Conservative) Vector Field:** A vector field $\\vec{F}$ is irrotational if its curl is zero:\\n$$\\nabla \\times \\vec{F} = \\vec{0} \\implies \\vec{F} = \\nabla \\phi$$',
+          keyMarkingPoints: ['0.5 Mark for div F = 0 (solenoidal)', '0.5 Mark for curl F = 0 (irrotational)']
+        },
+        {
+          qNum: 'Q1 (l)',
+          unit: 'Unit 3',
+          marks: 2,
+          question: 'State the sufficient conditions ($rt - s^2$ Hessian test) for a function $f(x, y)$ to have a local maximum, local minimum, or saddle point at a stationary point $(a, b)$.',
+          expectedFrequency: 'Every Year Standard (2M)',
+          modelAnswer: 'Let $f_x(a, b) = 0$ and $f_y(a, b) = 0$. Define $r = f_{xx}(a, b)$, $s = f_{xy}(a, b)$, $t = f_{yy}(a, b)$, and discriminant $\\Delta = rt - s^2$:\\n1. **Local Maximum:** $\\Delta = rt - s^2 > 0$ and $r < 0$.\\n2. **Local Minimum:** $\\Delta = rt - s^2 > 0$ and $r > 0$.\\n3. **Saddle Point:** $\\Delta = rt - s^2 < 0$.\\n4. **Test Fails:** $\\Delta = rt - s^2 = 0$ (requires further investigation).',
+          keyMarkingPoints: ['1 Mark for defining r, s, t and Delta = rt - s^2', '1 Mark for all 3 classification cases']
+        },
+        {
+          qNum: 'Q1 (m)',
+          unit: 'Unit 4',
+          marks: 1,
+          question: 'State D\'Alembert\'s Ratio Test and Raabe\'s Test for testing the convergence of a positive-term series $\\sum u_n$.',
+          expectedFrequency: 'Every Year Standard',
+          modelAnswer: '1. **Ratio Test:** Let $L = \\lim_{n \\to \\infty} \\frac{u_n}{u_{n+1}}$. Series converges if $L > 1$, diverges if $L < 1$, and test fails if $L = 1$.\\n2. **Raabe\'s Test (when $L = 1$):** Let $R = \\lim_{n \\to \\infty} n\\left(\\frac{u_n}{u_{n+1}} - 1\\right)$. Series converges if $R > 1$ and diverges if $R < 1$.',
+          keyMarkingPoints: ['0.5 Mark for Ratio Test limit & criteria', '0.5 Mark for Raabe Test limit & criteria']
+        },
+        {
+          qNum: 'Q1 (n)',
+          unit: 'Unit 4',
+          marks: 1,
+          question: 'State Leibnitz\'s Rule for the convergence of an alternating series $\\sum_{n=1}^\\infty (-1)^{n-1} u_n$ ($u_n > 0$).',
+          expectedFrequency: 'High Frequency 1M',
+          modelAnswer: 'An alternating series $u_1 - u_2 + u_3 - u_4 + \\dots$ ($u_n > 0$) converges if both conditions hold:\\n1. **Monotonic Decrease:** $u_{n+1} \\le u_n$ for all $n$.\\n2. **Vanishing Limit:** $\\lim_{n \\to \\infty} u_n = 0$.',
+          keyMarkingPoints: ['0.5 Mark for monotonic decreasing condition u_{n+1} <= u_n', '0.5 Mark for lim u_n = 0']
+        },
+        {
+          qNum: 'Q1 (o)',
+          unit: 'Unit 4',
+          marks: 1,
+          question: 'State Dirichlet\'s Conditions for the Fourier expansion of a periodic function $f(x)$ of period $2\\pi$.',
+          expectedFrequency: 'High Frequency Question',
+          modelAnswer: 'A function $f(x)$ defined in $(-\\pi, \\pi)$ can be expanded in a convergent Fourier series if:\\n1. $f(x)$ is single-valued, bounded, and periodic with period $2\\pi$.\\n2. $f(x)$ is piecewise continuous (at most a finite number of finite discontinuities in one period).\\n3. $f(x)$ has at most a finite number of local maxima and minima in one period.',
+          keyMarkingPoints: ['0.5 Mark for single-valued periodic condition', '0.5 Mark for finite discontinuities and finite extrema']
+        },
+        {
+          qNum: 'Q1 (p)',
           unit: 'Unit 4',
           marks: 2,
           question: 'If $f(x)$ is an odd function in the symmetric interval $(-l, l)$, what are the values of Fourier coefficients $a_0$, $a_n$, and $b_n$?',
-          expectedFrequency: 'Standard Symmetry Question',
+          expectedFrequency: 'Standard Symmetry Question (2M)',
           modelAnswer: 'For an odd function $f(-x) = -f(x)$ in $(-l, l)$:\\n\\n1. **$a_0$ coefficient:**\\n$$a_0 = \\frac{1}{l} \\int_{-l}^l f(x) \\, dx = 0$$\\n\\n2. **$a_n$ cosine coefficient:**\\n$$a_n = \\frac{1}{l} \\int_{-l}^l f(x) \\cos\\left(\\frac{n\\pi x}{l}\\right) dx = 0 \\quad (\\text{integrand is odd})$$\\n\\n3. **$b_n$ sine coefficient:**\\n$$b_n = \\frac{2}{l} \\int_0^l f(x) \\sin\\left(\\frac{n\\pi x}{l}\\right) dx \\ne 0 \\quad (\\text{Fourier Sine Series only})$$',
           keyMarkingPoints: ['1 Mark for a_0 = 0 and a_n = 0', '1 Mark for non-zero half-range sine coefficient b_n']
         }
       ]
     },
     sectionB: {
-      title: 'SECTION B (UNIT-WISE LONG QUESTIONS)',
+      title: 'SECTION C & D (UNIT-WISE ANALYTICAL & LONG QUESTIONS)',
       marks: 40,
-      note: 'Attempt ONE question from EACH Unit. Each question carries 10 marks.',
+      note: 'Covers Section C (4 questions × 4M = 16M) and Section D (4 questions × 6M = 24M), one from each Unit.',
       units: [
         {
           unitNumber: 'UNIT I',
@@ -548,7 +603,7 @@ export const expectedQuestionPapers = [
         },
         {
           unitNumber: 'UNIT III',
-          syllabusTopic: 'Multivariable Calculus & Vector Differentiation',
+          syllabusTopic: 'Multivariable Calculus (Differentiation) & Vector Calculus',
           questions: [
             {
               qNum: 'Q6',
@@ -565,7 +620,7 @@ export const expectedQuestionPapers = [
                   part: '(b)',
                   marks: 4,
                   question: 'Prove that the vector field $$\\vec{F} = (y^2 \\cos x + z^3)\\hat{i} + (2y \\sin x - 4)\\hat{j} + (3x z^2 + 2)\\hat{k}$$ is irrotational, and find its scalar potential $\\phi$ such that $\\vec{F} = \\nabla \\phi$.',
-                  solution: '1. **Check Irrotational Condition (\\text{curl } \\vec{F} = \\vec{0}):**\\n$$\\text{curl } \\vec{F} = \\nabla \\times \\vec{F} = \\begin{vmatrix} \\hat{i} & \\hat{j} & \\hat{k} \\\\[4pt] \\frac{\\partial}{\\partial x} & \\frac{\\partial}{\\partial y} & \\frac{\\partial}{\\partial z} \\\\[4pt] y^2 \\cos x + z^3 & 2y \\sin x - 4 & 3xz^2 + 2 \\end{vmatrix}$$\\n\\n• **$\\hat{i}$ component:** $\\frac{\\partial}{\\partial y}(3xz^2 + 2) - \\frac{\\partial}{\\partial z}(2y \\sin x - 4) = 0 - 0 = 0$\\n• **$\\hat{j}$ component:** $-\\left[\\frac{\\partial}{\\partial x}(3xz^2 + 2) - \\frac{\\partial}{\\partial z}(y^2 \\cos x + z^3)\\right] = -[3z^2 - 3z^2] = 0$\\n• **$\\hat{k}$ component:** $\\frac{\\partial}{\\partial x}(2y \\sin x - 4) - \\frac{\\partial}{\\partial y}(y^2 \\cos x + z^3) = 2y \\cos x - 2y \\cos x = 0$\\n\\n$$\\implies \\nabla \\times \\vec{F} = \\vec{0} \\quad \\text{Hence, } \\vec{F} \\text{ is Irrotational.}$$\\n\\n2. **Find Scalar Potential $\\phi$ ($d\\phi = \\vec{F} \\cdot d\\vec{r}$):**\\n$$d\\phi = F_1 dx + F_2 dy + F_3 dz$$\\n$$= (y^2 \\cos x + z^3)dx + (2y \\sin x - 4)dy + (3xz^2 + 2)dz$$\\n$$= (y^2 \\cos x dx + 2y \\sin x dy) + (z^3 dx + 3xz^2 dz) - 4dy + 2dz$$\\n$$= d(y^2 \\sin x) + d(x z^3) - d(4y) + d(2z)$$\\n\\nIntegrating both sides:\\n$$\\phi(x, y, z) = y^2 \\sin x + x z^3 - 4y + 2z + C$$',
+                  solution: '1. **Check Irrotational Condition ($\\text{curl } \\vec{F} = \\vec{0}$):**\\n$$\\text{curl } \\vec{F} = \\nabla \\times \\vec{F} = \\begin{vmatrix} \\hat{i} & \\hat{j} & \\hat{k} \\\\[4pt] \\frac{\\partial}{\\partial x} & \\frac{\\partial}{\\partial y} & \\frac{\\partial}{\\partial z} \\\\[4pt] y^2 \\cos x + z^3 & 2y \\sin x - 4 & 3xz^2 + 2 \\end{vmatrix}$$\\n\\n• **$\\hat{i}$ component:** $\\frac{\\partial}{\\partial y}(3xz^2 + 2) - \\frac{\\partial}{\\partial z}(2y \\sin x - 4) = 0 - 0 = 0$\\n• **$\\hat{j}$ component:** $-\\left[\\frac{\\partial}{\\partial x}(3xz^2 + 2) - \\frac{\\partial}{\\partial z}(y^2 \\cos x + z^3)\\right] = -[3z^2 - 3z^2] = 0$\\n• **$\\hat{k}$ component:** $\\frac{\\partial}{\\partial x}(2y \\sin x - 4) - \\frac{\\partial}{\\partial y}(y^2 \\cos x + z^3) = 2y \\cos x - 2y \\cos x = 0$\\n\\n$$\\implies \\nabla \\times \\vec{F} = \\vec{0} \\quad \\text{Hence, } \\vec{F} \\text{ is Irrotational.}$$\\n\\n2. **Find Scalar Potential $\\phi$ ($d\\phi = \\vec{F} \\cdot d\\vec{r}$):**\\n$$d\\phi = F_1 dx + F_2 dy + F_3 dz$$\\n$$= (y^2 \\cos x + z^3)dx + (2y \\sin x - 4)dy + (3xz^2 + 2)dz$$\\n$$= (y^2 \\cos x dx + 2y \\sin x dy) + (z^3 dx + 3xz^2 dz) - 4dy + 2dz$$\\n$$= d(y^2 \\sin x) + d(x z^3) - d(4y) + d(2z)$$\\n\\nIntegrating both sides:\\n$$\\phi(x, y, z) = y^2 \\sin x + x z^3 - 4y + 2z + C$$',
                   markingScheme: '2 Marks for proving curl F = 0 | 2 Marks for integrating exact differential d(phi) to find phi'
                 }
               ]
@@ -584,9 +639,9 @@ export const expectedQuestionPapers = [
                 {
                   part: '(b)',
                   marks: 4,
-                  question: 'Find the Jacobian $J = \\frac{\\partial(x, y)}{\\partial(u, v)}$ if $x = u(1 - v)$ and $y = uv$. Verify that $J \\cdot J\' = 1$.',
-                  solution: '1. **Jacobian Definition:**\\n$$J = \\frac{\\partial(x, y)}{\\partial(u, v)} = \\begin{vmatrix} \\frac{\\partial x}{\\partial u} & \\frac{\\partial x}{\\partial v} \\\\[4pt] \\frac{\\partial y}{\\partial u} & \\frac{\\partial y}{\\partial v} \\end{vmatrix}$$\\n\\n2. **Partial Derivatives:**\\n• From $x = u - uv \\implies \\frac{\\partial x}{\\partial u} = 1 - v, \\quad \\frac{\\partial x}{\\partial v} = -u$\\n• From $y = uv \\implies \\frac{\\partial y}{\\partial u} = v, \\quad \\frac{\\partial y}{\\partial v} = u$\\n\\n3. **Determinant Evaluation:**\\n$$J = (1 - v)(u) - (-u)(v) = u - uv + uv = u$$\\n\\n4. **Reverse Transformation & Inverse Jacobian $J\'$:**\\nAdding $x$ and $y$ gives $x + y = u$. Then $v = \\frac{y}{u} = \\frac{y}{x + y}$.\\n$$J\' = \\frac{\\partial(u, v)}{\\partial(x, y)} = \\begin{vmatrix} 1 & 1 \\\\[4pt] -\\frac{y}{(x+y)^2} & \\frac{x}{(x+y)^2} \\end{vmatrix} = \\frac{x + y}{(x+y)^2} = \\frac{1}{x+y} = \\frac{1}{u}$$\\n\\n5. **Verification:**\\n$$J \\cdot J\' = u \\cdot \\frac{1}{u} = 1 \\quad \\text{Hence Verified!}$$',
-                  markingScheme: '2 Marks for J = u | 2 Marks for reverse Jacobian J\' = 1/u and verification J . J\' = 1'
+                  question: 'Find the extreme values (local maxima, minima, and saddle points) of the function $f(x, y) = x^3 + y^3 - 3axy$ ($a > 0$).',
+                  solution: '1. **Find Stationary (Critical) Points ($f_x = 0, \\; f_y = 0$):**\\n$$f_x = 3x^2 - 3ay = 0 \\implies y = \\frac{x^2}{a}$$\\n$$f_y = 3y^2 - 3ax = 0 \\implies 3\\left(\\frac{x^2}{a}\\right)^2 - 3ax = 0 \\implies x(x^3 - a^3) = 0$$\\nHence, $x = 0$ or $x = a$. The stationary points are $(0, 0)$ and $(a, a)$.\\n\\n2. **Compute Second-Order Partial Derivatives ($r, s, t$):**\\n$$r = f_{xx} = 6x, \\quad s = f_{xy} = -3a, \\quad t = f_{yy} = 6y$$\\n$$\\Delta = rt - s^2 = 36xy - 9a^2$$\\n\\n3. **Classify Stationary Points:**\\n• **At $(0, 0)$:** $\\Delta = 0 - 9a^2 = -9a^2 < 0 \\implies (0, 0)$ is a **Saddle Point**.\\n• **At $(a, a)$:** $\\Delta = 36a^2 - 9a^2 = 27a^2 > 0$ and $r = 6a > 0 \\implies (a, a)$ is a **Local Minimum** with minimum value:\\n$$f_{\\min}(a, a) = a^3 + a^3 - 3a(a)(a) = -a^3$$',
+                  markingScheme: '1.5 Marks for finding stationary points (0,0) and (a,a) | 1.5 Marks for Hessian r, s, t and Delta = 36xy - 9a^2 | 1 Mark for classifying saddle point and f_min = -a^3'
                 }
               ]
             }

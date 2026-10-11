@@ -14,7 +14,7 @@ export const cSubjectDetails = {
   year: "1st Year",
   name: "Computational and Problem Solving using C",
   code: "BCSE-008",
-  credits: 4,
+  credits: 2,
   instructor: "Department of Computer Science & Engineering (MMDU)",
   notesCount: "4 Units Comprehensive Long Notes & Solved Questions",
   rating: 5.0,

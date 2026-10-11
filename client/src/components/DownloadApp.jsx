@@ -11,16 +11,16 @@ import { Download, Smartphone, Shield, Zap, Star, CheckCircle, ExternalLink, Inf
 
 /* ─── APK METADATA — UPDATE THIS WHEN YOU RELEASE A NEW APK ─────────────── */
 const APK_FILE  = '/downloads/campus-notes.apk';
-const APK_VERSION = '1.2.0';
-const APK_DATE    = 'September 2026';
-const APK_SIZE    = '~8 MB';
+const APK_VERSION = '1.3.0';
+const APK_DATE    = 'October 2026';
+const APK_SIZE    = '~22 MB';
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 const FEATURES = [
-  { icon: '📚', title: 'All Semester Notes', desc: 'B.Tech Sem 1 subjects — C, BEEE, Maths, Physics, Python, DSA, Web Tech, AI/ML — fully offline after first load.' },
-  { icon: '📝', title: 'Expected Question Papers', desc: 'Sessional & End-Semester question papers with complete 4-section format and detailed model answers.' },
+  { icon: '📚', title: 'All Semester Notes', desc: 'MMDU B.Tech Sem 1 & 2 subjects — C, BEEE, Maths I & II, Physics, Python, DSA, Web Tech, AI/ML — fully offline after first load.' },
+  { icon: '📝', title: 'Expected Question Papers', desc: 'Official MMDU 30-Mark Sessional & 60-Mark End-Semester papers (Sections A, B, C, D) with detailed model answers.' },
   { icon: '⚡', title: 'Exam Revision Cards', desc: 'Bite-sized short notes and quick-revision cards for last-minute preparation.' },
-  { icon: '🧪', title: 'Lab Manuals', desc: 'Practical codes, viva Q&A, and experiment write-ups for all lab subjects.' },
+  { icon: '🧪', title: 'Lab Manuals', desc: '55+ verified standalone C, Python, Web Tech, DSA & BEEE practical codes, outputs, and viva Q&A.' },
   { icon: '🔍', title: 'Universal Search (Ctrl+K)', desc: 'Cross-subject instant search — find any theorem, formula, or topic in seconds.' },
   { icon: '🌙', title: 'Dark Mode Always', desc: 'Engineered for night-owl study sessions. Pure dark theme, zero eye strain.' },
 ];
@@ -221,9 +221,9 @@ export default function DownloadApp() {
             v{APK_VERSION} — Latest Release &nbsp; <span style={{ color: '#94a3b8', fontWeight: 400 }}>({APK_DATE})</span>
           </div>
           <ul style={{ margin: 0, paddingLeft: 18, fontSize: '0.8rem', color: 'rgba(148,163,184,0.85)', lineHeight: 1.6 }}>
-            <li>4-section Sessional question papers with model answers</li>
-            <li>Improved code block rendering with line numbers &amp; file tabs</li>
-            <li>Expected Q&amp;A format matching university blueprint</li>
+            <li>Official MMDU 60-Mark End-Sem &amp; 30-Mark Sessional 4-Section Question Papers</li>
+            <li>100% MMDU Syllabus-aligned Mathematics I (BMAT-001) Notes &amp; Model Answers</li>
+            <li>Verified standalone C &amp; Python Lab Manual codes with preserved formatting</li>
             <li>Universal search across all subjects (Ctrl+K)</li>
           </ul>
         </div>
