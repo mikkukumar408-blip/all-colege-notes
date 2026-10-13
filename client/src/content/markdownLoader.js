@@ -1,10 +1,14 @@
 // Pure Markdown (.md) content loader for all 8 subjects.
-// In Vite (Web & Android APK): uses import.meta.glob(?raw) so .md files are loaded as raw text without JS string escaping.
-// In Node CLI scripts (build_unit_pdfs.mjs): uses process.getBuiltinModule('fs') to read the exact same .md files synchronously.
+// In Vite (Web & Android APK): import.meta.glob('./**/*.md', { query: '?raw', import: 'default', eager: true })
+// is statically replaced at compile time with the object mapping './<subject>/<sectionId>.md' -> raw string.
+// In Node CLI scripts (build_unit_pdfs.mjs): falls back to process.getBuiltinModule('fs').
 
-const viteMdModules = typeof import.meta.glob === 'function'
-  ? import.meta.glob('./**/*.md', { query: '?raw', import: 'default', eager: true })
-  : null;
+let viteMdModules = null;
+try {
+  viteMdModules = import.meta.glob('./**/*.md', { query: '?raw', import: 'default', eager: true });
+} catch {
+  viteMdModules = null;
+}
 
 export function getSectionMarkdown(subjectSlug, sectionId) {
   const relKey = `./${subjectSlug}/${sectionId}.md`;
