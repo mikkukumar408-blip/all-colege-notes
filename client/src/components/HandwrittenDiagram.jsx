@@ -1815,36 +1815,23 @@ export default function HandwrittenDiagram({ sectionId, sectionTitle = '', secti
       return (
         <div className="handwritten-diagram-container">
           <div className="diagram-header">
-            <span>✍️ Hand-Drawn Engineering Schematic</span>
+            <span>✍️ Engineering Comparison Blueprint</span>
             <span className="exam-tag">FIG 3.2: RECTIFIER EFFICIENCY, RIPPLE &amp; PIV COMPARISON</span>
           </div>
-          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 220" className="handwritten-svg">
-            <rect x="10" y="10" width="720" height="200" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
-            <g transform="translate(25, 22)">
-              <rect x="0" y="0" width="220" height="175" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
-              <text x="110" y="24" fill={colors.terminal} textAnchor="middle" fontSize="11.5" fontWeight="bold">HALF-WAVE (HWR)</text>
-              <text x="110" y="55" fill={colors.text} textAnchor="middle" fontSize="11" fontWeight="bold">Idc = Im / π | Irms = Im / 2</text>
-              <text x="110" y="85" fill={colors.badgeCyanText} textAnchor="middle" fontSize="11" fontWeight="bold">Max Efficiency η = 40.6%</text>
-              <text x="110" y="115" fill={colors.subtext} textAnchor="middle" fontSize="10.5">Ripple Factor γ = 1.21</text>
-              <text x="110" y="145" fill={colors.highlight} textAnchor="middle" fontSize="10.5" fontWeight="bold">PIV = Vm | fout = fin</text>
-            </g>
-            <g transform="translate(260, 22)">
-              <rect x="0" y="0" width="220" height="175" rx="10" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1.5" />
-              <text x="110" y="24" fill={colors.badgeAmberText} textAnchor="middle" fontSize="11.5" fontWeight="bold">CENTER-TAP FWR (2 Diodes)</text>
-              <text x="110" y="55" fill={colors.text} textAnchor="middle" fontSize="11" fontWeight="bold">Idc = 2Im / π | Irms = Im / √2</text>
-              <text x="110" y="85" fill={colors.badgeAmberText} textAnchor="middle" fontSize="11" fontWeight="bold">Max Efficiency η = 81.2%</text>
-              <text x="110" y="115" fill={colors.subtext} textAnchor="middle" fontSize="10.5">Ripple Factor γ = 0.482</text>
-              <text x="110" y="145" fill={colors.highlight} textAnchor="middle" fontSize="10.5" fontWeight="bold">PIV = 2Vm | fout = 2·fin</text>
-            </g>
-            <g transform="translate(495, 22)">
-              <rect x="0" y="0" width="220" height="175" rx="10" fill={colors.badgeGreenBg} stroke={colors.badgeGreenBorder} strokeWidth="1.5" />
-              <text x="110" y="24" fill={colors.badgeGreenText} textAnchor="middle" fontSize="11.5" fontWeight="bold">BRIDGE FWR (4 Diodes)</text>
-              <text x="110" y="55" fill={colors.text} textAnchor="middle" fontSize="11" fontWeight="bold">Idc = 2Im / π | Irms = Im / √2</text>
-              <text x="110" y="85" fill={colors.badgeGreenText} textAnchor="middle" fontSize="11" fontWeight="bold">Max Efficiency η = 81.2%</text>
-              <text x="110" y="115" fill={colors.subtext} textAnchor="middle" fontSize="10.5">Ripple Factor γ = 0.482</text>
-              <text x="110" y="145" fill={colors.source} textAnchor="middle" fontSize="10.5" fontWeight="bold">PIV = Vm | TUF = 0.812</text>
-            </g>
-          </svg>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '12px', padding: '14px', background: colors.bg, borderRadius: '12px', border: `1.5px solid ${colors.border}` }}>
+            {[
+              { title: 'HALF-WAVE (HWR)', bg: colors.badgeCyanBg, border: colors.badgeCyanBorder, accent: colors.terminal, items: ['Idc = Im / π  |  Irms = Im / 2', 'Max Efficiency η = 40.6%', 'Ripple Factor γ = 1.21', 'PIV = Vm  |  fout = fin'] },
+              { title: 'CENTER-TAP FWR (2 Diodes)', bg: colors.badgeAmberBg, border: colors.badgeAmberBorder, accent: colors.badgeAmberText, items: ['Idc = 2Im / π  |  Irms = Im / √2', 'Max Efficiency η = 81.2%', 'Ripple Factor γ = 0.482', 'PIV = 2Vm  |  fout = 2·fin'] },
+              { title: 'BRIDGE FWR (4 Diodes)', bg: colors.badgeGreenBg, border: colors.badgeGreenBorder, accent: colors.badgeGreenText, items: ['Idc = 2Im / π  |  Irms = Im / √2', 'Max Efficiency η = 81.2%', 'Ripple Factor γ = 0.482', 'PIV = Vm  |  TUF = 0.812'] },
+            ].map((card, i) => (
+              <div key={i} style={{ background: card.bg, border: `1.5px solid ${card.border}`, borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ color: card.accent, fontWeight: 800, fontSize: '0.82rem', textAlign: 'center', borderBottom: `1px dashed ${card.border}`, paddingBottom: '6px' }}>{card.title}</div>
+                {card.items.map((line, j) => (
+                  <div key={j} style={{ color: j === 1 ? card.accent : colors.text, fontWeight: j % 2 === 0 ? 700 : 600, fontSize: '0.78rem', textAlign: 'center', lineHeight: 1.4 }}>{line}</div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       );
 
@@ -1852,31 +1839,31 @@ export default function HandwrittenDiagram({ sectionId, sectionTitle = '', secti
       return (
         <div className="handwritten-diagram-container">
           <div className="diagram-header">
-            <span>✍️ Hand-Drawn Engineering Schematic</span>
+            <span>✍️ Engineering Comparison Blueprint</span>
             <span className="exam-tag">FIG 3.4: BJT vs FET (JFET / MOSFET) VOLTAGE-CONTROLLED ARCHITECTURE</span>
           </div>
-          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 220" className="handwritten-svg">
-            <rect x="10" y="10" width="720" height="200" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
-            <g transform="translate(25, 22)">
-              <rect x="0" y="0" width="335" height="175" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
-              <text x="167" y="24" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">JFET SHOCKLEY EQUATION</text>
-              <rect x="25" y="42" width="285" height="36" rx="6" fill={colors.formulaBg} stroke={colors.badgeCyanBorder} strokeWidth="1" />
-              <text x="167" y="65" fill={colors.badgeCyanText} textAnchor="middle" fontSize="12" fontWeight="bold">ID = IDSS · [ 1 − (VGS / VP) ]²</text>
-              <text x="167" y="105" fill={colors.text} textAnchor="middle" fontSize="10.5" fontWeight="bold">Unipolar (Majority Carriers Only) | High Zin (&gt;10⁹ Ω)</text>
-              <text x="167" y="135" fill={colors.subtext} textAnchor="middle" fontSize="10">Transconductance: gm = gm0 · [ 1 − (VGS / VP) ]</text>
-              <text x="167" y="158" fill={colors.source} textAnchor="middle" fontSize="10" fontWeight="bold">Zero Thermal Runaway (Negative Temp Coefficient)</text>
-            </g>
-            <g transform="translate(380, 22)">
-              <rect x="0" y="0" width="335" height="175" rx="10" fill={colors.badgePurpleBg} stroke={colors.badgePurpleBorder} strokeWidth="1.5" />
-              <text x="167" y="24" fill={colors.badgePurpleText} textAnchor="middle" fontSize="12" fontWeight="bold">D-MOSFET vs E-MOSFET MODES</text>
-              <rect x="20" y="42" width="295" height="52" rx="6" fill={colors.formulaBg} stroke={colors.badgePurpleBorder} strokeWidth="1" />
-              <text x="167" y="62" fill={colors.badgePurpleText} textAnchor="middle" fontSize="10.5" fontWeight="bold">Depletion MOSFET: Physical Channel Present</text>
-              <text x="167" y="80" fill={colors.subtext} textAnchor="middle" fontSize="9">Works in Depletion (VGS &lt; 0) &amp; Enhancement (VGS &gt; 0)</text>
-              <rect x="20" y="104" width="295" height="52" rx="6" fill={colors.formulaBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
-              <text x="167" y="124" fill={colors.badgeAmberText} textAnchor="middle" fontSize="10.5" fontWeight="bold">Enhancement MOSFET: No Initial Channel</text>
-              <text x="167" y="142" fill={colors.subtext} textAnchor="middle" fontSize="9.5">Conducts only when VGS &gt; Vth: ID = k·(VGS − Vth)²</text>
-            </g>
-          </svg>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px', padding: '14px', background: colors.bg, borderRadius: '12px', border: `1.5px solid ${colors.border}` }}>
+            <div style={{ background: colors.badgeCyanBg, border: `1.5px solid ${colors.badgeCyanBorder}`, borderRadius: '10px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ color: colors.terminal, fontWeight: 800, fontSize: '0.85rem', textAlign: 'center' }}>JFET SHOCKLEY EQUATION</div>
+              <div style={{ background: colors.formulaBg, border: `1px solid ${colors.badgeCyanBorder}`, borderRadius: '6px', padding: '8px', color: colors.badgeCyanText, fontWeight: 800, fontSize: '0.88rem', textAlign: 'center' }}>
+                ID = IDSS · [ 1 − (VGS / VP) ]²
+              </div>
+              <div style={{ color: colors.text, fontWeight: 700, fontSize: '0.78rem', textAlign: 'center' }}>Unipolar (Majority Carriers Only) • High Zin (&gt;10⁹ Ω)</div>
+              <div style={{ color: colors.subtext, fontSize: '0.76rem', textAlign: 'center' }}>Transconductance: gm = gm0 · [ 1 − (VGS / VP) ]</div>
+              <div style={{ color: colors.source, fontWeight: 700, fontSize: '0.76rem', textAlign: 'center' }}>Zero Thermal Runaway (Negative Temp Coefficient)</div>
+            </div>
+            <div style={{ background: colors.badgePurpleBg, border: `1.5px solid ${colors.badgePurpleBorder}`, borderRadius: '10px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ color: colors.badgePurpleText, fontWeight: 800, fontSize: '0.85rem', textAlign: 'center' }}>D-MOSFET vs E-MOSFET MODES</div>
+              <div style={{ background: colors.formulaBg, border: `1px solid ${colors.badgePurpleBorder}`, borderRadius: '6px', padding: '8px', textAlign: 'center' }}>
+                <div style={{ color: colors.badgePurpleText, fontWeight: 800, fontSize: '0.8rem' }}>Depletion MOSFET: Physical Channel Present</div>
+                <div style={{ color: colors.subtext, fontSize: '0.75rem', marginTop: '3px' }}>Operates in BOTH Depletion (VGS &lt; 0) &amp; Enhancement (VGS &gt; 0)</div>
+              </div>
+              <div style={{ background: colors.formulaBg, border: `1px solid ${colors.badgeAmberBorder}`, borderRadius: '6px', padding: '8px', textAlign: 'center' }}>
+                <div style={{ color: colors.badgeAmberText, fontWeight: 800, fontSize: '0.8rem' }}>Enhancement MOSFET: No Initial Channel</div>
+                <div style={{ color: colors.subtext, fontSize: '0.75rem', marginTop: '3px' }}>Conducts only when VGS &gt; Vth: ID = k · (VGS − Vth)²</div>
+              </div>
+            </div>
+          </div>
         </div>
       );
 
@@ -1884,29 +1871,27 @@ export default function HandwrittenDiagram({ sectionId, sectionTitle = '', secti
       return (
         <div className="handwritten-diagram-container">
           <div className="diagram-header">
-            <span>✍️ Hand-Drawn Engineering Schematic</span>
+            <span>✍️ Digital Logic Blueprint</span>
             <span className="exam-tag">FIG 4.1: NUMBER SYSTEM RADIX CONVERSION &amp; 2's COMPLEMENT</span>
           </div>
-          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 215" className="handwritten-svg">
-            <rect x="10" y="10" width="720" height="195" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
-            <g transform="translate(25, 22)">
-              <rect x="0" y="0" width="335" height="170" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
-              <text x="167" y="24" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">RADIX CONVERSION PIPELINE</text>
-              <text x="167" y="56" fill={colors.text} textAnchor="middle" fontSize="10.5" fontWeight="bold">Decimal (Base 10) → Base r: Divide Int / Multiply Frac</text>
-              <text x="167" y="86" fill={colors.badgeCyanText} textAnchor="middle" fontSize="10.5" fontWeight="bold">Octal (Base 8) ↔ Binary: 3-Bit Grouping (4-2-1)</text>
-              <text x="167" y="116" fill={colors.badgePurpleText} textAnchor="middle" fontSize="10.5" fontWeight="bold">Hex (Base 16) ↔ Binary: 4-Bit Grouping (8-4-2-1)</text>
-              <text x="167" y="148" fill={colors.subtext} textAnchor="middle" fontSize="10">BCD (8421): Valid 0000–1001 | Add 0110 (6) if Sum &gt; 9</text>
-            </g>
-            <g transform="translate(380, 22)">
-              <rect x="0" y="0" width="335" height="170" rx="10" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1.5" />
-              <text x="167" y="24" fill={colors.badgeAmberText} textAnchor="middle" fontSize="12" fontWeight="bold">COMPLEMENT SUBTRACTION: A − B</text>
-              <rect x="20" y="40" width="295" height="36" rx="6" fill={colors.formulaBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
-              <text x="167" y="63" fill={colors.badgeAmberText} textAnchor="middle" fontSize="11" fontWeight="bold">2's Complement = (1's Complement) + 1</text>
-              <text x="167" y="102" fill={colors.source} textAnchor="middle" fontSize="10.5" fontWeight="bold">If Carry Out = 1: Discard Carry → Result Positive</text>
-              <text x="167" y="130" fill={colors.highlight} textAnchor="middle" fontSize="10.5" fontWeight="bold">If Carry Out = 0: Take 2's Comp → Result Negative</text>
-              <text x="167" y="156" fill={colors.subtext} textAnchor="middle" fontSize="9.5">1's Comp Carry Out = 1: Add End-Around Carry to LSB</text>
-            </g>
-          </svg>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px', padding: '14px', background: colors.bg, borderRadius: '12px', border: `1.5px solid ${colors.border}` }}>
+            <div style={{ background: colors.badgeCyanBg, border: `1.5px solid ${colors.badgeCyanBorder}`, borderRadius: '10px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'center' }}>
+              <div style={{ color: colors.terminal, fontWeight: 800, fontSize: '0.85rem' }}>RADIX CONVERSION PIPELINE</div>
+              <div style={{ color: colors.text, fontWeight: 700, fontSize: '0.78rem' }}>Decimal (Base 10) → Base r: Divide Integer / Multiply Fraction</div>
+              <div style={{ color: colors.badgeCyanText, fontWeight: 700, fontSize: '0.78rem' }}>Octal (Base 8) ↔ Binary: 3-Bit Grouping (4-2-1)</div>
+              <div style={{ color: colors.badgePurpleText, fontWeight: 700, fontSize: '0.78rem' }}>Hex (Base 16) ↔ Binary: 4-Bit Grouping (8-4-2-1)</div>
+              <div style={{ color: colors.subtext, fontSize: '0.75rem' }}>BCD (8421): Valid 0000–1001 • Add 0110 (6) if Sum &gt; 9</div>
+            </div>
+            <div style={{ background: colors.badgeAmberBg, border: `1.5px solid ${colors.badgeAmberBorder}`, borderRadius: '10px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'center' }}>
+              <div style={{ color: colors.badgeAmberText, fontWeight: 800, fontSize: '0.85rem' }}>COMPLEMENT SUBTRACTION: A − B</div>
+              <div style={{ background: colors.formulaBg, border: `1px solid ${colors.badgeAmberBorder}`, borderRadius: '6px', padding: '7px', color: colors.badgeAmberText, fontWeight: 800, fontSize: '0.82rem' }}>
+                2's Complement = (1's Complement) + 1
+              </div>
+              <div style={{ color: colors.source, fontWeight: 700, fontSize: '0.78rem' }}>If Carry Out = 1: Discard Carry → Result is Positive</div>
+              <div style={{ color: colors.highlight, fontWeight: 700, fontSize: '0.78rem' }}>If Carry Out = 0: Take 2's Comp → Result is Negative</div>
+              <div style={{ color: colors.subtext, fontSize: '0.75rem' }}>1's Comp Carry Out = 1: Add End-Around Carry to LSB</div>
+            </div>
+          </div>
         </div>
       );
 
@@ -1914,42 +1899,39 @@ export default function HandwrittenDiagram({ sectionId, sectionTitle = '', secti
       return (
         <div className="handwritten-diagram-container">
           <div className="diagram-header">
-            <span>✍️ Hand-Drawn Engineering Schematic</span>
+            <span>✍️ Digital Logic Blueprint</span>
             <span className="exam-tag">FIG 4.4: 4-VARIABLE KARNAUGH MAP (GRAY CODE ADJACENCY)</span>
           </div>
-          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 220" className="handwritten-svg">
-            <rect x="10" y="10" width="720" height="200" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
-            <g transform="translate(25, 22)">
-              <rect x="0" y="0" width="335" height="175" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
-              <text x="167" y="24" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">GRAY CODE ORDER: 00 → 01 → 11 → 10</text>
-              <text x="167" y="54" fill={colors.text} textAnchor="middle" fontSize="10.5" fontWeight="bold">Row 00: m0, m1, m3, m2  |  Row 01: m4, m5, m7, m6</text>
-              <text x="167" y="82" fill={colors.text} textAnchor="middle" fontSize="10.5" fontWeight="bold">Row 11: m12, m13, m15, m14 | Row 10: m8, m9, m11, m10</text>
-              <rect x="20" y="102" width="295" height="54" rx="6" fill={colors.formulaBg} stroke={colors.badgeCyanBorder} strokeWidth="1" />
-              <text x="167" y="124" fill={colors.badgeCyanText} textAnchor="middle" fontSize="10.5" fontWeight="bold">4 Corners Wrap-Around (m0, m2, m8, m10) = B'·D'</text>
-              <text x="167" y="144" fill={colors.subtext} textAnchor="middle" fontSize="9.5">Group of 2^k cells eliminates exactly k variables</text>
-            </g>
-            <g transform="translate(380, 22)">
-              <rect x="0" y="0" width="335" height="175" rx="10" fill={colors.badgeGreenBg} stroke={colors.badgeGreenBorder} strokeWidth="1.5" />
-              <text x="167" y="24" fill={colors.badgeGreenText} textAnchor="middle" fontSize="12" fontWeight="bold">COMBINATIONAL ARITHMETIC BLOCKS</text>
-              <text x="167" y="60" fill={colors.text} textAnchor="middle" fontSize="11" fontWeight="bold">Half Adder: Sum = A ⊕ B  |  Carry = A · B</text>
-              <text x="167" y="95" fill={colors.badgeGreenText} textAnchor="middle" fontSize="11" fontWeight="bold">Full Adder: Sum = A ⊕ B ⊕ Cin</text>
-              <text x="167" y="125" fill={colors.source} textAnchor="middle" fontSize="10.5" fontWeight="bold">Cout = A·B + Cin·(A ⊕ B)</text>
-              <text x="167" y="155" fill={colors.subtext} textAnchor="middle" fontSize="10">Don't Care (X/d): Include only if it enlarges a 2^k group</text>
-            </g>
-          </svg>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px', padding: '14px', background: colors.bg, borderRadius: '12px', border: `1.5px solid ${colors.border}` }}>
+            <div style={{ background: colors.badgeCyanBg, border: `1.5px solid ${colors.badgeCyanBorder}`, borderRadius: '10px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'center' }}>
+              <div style={{ color: colors.terminal, fontWeight: 800, fontSize: '0.85rem' }}>GRAY CODE ORDER: 00 → 01 → 11 → 10</div>
+              <div style={{ color: colors.text, fontWeight: 700, fontSize: '0.78rem' }}>Row 00: m0, m1, m3, m2 • Row 01: m4, m5, m7, m6</div>
+              <div style={{ color: colors.text, fontWeight: 700, fontSize: '0.78rem' }}>Row 11: m12, m13, m15, m14 • Row 10: m8, m9, m11, m10</div>
+              <div style={{ background: colors.formulaBg, border: `1px solid ${colors.badgeCyanBorder}`, borderRadius: '6px', padding: '8px' }}>
+                <div style={{ color: colors.badgeCyanText, fontWeight: 800, fontSize: '0.78rem' }}>4 Corners Wrap-Around (m0, m2, m8, m10) = B'·D'</div>
+                <div style={{ color: colors.subtext, fontSize: '0.74rem', marginTop: '3px' }}>Group of 2^k adjacent cells eliminates exactly k variables</div>
+              </div>
+            </div>
+            <div style={{ background: colors.badgeGreenBg, border: `1.5px solid ${colors.badgeGreenBorder}`, borderRadius: '10px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'center' }}>
+              <div style={{ color: colors.badgeGreenText, fontWeight: 800, fontSize: '0.85rem' }}>COMBINATIONAL ARITHMETIC BLOCKS</div>
+              <div style={{ color: colors.text, fontWeight: 700, fontSize: '0.8rem' }}>Half Adder: Sum = A ⊕ B  |  Carry = A · B</div>
+              <div style={{ color: colors.badgeGreenText, fontWeight: 800, fontSize: '0.8rem' }}>Full Adder: Sum = A ⊕ B ⊕ Cin</div>
+              <div style={{ color: colors.source, fontWeight: 800, fontSize: '0.8rem' }}>Cout = A·B + Cin·(A ⊕ B)</div>
+              <div style={{ color: colors.subtext, fontSize: '0.75rem' }}>Don't Care (X/d): Include only when it enlarges a 2^k group</div>
+            </div>
+          </div>
         </div>
       );
 
     default: {
       if (!sectionTitle && !sectionContent) return null;
-      // Extract up to 3 subheadings or key bullets from sectionContent for a clean zero-overlap schematic
       const rawHeadings = [...(sectionContent || '').matchAll(/^###\s+([^\n]+)/gm)]
         .map(m => m[1].replace(/[*`$\\]/g, '').replace(/\s+/g, ' ').trim())
         .filter(Boolean);
-      const pill1 = (rawHeadings[0] || sectionTitle || 'Core Concept & Architecture').slice(0, 38);
-      const pill2 = (rawHeadings[1] || 'Mathematical Formulation & Rules').slice(0, 38);
-      const pill3 = (rawHeadings[2] || 'University Exam Implementation').slice(0, 38);
-      const cleanHeader = (sectionTitle || sectionId || 'CONCEPT SCHEMATIC').replace(/[*`$]/g, '').toUpperCase().slice(0, 56);
+      const pill1 = rawHeadings[0] || sectionTitle || 'Core Concept & Architecture';
+      const pill2 = rawHeadings[1] || 'Mathematical Formulation & Governing Rules';
+      const pill3 = rawHeadings[2] || 'University Exam Implementation & Verification';
+      const cleanHeader = (sectionTitle || sectionId || 'CONCEPT SCHEMATIC').replace(/[*`$]/g, '').toUpperCase();
 
       return (
         <div className="handwritten-diagram-container">
@@ -1957,38 +1939,31 @@ export default function HandwrittenDiagram({ sectionId, sectionTitle = '', secti
             <span>✍️ Architectural Concept Blueprint</span>
             <span className="exam-tag">{cleanHeader}</span>
           </div>
-          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 200" className="handwritten-svg">
-            <rect x="10" y="10" width="720" height="180" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
-            <text x="370" y="34" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">
+          <div style={{ background: colors.bg, border: `1.5px solid ${colors.border}`, borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ color: colors.terminal, fontWeight: 800, fontSize: '0.85rem', textAlign: 'center', letterSpacing: '0.4px' }}>
               {cleanHeader}
-            </text>
-            <g transform="translate(25, 50)">
-              <rect x="0" y="0" width="210" height="90" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
-              <text x="105" y="26" fill={colors.terminal} textAnchor="middle" fontSize="10.5" fontWeight="bold">STAGE 1: FOUNDATION</text>
-              <text x="105" y="56" fill={colors.text} textAnchor="middle" fontSize="9.5" fontWeight="bold">{pill1}</text>
-              <text x="105" y="76" fill={colors.subtext} textAnchor="middle" fontSize="8.5">Definitions &amp; Core Principles</text>
-            </g>
-            <line x1="235" y1="95" x2="265" y2="95" stroke={colors.wire} strokeWidth="2.5" />
-            <polygon points="258,90 266,95 258,100" fill={colors.wire} />
-            <g transform="translate(265, 50)">
-              <rect x="0" y="0" width="210" height="90" rx="10" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1.5" />
-              <text x="105" y="26" fill={colors.badgeAmberText} textAnchor="middle" fontSize="10.5" fontWeight="bold">STAGE 2: MECHANISM</text>
-              <text x="105" y="56" fill={colors.text} textAnchor="middle" fontSize="9.5" fontWeight="bold">{pill2}</text>
-              <text x="105" y="76" fill={colors.subtext} textAnchor="middle" fontSize="8.5">Derivation &amp; Governing Logic</text>
-            </g>
-            <line x1="475" y1="95" x2="505" y2="95" stroke={colors.source} strokeWidth="2.5" />
-            <polygon points="498,90 506,95 498,100" fill={colors.source} />
-            <g transform="translate(505, 50)">
-              <rect x="0" y="0" width="210" height="90" rx="10" fill={colors.badgeGreenBg} stroke={colors.badgeGreenBorder} strokeWidth="1.5" />
-              <text x="105" y="26" fill={colors.badgeGreenText} textAnchor="middle" fontSize="10.5" fontWeight="bold">STAGE 3: APPLICATION</text>
-              <text x="105" y="56" fill={colors.text} textAnchor="middle" fontSize="9.5" fontWeight="bold">{pill3}</text>
-              <text x="105" y="76" fill={colors.subtext} textAnchor="middle" fontSize="8.5">Solved Numerical &amp; Exam Proof</text>
-            </g>
-            <rect x="95" y="152" width="550" height="26" rx="6" fill={colors.formulaBg} stroke={colors.border} strokeWidth="1" />
-            <text x="370" y="169" fill={colors.subtext} textAnchor="middle" fontSize="9.5" fontWeight="bold">
-              Section ID: {sectionId} • Verified Zero-Overlap Vector Schematic
-            </text>
-          </svg>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', alignItems: 'stretch' }}>
+              <div style={{ background: colors.badgeCyanBg, border: `1.5px solid ${colors.badgeCyanBorder}`, borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '6px', textAlign: 'center' }}>
+                <div style={{ color: colors.terminal, fontWeight: 800, fontSize: '0.74rem', letterSpacing: '0.5px' }}>STAGE 1: FOUNDATION</div>
+                <div style={{ color: colors.text, fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.4, wordBreak: 'break-word' }}>{pill1}</div>
+                <div style={{ color: colors.subtext, fontSize: '0.72rem' }}>Definitions &amp; Core Principles</div>
+              </div>
+              <div style={{ background: colors.badgeAmberBg, border: `1.5px solid ${colors.badgeAmberBorder}`, borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '6px', textAlign: 'center' }}>
+                <div style={{ color: colors.badgeAmberText, fontWeight: 800, fontSize: '0.74rem', letterSpacing: '0.5px' }}>STAGE 2: MECHANISM</div>
+                <div style={{ color: colors.text, fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.4, wordBreak: 'break-word' }}>{pill2}</div>
+                <div style={{ color: colors.subtext, fontSize: '0.72rem' }}>Derivation &amp; Governing Logic</div>
+              </div>
+              <div style={{ background: colors.badgeGreenBg, border: `1.5px solid ${colors.badgeGreenBorder}`, borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '6px', textAlign: 'center' }}>
+                <div style={{ color: colors.badgeGreenText, fontWeight: 800, fontSize: '0.74rem', letterSpacing: '0.5px' }}>STAGE 3: APPLICATION</div>
+                <div style={{ color: colors.text, fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.4, wordBreak: 'break-word' }}>{pill3}</div>
+                <div style={{ color: colors.subtext, fontSize: '0.72rem' }}>Solved Numerical &amp; Exam Proof</div>
+              </div>
+            </div>
+            <div style={{ background: colors.formulaBg, border: `1px solid ${colors.border}`, borderRadius: '6px', padding: '6px 10px', color: colors.subtext, fontSize: '0.74rem', fontWeight: 700, textAlign: 'center' }}>
+              Section ID: {sectionId} • Auto-Sizing Responsive HTML/CSS Blueprint
+            </div>
+          </div>
         </div>
       );
     }
