@@ -319,7 +319,7 @@ The **Root Name Server (\`.\`)** stands at the apex of the global DNS namespace.
     
     <rect x="290" y="40" width="310" height="50" rx="4" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="1.5" />
     <text x="445" y="62" text-anchor="middle" fill="#86efac" font-size="11" font-weight="bold">Root Action: Evaluates suffix ".org"</text>
-    <text x="445" y="78" text-anchor="middle" fill="#a7f3d0" font-size="9.5">Returns: Delegated IPs for .org TLD Cluster ➔ Query Continues ✓</text>
+    <text x="445" y="78" text-anchor="middle" fill="#a7f3d0" font-size="8.2">Returns: Delegated IPs for .org TLD Cluster ➔ Query Continues ✓</text>
   </svg>
   <div class="circuit-diagram-caption">Fig S1: Solved Root Server Referral Mechanism</div>
 </div>
@@ -345,7 +345,7 @@ Illustrate the 3-way handshake connection sequence between a client browser and 
     
     <rect x="420" y="45" width="180" height="55" rx="5" fill="rgba(16,185,129,0.12)" stroke="#10b981" stroke-width="1.5" />
     <text x="510" y="68" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">Web Server</text>
-    <text x="510" y="85" text-anchor="middle" fill="#94a3b8" font-size="9">Socket State: LISTEN \frac{Port 80}{443}</text>
+    <text x="510" y="85" text-anchor="middle" fill="#94a3b8" font-size="9">Socket State: LISTEN (Port 80/443)</text>
   </svg>
   <div class="circuit-diagram-caption">Fig Q5: Client-Server Socket Initial Endpoints</div>
 </div>
@@ -991,7 +991,7 @@ Develop complete JavaScript and HTML5 code to draw a dynamic comparison bar char
 <div class="circuit-diagram-card">
   <svg class="circuit-svg" viewBox="0 0 640 180" width="100%" style="height:auto;" xmlns="http://www.w3.org/2000/svg">
     <rect x="5" y="5" width="630" height="170" rx="8" fill="rgba(15,23,42,0.6)" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="4 4" />
-    <text x="320" y="24" text-anchor="middle" fill="#38bdf8" font-size="11" font-weight="bold">FIGURE Q15: CANVAS ACADEMIC BAR CHART TARGET</text>
+    <text x="320" y="15" text-anchor="middle" fill="#38bdf8" font-size="10.5" font-weight="bold">FIGURE Q15: CANVAS ACADEMIC BAR CHART TARGET</text>
     
     <!-- Baseline Axis -->
     <line x1="60" y1="130" x2="580" y2="130" stroke="#94a3b8" stroke-width="2" />

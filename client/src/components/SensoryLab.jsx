@@ -646,6 +646,18 @@ function formatNoteContent(content, activeRecallMode = false, sectionId = 'sec')
 
   let html = content;
 
+  // Step 00 (SVG SHIELD): Extract all <svg>...</svg> blocks FIRST so that no LaTeX/KaTeX/Markdown
+  // regex ever injects <span>/<div>/<em> tags inside <svg><text> (which causes HTML5 parser to abort the SVG!)
+  const svgBlocks = [];
+  html = html.replace(/<svg\b[\s\S]*?<\/svg>/gi, (svgMatch) => {
+    const cleanSvg = svgMatch
+      .replace(/(?:\x0crac|\\+frac)\{([^{}]+)\}\{([^{}]+)\}/g, '$1/$2')
+      .replace(/\x0c/g, '');
+    const placeholder = `\x00SVGBLOCK_${svgBlocks.length}\x00`;
+    svgBlocks.push(cleanSvg);
+    return placeholder;
+  });
+
   // Pre-clean 0A: Auto-fix unescaped \f formfeed from \frac in JS strings and stray arrow symbols
   html = html.replace(/\x0crac/g, '\\frac');
   html = html.replace(/⬆rac/g, '\\frac');
@@ -1011,9 +1023,12 @@ function formatNoteContent(content, activeRecallMode = false, sectionId = 'sec')
     html = html.replace(`\x00MATH_DISPLAY_${i}\x00`, rendered);
   });
 
-  // Step 9 (POST-PASS): Restore code block placeholders with their rendered HTML
+  // Step 9 (POST-PASS): Restore code block and SVG placeholders with their rendered HTML
   codeBlocks.forEach((rendered, i) => {
     html = html.replace(`\x00CODEBLOCK_${i}\x00`, rendered);
+  });
+  svgBlocks.forEach((rendered, i) => {
+    html = html.replace(`\x00SVGBLOCK_${i}\x00`, rendered);
   });
 
   if (noteContentCache.size > 80) {
@@ -2584,7 +2599,9 @@ export default function SensoryLab({
 
                 {/* Vector SVG Diagram with dynamic themeMode */}
                 <HandwrittenDiagram 
-                  sectionId={section.sectionId} 
+                  sectionId={section.sectionId}
+                  sectionTitle={section.title}
+                  sectionContent={section.content}
                   themeMode={themeMode}
                   isHandwrittenMode={themeMode !== 'clean'} 
                 />

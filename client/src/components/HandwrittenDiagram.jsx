@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isHandwrittenMode = true }) {
+export default function HandwrittenDiagram({ sectionId, sectionTitle = '', sectionContent = '', themeMode = 'cyber', isHandwrittenMode = true }) {
   const isPaper = themeMode === 'paper';
   const isClean = themeMode === 'clean';
   const isLight = isPaper || isClean;
@@ -102,14 +102,14 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               <path d="M 119 100 L 145 100" fill="none" stroke={colors.wire} strokeWidth="2.5" />
               <path d="M 145 100 L 152 88 L 164 112 L 176 88 L 188 112 L 200 88 L 212 112 L 219 100" fill="none" stroke={colors.resistor} strokeWidth="2.5" strokeLinejoin="round" />
               <text x="182" y="78" fill={colors.resistor} textAnchor="middle" fontSize="12" fontWeight="bold">Rse (Series)</text>
-              <path d="M 219 100 L 280 100" fill="none" stroke={colors.wire} strokeWidth="2.5" />
-              <circle cx="280" cy="100" r="4" fill={colors.terminal} />
-              <text x="295" y="104" fill={colors.terminal} fontSize="14" fontWeight="bold">A (+)</text>
-              <path d="M 40 160 L 280 160" fill="none" stroke={colors.wire} strokeWidth="2.5" />
+              <path d="M 219 100 L 265 100" fill="none" stroke={colors.wire} strokeWidth="2.5" />
+              <circle cx="265" cy="100" r="4" fill={colors.terminal} />
+              <text x="275" y="104" fill={colors.terminal} fontSize="12" fontWeight="bold">A (+)</text>
+              <path d="M 40 160 L 265 160" fill="none" stroke={colors.wire} strokeWidth="2.5" />
               <path d="M 40 100 L 40 160" fill="none" stroke={colors.wire} strokeWidth="2.5" />
-              <circle cx="280" cy="160" r="4" fill={colors.terminal} />
-              <text x="295" y="164" fill={colors.terminal} fontSize="14" fontWeight="bold">B (−)</text>
-              <text x="160" y="180" fill={colors.subtext} textAnchor="middle" fontSize="11" fontStyle="italic">
+              <circle cx="265" cy="160" r="4" fill={colors.terminal} />
+              <text x="275" y="164" fill={colors.terminal} fontSize="12" fontWeight="bold">B (−)</text>
+              <text x="160" y="180" fill={colors.subtext} textAnchor="middle" fontSize="9.5" fontStyle="italic">
                 VL = Vs − (IL · Rse) → Terminal voltage drops with load
               </text>
             </g>
@@ -127,7 +127,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               <text x="305" y="70" fill={colors.terminal} fontSize="14" fontWeight="bold">A</text>
               <circle cx="290" cy="165" r="4" fill={colors.terminal} />
               <text x="305" y="170" fill={colors.terminal} fontSize="14" fontWeight="bold">B</text>
-              <text x="170" y="182" fill={colors.subtext} textAnchor="middle" fontSize="11" fontStyle="italic">
+              <text x="170" y="182" fill={colors.subtext} textAnchor="middle" fontSize="9.5" fontStyle="italic">
                 IL = Is − (VL / Rsh) → Shunt absorbs leakage current
               </text>
             </g>
@@ -167,19 +167,19 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             </g>
             <g transform="translate(390, 15)">
               <rect x="0" y="0" width="320" height="225" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
-              <text x="160" y="24" fill={colors.highlight} textAnchor="middle" fontSize="13" fontWeight="bold">KVL: CONSERVATION OF ENERGY</text>
-              <rect x="40" y="46" width="240" height="110" fill="none" stroke={colors.wire} strokeWidth="2" rx="4" />
-              <circle cx="40" cy="101" r="16" fill={colors.bg} stroke={colors.source} strokeWidth="2" />
-              <text x="40" y="97" fill={colors.source} textAnchor="middle" fontSize="11" fontWeight="bold">+</text>
-              <text x="40" y="111" fill={colors.source} textAnchor="middle" fontSize="11" fontWeight="bold">−</text>
-              <text x="15" y="105" fill={colors.source} fontSize="12" fontWeight="bold">E</text>
-              <rect x="130" y="40" width="60" height="12" fill={colors.bg} stroke={colors.resistor} strokeWidth="2" />
-              <text x="160" y="34" fill={colors.resistor} textAnchor="middle" fontSize="11" fontWeight="bold">R1 (−I·R1)</text>
-              <rect x="274" y="81" width="12" height="40" fill={colors.bg} stroke={colors.resistor} strokeWidth="2" />
-              <text x="295" y="105" fill={colors.resistor} fontSize="11" fontWeight="bold">R2</text>
-              <path d="M 140 91 A 20 20 0 1 1 155 119" fill="none" stroke={colors.secondary} strokeWidth="2.5" strokeDasharray="3 3" />
-              <polygon points="150,119 160,121 156,113" fill={colors.secondary} />
-              <text x="160" y="106" fill={colors.secondary} textAnchor="middle" fontSize="11" fontWeight="bold">Loop I</text>
+              <text x="160" y="22" fill={colors.highlight} textAnchor="middle" fontSize="13" fontWeight="bold">KVL: CONSERVATION OF ENERGY</text>
+              <rect x="40" y="54" width="240" height="104" fill="none" stroke={colors.wire} strokeWidth="2" rx="4" />
+              <circle cx="40" cy="106" r="16" fill={colors.bg} stroke={colors.source} strokeWidth="2" />
+              <text x="40" y="102" fill={colors.source} textAnchor="middle" fontSize="11" fontWeight="bold">+</text>
+              <text x="40" y="116" fill={colors.source} textAnchor="middle" fontSize="11" fontWeight="bold">−</text>
+              <text x="15" y="110" fill={colors.source} fontSize="12" fontWeight="bold">E</text>
+              <rect x="130" y="48" width="60" height="12" fill={colors.bg} stroke={colors.resistor} strokeWidth="2" />
+              <text x="160" y="42" fill={colors.resistor} textAnchor="middle" fontSize="10.5" fontWeight="bold">R1 (−I·R1)</text>
+              <rect x="274" y="86" width="12" height="40" fill={colors.bg} stroke={colors.resistor} strokeWidth="2" />
+              <text x="292" y="110" fill={colors.resistor} fontSize="11" fontWeight="bold">R2</text>
+              <path d="M 140 96 A 20 20 0 1 1 155 124" fill="none" stroke={colors.secondary} strokeWidth="2.5" strokeDasharray="3 3" />
+              <polygon points="150,124 160,126 156,118" fill={colors.secondary} />
+              <text x="160" y="111" fill={colors.secondary} textAnchor="middle" fontSize="11" fontWeight="bold">Loop I</text>
               <rect x="25" y="176" width="270" height="34" rx="6" fill={colors.badgePinkBg} stroke={colors.badgePinkBorder} strokeWidth="1" />
               <text x="160" y="198" fill={colors.badgePinkText} textAnchor="middle" fontSize="12" fontWeight="bold">
                 Σ V = 0 ⇒ E − I·R1 − I·R2 = 0
@@ -288,16 +288,16 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             <g transform="translate(420, 20)">
               <rect x="0" y="0" width="300" height="195" rx="10" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
               <text x="150" y="24" fill={colors.highlight} textAnchor="middle" fontSize="12" fontWeight="bold">POWER TRIANGLE (AC POWER)</text>
-              <line x1="50" y1="140" x2="200" y2="140" stroke={colors.source} strokeWidth="3" />
-              <text x="125" y="158" fill={colors.source} textAnchor="middle" fontSize="12" fontWeight="bold">P = V·I·cosφ (Watts)</text>
-              <line x1="200" y1="140" x2="200" y2="55" stroke={colors.highlight} strokeWidth="3" />
-              <text x="250" y="100" fill={colors.highlight} textAnchor="middle" fontSize="12" fontWeight="bold">Q = V·I·sinφ (VAR)</text>
-              <line x1="50" y1="140" x2="200" y2="55" stroke={colors.wire} strokeWidth="3.5" strokeDasharray="5 2" />
-              <text x="110" y="85" fill={colors.wire} textAnchor="middle" fontSize="12" fontWeight="bold">S = V·I (VA)</text>
-              <path d="M 80 140 A 30 30 0 0 0 74 125" fill="none" stroke={colors.resistor} strokeWidth="2" />
-              <text x="85" y="130" fill={colors.resistor} fontSize="12" fontWeight="bold">φ</text>
+              <line x1="45" y1="140" x2="180" y2="140" stroke={colors.source} strokeWidth="3" />
+              <text x="115" y="158" fill={colors.source} textAnchor="middle" fontSize="11" fontWeight="bold">P = V·I·cosφ (Watts)</text>
+              <line x1="180" y1="140" x2="180" y2="55" stroke={colors.highlight} strokeWidth="3" />
+              <text x="235" y="100" fill={colors.highlight} textAnchor="middle" fontSize="10" fontWeight="bold">Q = V·I·sinφ (VAR)</text>
+              <line x1="45" y1="140" x2="180" y2="55" stroke={colors.wire} strokeWidth="3.5" strokeDasharray="5 2" />
+              <text x="100" y="85" fill={colors.wire} textAnchor="middle" fontSize="11" fontWeight="bold">S = V·I (VA)</text>
+              <path d="M 75 140 A 30 30 0 0 0 69 125" fill="none" stroke={colors.resistor} strokeWidth="2" />
+              <text x="80" y="130" fill={colors.resistor} fontSize="12" fontWeight="bold">φ</text>
               <rect x="25" y="168" width="250" height="24" rx="6" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
-              <text x="150" y="184" fill={colors.badgeAmberText} textAnchor="middle" fontSize="12" fontWeight="bold">
+              <text x="150" y="184" fill={colors.badgeAmberText} textAnchor="middle" fontSize="11" fontWeight="bold">
                 Power Factor = cosφ = P / S
               </text>
             </g>
@@ -362,33 +362,33 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
           </div>
           <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 220" className="handwritten-svg">
             <rect x="10" y="10" width="720" height="200" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
-            <g transform="translate(60, 25)">
+            <g transform="translate(55, 25)">
               <rect x="60" y="20" width="160" height="140" rx="6" fill={colors.formulaBg} stroke={colors.ground} strokeWidth="3" />
               <rect x="95" y="55" width="90" height="70" rx="4" fill={colors.bg} stroke={colors.ground} strokeWidth="2.5" />
               <rect x="78" y="38" width="124" height="104" rx="4" fill="none" stroke={colors.resistor} strokeWidth="1.5" strokeDasharray="4 4" />
-              <text x="140" y="48" fill={colors.resistor} textAnchor="middle" fontSize="11" fontWeight="bold">Mutual Flux Φm</text>
+              <text x="140" y="49" fill={colors.resistor} textAnchor="middle" fontSize="10.5" fontWeight="bold">Mutual Flux Φm</text>
               <g stroke={colors.resistor} strokeWidth="3.5" fill="none">
                 <path d="M 40 45 L 60 45 Q 50 60 60 70 Q 50 85 60 95 Q 50 110 60 120 L 40 120" />
               </g>
-              <text x="20" y="85" fill={colors.resistor} textAnchor="middle" fontSize="12" fontWeight="bold">V1 (N1)</text>
+              <text x="15" y="88" fill={colors.resistor} textAnchor="middle" fontSize="11" fontWeight="bold">V1 (N1)</text>
               <g stroke={colors.wire} strokeWidth="3.5" fill="none">
                 <path d="M 240 50 L 220 50 Q 230 65 220 75 Q 230 90 220 100 Q 230 115 220 125 L 240 125" />
               </g>
-              <text x="260" y="90" fill={colors.wire} textAnchor="middle" fontSize="12" fontWeight="bold">V2 (N2)</text>
-              <text x="140" y="178" fill={colors.subtext} textAnchor="middle" fontSize="11">
+              <text x="275" y="92" fill={colors.wire} textAnchor="middle" fontSize="11" fontWeight="bold">V2 (N2)</text>
+              <text x="140" y="178" fill={colors.subtext} textAnchor="middle" fontSize="10">
                 Laminated Silicon Steel Core (Reduces Eddy Current Losses)
               </text>
             </g>
-            <g transform="translate(410, 30)">
-              <rect x="0" y="0" width="300" height="160" rx="10" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1.5" />
-              <text x="150" y="26" fill={colors.badgeAmberText} textAnchor="middle" fontSize="13" fontWeight="bold">EMF EQUATION OF TRANSFORMER</text>
-              <rect x="20" y="42" width="260" height="42" rx="6" fill={colors.formulaBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
-              <text x="150" y="68" fill={colors.badgeAmberText} textAnchor="middle" fontSize="15" fontWeight="bold">
+            <g transform="translate(405, 30)">
+              <rect x="0" y="0" width="310" height="160" rx="10" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1.5" />
+              <text x="155" y="26" fill={colors.badgeAmberText} textAnchor="middle" fontSize="12.5" fontWeight="bold">EMF EQUATION OF TRANSFORMER</text>
+              <rect x="25" y="42" width="260" height="40" rx="6" fill={colors.formulaBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
+              <text x="155" y="67" fill={colors.badgeAmberText} textAnchor="middle" fontSize="14" fontWeight="bold">
                 E = 4.44 · f · N · Φm
               </text>
-              <text x="30" y="105" fill={colors.subtext} fontSize="11">• E1 / E2 = N1 / N2 = I2 / I1 = K (Turns Ratio)</text>
-              <text x="30" y="125" fill={colors.subtext} fontSize="11">• Open Circuit (OC) Test ⇒ Core / Iron Loss (Pi)</text>
-              <text x="30" y="145" fill={colors.subtext} fontSize="11">• Short Circuit (SC) Test ⇒ Full Load Copper Loss (Pcu)</text>
+              <text x="18" y="105" fill={colors.subtext} fontSize="9.5">• E1 / E2 = N1 / N2 = I2 / I1 = K (Turns Ratio)</text>
+              <text x="18" y="125" fill={colors.subtext} fontSize="9.5">• Open Circuit (OC) Test ⇒ Core / Iron Loss (Pi)</text>
+              <text x="18" y="145" fill={colors.subtext} fontSize="9.5">• Short Circuit (SC) Test ⇒ Copper Loss (Pcu)</text>
             </g>
           </svg>
         </div>
@@ -401,41 +401,41 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             <span>✍️ Hand-Drawn Engineering Schematic</span>
             <span className="exam-tag">FIG 3.1: P-N JUNCTION & V-I CHARACTERISTIC CURVE</span>
           </div>
-          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 240" className="handwritten-svg">
-            <rect x="10" y="10" width="720" height="220" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
-            <g transform="translate(30, 30)">
-              <text x="150" y="16" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">P-N JUNCTION IN EQUILIBRIUM</text>
-              <rect x="20" y="30" width="260" height="100" rx="6" fill="none" stroke={colors.wire} strokeWidth="2" />
-              <rect x="20" y="30" width="100" height="100" fill={colors.badgeCyanBg} />
-              <text x="70" y="85" fill={colors.badgeCyanText} textAnchor="middle" fontSize="16" fontWeight="bold">P-Type</text>
-              <text x="70" y="105" fill={colors.subtext} textAnchor="middle" fontSize="10">Holes (Maj)</text>
-              <rect x="120" y="30" width="60" height="100" fill={colors.badgePinkBg} stroke={colors.badgePinkBorder} strokeWidth="1.5" strokeDasharray="3 3" />
-              <text x="150" y="75" fill={colors.badgePinkText} textAnchor="middle" fontSize="10" fontWeight="bold">Depletion</text>
-              <text x="150" y="90" fill={colors.badgePinkText} textAnchor="middle" fontSize="10">Layer</text>
-              <text x="150" y="115" fill={colors.badgeAmberText} textAnchor="middle" fontSize="10" fontWeight="bold">V0 = 0.7V</text>
-              <rect x="180" y="30" width="100" height="100" fill={colors.badgeGreenBg} />
-              <text x="230" y="85" fill={colors.badgeGreenText} textAnchor="middle" fontSize="16" fontWeight="bold">N-Type</text>
-              <text x="230" y="105" fill={colors.subtext} textAnchor="middle" fontSize="10">Electrons (Maj)</text>
-              <line x1="0" y1="80" x2="20" y2="80" stroke={colors.terminal} strokeWidth="3" />
-              <text x="5" y="70" fill={colors.terminal} fontSize="12" fontWeight="bold">Anode (+)</text>
-              <line x1="280" y1="80" x2="300" y2="80" stroke={colors.terminal} strokeWidth="3" />
-              <text x="260" y="70" fill={colors.terminal} fontSize="12" fontWeight="bold">Cathode (−)</text>
+          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 245" className="handwritten-svg">
+            <rect x="10" y="10" width="720" height="225" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+            <g transform="translate(25, 30)">
+              <text x="170" y="16" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">P-N JUNCTION IN EQUILIBRIUM</text>
+              <rect x="65" y="34" width="210" height="100" rx="6" fill="none" stroke={colors.wire} strokeWidth="2" />
+              <rect x="65" y="34" width="75" height="100" fill={colors.badgeCyanBg} />
+              <text x="102" y="84" fill={colors.badgeCyanText} textAnchor="middle" fontSize="14" fontWeight="bold">P-Type</text>
+              <text x="102" y="104" fill={colors.subtext} textAnchor="middle" fontSize="9">Holes (Majority)</text>
+              <rect x="140" y="34" width="60" height="100" fill={colors.badgePinkBg} stroke={colors.badgePinkBorder} strokeWidth="1.5" strokeDasharray="3 3" />
+              <text x="170" y="75" fill={colors.badgePinkText} textAnchor="middle" fontSize="9.5" fontWeight="bold">Depletion</text>
+              <text x="170" y="90" fill={colors.badgePinkText} textAnchor="middle" fontSize="9.5">Layer</text>
+              <text x="170" y="116" fill={colors.badgeAmberText} textAnchor="middle" fontSize="9.5" fontWeight="bold">V0 = 0.7V</text>
+              <rect x="200" y="34" width="75" height="100" fill={colors.badgeGreenBg} />
+              <text x="237" y="84" fill={colors.badgeGreenText} textAnchor="middle" fontSize="14" fontWeight="bold">N-Type</text>
+              <text x="237" y="104" fill={colors.subtext} textAnchor="middle" fontSize="9">e⁻ (Majority)</text>
+              <line x1="25" y1="84" x2="65" y2="84" stroke={colors.terminal} strokeWidth="3" />
+              <text x="58" y="74" fill={colors.terminal} textAnchor="end" fontSize="10.5" fontWeight="bold">Anode (+)</text>
+              <line x1="275" y1="84" x2="315" y2="84" stroke={colors.terminal} strokeWidth="3" />
+              <text x="282" y="74" fill={colors.terminal} fontSize="10.5" fontWeight="bold">Cathode (−)</text>
             </g>
-            <g transform="translate(390, 25)">
-              <text x="160" y="16" fill={colors.highlight} textAnchor="middle" fontSize="12" fontWeight="bold">DIODE V-I CHARACTERISTIC CURVE</text>
-              <line x1="20" y1="110" x2="310" y2="110" stroke={colors.ground} strokeWidth="1.5" />
-              <line x1="160" y1="20" x2="160" y2="185" stroke={colors.ground} strokeWidth="1.5" />
-              <text x="310" y="105" fill="#22c55e" fontSize="10" fontWeight="bold">+VF (V)</text>
-              <text x="10" y="105" fill="#ef4444" fontSize="10" fontWeight="bold">−VR (V)</text>
-              <text x="165" y="25" fill="#22c55e" fontSize="10" fontWeight="bold">+IF (mA)</text>
-              <text x="165" y="185" fill="#ef4444" fontSize="10" fontWeight="bold">−IR (μA)</text>
-              <path d="M 160 110 L 210 110 Q 225 110 235 80 L 250 30" fill="none" stroke="#22c55e" strokeWidth="3" />
-              <line x1="225" y1="110" x2="225" y2="85" stroke={colors.resistor} strokeWidth="1" strokeDasharray="2 2" />
-              <text x="225" y="125" fill={colors.resistor} textAnchor="middle" fontSize="10" fontWeight="bold">Vγ=0.7V (Si)</text>
-              <path d="M 160 110 L 70 113 Q 55 115 50 145 L 45 180" fill="none" stroke="#ef4444" strokeWidth="2.5" />
-              <text x="50" y="140" fill="#ef4444" fontSize="9" fontWeight="bold">Vz (Breakdown)</text>
-              <rect x="20" y="174" width="280" height="24" rx="5" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
-              <text x="160" y="190" fill={colors.badgeAmberText} textAnchor="middle" fontSize="11" fontWeight="bold">
+            <g transform="translate(390, 22)">
+              <text x="160" y="14" fill={colors.highlight} textAnchor="middle" fontSize="12" fontWeight="bold">DIODE V-I CHARACTERISTIC CURVE</text>
+              <line x1="20" y1="102" x2="295" y2="102" stroke={colors.ground} strokeWidth="1.5" />
+              <line x1="155" y1="26" x2="155" y2="162" stroke={colors.ground} strokeWidth="1.5" />
+              <text x="295" y="95" fill="#22c55e" textAnchor="end" fontSize="9.5" fontWeight="bold">+VF (V)</text>
+              <text x="20" y="95" fill="#ef4444" fontSize="9.5" fontWeight="bold">−VR (V)</text>
+              <text x="162" y="36" fill="#22c55e" fontSize="9.5" fontWeight="bold">+IF (mA)</text>
+              <text x="162" y="158" fill="#ef4444" fontSize="9.5" fontWeight="bold">−IR (μA)</text>
+              <path d="M 155 102 L 205 102 Q 220 102 230 74 L 245 30" fill="none" stroke="#22c55e" strokeWidth="3" />
+              <line x1="220" y1="102" x2="220" y2="78" stroke={colors.resistor} strokeWidth="1" strokeDasharray="2 2" />
+              <text x="220" y="117" fill={colors.resistor} textAnchor="middle" fontSize="9.5" fontWeight="bold">Vγ=0.7V (Si)</text>
+              <path d="M 155 102 L 70 105 Q 55 107 50 132 L 45 160" fill="none" stroke="#ef4444" strokeWidth="2.5" />
+              <text x="54" y="132" fill="#ef4444" fontSize="9" fontWeight="bold">Vz (Breakdown)</text>
+              <rect x="20" y="172" width="280" height="24" rx="5" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
+              <text x="160" y="188" fill={colors.badgeAmberText} textAnchor="middle" fontSize="10.5" fontWeight="bold">
                 Knee Voltage: Si = 0.7V | Ge = 0.3V
               </text>
             </g>
@@ -450,43 +450,43 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             <span>✍️ Hand-Drawn Engineering Schematic</span>
             <span className="exam-tag">FIG 3.3: BJT CE OUTPUT CHARACTERISTICS FAMILY</span>
           </div>
-          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 230" className="handwritten-svg">
-            <rect x="10" y="10" width="720" height="210" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
-            <g transform="translate(40, 30)">
+          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 235" className="handwritten-svg">
+            <rect x="10" y="10" width="720" height="215" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+            <g transform="translate(35, 26)">
               <text x="100" y="15" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">NPN BJT SYMBOL</text>
-              <circle cx="100" cy="85" r="35" fill="none" stroke={colors.border} strokeWidth="2" />
-              <line x1="85" y1="65" x2="85" y2="105" stroke={colors.wire} strokeWidth="4" strokeLinecap="round" />
-              <line x1="50" y1="85" x2="85" y2="85" stroke={colors.wire} strokeWidth="2.5" />
-              <text x="40" y="90" fill={colors.terminal} fontSize="12" fontWeight="bold">B</text>
-              <line x1="85" y1="72" x2="120" y2="55" stroke={colors.wire} strokeWidth="2.5" />
-              <line x1="120" y1="55" x2="120" y2="35" stroke={colors.wire} strokeWidth="2.5" />
+              <circle cx="100" cy="82" r="34" fill="none" stroke={colors.border} strokeWidth="2" />
+              <line x1="85" y1="62" x2="85" y2="102" stroke={colors.wire} strokeWidth="4" strokeLinecap="round" />
+              <line x1="50" y1="82" x2="85" y2="82" stroke={colors.wire} strokeWidth="2.5" />
+              <text x="38" y="87" fill={colors.terminal} fontSize="12" fontWeight="bold">B</text>
+              <line x1="85" y1="69" x2="120" y2="52" stroke={colors.wire} strokeWidth="2.5" />
+              <line x1="120" y1="52" x2="120" y2="34" stroke={colors.wire} strokeWidth="2.5" />
               <text x="120" y="28" fill={colors.resistor} fontSize="12" fontWeight="bold">C</text>
-              <line x1="85" y1="98" x2="120" y2="115" stroke={colors.wire} strokeWidth="2.5" />
-              <polygon points="112,110 120,115 110,118" fill={colors.highlight} />
-              <line x1="120" y1="115" x2="120" y2="135" stroke={colors.wire} strokeWidth="2.5" />
-              <text x="120" y="148" fill={colors.highlight} fontSize="12" fontWeight="bold">E (Arrow Out)</text>
-              <rect x="10" y="145" width="180" height="24" rx="5" fill={colors.badgePinkBg} stroke={colors.badgePinkBorder} strokeWidth="1" />
-              <text x="100" y="161" fill={colors.badgePinkText} textAnchor="middle" fontSize="11" fontWeight="bold">
-                IE = IB + IC & β = α/(1−α)
+              <line x1="85" y1="95" x2="120" y2="112" stroke={colors.wire} strokeWidth="2.5" />
+              <polygon points="112,107 120,112 110,115" fill={colors.highlight} />
+              <line x1="120" y1="112" x2="120" y2="128" stroke={colors.wire} strokeWidth="2.5" />
+              <text x="120" y="141" fill={colors.highlight} textAnchor="middle" fontSize="10.5" fontWeight="bold">E (Arrow Out)</text>
+              <rect x="10" y="152" width="180" height="24" rx="5" fill={colors.badgePinkBg} stroke={colors.badgePinkBorder} strokeWidth="1" />
+              <text x="100" y="168" fill={colors.badgePinkText} textAnchor="middle" fontSize="10.5" fontWeight="bold">
+                IE = IB + IC &amp; β = α/(1−α)
               </text>
             </g>
-            <g transform="translate(300, 25)">
-              <text x="200" y="15" fill={colors.highlight} textAnchor="middle" fontSize="12" fontWeight="bold">CE OUTPUT CHARACTERISTICS (IC vs VCE)</text>
-              <line x1="40" y1="155" x2="380" y2="155" stroke={colors.ground} strokeWidth="1.5" />
-              <line x1="40" y1="155" x2="40" y2="30" stroke={colors.ground} strokeWidth="1.5" />
-              <text x="380" y="170" fill={colors.subtext} fontSize="11">VCE (Volts) →</text>
-              <text x="25" y="30" fill={colors.subtext} fontSize="11">IC (mA) ↑</text>
-              <rect x="40" y="30" width="30" height="125" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1" />
-              <text x="55" y="24" fill={colors.badgeCyanText} textAnchor="middle" fontSize="10" fontWeight="bold">SATURATION</text>
-              <path d="M 40 155 Q 65 55 350 50" fill="none" stroke="#22c55e" strokeWidth="2.5" />
-              <text x="355" y="54" fill="#22c55e" fontSize="10" fontWeight="bold">IB = 40 μA</text>
-              <path d="M 40 155 Q 65 85 350 80" fill="none" stroke={colors.wire} strokeWidth="2.5" />
-              <text x="355" y="84" fill={colors.wire} fontSize="10" fontWeight="bold">IB = 30 μA</text>
-              <path d="M 40 155 Q 65 115 350 110" fill="none" stroke={colors.resistor} strokeWidth="2.5" />
-              <text x="355" y="114" fill={colors.resistor} fontSize="10" fontWeight="bold">IB = 20 μA</text>
-              <path d="M 40 155 L 350 153" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="3 3" />
-              <text x="250" y="148" fill="#ef4444" fontSize="10" fontWeight="bold">CUTOFF REGION (IB = 0)</text>
-              <text x="200" y="70" fill={colors.badgeAmberText} fontSize="12" fontWeight="bold">ACTIVE REGION (Amplifier)</text>
+            <g transform="translate(295, 22)">
+              <text x="215" y="14" fill={colors.highlight} textAnchor="middle" fontSize="12" fontWeight="bold">CE OUTPUT CHARACTERISTICS (IC vs VCE)</text>
+              <line x1="45" y1="160" x2="380" y2="160" stroke={colors.ground} strokeWidth="1.5" />
+              <line x1="45" y1="160" x2="45" y2="36" stroke={colors.ground} strokeWidth="1.5" />
+              <text x="380" y="175" fill={colors.subtext} textAnchor="end" fontSize="10.5">VCE (Volts) →</text>
+              <text x="38" y="34" fill={colors.subtext} textAnchor="end" fontSize="10">IC (mA) ↑</text>
+              <rect x="45" y="38" width="28" height="122" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1" />
+              <text x="59" y="32" fill={colors.badgeCyanText} textAnchor="middle" fontSize="8.5" fontWeight="bold">SAT.</text>
+              <path d="M 45 160 Q 70 60 345 55" fill="none" stroke="#22c55e" strokeWidth="2.5" />
+              <text x="350" y="59" fill="#22c55e" fontSize="9.5" fontWeight="bold">IB = 40 μA</text>
+              <path d="M 45 160 Q 70 90 345 85" fill="none" stroke={colors.wire} strokeWidth="2.5" />
+              <text x="350" y="89" fill={colors.wire} fontSize="9.5" fontWeight="bold">IB = 30 μA</text>
+              <path d="M 45 160 Q 70 120 345 115" fill="none" stroke={colors.resistor} strokeWidth="2.5" />
+              <text x="350" y="119" fill={colors.resistor} fontSize="9.5" fontWeight="bold">IB = 20 μA</text>
+              <path d="M 45 160 L 345 158" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="3 3" />
+              <text x="245" y="152" fill="#ef4444" fontSize="9.5" fontWeight="bold">CUTOFF REGION (IB = 0)</text>
+              <text x="195" y="75" fill={colors.badgeAmberText} fontSize="11" fontWeight="bold">ACTIVE REGION (Amplifier)</text>
             </g>
           </svg>
         </div>
@@ -509,10 +509,10 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               <text x="162" y="62" fill={colors.badgeCyanText} textAnchor="middle" fontSize="15" fontWeight="bold">
                 (A · B)' = A' + B'
               </text>
-              <text x="162" y="98" fill={colors.text} textAnchor="middle" fontSize="11" fontWeight="bold">
+              <text x="162" y="98" fill={colors.text} textAnchor="middle" fontSize="10.5" fontWeight="bold">
                 NAND Gate ≡ Inverted-Input OR Gate (Bubbled OR)
               </text>
-              <text x="162" y="125" fill={colors.subtext} textAnchor="middle" fontSize="11" fontStyle="italic">
+              <text x="162" y="125" fill={colors.subtext} textAnchor="middle" fontSize="9" fontStyle="italic">
                 "Break the line across AND, change to OR with individual bars"
               </text>
             </g>
@@ -523,10 +523,10 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               <text x="162" y="62" fill={colors.badgePinkText} textAnchor="middle" fontSize="15" fontWeight="bold">
                 (A + B)' = A' · B'
               </text>
-              <text x="162" y="98" fill={colors.text} textAnchor="middle" fontSize="11" fontWeight="bold">
+              <text x="162" y="98" fill={colors.text} textAnchor="middle" fontSize="10.5" fontWeight="bold">
                 NOR Gate ≡ Inverted-Input AND Gate (Bubbled AND)
               </text>
-              <text x="162" y="125" fill={colors.subtext} textAnchor="middle" fontSize="11" fontStyle="italic">
+              <text x="162" y="125" fill={colors.subtext} textAnchor="middle" fontSize="9" fontStyle="italic">
                 "Break the line across OR, change to AND with individual bars"
               </text>
             </g>
@@ -547,17 +547,17 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             {/* Outer Box: Artificial Intelligence */}
             <rect x="40" y="30" width="660" height="200" rx="12" fill="rgba(0, 240, 255, 0.05)" stroke={colors.wire} strokeWidth="2" strokeDasharray="5 5" />
             <text x="60" y="55" fill={colors.wire} fontSize="14" fontWeight="900" letterSpacing="1px">ARTIFICIAL INTELLIGENCE (AI)</text>
-            <text x="60" y="72" fill={colors.subtext} fontSize="11">Machines performing tasks requiring human-like intelligence & reasoning (John McCarthy, 1956)</text>
+            <text x="60" y="72" fill={colors.subtext} fontSize="10.5">Machines performing tasks requiring human-like intelligence &amp; reasoning (John McCarthy, 1956)</text>
             
             {/* Middle Box: Machine Learning */}
             <rect x="180" y="85" width="500" height="135" rx="10" fill="rgba(245, 158, 11, 0.07)" stroke={colors.resistor} strokeWidth="2" />
             <text x="200" y="108" fill={colors.resistor} fontSize="13" fontWeight="900" letterSpacing="1px">MACHINE LEARNING (ML)</text>
-            <text x="200" y="123" fill={colors.subtext} fontSize="11">Statistical algorithms learning patterns from Experience (E, T, P) without explicit programming</text>
+            <text x="200" y="123" fill={colors.subtext} fontSize="9.2">Statistical algorithms learning patterns from Experience (E, T, P) without explicit coding</text>
             
             {/* Inner Box: Deep Learning */}
             <rect x="350" y="135" width="310" height="75" rx="8" fill="rgba(236, 72, 153, 0.1)" stroke={colors.highlight} strokeWidth="2" />
             <text x="365" y="160" fill={colors.highlight} fontSize="13" fontWeight="900" letterSpacing="1px">DEEP LEARNING (DL)</text>
-            <text x="365" y="177" fill={colors.text} fontSize="11" fontWeight="bold">Multi-layer ANNs, Transformers & LLMs</text>
+            <text x="365" y="177" fill={colors.text} fontSize="11" fontWeight="bold">Multi-layer ANNs, Transformers &amp; LLMs</text>
             <text x="365" y="195" fill={colors.subtext} fontSize="10">Self-attention, CNNs, Generative AI (GPT-4, Gemini)</text>
           </svg>
         </div>
@@ -639,11 +639,11 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
 
             {/* B -> D (OPTIMAL) */}
             <line x1="235" y1="165" x2="365" y2="165" stroke={colors.source} strokeWidth="3.5" />
-            <text x="300" y="180" fill={colors.source} fontSize="12" fontWeight="bold">c=3 ★</text>
+            <text x="300" y="158" fill={colors.source} fontSize="12" fontWeight="bold">c=3 ★</text>
 
             {/* B -> E */}
             <line x1="235" y1="175" x2="505" y2="190" stroke={colors.subtext} strokeWidth="1.5" />
-            <text x="360" y="200" fill={colors.subtext} fontSize="11">c=5</text>
+            <text x="320" y="198" fill={colors.subtext} fontSize="11">c=5</text>
 
             {/* C -> G */}
             <line x1="395" y1="65" x2="625" y2="105" stroke={colors.subtext} strokeWidth="1.5" />
@@ -843,8 +843,8 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             <text x="655" y="150" fill={colors.subtext} textAnchor="middle" fontSize="14">0</text>
             
             {/* Rank Result Ribbon */}
-            <rect x="220" y="195" width="300" height="28" rx="14" fill={colors.source} fillOpacity="0.15" stroke={colors.source} strokeWidth="1.5" />
-            <text x="370" y="214" fill={colors.source} textAnchor="middle" fontSize="12" fontWeight="bold">
+            <rect x="165" y="195" width="410" height="28" rx="14" fill={colors.source} fillOpacity="0.15" stroke={colors.source} strokeWidth="1.5" />
+            <text x="370" y="214" fill={colors.source} textAnchor="middle" fontSize="11" fontWeight="bold">
               ★ RANK: ρ(A) = r (Order of Non-Zero Identity Block Iᵣ)
             </text>
           </svg>
@@ -902,19 +902,19 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             <rect x="30" y="130" width="680" height="90" rx="10" fill={colors.bg} stroke={colors.border} strokeWidth="1" strokeDasharray="4 4" />
             <text x="50" y="155" fill={colors.highlight} fontSize="12" fontWeight="bold">EXAM NOTEBOOK WORKING TRACE (2×2 SOLVED EXAMPLE):</text>
             
-            <g transform="translate(60, 165)">
-              <text x="0" y="20" fill={colors.text} fontSize="12" fontFamily="monospace">[ 1  2 | 1  0 ]</text>
-              <text x="0" y="38" fill={colors.text} fontSize="12" fontFamily="monospace">[ 3  4 | 0  1 ]</text>
+            <g transform="translate(45, 165)">
+              <text x="0" y="20" fill={colors.text} fontSize="10.5" fontFamily="monospace">[ 1  2 | 1  0 ]</text>
+              <text x="0" y="38" fill={colors.text} fontSize="10.5" fontFamily="monospace">[ 3  4 | 0  1 ]</text>
 
-              <text x="140" y="30" fill={colors.wire} fontSize="13" fontWeight="bold">⎯⎯ R₂ → R₂ − 3R₁ ⎯⎯→</text>
+              <text x="125" y="30" fill={colors.wire} fontSize="11" fontWeight="bold">⎯ R₂→R₂−3R₁ →</text>
 
-              <text x="320" y="20" fill={colors.text} fontSize="12" fontFamily="monospace">[ 1  2 |  1  0 ]</text>
-              <text x="320" y="38" fill={colors.text} fontSize="12" fontFamily="monospace">[ 0 -2 | -3  1 ]</text>
+              <text x="260" y="20" fill={colors.text} fontSize="10.5" fontFamily="monospace">[ 1  2 |  1  0 ]</text>
+              <text x="260" y="38" fill={colors.text} fontSize="10.5" fontFamily="monospace">[ 0 -2 | -3  1 ]</text>
 
-              <text x="450" y="30" fill={colors.source} fontSize="13" fontWeight="bold">⎯⎯ Norm & Clear ⎯⎯→</text>
+              <text x="395" y="30" fill={colors.source} fontSize="11" fontWeight="bold">⎯ Norm &amp; Clear →</text>
 
-              <text x="575" y="20" fill={colors.source} fontSize="12" fontWeight="bold" fontFamily="monospace">[ 1  0 | -2    1  ]</text>
-              <text x="575" y="38" fill={colors.source} fontSize="12" fontWeight="bold" fontFamily="monospace">[ 0  1 | 1.5 -0.5 ]</text>
+              <text x="520" y="20" fill={colors.source} fontSize="10.5" fontWeight="bold" fontFamily="monospace">[ 1 0 | -2   1  ]</text>
+              <text x="520" y="38" fill={colors.source} fontSize="10.5" fontWeight="bold" fontFamily="monospace">[ 0 1 | 1.5 -0.5]</text>
             </g>
           </svg>
         </div>
@@ -998,7 +998,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
 
               {/* Transformed Vector AX = lambda X */}
               <line x1="60" y1="140" x2="230" y2="63" stroke={colors.source} strokeWidth="3" markerEnd="url(#arrow)" />
-              <text x="210" y="55" fill={colors.source} fontSize="12" fontWeight="900">A·X = λ·X (Scaled!)</text>
+              <text x="180" y="54" fill={colors.source} fontSize="11" fontWeight="900">A·X = λ·X (Scaled!)</text>
 
               {/* Non-eigenvector showing rotation */}
               <line x1="60" y1="140" x2="160" y2="145" stroke={colors.highlight} strokeWidth="1.5" strokeDasharray="2 2" />
@@ -1127,12 +1127,12 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               <text x="160" y="165" fill={colors.highlight} textAnchor="middle" fontSize="11" fontWeight="bold">x = a</text>
 
               {/* Tangent Line P1(x) */}
-              <line x1="70" y1="155" x2="260" y2="105" stroke={colors.wire} strokeWidth="2" strokeDasharray="4 2" />
-              <text x="265" y="108" fill={colors.wire} fontSize="10">P₁(x) = f(a) + f'(a)(x-a)</text>
+              <line x1="70" y1="155" x2="245" y2="108" stroke={colors.wire} strokeWidth="2" strokeDasharray="4 2" />
+              <text x="250" y="112" fill={colors.wire} fontSize="9">P₁(x) = f(a) + f'(a)(x−a)</text>
 
               {/* Parabola P2(x) */}
-              <path d="M 80 152 Q 160 132 280 65" fill="none" stroke={colors.source} strokeWidth="2" />
-              <text x="285" y="70" fill={colors.source} fontSize="10" fontWeight="bold">P₂(x) = P₁ + f''(a)/2!(x-a)²</text>
+              <path d="M 80 152 Q 160 132 245 68" fill="none" stroke={colors.source} strokeWidth="2" />
+              <text x="250" y="70" fill={colors.source} fontSize="9" fontWeight="bold">P₂(x) = P₁ + f''(a)/2!(x−a)²</text>
             </g>
 
             {/* Right Card: Remainder Formulas */}
@@ -1146,7 +1146,7 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
 
               <rect x="15" y="102" width="220" height="50" rx="6" fill="rgba(0, 240, 255, 0.08)" stroke={colors.border} strokeWidth="1" />
               <text x="25" y="120" fill={colors.wire} fontSize="10" fontWeight="bold">Cauchy's Form:</text>
-              <text x="25" y="140" fill={colors.text} fontSize="10">Rₙ = [hⁿ(1−θ)ⁿ⁻¹ / (n−1)!] · fⁿ(a + θh)</text>
+              <text x="25" y="140" fill={colors.text} fontSize="9">Rₙ = [hⁿ(1−θ)ⁿ⁻¹/(n−1)!]·fⁿ(a+θh)</text>
             </g>
           </svg>
         </div>
@@ -1314,19 +1314,19 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               <text x="160" y="24" fill={colors.wire} textAnchor="middle" fontSize="12" fontWeight="bold">HOMOGENEOUS SCALING BY FACTOR t</text>
 
               {/* Ray from origin */}
-              <line x1="30" y1="135" x2="280" y2="40" stroke={colors.border} strokeWidth="1.5" />
-              <circle cx="30" cy="135" r="4" fill={colors.text} />
-              <text x="30" y="152" fill={colors.text} fontSize="10">Origin (0,0)</text>
+              <line x1="30" y1="125" x2="280" y2="40" stroke={colors.border} strokeWidth="1.5" />
+              <circle cx="30" cy="125" r="4" fill={colors.text} />
+              <text x="35" y="116" fill={colors.text} fontSize="9.5">Origin (0,0)</text>
 
               {/* Base point (x, y) */}
-              <circle cx="110" cy="105" r="5" fill={colors.source} />
-              <text x="100" y="95" fill={colors.source} fontSize="11" fontWeight="bold">P(x, y) ⟹ u</text>
+              <circle cx="115" cy="96" r="5" fill={colors.source} />
+              <text x="105" y="86" fill={colors.source} fontSize="10.5" fontWeight="bold">P(x, y) ⟹ u</text>
 
               {/* Scaled point (tx, ty) */}
-              <circle cx="210" cy="65" r="5" fill={colors.highlight} />
-              <text x="200" y="55" fill={colors.highlight} fontSize="11" fontWeight="bold">P'(tx, ty) ⟹ tⁿ · u</text>
+              <circle cx="215" cy="62" r="5" fill={colors.highlight} />
+              <text x="200" y="52" fill={colors.highlight} fontSize="10.5" fontWeight="bold">P'(tx, ty) ⟹ tⁿ · u</text>
 
-              <text x="160" y="145" fill={colors.text} textAnchor="middle" fontSize="11">
+              <text x="160" y="150" fill={colors.text} textAnchor="middle" fontSize="10.5">
                 Degree n = Power of scaling factor t
               </text>
             </g>
@@ -1513,8 +1513,8 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             <text x="150" y="132" fill={colors.highlight} textAnchor="middle" fontSize="12" fontWeight="900">DIVERGES IMMEDIATELY!</text>
 
             {/* Right: lim uₙ = 0 */}
-            <rect x="420" y="95" width="200" height="40" rx="8" fill="rgba(16, 185, 129, 0.1)" stroke={colors.source} strokeWidth="1.5" />
-            <text x="520" y="120" fill={colors.source} textAnchor="middle" fontSize="11" fontWeight="bold">lim (uₙ) = 0 (Apply specific test)</text>
+            <rect x="405" y="95" width="230" height="40" rx="8" fill="rgba(16, 185, 129, 0.1)" stroke={colors.source} strokeWidth="1.5" />
+            <text x="520" y="120" fill={colors.source} textAnchor="middle" fontSize="10.5" fontWeight="bold">lim (uₙ) = 0 (Apply specific test)</text>
 
             {/* Split from specific test: Ratio vs Root vs p-Series */}
             <line x1="450" y1="135" x2="330" y2="165" stroke={colors.source} strokeWidth="1.5" />
@@ -1556,17 +1556,17 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
             {/* Left Diagram: Alternating Trajectory */}
             <g transform="translate(30, 25)">
               <rect x="0" y="0" width="330" height="180" rx="10" fill={colors.bg} stroke={colors.wire} strokeWidth="1.5" />
-              <text x="165" y="24" fill={colors.wire} textAnchor="middle" fontSize="12" fontWeight="bold">LEIBNIZ ALTERNATING OSCILLATION</text>
+              <text x="165" y="20" fill={colors.wire} textAnchor="middle" fontSize="11.5" fontWeight="bold">LEIBNIZ ALTERNATING OSCILLATION</text>
 
               {/* Equilibrium Line */}
-              <line x1="20" y1="100" x2="300" y2="100" stroke={colors.source} strokeWidth="1.5" strokeDasharray="4 2" />
-              <text x="305" y="104" fill={colors.source} fontSize="11" fontWeight="bold">Sum S</text>
+              <line x1="20" y1="100" x2="285" y2="100" stroke={colors.source} strokeWidth="1.5" strokeDasharray="4 2" />
+              <text x="290" y="104" fill={colors.source} fontSize="10" fontWeight="bold">Sum S</text>
 
               {/* Zigzag Partial Sums */}
-              <path d="M 30 160 L 70 40 L 120 140 L 170 70 L 220 120 L 260 90 L 290 100" fill="none" stroke={colors.highlight} strokeWidth="2.5" />
+              <path d="M 30 155 L 70 48 L 120 140 L 170 70 L 220 120 L 260 90 L 285 100" fill="none" stroke={colors.highlight} strokeWidth="2.5" />
               
-              <circle cx="70" cy="40" r="4" fill={colors.highlight} />
-              <text x="70" y="30" fill={colors.highlight} textAnchor="middle" fontSize="9">S₁</text>
+              <circle cx="70" cy="48" r="4" fill={colors.highlight} />
+              <text x="70" y="38" fill={colors.highlight} textAnchor="middle" fontSize="9">S₁</text>
 
               <circle cx="120" cy="140" r="4" fill={colors.highlight} />
               <text x="120" y="155" fill={colors.highlight} textAnchor="middle" fontSize="9">S₂</text>
@@ -1574,8 +1574,8 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
               <circle cx="170" cy="70" r="4" fill={colors.highlight} />
               <text x="170" y="60" fill={colors.highlight} textAnchor="middle" fontSize="9">S₃</text>
 
-              <text x="165" y="172" fill={colors.text} textAnchor="middle" fontSize="10">
-                1. uₙ₊₁ ≤ uₙ (Monotonic) & 2. lim uₙ = 0 ⟹ CONVERGES!
+              <text x="165" y="172" fill={colors.text} textAnchor="middle" fontSize="9.5">
+                1. uₙ₊₁ ≤ uₙ (Monotonic) &amp; 2. lim uₙ = 0 ⟹ CONVERGES!
               </text>
             </g>
 
@@ -1586,11 +1586,11 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
 
               <rect x="20" y="45" width="290" height="52" rx="6" fill="rgba(16, 185, 129, 0.1)" stroke={colors.source} strokeWidth="1" />
               <text x="30" y="66" fill={colors.source} fontSize="11" fontWeight="bold">ABSOLUTE CONVERGENCE (Strongest):</text>
-              <text x="30" y="85" fill={colors.text} fontSize="10">Both Σ uₙ and Σ |uₙ| converge (e.g. Σ (-1)ⁿ/n²)</text>
+              <text x="30" y="85" fill={colors.text} fontSize="9.5">Both Σ uₙ and Σ |uₙ| converge (e.g. Σ (-1)ⁿ/n²)</text>
 
               <rect x="20" y="110" width="290" height="52" rx="6" fill="rgba(245, 158, 11, 0.1)" stroke={colors.resistor} strokeWidth="1" />
               <text x="30" y="131" fill={colors.resistor} fontSize="11" fontWeight="bold">CONDITIONAL CONVERGENCE:</text>
-              <text x="30" y="150" fill={colors.text} fontSize="10">Σ uₙ converges, but Σ |uₙ| diverges (e.g. Σ (-1)ⁿ/n)</text>
+              <text x="30" y="150" fill={colors.text} fontSize="9.2">Σ uₙ converges, but Σ |uₙ| diverges (e.g. Σ (-1)ⁿ/n)</text>
             </g>
           </svg>
         </div>
@@ -1703,7 +1703,294 @@ export default function HandwrittenDiagram({ sectionId, themeMode = 'cyber', isH
         </div>
       );
 
-    default:
-      return null;
+    case 'u2-s1':
+      return (
+        <div className="handwritten-diagram-container">
+          <div className="diagram-header">
+            <span>✍️ Hand-Drawn Engineering Schematic</span>
+            <span className="exam-tag">FIG 2.1: MAGNETIC vs ELECTRIC CIRCUIT ANALOGY &amp; B-H HYSTERESIS LOOP</span>
+          </div>
+          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 230" className="handwritten-svg">
+            <rect x="10" y="10" width="720" height="210" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+            <g transform="translate(25, 25)">
+              <rect x="0" y="0" width="330" height="180" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
+              <text x="165" y="24" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">ROWLAND RING MAGNETIC CIRCUIT</text>
+              <circle cx="115" cy="95" r="46" fill="none" stroke={colors.ground} strokeWidth="16" />
+              <circle cx="115" cy="95" r="46" fill="none" stroke={colors.resistor} strokeWidth="1.5" strokeDasharray="4 3" />
+              <text x="115" y="99" fill={colors.resistor} textAnchor="middle" fontSize="11" fontWeight="bold">Flux Φ</text>
+              <rect x="180" y="45" width="135" height="36" rx="6" fill={colors.formulaBg} stroke={colors.badgeCyanBorder} strokeWidth="1" />
+              <text x="247" y="67" fill={colors.badgeCyanText} textAnchor="middle" fontSize="11" fontWeight="bold">MMF = N·I = Φ · S</text>
+              <rect x="180" y="92" width="135" height="36" rx="6" fill={colors.formulaBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
+              <text x="247" y="114" fill={colors.badgeAmberText} textAnchor="middle" fontSize="10.5" fontWeight="bold">S = l / (μ₀·μr·A)</text>
+              <text x="165" y="164" fill={colors.subtext} textAnchor="middle" fontSize="10">Hopkinson Law: Φ = MMF / Reluctance (AT/Wb)</text>
+            </g>
+            <g transform="translate(380, 25)">
+              <rect x="0" y="0" width="335" height="180" rx="10" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+              <text x="167" y="24" fill={colors.highlight} textAnchor="middle" fontSize="12" fontWeight="bold">B-H HYSTERESIS LOOP (CORE LOSS)</text>
+              <line x1="35" y1="100" x2="300" y2="100" stroke={colors.ground} strokeWidth="1.5" />
+              <line x1="167" y1="36" x2="167" y2="164" stroke={colors.ground} strokeWidth="1.5" />
+              <text x="295" y="94" fill={colors.subtext} textAnchor="end" fontSize="9.5">+H (AT/m)</text>
+              <text x="174" y="46" fill={colors.subtext} fontSize="9.5">+B (Tesla)</text>
+              <path d="M 85 145 Q 130 140 195 100 Q 225 60 255 50 Q 195 55 140 100 Q 110 135 85 145" fill="rgba(236, 72, 153, 0.1)" stroke={colors.highlight} strokeWidth="2.5" />
+              <text x="135" y="75" fill={colors.source} fontSize="9.5" fontWeight="bold">Br (Retentivity)</text>
+              <text x="225" y="116" fill={colors.resistor} fontSize="9.5" fontWeight="bold">Hc (Coercivity)</text>
+              <text x="167" y="172" fill={colors.badgePinkText} textAnchor="middle" fontSize="10" fontWeight="bold">Wh = η · Bmax^1.6 · f · V (Steinmetz)</text>
+            </g>
+          </svg>
+        </div>
+      );
+
+    case 'u2-s3':
+      return (
+        <div className="handwritten-diagram-container">
+          <div className="diagram-header">
+            <span>✍️ Hand-Drawn Engineering Schematic</span>
+            <span className="exam-tag">FIG 2.3: DC MACHINE EQUIVALENT CIRCUIT &amp; BACK-EMF</span>
+          </div>
+          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 225" className="handwritten-svg">
+            <rect x="10" y="10" width="720" height="205" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+            <g transform="translate(25, 22)">
+              <rect x="0" y="0" width="335" height="180" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
+              <text x="167" y="24" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">DC GENERATOR: Eg = V + Ia·Ra</text>
+              <circle cx="105" cy="95" r="28" fill={colors.bg} stroke={colors.source} strokeWidth="2.5" />
+              <text x="105" y="99" fill={colors.source} textAnchor="middle" fontSize="12" fontWeight="bold">Eg</text>
+              <rect x="97" y="55" width="16" height="10" fill={colors.ground} />
+              <rect x="97" y="125" width="16" height="10" fill={colors.ground} />
+              <text x="180" y="68" fill={colors.source} fontSize="10.5" fontWeight="bold">Ia → (Out to Load)</text>
+              <rect x="155" y="88" width="165" height="32" rx="6" fill={colors.formulaBg} stroke={colors.badgeCyanBorder} strokeWidth="1" />
+              <text x="237" y="108" fill={colors.badgeCyanText} textAnchor="middle" fontSize="10" fontWeight="bold">Eg = (Φ·Z·N)/60 · (P/A)</text>
+              <text x="167" y="160" fill={colors.subtext} textAnchor="middle" fontSize="10">Lap Winding: A = P | Wave Winding: A = 2</text>
+            </g>
+            <g transform="translate(380, 22)">
+              <rect x="0" y="0" width="335" height="180" rx="10" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1.5" />
+              <text x="167" y="24" fill={colors.badgeAmberText} textAnchor="middle" fontSize="12" fontWeight="bold">DC MOTOR: V = Eb + Ia·Ra</text>
+              <circle cx="105" cy="95" r="28" fill={colors.bg} stroke={colors.resistor} strokeWidth="2.5" />
+              <text x="105" y="99" fill={colors.resistor} textAnchor="middle" fontSize="12" fontWeight="bold">Eb</text>
+              <rect x="97" y="55" width="16" height="10" fill={colors.ground} />
+              <rect x="97" y="125" width="16" height="10" fill={colors.ground} />
+              <text x="180" y="68" fill={colors.resistor} fontSize="10.5" fontWeight="bold">← Ia (From Supply V)</text>
+              <rect x="155" y="88" width="165" height="32" rx="6" fill={colors.formulaBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
+              <text x="237" y="108" fill={colors.badgeAmberText} textAnchor="middle" fontSize="9.5" fontWeight="bold">Ta = 0.159·Φ·Z·Ia·(P/A)</text>
+              <text x="167" y="160" fill={colors.subtext} textAnchor="middle" fontSize="10">Speed Control: N ∝ Eb / Φ = (V − Ia·Ra) / Φ</text>
+            </g>
+          </svg>
+        </div>
+      );
+
+    case 'u2-s4':
+      return (
+        <div className="handwritten-diagram-container">
+          <div className="diagram-header">
+            <span>✍️ Hand-Drawn Engineering Schematic</span>
+            <span className="exam-tag">FIG 2.4: 3-PHASE INDUCTION MOTOR SLIP &amp; TORQUE-SLIP CURVE</span>
+          </div>
+          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 225" className="handwritten-svg">
+            <rect x="10" y="10" width="720" height="205" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+            <g transform="translate(25, 22)">
+              <rect x="0" y="0" width="330" height="180" rx="10" fill={colors.badgeGreenBg} stroke={colors.badgeGreenBorder} strokeWidth="1.5" />
+              <text x="165" y="24" fill={colors.badgeGreenText} textAnchor="middle" fontSize="12" fontWeight="bold">ROTATING MAGNETIC FIELD &amp; SLIP</text>
+              <rect x="20" y="40" width="290" height="34" rx="6" fill={colors.formulaBg} stroke={colors.badgeGreenBorder} strokeWidth="1" />
+              <text x="165" y="62" fill={colors.badgeGreenText} textAnchor="middle" fontSize="12" fontWeight="bold">Ns = (120 · f) / P  (Synchronous RPM)</text>
+              <rect x="20" y="84" width="290" height="34" rx="6" fill={colors.formulaBg} stroke={colors.badgeCyanBorder} strokeWidth="1" />
+              <text x="165" y="106" fill={colors.badgeCyanText} textAnchor="middle" fontSize="11.5" fontWeight="bold">Slip s = (Ns − Nr) / Ns  |  fr = s · f</text>
+              <text x="165" y="142" fill={colors.text} textAnchor="middle" fontSize="10.5" fontWeight="bold">Power Stages: P2 : Pcu2 : Pm = 1 : s : (1 − s)</text>
+              <text x="165" y="164" fill={colors.subtext} textAnchor="middle" fontSize="10">Max Torque Condition: s_max = R2 / X20</text>
+            </g>
+            <g transform="translate(380, 22)">
+              <rect x="0" y="0" width="335" height="180" rx="10" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+              <text x="167" y="24" fill={colors.highlight} textAnchor="middle" fontSize="12" fontWeight="bold">TORQUE-SLIP CHARACTERISTIC</text>
+              <line x1="40" y1="150" x2="305" y2="150" stroke={colors.ground} strokeWidth="1.5" />
+              <line x1="40" y1="150" x2="40" y2="40" stroke={colors.ground} strokeWidth="1.5" />
+              <path d="M 40 150 L 115 52 Q 175 95 290 115" fill="none" stroke={colors.highlight} strokeWidth="3" />
+              <line x1="115" y1="52" x2="115" y2="150" stroke={colors.resistor} strokeWidth="1.5" strokeDasharray="3 3" />
+              <text x="115" y="44" fill={colors.resistor} textAnchor="middle" fontSize="10" fontWeight="bold">Tmax (Pull-out)</text>
+              <text x="45" y="166" fill={colors.subtext} fontSize="9.5">s=0 (N=Ns)</text>
+              <text x="290" y="166" fill={colors.subtext} textAnchor="end" fontSize="9.5">s=1 (Standstill)</text>
+            </g>
+          </svg>
+        </div>
+      );
+
+    case 'u3-s2':
+      return (
+        <div className="handwritten-diagram-container">
+          <div className="diagram-header">
+            <span>✍️ Hand-Drawn Engineering Schematic</span>
+            <span className="exam-tag">FIG 3.2: RECTIFIER EFFICIENCY, RIPPLE &amp; PIV COMPARISON</span>
+          </div>
+          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 220" className="handwritten-svg">
+            <rect x="10" y="10" width="720" height="200" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+            <g transform="translate(25, 22)">
+              <rect x="0" y="0" width="220" height="175" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
+              <text x="110" y="24" fill={colors.terminal} textAnchor="middle" fontSize="11.5" fontWeight="bold">HALF-WAVE (HWR)</text>
+              <text x="110" y="55" fill={colors.text} textAnchor="middle" fontSize="11" fontWeight="bold">Idc = Im / π | Irms = Im / 2</text>
+              <text x="110" y="85" fill={colors.badgeCyanText} textAnchor="middle" fontSize="11" fontWeight="bold">Max Efficiency η = 40.6%</text>
+              <text x="110" y="115" fill={colors.subtext} textAnchor="middle" fontSize="10.5">Ripple Factor γ = 1.21</text>
+              <text x="110" y="145" fill={colors.highlight} textAnchor="middle" fontSize="10.5" fontWeight="bold">PIV = Vm | fout = fin</text>
+            </g>
+            <g transform="translate(260, 22)">
+              <rect x="0" y="0" width="220" height="175" rx="10" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1.5" />
+              <text x="110" y="24" fill={colors.badgeAmberText} textAnchor="middle" fontSize="11.5" fontWeight="bold">CENTER-TAP FWR (2 Diodes)</text>
+              <text x="110" y="55" fill={colors.text} textAnchor="middle" fontSize="11" fontWeight="bold">Idc = 2Im / π | Irms = Im / √2</text>
+              <text x="110" y="85" fill={colors.badgeAmberText} textAnchor="middle" fontSize="11" fontWeight="bold">Max Efficiency η = 81.2%</text>
+              <text x="110" y="115" fill={colors.subtext} textAnchor="middle" fontSize="10.5">Ripple Factor γ = 0.482</text>
+              <text x="110" y="145" fill={colors.highlight} textAnchor="middle" fontSize="10.5" fontWeight="bold">PIV = 2Vm | fout = 2·fin</text>
+            </g>
+            <g transform="translate(495, 22)">
+              <rect x="0" y="0" width="220" height="175" rx="10" fill={colors.badgeGreenBg} stroke={colors.badgeGreenBorder} strokeWidth="1.5" />
+              <text x="110" y="24" fill={colors.badgeGreenText} textAnchor="middle" fontSize="11.5" fontWeight="bold">BRIDGE FWR (4 Diodes)</text>
+              <text x="110" y="55" fill={colors.text} textAnchor="middle" fontSize="11" fontWeight="bold">Idc = 2Im / π | Irms = Im / √2</text>
+              <text x="110" y="85" fill={colors.badgeGreenText} textAnchor="middle" fontSize="11" fontWeight="bold">Max Efficiency η = 81.2%</text>
+              <text x="110" y="115" fill={colors.subtext} textAnchor="middle" fontSize="10.5">Ripple Factor γ = 0.482</text>
+              <text x="110" y="145" fill={colors.source} textAnchor="middle" fontSize="10.5" fontWeight="bold">PIV = Vm | TUF = 0.812</text>
+            </g>
+          </svg>
+        </div>
+      );
+
+    case 'u3-s4':
+      return (
+        <div className="handwritten-diagram-container">
+          <div className="diagram-header">
+            <span>✍️ Hand-Drawn Engineering Schematic</span>
+            <span className="exam-tag">FIG 3.4: BJT vs FET (JFET / MOSFET) VOLTAGE-CONTROLLED ARCHITECTURE</span>
+          </div>
+          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 220" className="handwritten-svg">
+            <rect x="10" y="10" width="720" height="200" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+            <g transform="translate(25, 22)">
+              <rect x="0" y="0" width="335" height="175" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
+              <text x="167" y="24" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">JFET SHOCKLEY EQUATION</text>
+              <rect x="25" y="42" width="285" height="36" rx="6" fill={colors.formulaBg} stroke={colors.badgeCyanBorder} strokeWidth="1" />
+              <text x="167" y="65" fill={colors.badgeCyanText} textAnchor="middle" fontSize="12" fontWeight="bold">ID = IDSS · [ 1 − (VGS / VP) ]²</text>
+              <text x="167" y="105" fill={colors.text} textAnchor="middle" fontSize="10.5" fontWeight="bold">Unipolar (Majority Carriers Only) | High Zin (&gt;10⁹ Ω)</text>
+              <text x="167" y="135" fill={colors.subtext} textAnchor="middle" fontSize="10">Transconductance: gm = gm0 · [ 1 − (VGS / VP) ]</text>
+              <text x="167" y="158" fill={colors.source} textAnchor="middle" fontSize="10" fontWeight="bold">Zero Thermal Runaway (Negative Temp Coefficient)</text>
+            </g>
+            <g transform="translate(380, 22)">
+              <rect x="0" y="0" width="335" height="175" rx="10" fill={colors.badgePurpleBg} stroke={colors.badgePurpleBorder} strokeWidth="1.5" />
+              <text x="167" y="24" fill={colors.badgePurpleText} textAnchor="middle" fontSize="12" fontWeight="bold">D-MOSFET vs E-MOSFET MODES</text>
+              <rect x="20" y="42" width="295" height="52" rx="6" fill={colors.formulaBg} stroke={colors.badgePurpleBorder} strokeWidth="1" />
+              <text x="167" y="62" fill={colors.badgePurpleText} textAnchor="middle" fontSize="10.5" fontWeight="bold">Depletion MOSFET: Physical Channel Present</text>
+              <text x="167" y="80" fill={colors.subtext} textAnchor="middle" fontSize="9">Works in Depletion (VGS &lt; 0) &amp; Enhancement (VGS &gt; 0)</text>
+              <rect x="20" y="104" width="295" height="52" rx="6" fill={colors.formulaBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
+              <text x="167" y="124" fill={colors.badgeAmberText} textAnchor="middle" fontSize="10.5" fontWeight="bold">Enhancement MOSFET: No Initial Channel</text>
+              <text x="167" y="142" fill={colors.subtext} textAnchor="middle" fontSize="9.5">Conducts only when VGS &gt; Vth: ID = k·(VGS − Vth)²</text>
+            </g>
+          </svg>
+        </div>
+      );
+
+    case 'u4-s1':
+      return (
+        <div className="handwritten-diagram-container">
+          <div className="diagram-header">
+            <span>✍️ Hand-Drawn Engineering Schematic</span>
+            <span className="exam-tag">FIG 4.1: NUMBER SYSTEM RADIX CONVERSION &amp; 2's COMPLEMENT</span>
+          </div>
+          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 215" className="handwritten-svg">
+            <rect x="10" y="10" width="720" height="195" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+            <g transform="translate(25, 22)">
+              <rect x="0" y="0" width="335" height="170" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
+              <text x="167" y="24" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">RADIX CONVERSION PIPELINE</text>
+              <text x="167" y="56" fill={colors.text} textAnchor="middle" fontSize="10.5" fontWeight="bold">Decimal (Base 10) → Base r: Divide Int / Multiply Frac</text>
+              <text x="167" y="86" fill={colors.badgeCyanText} textAnchor="middle" fontSize="10.5" fontWeight="bold">Octal (Base 8) ↔ Binary: 3-Bit Grouping (4-2-1)</text>
+              <text x="167" y="116" fill={colors.badgePurpleText} textAnchor="middle" fontSize="10.5" fontWeight="bold">Hex (Base 16) ↔ Binary: 4-Bit Grouping (8-4-2-1)</text>
+              <text x="167" y="148" fill={colors.subtext} textAnchor="middle" fontSize="10">BCD (8421): Valid 0000–1001 | Add 0110 (6) if Sum &gt; 9</text>
+            </g>
+            <g transform="translate(380, 22)">
+              <rect x="0" y="0" width="335" height="170" rx="10" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1.5" />
+              <text x="167" y="24" fill={colors.badgeAmberText} textAnchor="middle" fontSize="12" fontWeight="bold">COMPLEMENT SUBTRACTION: A − B</text>
+              <rect x="20" y="40" width="295" height="36" rx="6" fill={colors.formulaBg} stroke={colors.badgeAmberBorder} strokeWidth="1" />
+              <text x="167" y="63" fill={colors.badgeAmberText} textAnchor="middle" fontSize="11" fontWeight="bold">2's Complement = (1's Complement) + 1</text>
+              <text x="167" y="102" fill={colors.source} textAnchor="middle" fontSize="10.5" fontWeight="bold">If Carry Out = 1: Discard Carry → Result Positive</text>
+              <text x="167" y="130" fill={colors.highlight} textAnchor="middle" fontSize="10.5" fontWeight="bold">If Carry Out = 0: Take 2's Comp → Result Negative</text>
+              <text x="167" y="156" fill={colors.subtext} textAnchor="middle" fontSize="9.5">1's Comp Carry Out = 1: Add End-Around Carry to LSB</text>
+            </g>
+          </svg>
+        </div>
+      );
+
+    case 'u4-s4':
+      return (
+        <div className="handwritten-diagram-container">
+          <div className="diagram-header">
+            <span>✍️ Hand-Drawn Engineering Schematic</span>
+            <span className="exam-tag">FIG 4.4: 4-VARIABLE KARNAUGH MAP (GRAY CODE ADJACENCY)</span>
+          </div>
+          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 220" className="handwritten-svg">
+            <rect x="10" y="10" width="720" height="200" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+            <g transform="translate(25, 22)">
+              <rect x="0" y="0" width="335" height="175" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
+              <text x="167" y="24" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">GRAY CODE ORDER: 00 → 01 → 11 → 10</text>
+              <text x="167" y="54" fill={colors.text} textAnchor="middle" fontSize="10.5" fontWeight="bold">Row 00: m0, m1, m3, m2  |  Row 01: m4, m5, m7, m6</text>
+              <text x="167" y="82" fill={colors.text} textAnchor="middle" fontSize="10.5" fontWeight="bold">Row 11: m12, m13, m15, m14 | Row 10: m8, m9, m11, m10</text>
+              <rect x="20" y="102" width="295" height="54" rx="6" fill={colors.formulaBg} stroke={colors.badgeCyanBorder} strokeWidth="1" />
+              <text x="167" y="124" fill={colors.badgeCyanText} textAnchor="middle" fontSize="10.5" fontWeight="bold">4 Corners Wrap-Around (m0, m2, m8, m10) = B'·D'</text>
+              <text x="167" y="144" fill={colors.subtext} textAnchor="middle" fontSize="9.5">Group of 2^k cells eliminates exactly k variables</text>
+            </g>
+            <g transform="translate(380, 22)">
+              <rect x="0" y="0" width="335" height="175" rx="10" fill={colors.badgeGreenBg} stroke={colors.badgeGreenBorder} strokeWidth="1.5" />
+              <text x="167" y="24" fill={colors.badgeGreenText} textAnchor="middle" fontSize="12" fontWeight="bold">COMBINATIONAL ARITHMETIC BLOCKS</text>
+              <text x="167" y="60" fill={colors.text} textAnchor="middle" fontSize="11" fontWeight="bold">Half Adder: Sum = A ⊕ B  |  Carry = A · B</text>
+              <text x="167" y="95" fill={colors.badgeGreenText} textAnchor="middle" fontSize="11" fontWeight="bold">Full Adder: Sum = A ⊕ B ⊕ Cin</text>
+              <text x="167" y="125" fill={colors.source} textAnchor="middle" fontSize="10.5" fontWeight="bold">Cout = A·B + Cin·(A ⊕ B)</text>
+              <text x="167" y="155" fill={colors.subtext} textAnchor="middle" fontSize="10">Don't Care (X/d): Include only if it enlarges a 2^k group</text>
+            </g>
+          </svg>
+        </div>
+      );
+
+    default: {
+      if (!sectionTitle && !sectionContent) return null;
+      // Extract up to 3 subheadings or key bullets from sectionContent for a clean zero-overlap schematic
+      const rawHeadings = [...(sectionContent || '').matchAll(/^###\s+([^\n]+)/gm)]
+        .map(m => m[1].replace(/[*`$\\]/g, '').replace(/\s+/g, ' ').trim())
+        .filter(Boolean);
+      const pill1 = (rawHeadings[0] || sectionTitle || 'Core Concept & Architecture').slice(0, 38);
+      const pill2 = (rawHeadings[1] || 'Mathematical Formulation & Rules').slice(0, 38);
+      const pill3 = (rawHeadings[2] || 'University Exam Implementation').slice(0, 38);
+      const cleanHeader = (sectionTitle || sectionId || 'CONCEPT SCHEMATIC').replace(/[*`$]/g, '').toUpperCase().slice(0, 56);
+
+      return (
+        <div className="handwritten-diagram-container">
+          <div className="diagram-header">
+            <span>✍️ Architectural Concept Blueprint</span>
+            <span className="exam-tag">{cleanHeader}</span>
+          </div>
+          <svg width="100%" style={{ height: 'auto' }} preserveAspectRatio="xMidYMid meet" viewBox="0 0 740 200" className="handwritten-svg">
+            <rect x="10" y="10" width="720" height="180" rx="12" fill={colors.bg} stroke={colors.border} strokeWidth="1.5" />
+            <text x="370" y="34" fill={colors.terminal} textAnchor="middle" fontSize="12" fontWeight="bold">
+              {cleanHeader}
+            </text>
+            <g transform="translate(25, 50)">
+              <rect x="0" y="0" width="210" height="90" rx="10" fill={colors.badgeCyanBg} stroke={colors.badgeCyanBorder} strokeWidth="1.5" />
+              <text x="105" y="26" fill={colors.terminal} textAnchor="middle" fontSize="10.5" fontWeight="bold">STAGE 1: FOUNDATION</text>
+              <text x="105" y="56" fill={colors.text} textAnchor="middle" fontSize="9.5" fontWeight="bold">{pill1}</text>
+              <text x="105" y="76" fill={colors.subtext} textAnchor="middle" fontSize="8.5">Definitions &amp; Core Principles</text>
+            </g>
+            <line x1="235" y1="95" x2="265" y2="95" stroke={colors.wire} strokeWidth="2.5" />
+            <polygon points="258,90 266,95 258,100" fill={colors.wire} />
+            <g transform="translate(265, 50)">
+              <rect x="0" y="0" width="210" height="90" rx="10" fill={colors.badgeAmberBg} stroke={colors.badgeAmberBorder} strokeWidth="1.5" />
+              <text x="105" y="26" fill={colors.badgeAmberText} textAnchor="middle" fontSize="10.5" fontWeight="bold">STAGE 2: MECHANISM</text>
+              <text x="105" y="56" fill={colors.text} textAnchor="middle" fontSize="9.5" fontWeight="bold">{pill2}</text>
+              <text x="105" y="76" fill={colors.subtext} textAnchor="middle" fontSize="8.5">Derivation &amp; Governing Logic</text>
+            </g>
+            <line x1="475" y1="95" x2="505" y2="95" stroke={colors.source} strokeWidth="2.5" />
+            <polygon points="498,90 506,95 498,100" fill={colors.source} />
+            <g transform="translate(505, 50)">
+              <rect x="0" y="0" width="210" height="90" rx="10" fill={colors.badgeGreenBg} stroke={colors.badgeGreenBorder} strokeWidth="1.5" />
+              <text x="105" y="26" fill={colors.badgeGreenText} textAnchor="middle" fontSize="10.5" fontWeight="bold">STAGE 3: APPLICATION</text>
+              <text x="105" y="56" fill={colors.text} textAnchor="middle" fontSize="9.5" fontWeight="bold">{pill3}</text>
+              <text x="105" y="76" fill={colors.subtext} textAnchor="middle" fontSize="8.5">Solved Numerical &amp; Exam Proof</text>
+            </g>
+            <rect x="95" y="152" width="550" height="26" rx="6" fill={colors.formulaBg} stroke={colors.border} strokeWidth="1" />
+            <text x="370" y="169" fill={colors.subtext} textAnchor="middle" fontSize="9.5" fontWeight="bold">
+              Section ID: {sectionId} • Verified Zero-Overlap Vector Schematic
+            </text>
+          </svg>
+        </div>
+      );
+    }
   }
 }
