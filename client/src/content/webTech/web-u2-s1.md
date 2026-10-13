@@ -2,46 +2,16 @@
 
 Building enterprise web platforms requires systematic adherence to an 8-stage lifecycle:
 
-```
-  [ Stage 1: Planning & Feasibility ]
-  • Define Software Requirements Specification (SRS), project scope, and personas.
-  • Conduct technical feasibility and hosting budget analysis.
-                 │
-                 ▼
-  [ Stage 2: UI/UX Wireframing & Design ]
-  • Information architecture (IA) mapping and user journey workflows.
-  • High-fidelity interactive UI prototypes created in Figma.
-                 │
-                 ▼
-  [ Stage 3: Frontend Client Development ]
-  • Semantic HTML5 markup structure and accessible CSS3 stylesheets.
-  • Responsive mobile-first layouts and client-side interactions.
-                 │
-                 ▼
-  [ Stage 4: Backend API & Database Engineering ]
-  • Server-side business logic implementation (Node.js, Python, PHP, Java).
-  • Database schema modeling (MySQL, PostgreSQL) and RESTful API endpoints.
-                 │
-                 ▼
-  [ Stage 5: Quality Assurance & Cross-Browser Testing ]
-  • Cross-browser testing (Chrome, Safari, Firefox, Edge) and mobile testing.
-  • WCAG accessibility compliance, security audits (OWASP Top 10), and unit testing.
-                 │
-                 ▼
-  [ Stage 6: Domain Registration & DNS Configuration ]
-  • Domain name acquisition through accredited registrars (ICANN).
-  • Configuring DNS records (`A` for IPv4, `AAAA` for IPv6, `CNAME` for aliases).
-                 │
-                 ▼
-  [ Stage 7: Web Publishing & Deployment ]
-  • Automated CI/CD build pipelines (GitHub Actions, GitLab CI).
-  • Production deployment onto cloud VPS, container clusters, or edge CDNs.
-                 │
-                 ▼
-  [ Stage 8: Maintenance, Monitoring & SEO Audits ]
-  • Uptime monitoring, server security patching, database automated backups.
-  • Technical SEO audits, Core Web Vitals optimization, and analytics tracking.
-```
+| SDLC Stage | Engineering Phase | Core Deliverables & Technical Activities |
+| :--- | :--- | :--- |
+| **Stage 1** | **Planning & Feasibility** | Define Software Requirements Specification (SRS), user personas, scope, and hosting budget. |
+| **Stage 2** | **UI/UX Wireframing & Design** | Information Architecture (IA) sitemaps, user journeys, and interactive Figma prototypes. |
+| **Stage 3** | **Frontend Client Engineering** | Semantic HTML5 DOM structure, responsive mobile-first CSS3 layouts, and JS interactivity. |
+| **Stage 4** | **Backend API & Database** | Server-side business logic (Node.js/Python/Java), SQL/NoSQL schema modeling, and REST APIs. |
+| **Stage 5** | **QA & Security Testing** | Cross-browser testing, WCAG accessibility audits, OWASP Top-10 security checks, and unit tests. |
+| **Stage 6** | **Domain & DNS Provisioning** | ICANN registrar domain registration and authoritative DNS zone records (`A`, `AAAA`, `CNAME`). |
+| **Stage 7** | **CI/CD & Cloud Deployment** | Automated build pipelines (GitHub Actions) deploying to cloud VPS, Kubernetes, or edge CDNs. |
+| **Stage 8** | **Maintenance & SEO Audits** | Real-time uptime telemetry, security patching, automated DB backups, and Core Web Vitals SEO. |
 
 ---
 

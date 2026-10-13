@@ -6,8 +6,8 @@
 
 | List Type | Node Structure | Traversal Direction | End Condition | Header Overhead |
 | :--- | :--- | :--- | :--- | :--- |
-| **Singly (SLL)** | [Data | Next*] | Unidirectional (Forward) | ptr->next == NULL | Single pointer (head) |
-| **Doubly (DLL)** | [*Prev | Data | *Next] | Bidirectional (Fwd/Bwd) | next == NULL, prev == NULL | Two pointers per node |
-| **Circular SLL** | [Data | Next*] | Circular Unidirectional | ptr->next == head | No NULL pointers |
-| **Circular DLL** | [*Prev | Data | *Next] | Circular Bidirectional | head->prev == last, last->next == head | Fast access to head & tail |
-| **Header List** | [Dummy Header] -> [Nodes] | As per underlying list | ptr->next == NULL | Dummy node storing list size/metadata |
+| **Singly (SLL)** | `[Data &#124; Next*]` | Unidirectional (Forward) | `ptr->next == NULL` | Single pointer (`head`) |
+| **Doubly (DLL)** | `[*Prev &#124; Data &#124; *Next]` | Bidirectional (Fwd/Bwd) | `next == NULL, prev == NULL` | Two pointers per node |
+| **Circular SLL** | `[Data &#124; Next*]` | Circular Unidirectional | `ptr->next == head` | No `NULL` pointers |
+| **Circular DLL** | `[*Prev &#124; Data &#124; *Next]` | Circular Bidirectional | `head->prev == last, last->next == head` | Fast access to `head` & `tail` |
+| **Header List** | `[Dummy Header] -> [Nodes]` | As per underlying list | `ptr->next == NULL` | Dummy node storing list size/metadata |

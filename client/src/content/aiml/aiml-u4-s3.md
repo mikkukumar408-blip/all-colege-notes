@@ -21,14 +21,38 @@ where $\vec{μ}_j$ is the centroid (mean) of cluster $S_j$.
 
 ### 3. Determining Optimal $k$: The Elbow Method
 
-```
-    WCSS (Loss J)
-        |
-        |\\n        | \\n        |  \\n        |   \\n        |    \___ (ELBOW POINT: Optimal k = 3)
-        |        \__________
-        |                   \_______
-        +-----------------------------> Number of Clusters (k)
-```
+<div class="circuit-diagram-card">
+  <svg class="circuit-svg" viewBox="0 0 680 210" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <rect x="5" y="5" width="670" height="200" rx="12" class="schematic-bg" fill="rgba(15,23,42,0.75)" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5 4" />
+    <text x="340" y="25" text-anchor="middle" fill="#38bdf8" font-size="12.5" font-weight="bold" letter-spacing="1">WCSS (WITHIN-CLUSTER SUM OF SQUARES) ELBOW CURVE</text>
+    <!-- Axes -->
+    <line x1="90" y1="38" x2="90" y2="172" stroke="#94a3b8" stroke-width="2" />
+    <line x1="90" y1="172" x2="610" y2="172" stroke="#94a3b8" stroke-width="2" />
+    <text x="45" y="108" text-anchor="middle" fill="#bae6fd" font-size="11" font-weight="bold" transform="rotate(-90 45,108)">WCSS Objective Loss (J)</text>
+    <text x="350" y="194" text-anchor="middle" fill="#bae6fd" font-size="11.5" font-weight="bold">Number of Clusters (k)</text>
+    <!-- Curve Points: k=1..7 -->
+    <polyline points="130,48 200,92 270,138 350,152 430,159 510,163 580,166" fill="none" stroke="#38bdf8" stroke-width="3" />
+    <!-- Data Dots -->
+    <circle cx="130" cy="48" r="4.5" fill="#38bdf8" />
+    <text x="130" y="186" text-anchor="middle" fill="#cbd5e1" font-size="10">k=1</text>
+    <circle cx="200" cy="92" r="4.5" fill="#38bdf8" />
+    <text x="200" y="186" text-anchor="middle" fill="#cbd5e1" font-size="10">k=2</text>
+    <!-- Elbow Point k=3 -->
+    <circle cx="270" cy="138" r="7" fill="#f43f5e" stroke="#ffffff" stroke-width="2" />
+    <text x="270" y="186" text-anchor="middle" fill="#fda4af" font-size="11" font-weight="bold">k=3</text>
+    <line x1="278" y1="132" x2="345" y2="95" stroke="#f43f5e" stroke-width="1.8" stroke-dasharray="4 3" />
+    <rect x="345" y="72" width="235" height="36" rx="6" fill="rgba(136,19,55,0.85)" stroke="#f43f5e" stroke-width="1.5" />
+    <text x="462" y="88" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="bold">ELBOW POINT (Optimal k = 3)</text>
+    <text x="462" y="102" text-anchor="middle" fill="#fecdd3" font-size="9.5">Diminishing WCSS reduction beyond k=3</text>
+    <!-- Remaining dots -->
+    <circle cx="350" cy="152" r="4.5" fill="#38bdf8" />
+    <text x="350" y="186" text-anchor="middle" fill="#cbd5e1" font-size="10">k=4</text>
+    <circle cx="430" cy="159" r="4.5" fill="#38bdf8" />
+    <text x="430" y="186" text-anchor="middle" fill="#cbd5e1" font-size="10">k=5</text>
+    <circle cx="510" cy="163" r="4.5" fill="#38bdf8" />
+    <text x="510" y="186" text-anchor="middle" fill="#cbd5e1" font-size="10">k=6</text>
+  </svg>
+</div>
 
 - **The Elbow Criterion:** Plot WCSS ($J$) as a function of $k$. As $k$ increases, WCSS decreases monotonically (reaching $J = 0$ when $k = N$). The point of maximum inflection (the "elbow") represents the optimal balance between cluster compactness and model complexity.
 

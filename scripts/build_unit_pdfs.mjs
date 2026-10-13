@@ -88,11 +88,28 @@ function processMarkdownToHtml(rawContent) {
     return `\x00MATH_INLINE_${id}\x00`;
   });
 
-  // 5. Handle code blocks
+  // 5. Handle code blocks (including visual flowchart chains)
   const codeBlocks = [];
   text = text.replace(/```([a-zA-Z0-9_\-\+]*)\n?([\s\S]*?)```/g, (_, lang, code) => {
     const id = codeBlocks.length;
-    const escaped = code.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const trimmed = code.trim();
+    const l = (lang || '').trim().toLowerCase();
+    if (!l && trimmed.includes('➔') && !/\b(?:printf|scanf|#include|int\s+main|def\s+)\b/.test(trimmed)) {
+      const clean = trimmed.replace(/`([^`\n]+)`/g, '$1');
+      const prefixMatch = clean.match(/^((?:Question|Solution)[^:]+:)\s*([\s\S]*)$/i);
+      const headerHtml = prefixMatch ? `<div style="font-size:8.5pt;font-weight:800;color:#0284c7;text-transform:uppercase;margin-bottom:6px;">${prefixMatch[1]}</div>` : '';
+      const flowBody = prefixMatch ? prefixMatch[2] : clean;
+      const steps = flowBody.split(/\s*➔\s*/).map(s => s.trim()).filter(Boolean);
+      if (steps.length >= 2) {
+        const pills = steps.map((st, idx) =>
+          `<span style="display:inline-block;background:#eff6ff;border:1.5px solid #3b82f6;color:#1e3a8a;border-radius:6px;padding:4px 10px;font-weight:700;font-size:9pt;margin:2px 0;">${st}</span>` +
+          (idx < steps.length - 1 ? `<span style="display:inline-block;color:#0284c7;font-weight:900;padding:0 6px;">➔</span>` : '')
+        ).join('');
+        codeBlocks.push(`<div style="margin:10px 0;padding:10px 14px;background:#f8fafc;border:1.5px solid #93c5fd;border-radius:8px;page-break-inside:avoid;">${headerHtml}<div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px;">${pills}</div></div>`);
+        return `\x00CODE_BLOCK_${id}\x00`;
+      }
+    }
+    const escaped = trimmed.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     codeBlocks.push(`<div class="code-editor-box"><pre><code>${escaped}</code></pre></div>`);
     return `\x00CODE_BLOCK_${id}\x00`;
   });
@@ -111,7 +128,7 @@ function processMarkdownToHtml(rawContent) {
   text = text.replace(/<pill ([a-z\-]+)>([\s\S]*?)<\/pill>/g, '<strong>[$2]</strong>');
 
   // 7. Handle tables
-  text = text.replace(/((?:\|[^\n]+\|\r?\n)+)/g, (tableMatch) => {
+  text = text.replace(/((?:^[ \t]*\|[^\n]+\|[ \t]*(?:\r?\n|$))+)/gm, (tableMatch) => {
     const lines = tableMatch.trim().split(/\r?\n/);
     if (lines.length < 2) return tableMatch;
     let tableHtml = '<div class="table-wrap"><table class="academic-table">';

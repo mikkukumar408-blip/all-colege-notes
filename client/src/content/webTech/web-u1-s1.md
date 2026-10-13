@@ -19,7 +19,7 @@ In university examinations, differentiating the Internet from the World Wide Web
 | **1** | **Fundamental Nature** | Vast physical & logical network of interconnected hardware, cables, and routers. | Cyberspace collection of hyperlinked multimedia documents and online software resources. |
 | **2** | **Year of Origin** | **1969** (Launch of ARPANET by US Department of Defense DARPA). | **1989** (Invented by Sir Tim Berners-Lee at CERN, Switzerland). |
 | **3** | **OSI Layer** | Operates across lower layers: Physical, Data Link, Network, and Transport. | Operates strictly at Layer 7: the **Application Layer**. |
-| **4** | **Governing Protocols** | Driven by IP \frac{IPv4}{IPv6}, TCP, UDP, BGP, ICMP, ARP, RIP. | Driven by HTTP, HTTPS, WebSockets, WebRTC. |
+| **4** | **Governing Protocols** | Driven by IP (IPv4 / IPv6), TCP, UDP, BGP, ICMP, ARP, RIP. | Driven by HTTP, HTTPS, WebSockets, WebRTC. |
 | **5** | **Core Purpose** | Transports raw binary packets between endpoints reliably. | Structures, formats, and navigates multimedia hypermedia. |
 | **6** | **Dependency Relation** | **Completely independent.** It existed 20 years before the Web and functions without it. | **Completely dependent on the Internet.** The Web cannot exist without the Internet backbone. |
 | **7** | **Addressing Scheme** | Hardware MAC addresses (48-bit) and logical IP addresses (32/128 bit). | Uniform Resource Locators (URLs) and URIs (e.g. `https://mmumullana.org`). |

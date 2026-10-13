@@ -6,27 +6,43 @@ An **Expert System (ES)** is a knowledge-intensive AI software program that achi
 Unlike conventional software where domain rules and algorithmic execution logic are tangled together in procedural code (`if-else`), an Expert System enforces a strict mathematical separation:
 $$\mathbf{\text{Expert System} = \text{Knowledge Base} + \text{Inference Engine}}$$
 
-```
-       +-----------------------+              +-----------------------+
-       |   DOMAIN KNOWLEDGE    |              |     WORKING MEMORY    |
-       |         BASE          |              |    (Dynamic Facts)    |
-       |  IF-THEN Rules, Facts |              | Patient Fever = 103 F |
-       +-----------------------+              +-----------------------+
-                                                 /
-                                                /
-                     v                          v
-              +----------------------------------------+
-              |           INFERENCE ENGINE             |
-              |   - Pattern Matcher (Rete Algorithm)   |
-              |   - Conflict Resolution Strategy       |
-              |   - Execution / Firing Engine          |
-              +----------------------------------------+
-                             /            \\n                            /              \\n                           v                v
-            +--------------------+    +--------------------+
-            | EXPLANATION MODULE |    |   USER INTERFACE   |
-            |  Answers HOW & WHY |    | Consultation Modal |
-            +--------------------+    +--------------------+
-```
+<div class="circuit-diagram-card">
+  <svg class="circuit-svg" viewBox="0 0 680 250" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="es-arr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+      </marker>
+    </defs>
+    <rect x="5" y="5" width="670" height="240" rx="12" class="schematic-bg" fill="rgba(15,23,42,0.75)" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5 4" />
+    <text x="340" y="25" text-anchor="middle" fill="#38bdf8" font-size="12.5" font-weight="bold" letter-spacing="1">CLASSICAL EXPERT SYSTEM ARCHITECTURAL DECOMPOSITION</text>
+    <!-- Top Left: Knowledge Base -->
+    <rect x="55" y="38" width="250" height="52" rx="8" fill="rgba(30,58,138,0.85)" stroke="#60a5fa" stroke-width="2" />
+    <text x="180" y="59" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">DOMAIN KNOWLEDGE BASE</text>
+    <text x="180" y="77" text-anchor="middle" fill="#bae6fd" font-size="10.5">Static IF-THEN Production Rules &amp; Heuristics</text>
+    <!-- Top Right: Working Memory -->
+    <rect x="375" y="38" width="250" height="52" rx="8" fill="rgba(15,118,110,0.85)" stroke="#2dd4bf" stroke-width="2" />
+    <text x="500" y="59" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">WORKING MEMORY (BLACKBOARD)</text>
+    <text x="500" y="77" text-anchor="middle" fill="#99f6e4" font-size="10.5">Dynamic Case Facts (e.g. Fever = 103°F)</text>
+    <!-- Arrows to Inference Engine -->
+    <line x1="210" y1="90" x2="280" y2="114" stroke="#38bdf8" stroke-width="2" marker-end="url(#es-arr)" />
+    <line x1="470" y1="90" x2="400" y2="114" stroke="#38bdf8" stroke-width="2" marker-end="url(#es-arr)" />
+    <!-- Center: Inference Engine -->
+    <rect x="155" y="116" width="370" height="54" rx="10" fill="rgba(88,28,135,0.85)" stroke="#c084fc" stroke-width="2" />
+    <text x="340" y="137" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="bold">INFERENCE ENGINE (REASONING CORE)</text>
+    <text x="340" y="156" text-anchor="middle" fill="#e9d5ff" font-size="10.5">Rete Pattern Matcher • Conflict Resolution • Rule Firing</text>
+    <!-- Arrows to Explanation & UI -->
+    <line x1="270" y1="170" x2="195" y2="190" stroke="#38bdf8" stroke-width="2" marker-end="url(#es-arr)" />
+    <line x1="410" y1="170" x2="485" y2="190" stroke="#38bdf8" stroke-width="2" marker-end="url(#es-arr)" />
+    <!-- Bottom Left: Explanation Module -->
+    <rect x="65" y="192" width="240" height="44" rx="8" fill="rgba(6,78,59,0.85)" stroke="#34d399" stroke-width="1.8" />
+    <text x="185" y="211" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">EXPLANATION SUBSYSTEM</text>
+    <text x="185" y="227" text-anchor="middle" fill="#a7f3d0" font-size="10.5">Answers HOW &amp; WHY Queries</text>
+    <!-- Bottom Right: User Interface -->
+    <rect x="375" y="192" width="240" height="44" rx="8" fill="rgba(124,45,18,0.85)" stroke="#fb923c" stroke-width="1.8" />
+    <text x="495" y="211" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">USER INTERFACE</text>
+    <text x="495" y="227" text-anchor="middle" fill="#fed7aa" font-size="10.5">Interactive Consultation Modal</text>
+  </svg>
+</div>
 
 ---
 

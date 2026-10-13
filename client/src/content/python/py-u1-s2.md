@@ -24,7 +24,7 @@ print(x)             # Output: [1, 2, 3, 4] (x reflects mutation!)
 | **4** | Multiplicative | `*`, `/` (float div), `//` (floor div), `%` (mod) | Left-to-Right |
 | **5** | Additive | `+`, `-` | Left-to-Right |
 | **6** | Bitwise Shifts | `<<`, `>>` | Left-to-Right |
-| **7** | Bitwise Logic | `&` (AND) &rarr; `^` (XOR) &rarr; `|` (OR) | Left-to-Right |
+| **7** | Bitwise Logic | `&` (AND) &rarr; `^` (XOR) &rarr; `&#124;` (OR) | Left-to-Right |
 | **8** | Comparisons & Identity | `==`, `!=`, `<`, `>`, `<=`, `>=`, `is`, `in` | Left-to-Right |
 | **9** | Boolean Logic | `not` &rarr; `and` &rarr; `or` (Short-circuit) | Left-to-Right |
 

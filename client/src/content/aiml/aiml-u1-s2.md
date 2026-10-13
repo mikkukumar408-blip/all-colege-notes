@@ -9,24 +9,43 @@
    $$\mathbf{f: P^* \to  \mathcal{A}}$$
 4. **Agent Program:** The concrete software algorithm executing on the physical computing architecture implementing the agent function $f$.
 
-```
-                  +-----------------------------------+
-                  |            ENVIRONMENT            |
-                  +-----------------------------------+
-                        |                       ^
-               Percepts |                       | Actions
-                        v                       |
-                  +-----------+           +------------+
-                  |  SENSORS  |           | ACTUATORS  |
-                  +-----------+           +------------+
-                        |                       ^
-                        v                       |
-                  +-----------------------------------+
-                  |           AGENT PROGRAM           |
-                  |  State: Tracks world history      |
-                  |  Decision: Maximizes performance  |
-                  +-----------------------------------+
-```
+<div class="circuit-diagram-card">
+  <svg class="circuit-svg" viewBox="0 0 680 230" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="ag-arr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+      </marker>
+      <marker id="ag-arr-g" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+      </marker>
+    </defs>
+    <rect x="5" y="5" width="670" height="220" rx="12" class="schematic-bg" fill="rgba(15,23,42,0.75)" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5 4" />
+    <text x="340" y="25" text-anchor="middle" fill="#38bdf8" font-size="12.5" font-weight="bold" letter-spacing="1">INTELLIGENT AGENT – ENVIRONMENT FEEDBACK LOOP</text>
+    <!-- Environment Box -->
+    <rect x="160" y="36" width="360" height="42" rx="8" fill="rgba(30,58,138,0.85)" stroke="#60a5fa" stroke-width="2" />
+    <text x="340" y="62" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">EXTERNAL TASK ENVIRONMENT</text>
+    <!-- Left Down Arrow: Percepts -->
+    <line x1="230" y1="78" x2="230" y2="106" stroke="#38bdf8" stroke-width="2" marker-end="url(#ag-arr)" />
+    <text x="175" y="97" text-anchor="end" fill="#7dd3fc" font-size="11" font-weight="bold">Percepts P*</text>
+    <!-- Sensors Box -->
+    <rect x="150" y="108" width="160" height="36" rx="8" fill="rgba(15,118,110,0.85)" stroke="#2dd4bf" stroke-width="1.8" />
+    <text x="230" y="131" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">SENSORS</text>
+    <!-- Arrow Sensors -> Agent Program -->
+    <line x1="230" y1="144" x2="230" y2="166" stroke="#38bdf8" stroke-width="2" marker-end="url(#ag-arr)" />
+    <!-- Agent Program Box -->
+    <rect x="140" y="168" width="400" height="46" rx="8" fill="rgba(88,28,135,0.85)" stroke="#c084fc" stroke-width="2" />
+    <text x="340" y="188" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">AGENT PROGRAM: f(P*) → Action</text>
+    <text x="340" y="205" text-anchor="middle" fill="#e9d5ff" font-size="10.5">Tracks World State &amp; Selects Utility-Maximizing Action</text>
+    <!-- Arrow Agent Program -> Actuators -->
+    <line x1="450" y1="168" x2="450" y2="146" stroke="#34d399" stroke-width="2" marker-end="url(#ag-arr-g)" />
+    <!-- Actuators Box -->
+    <rect x="370" y="108" width="160" height="36" rx="8" fill="rgba(6,78,59,0.85)" stroke="#34d399" stroke-width="1.8" />
+    <text x="450" y="131" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">ACTUATORS</text>
+    <!-- Right Up Arrow: Actions -->
+    <line x1="450" y1="108" x2="450" y2="80" stroke="#34d399" stroke-width="2" marker-end="url(#ag-arr-g)" />
+    <text x="505" y="97" text-anchor="start" fill="#6ee7b7" font-size="11" font-weight="bold">Actions A</text>
+  </svg>
+</div>
 
 ---
 

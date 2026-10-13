@@ -12,14 +12,11 @@ The evolution of modern web computing spans five key milestones:
 
 ### 2. The Three Generations of the Web
 
-```
-  [ Web 1.0 (1991–2004) ]        [ Web 2.0 (2004–2016) ]        [ Web 3.0 (2016–Present) ]
-     "The Read-Only Web"           "The Read-Write Web"           "The Semantic & AI Web"
-  • Static HTML files            • User-generated content       • Machine-readable semantics
-  • Table-based layouts          • AJAX asynchronous calls      • Decentralized storage (IPFS)
-  • Centralized webmasters       • Social media & blogs         • AI search & Progressive Web Apps
-  • Zero user interactivity      • Responsive mobile design     • Smart agents & WebAssembly
-```
+| Architectural Dimension | Web 1.0 *(1991–2004)*<br/>**"The Read-Only Web"** | Web 2.0 *(2004–2016)*<br/>**"The Read-Write Social Web"** | Web 3.0 *(2016–Present)*<br/>**"The Semantic & AI Web"** |
+| :--- | :--- | :--- | :--- |
+| **Content Paradigm** | Static HTML documents authored solely by webmasters. | Dynamic user-generated content (blogs, wikis, video platforms). | Machine-readable semantic graphs & autonomous AI agents. |
+| **Frontend Engineering** | Table-based static layouts; zero client interactivity. | **AJAX** asynchronous requests, responsive mobile-first DOM. | Progressive Web Apps (PWAs), **WebAssembly**, 3D WebGL. |
+| **Data & Infrastructure** | Centralized institutional file servers (`CERN httpd`). | Cloud data centers (AWS/GCP), relational & NoSQL clusters. | Decentralized protocols (IPFS), edge computing & LLMs. |
 
 ---
 

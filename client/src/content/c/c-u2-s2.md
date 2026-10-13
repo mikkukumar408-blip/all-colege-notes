@@ -8,6 +8,6 @@
 | **4** | Additive | `+  -` | Left-to-Right | Standard arithmetic addition and subtraction. |
 | **5** | Relational | `<  <=  >  >=` | Left-to-Right | Yields Boolean 1 (True) or 0 (False). |
 | **6** | Equality | `==  !=` | Left-to-Right | Lower precedence than relational: `a < b == c` evaluates as `(a < b) == c`. |
-| **7** | Logical | `&&` (AND) then `||` (OR) | Left-to-Right | **Short-Circuit:** In `A && B`, if A=0, B is skipped! In `A || B`, if A=1, B is skipped! |
+| **7** | Logical | `&&` (AND) then `&#124;&#124;` (OR) | Left-to-Right | **Short-Circuit:** In `A && B`, if A=0, B is skipped! In `A &#124;&#124; B`, if A=1, B is skipped! |
 | **8** | Ternary Conditional | `? :` | **Right-to-Left** | `condition ? expr1 : expr2`. Nested ternaries group right-to-left. |
-| **9 (Lowest)** | Assignment & Comma | `=  +=  -=  *=  /=  %=` | `,` | **R-to-L** (=) | L-to-R (,) | Comma operator evaluates left-to-right and returns rightmost expression. |
+| **9 (Lowest)** | Assignment & Comma | `=  +=  -=  *=  /=  %=  ,` | **R-to-L** (`=`), **L-to-R** (`,`) | Comma operator evaluates left-to-right and returns rightmost expression. |

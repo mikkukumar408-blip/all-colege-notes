@@ -15,21 +15,59 @@ Machine Learning (ML) is the subfield of Artificial Intelligence concerned with 
 
 ### 2. The Three Major Paradigms of Machine Learning
 
-```
-                            [ MACHINE LEARNING ]
-                                     |
-         +---------------------------+---------------------------+
-         |                           |                           |
-  [ SUPERVISED ]              [ UNSUPERVISED ]          [ REINFORCEMENT ]
-  Data: (X, Y)                Data: (X) unlabeled        Data: Agent in World
-  Goal: Learn mapping         Goal: Find intrinsic       Goal: Learn policy pi(a|s)
-        f: X -> Y                   clusters / patterns         maximizing reward R
-         |                           |                           |
-   +-----+-----+               +-----+-----+               +-----+-----+
-   |           |               |           |               |           |
-Classification Regression   Clustering  Association      Q-Learning   PPO
-(Discrete Y)  (Continuous Y)(k-Means)   (Apriori)        (Markov Decision Process)
-```
+<div class="circuit-diagram-card">
+  <svg class="circuit-svg" viewBox="0 0 680 235" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="ml-arr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+      </marker>
+    </defs>
+    <rect x="5" y="5" width="670" height="225" rx="12" class="schematic-bg" fill="rgba(15,23,42,0.75)" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5 4" />
+    <!-- Root Node -->
+    <rect x="220" y="18" width="240" height="36" rx="8" fill="rgba(30,58,138,0.9)" stroke="#38bdf8" stroke-width="2" />
+    <text x="340" y="41" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="bold">MACHINE LEARNING PARADIGMS</text>
+    <!-- Tree Branches -->
+    <path d="M 340 54 L 340 68 M 115 68 L 565 68 M 115 68 L 115 82 M 340 68 L 340 82 M 565 68 L 565 82" stroke="#38bdf8" stroke-width="2" fill="none" />
+    <!-- 1. Supervised -->
+    <rect x="20" y="84" width="190" height="58" rx="8" fill="rgba(6,78,59,0.85)" stroke="#34d399" stroke-width="1.8" />
+    <text x="115" y="103" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">SUPERVISED LEARNING</text>
+    <text x="115" y="119" text-anchor="middle" fill="#a7f3d0" font-size="10">Labeled Data: (X, Y)</text>
+    <text x="115" y="133" text-anchor="middle" fill="#6ee7b7" font-size="10">Learn Mapping f: X → Y</text>
+    <!-- 2. Unsupervised -->
+    <rect x="245" y="84" width="190" height="58" rx="8" fill="rgba(88,28,135,0.85)" stroke="#c084fc" stroke-width="1.8" />
+    <text x="340" y="103" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">UNSUPERVISED LEARNING</text>
+    <text x="340" y="119" text-anchor="middle" fill="#e9d5ff" font-size="10">Unlabeled Data: (X only)</text>
+    <text x="340" y="133" text-anchor="middle" fill="#d8b4fe" font-size="10">Discover Latent Structure</text>
+    <!-- 3. Reinforcement -->
+    <rect x="470" y="84" width="190" height="58" rx="8" fill="rgba(124,45,18,0.85)" stroke="#fb923c" stroke-width="1.8" />
+    <text x="565" y="103" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">REINFORCEMENT (RL)</text>
+    <text x="565" y="119" text-anchor="middle" fill="#fed7aa" font-size="10">State-Action-Reward (s, a, r)</text>
+    <text x="565" y="133" text-anchor="middle" fill="#fdba74" font-size="10">Maximize Cumulative Return</text>
+    <!-- Sub-branches -->
+    <path d="M 115 142 L 115 154 M 65 154 L 165 154 M 65 154 L 65 166 M 165 154 L 165 166" stroke="#34d399" stroke-width="1.5" fill="none" />
+    <path d="M 340 142 L 340 154 M 290 154 L 390 154 M 290 154 L 290 166 M 390 154 L 390 166" stroke="#c084fc" stroke-width="1.5" fill="none" />
+    <path d="M 565 142 L 565 154 M 515 154 L 615 154 M 515 154 L 515 166 M 615 154 L 615 166" stroke="#fb923c" stroke-width="1.5" fill="none" />
+    <!-- Leaf Nodes -->
+    <rect x="18" y="167" width="92" height="46" rx="6" fill="#0f172a" stroke="#34d399" stroke-width="1.3" />
+    <text x="64" y="186" text-anchor="middle" fill="#ffffff" font-size="10.5" font-weight="bold">Classification</text>
+    <text x="64" y="202" text-anchor="middle" fill="#6ee7b7" font-size="9.5">Discrete Y</text>
+    <rect x="118" y="167" width="92" height="46" rx="6" fill="#0f172a" stroke="#34d399" stroke-width="1.3" />
+    <text x="164" y="186" text-anchor="middle" fill="#ffffff" font-size="10.5" font-weight="bold">Regression</text>
+    <text x="164" y="202" text-anchor="middle" fill="#6ee7b7" font-size="9.5">Continuous Y</text>
+    <rect x="243" y="167" width="92" height="46" rx="6" fill="#0f172a" stroke="#c084fc" stroke-width="1.3" />
+    <text x="289" y="186" text-anchor="middle" fill="#ffffff" font-size="10.5" font-weight="bold">Clustering</text>
+    <text x="289" y="202" text-anchor="middle" fill="#d8b4fe" font-size="9.5">k-Means / Hierarchical</text>
+    <rect x="343" y="167" width="92" height="46" rx="6" fill="#0f172a" stroke="#c084fc" stroke-width="1.3" />
+    <text x="389" y="186" text-anchor="middle" fill="#ffffff" font-size="10.5" font-weight="bold">Association</text>
+    <text x="389" y="202" text-anchor="middle" fill="#d8b4fe" font-size="9.5">Apriori / FP-Growth</text>
+    <rect x="468" y="167" width="92" height="46" rx="6" fill="#0f172a" stroke="#fb923c" stroke-width="1.3" />
+    <text x="514" y="186" text-anchor="middle" fill="#ffffff" font-size="10.5" font-weight="bold">Model-Free</text>
+    <text x="514" y="202" text-anchor="middle" fill="#fdba74" font-size="9.5">Q-Learning / PPO</text>
+    <rect x="568" y="167" width="92" height="46" rx="6" fill="#0f172a" stroke="#fb923c" stroke-width="1.3" />
+    <text x="614" y="186" text-anchor="middle" fill="#ffffff" font-size="10.5" font-weight="bold">Model-Based</text>
+    <text x="614" y="202" text-anchor="middle" fill="#fdba74" font-size="9.5">Markov (MDP)</text>
+  </svg>
+</div>
 
 ---
 

@@ -12,13 +12,42 @@ A **Semantic Network** represents knowledge as a directed graph consisting of:
   3. **`HAS-PART` (Aggregation):** `Bird HAS-PART Wings`.
   4. **Property Links:** `Canary COLOR Yellow`.
 
-```
-       [ Animal ] <---( IS-A )--- [ Bird ] <---( IS-A )--- [ Canary ]
-           |                         |                         |
-     (HAS-PROP)                  (CAN-DO)                  (IS-A)
-           v                         v                         v
-     [ Alive ]                   [ Fly ]                   [ Tweety ]
-```
+<div class="circuit-diagram-card">
+  <svg class="circuit-svg" viewBox="0 0 680 185" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="sn-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+      </marker>
+    </defs>
+    <rect x="5" y="5" width="670" height="175" rx="12" class="schematic-bg" fill="rgba(15,23,42,0.75)" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5 4" />
+    <text x="340" y="25" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="bold" letter-spacing="1">SEMANTIC NETWORK INHERITANCE HIERARCHY (QUILLIAN, 1968)</text>
+    <!-- Top Row Nodes: Animal <- Bird <- Canary -->
+    <rect x="45" y="42" width="130" height="38" rx="8" fill="rgba(30,58,138,0.85)" stroke="#60a5fa" stroke-width="2" />
+    <text x="110" y="66" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">Animal</text>
+    <line x1="275" y1="61" x2="178" y2="61" stroke="#38bdf8" stroke-width="2" marker-end="url(#sn-arr)" />
+    <text x="226" y="53" text-anchor="middle" fill="#7dd3fc" font-size="10.5" font-weight="bold">IS-A</text>
+    <rect x="275" y="42" width="130" height="38" rx="8" fill="rgba(30,58,138,0.85)" stroke="#60a5fa" stroke-width="2" />
+    <text x="340" y="66" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">Bird</text>
+    <line x1="505" y1="61" x2="408" y2="61" stroke="#38bdf8" stroke-width="2" marker-end="url(#sn-arr)" />
+    <text x="456" y="53" text-anchor="middle" fill="#7dd3fc" font-size="10.5" font-weight="bold">IS-A</text>
+    <rect x="505" y="42" width="130" height="38" rx="8" fill="rgba(30,58,138,0.85)" stroke="#60a5fa" stroke-width="2" />
+    <text x="570" y="66" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">Canary</text>
+    <!-- Vertical Edges -->
+    <line x1="110" y1="80" x2="110" y2="124" stroke="#38bdf8" stroke-width="2" marker-end="url(#sn-arr)" />
+    <text x="148" y="106" text-anchor="middle" fill="#fde047" font-size="10" font-weight="bold">HAS-PROP</text>
+    <line x1="340" y1="80" x2="340" y2="124" stroke="#38bdf8" stroke-width="2" marker-end="url(#sn-arr)" />
+    <text x="375" y="106" text-anchor="middle" fill="#fde047" font-size="10" font-weight="bold">CAN-DO</text>
+    <line x1="570" y1="80" x2="570" y2="124" stroke="#38bdf8" stroke-width="2" marker-end="url(#sn-arr)" />
+    <text x="615" y="106" text-anchor="middle" fill="#fde047" font-size="10" font-weight="bold">INSTANCE-OF</text>
+    <!-- Bottom Row Nodes: Alive, Fly, Tweety -->
+    <rect x="45" y="126" width="130" height="38" rx="8" fill="rgba(6,78,59,0.85)" stroke="#34d399" stroke-width="1.8" />
+    <text x="110" y="150" text-anchor="middle" fill="#a7f3d0" font-size="13" font-weight="bold">Alive</text>
+    <rect x="275" y="126" width="130" height="38" rx="8" fill="rgba(6,78,59,0.85)" stroke="#34d399" stroke-width="1.8" />
+    <text x="340" y="150" text-anchor="middle" fill="#a7f3d0" font-size="13" font-weight="bold">Fly</text>
+    <rect x="505" y="126" width="130" height="38" rx="8" fill="rgba(88,28,135,0.85)" stroke="#c084fc" stroke-width="1.8" />
+    <text x="570" y="150" text-anchor="middle" fill="#e9d5ff" font-size="13" font-weight="bold">Tweety</text>
+  </svg>
+</div>
 
 ---
 

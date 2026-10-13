@@ -31,7 +31,7 @@ for (int i = 1; i <= 3; i++) {
 | **1** | Line 2 | 1 | 1 <= 3 (True) | 0 | Loop init `i = 1`; entry condition holds. |
 | **2** | Line 3 | 1 | - | 1 | Accumulate: `sum = 0 + 1 = 1`. |
 | **3** | Line 2 | 2 | 2 <= 3 (True) | 1 | Increment `i++`; condition holds. |
-| **4** | Line\frac{3}{2}| - | 3 | Accumulate: `sum = 1 + 2 = 3`. |
+| **4** | Line 3 | 2 | - | 3 | Accumulate: `sum = 1 + 2 = 3`. |
 | **5** | Line 2 | 3 | 3 <= 3 (True) | 3 | Increment `i++`; condition holds. |
 | **6** | Line 3 | 3 | - | 6 | Accumulate: `sum = 3 + 3 = 6`. |
 | **7** | Line 2 | 4 | 4 <= 3 (False) | 6 | Increment `i++`; condition fails ➔ Loop terminates! |

@@ -2,30 +2,36 @@
 
 Modern web search engines process billions of documents via a 4-phase pipeline:
 
-```
-  [ Phase 1: Web Crawlers (Spiders / Bots) ]
-  • Discovers URLs by traversing hyperlinks across the web graph.
-  • Respects robots.txt directives and crawls recursively.
-                    │
-                    ▼
-  [ Phase 2: Document Parser & Tokenizer ]
-  • Strips HTML markup tags and extracts raw text.
-  • Lowercases tokens, eliminates non-informative stop words ("the", "is", "at").
-  • Normalizes words to linguistic stems via Porter Stemming.
-                    │
-                    ▼
-  [ Phase 3: Inverted Index Generation ]
-  • Constructs a dictionary of all distinct words mapped to Document Postings Lists:
-      Term "html"    ───> [ Doc 101, Doc 104, Doc 209 ]
-      Term "css"     ───> [ Doc 104, Doc 312 ]
-      Term "mullana" ───> [ Doc 101, Doc 418 ]
-                    │
-                    ▼
-  [ Phase 4: Query Ranking Engine (PageRank / AI) ]
-  • Evaluates query terms using TF-IDF (Term Frequency - Inverse Document Frequency).
-  • Computes PageRank authority score based on incoming link eigenvector centrality.
-  • Returns top ranked results to user in under 100 milliseconds.
-```
+<div class="circuit-diagram-card">
+  <svg class="circuit-svg" viewBox="0 0 680 265" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="se-arr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+      </marker>
+    </defs>
+    <rect x="5" y="5" width="670" height="255" rx="12" class="schematic-bg" fill="rgba(15,23,42,0.75)" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5 4" />
+    <text x="340" y="24" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="bold" letter-spacing="1">4-PHASE WEB SEARCH ENGINE INDEXING &amp; RANKING PIPELINE</text>
+    <!-- Phase 1 -->
+    <rect x="45" y="34" width="590" height="44" rx="8" fill="rgba(30,58,138,0.85)" stroke="#60a5fa" stroke-width="1.8" />
+    <text x="340" y="52" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">PHASE 1: WEB CRAWLERS (SPIDERS / BOTS)</text>
+    <text x="340" y="68" text-anchor="middle" fill="#bae6fd" font-size="10">Traverses hyperlink graph recursively • Respects robots.txt &amp; sitemaps</text>
+    <line x1="340" y1="78" x2="340" y2="90" stroke="#38bdf8" stroke-width="2" marker-end="url(#se-arr)" />
+    <!-- Phase 2 -->
+    <rect x="45" y="92" width="590" height="44" rx="8" fill="rgba(15,118,110,0.85)" stroke="#2dd4bf" stroke-width="1.8" />
+    <text x="340" y="110" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">PHASE 2: DOCUMENT PARSER, TOKENIZER &amp; STEMMER</text>
+    <text x="340" y="126" text-anchor="middle" fill="#99f6e4" font-size="10">Strips HTML tags • Removes stop-words ("the", "is") • Porter Stemming normalization</text>
+    <line x1="340" y1="136" x2="340" y2="148" stroke="#38bdf8" stroke-width="2" marker-end="url(#se-arr)" />
+    <!-- Phase 3 -->
+    <rect x="45" y="150" width="590" height="46" rx="8" fill="rgba(88,28,135,0.85)" stroke="#c084fc" stroke-width="1.8" />
+    <text x="340" y="168" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">PHASE 3: INVERTED INDEX GENERATION (TERM → POSTINGS LIST)</text>
+    <text x="340" y="185" text-anchor="middle" fill="#e9d5ff" font-size="10">"html" → [Doc 101, 104, 209]   •   "css" → [Doc 104, 312]   •   "mmu" → [Doc 101, 418]</text>
+    <line x1="340" y1="196" x2="340" y2="208" stroke="#38bdf8" stroke-width="2" marker-end="url(#se-arr)" />
+    <!-- Phase 4 -->
+    <rect x="45" y="210" width="590" height="42" rx="8" fill="rgba(6,78,59,0.9)" stroke="#34d399" stroke-width="2" />
+    <text x="340" y="228" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">PHASE 4: QUERY RANKING ENGINE (TF-IDF + PAGERANK AUTHORITY)</text>
+    <text x="340" y="244" text-anchor="middle" fill="#a7f3d0" font-size="10">Scores relevance &amp; link eigenvector centrality → Returns SERP in &lt; 100 ms</text>
+  </svg>
+</div>
 
 ---
 

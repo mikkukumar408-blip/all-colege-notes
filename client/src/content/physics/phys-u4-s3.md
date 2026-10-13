@@ -13,4 +13,4 @@
 | **9** | **Transport Mechanism** | Vacancy hopping conductivity. | Interstitial ionic diffusion conductivity. |
 | **10** | **Entropy Contribution**| Increases configurational pair entropy. | Increases vacancy-interstitial entropy. |
 | **11** | **Representative Crystals** | **NaCl, KCl, KBr, CsCl** | **AgCl, AgI, ZnS** |
-| **12** | **Unique Special Case** | **Silver Bromide (AgBr)** exhibits **BOTH** Schottky and Frenkel defects depending on temperature! |
+| **12** | **Unique Dual-Defect Crystal** | **Silver Bromide ($\text{AgBr}$)** exhibits Schottky pair vacancies at high temperatures. | **Silver Bromide ($\text{AgBr}$)** also exhibits Frenkel $\text{Ag}^+$ interstitials (both defects coexist)! |

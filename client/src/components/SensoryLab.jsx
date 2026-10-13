@@ -684,8 +684,8 @@ function formatNoteContent(content, activeRecallMode = false, sectionId = 'sec')
     const trimmedCode = code.trim();
     const l = (lang || '').toLowerCase().trim();
 
-    // Check if it is a pure mathematical derivation without programming tokens
-    const isMathDerivation = /^\s*(?:Solution|Question)\s+[A-Za-z0-9\s]+(?:Derivation|Equation|Trace|Formulation|Matrix|Transformation):/i.test(trimmedCode) ||
+    // Check if it is a pure mathematical derivation or Solved Exam Question/Solution schematic without programming tokens
+    const isMathDerivation = /^\s*(?:Solution|Question)\s+[A-Za-z0-9\s\-&×]+:/i.test(trimmedCode) ||
       (!l && /`[^`]+`|\\frac|frac-num|\b(?:Cayley|Eigen|Cauchy|Rolle|LMVT)\b/i.test(trimmedCode) && !/\b(?:def|for|while|import|printf|scanf|#include|int\s+main|return|public|class)\b/.test(trimmedCode));
 
     if (isMathDerivation) {
@@ -701,8 +701,41 @@ function formatNoteContent(content, activeRecallMode = false, sectionId = 'sec')
         return `<span class="derivation-math-step">${renderKaTeXSafe(math, false)}</span>`;
       });
       cleanCode = cleanMathTypography(cleanCode);
+      // If it's a single-line or arrow-chain conceptual flow (contains ➔), render as visual flowchart pills
+      if (cleanCode.includes('➔') && !cleanCode.includes('<div class="derivation-step-row"')) {
+        const prefixMatch = cleanCode.match(/^((?:Question|Solution)[^:]+:)\s*([\s\S]*)$/i);
+        const headerHtml = prefixMatch ? `<div class="visual-flow-header">${prefixMatch[1]}</div>` : '';
+        const flowBody = prefixMatch ? prefixMatch[2] : cleanCode;
+        const steps = flowBody.split(/\s*➔\s*/).map(s => s.trim()).filter(Boolean);
+        if (steps.length >= 2) {
+          const pillsHtml = steps.map((st, idx) =>
+            `<div class="visual-flow-node">${st}</div>` +
+            (idx < steps.length - 1 ? `<div class="visual-flow-arrow">➔</div>` : '')
+          ).join('');
+          const placeholder = `\x00CODEBLOCK_${codeBlocks.length}\x00`;
+          codeBlocks.push(`<div class="visual-flowchart-card">${headerHtml}<div class="visual-flow-chain">${pillsHtml}</div></div>`);
+          return placeholder;
+        }
+      }
       const placeholder = `\x00CODEBLOCK_${codeBlocks.length}\x00`;
       codeBlocks.push(`<div class="analytical-derivation-box"><div class="derivation-body-content">${cleanCode}</div></div>`);
+      return placeholder;
+    }
+
+    // Check if it's an untagged arrow-chain flowchart (e.g., "prog.c ➔ Preprocessor ➔ prog.i" or "bool ➔ char ➔ int")
+    if (!l && trimmedCode.includes('➔') && !/\b(?:printf|scanf|#include|int\s+main|def\s+)\b/.test(trimmedCode)) {
+      const cleanFlow = cleanMathTypography(trimmedCode);
+      const lines = cleanFlow.split(/\r?\n/).map(ln => ln.trim()).filter(Boolean);
+      const rowsHtml = lines.map(line => {
+        const steps = line.split(/\s*➔\s*/).map(s => s.trim()).filter(Boolean);
+        if (steps.length < 2) return `<div class="visual-flow-node">${line}</div>`;
+        return `<div class="visual-flow-chain">` + steps.map((st, idx) =>
+          `<div class="visual-flow-node">${st}</div>` +
+          (idx < steps.length - 1 ? `<div class="visual-flow-arrow">➔</div>` : '')
+        ).join('') + `</div>`;
+      }).join('');
+      const placeholder = `\x00CODEBLOCK_${codeBlocks.length}\x00`;
+      codeBlocks.push(`<div class="visual-flowchart-card">${rowsHtml}</div>`);
       return placeholder;
     }
 
@@ -819,8 +852,8 @@ function formatNoteContent(content, activeRecallMode = false, sectionId = 'sec')
   // Step 3.2: Pill Badges
   html = html.replace(/<pill ([a-z\-]+)>([\s\S]*?)<\/pill>/g, '<span class="pill-badge pill-$1">$2</span>');
 
-  // Step 3.3: Markdown Tables
-  html = html.replace(/((?:\|[^\n]+\|\r?\n)+)/g, (tableMatch) => {
+  // Step 3.3: Markdown Tables (supports optional leading indentation and tables at end of file)
+  html = html.replace(/((?:^[ \t]*\|[^\n]+\|[ \t]*(?:\r?\n|$))+)/gm, (tableMatch) => {
     const lines = tableMatch.trim().split(/\r?\n/);
     if (lines.length < 2) return tableMatch;
     

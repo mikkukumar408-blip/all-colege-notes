@@ -19,24 +19,10 @@ Artificial Intelligence (AI) is the computational study of synthesizing goal-dir
 
 Stuart Russell and Peter Norvig categorized all historical definitions of AI along two orthogonal axes: **Thought vs Behavior**, and **Human Benchmark vs Rationality Benchmark**:
 
-```
-                       HUMAN BENCHMARK                RATIONAL BENCHMARK
-                 +-----------------------------+-----------------------------+
-                 |                             |                             |
-    THINKING     |  [ Thinking Humanly ]       |  [ Thinking Rationally ]    |
-    (Cognition)  |  - Cognitive Science        |  - "Laws of Thought"        |
-                 |  - GPS (Newell & Simon)     |  - Aristotle Deductive      |
-                 |  - Neural Brain Mapping     |    Syllogisms & Logics      |
-                 |                             |                             |
-                 +-----------------------------+-----------------------------+
-                 |                             |                             |
-    ACTING       |  [ Acting Humanly ]         |  [ Acting Rationally ]      |
-    (Behavior)   |  - Turing Imitation Test    |  - ⭐ THE MODERN STANDARD!  |
-                 |  - Fools human interrogator |  - Rational Agent Framework |
-                 |  - NLP, Vision, Robotics    |  - Maximizes Expected       |
-                 |                             |    Utility Under Risk       |
-                 +-----------------------------+-----------------------------+
-```
+| Cognitive / Behavioral Axis | Human Benchmark *(Fidelity to Human Performance)* | Rational Benchmark *(Ideal Mathematical Performance)* |
+| :--- | :--- | :--- |
+| **THINKING**<br/>*(Internal Cognition & Reasoning)* | **1. Thinking Humanly *(Cognitive Modeling Approach)***<br/>• Models human mind via introspection & psychological tests.<br/>• **Newell & Simon's GPS** *(General Problem Solver)*.<br/>• Foundation of modern **Cognitive Science**. | **2. Thinking Rationally *(Laws of Thought Approach)***<br/>• Encodes Aristotle's **Deductive Syllogisms** & Formal Logic.<br/>• Guarantees indisputable conclusions from true premises.<br/>• Foundation of **Automated Theorem Proving**. |
+| **ACTING**<br/>*(External Behavior & Decisions)* | **3. Acting Humanly *(Turing Test Approach)***<br/>• Behavioral indistinguishability from a real human.<br/>• Requires **NLP, Knowledge Representation, Automated Reasoning, ML, Computer Vision, and Robotics**. | **4. Acting Rationally *(Rational Agent Approach — ⭐ Modern Standard)***<br/>• Synthesizes **Autonomous Rational Agents**.<br/>• Selects actions that **Maximize Expected Utility** under uncertainty and resource bounds. |
 
 ---
 
@@ -44,18 +30,38 @@ Stuart Russell and Peter Norvig categorized all historical definitions of AI alo
 
 In 1950, Alan Turing replaced the metaphysical question *"Can machines think?"* with an empirical behavioral experiment:
 
-```
-                           +----------------------+
-                           |  Human Interrogator  |
-                           |         (C)          |
-                           +----------------------+
-                                  /        \\n                    Teletype text/          \Teletype text
-                                v            v
-                     +--------------+    +--------------+
-                     |  Machine AI  |    |  Real Human  |
-                     |     (A)      |    |     (B)      |
-                     +--------------+    +--------------+
-```
+<div class="circuit-diagram-card">
+  <svg class="circuit-svg" viewBox="0 0 680 230" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="tt-arr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+      </marker>
+    </defs>
+    <rect x="5" y="5" width="670" height="220" rx="12" class="schematic-bg" fill="rgba(15,23,42,0.75)" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5 4" />
+    <text x="340" y="26" text-anchor="middle" fill="#38bdf8" font-size="12.5" font-weight="bold" letter-spacing="1">ALAN TURING'S IMITATION GAME ARCHITECTURE (1950)</text>
+    <!-- Interrogator Node -->
+    <rect x="220" y="42" width="240" height="52" rx="10" fill="rgba(30,58,138,0.85)" stroke="#60a5fa" stroke-width="2" />
+    <text x="340" y="64" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="bold">Human Interrogator (C)</text>
+    <text x="340" y="83" text-anchor="middle" fill="#bae6fd" font-size="11">Isolated Evaluator (Blind to Identity)</text>
+    <!-- Opaque Wall Divider -->
+    <line x1="40" y1="122" x2="640" y2="122" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="6 4" />
+    <rect x="235" y="111" width="210" height="22" rx="6" fill="#0f172a" stroke="#f43f5e" stroke-width="1.2" />
+    <text x="340" y="126" text-anchor="middle" fill="#fda4af" font-size="10.5" font-weight="bold">OPAQUE ISOLATION BARRIER</text>
+    <!-- Bidirectional Teletype Arrows -->
+    <line x1="270" y1="94" x2="175" y2="152" stroke="#38bdf8" stroke-width="2" marker-start="url(#tt-arr)" marker-end="url(#tt-arr)" />
+    <text x="165" y="114" text-anchor="middle" fill="#7dd3fc" font-size="10.5" font-weight="bold">Teletype Text Stream</text>
+    <line x1="410" y1="94" x2="505" y2="152" stroke="#38bdf8" stroke-width="2" marker-start="url(#tt-arr)" marker-end="url(#tt-arr)" />
+    <text x="515" y="114" text-anchor="middle" fill="#7dd3fc" font-size="10.5" font-weight="bold">Teletype Text Stream</text>
+    <!-- Player A: Machine AI -->
+    <rect x="65" y="155" width="220" height="54" rx="10" fill="rgba(6,78,59,0.85)" stroke="#34d399" stroke-width="2" />
+    <text x="175" y="177" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="bold">Machine AI Agent (A)</text>
+    <text x="175" y="196" text-anchor="middle" fill="#a7f3d0" font-size="11">Goal: Fool Interrogator C</text>
+    <!-- Player B: Real Human -->
+    <rect x="395" y="155" width="220" height="54" rx="10" fill="rgba(88,28,135,0.85)" stroke="#c084fc" stroke-width="2" />
+    <text x="505" y="177" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="bold">Real Human Witness (B)</text>
+    <text x="505" y="196" text-anchor="middle" fill="#e9d5ff" font-size="11">Goal: Assist Interrogator C</text>
+  </svg>
+</div>
 
 #### Necessary Disciplines Required to Pass the Total Turing Test:
 1. **Natural Language Processing (NLP):** To comprehend and communicate fluently in natural human tongue.

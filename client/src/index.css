@@ -2408,55 +2408,80 @@ button,
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   -webkit-overflow-scrolling: touch;
+  white-space: normal !important;
 }
 
 .colorful-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.88rem;
-  line-height: 1.6;
+  font-size: 0.92rem;
+  line-height: 1.65;
   text-align: left;
+  white-space: normal !important;
+}
+
+.colorful-table th,
+.colorful-table td {
+  vertical-align: top;
+  white-space: normal !important;
+}
+
+.theme-cyber .colorful-table {
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(15, 23, 42, 0.82);
 }
 
 .theme-cyber .colorful-table th {
-  background: linear-gradient(90deg, rgba(0, 240, 255, 0.25), rgba(168, 85, 247, 0.25));
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.28), rgba(168, 85, 247, 0.28));
   color: #fff;
   font-weight: 800;
-  padding: 12px 16px;
+  padding: 13px 16px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
   border-bottom: 2px solid #00f0ff;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 .theme-cyber .colorful-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.22);
   color: #e2e8f0;
 }
 
 .theme-cyber .colorful-table tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(30, 41, 59, 0.55);
 }
 
 .theme-cyber .colorful-table tr:hover {
-  background: rgba(0, 240, 255, 0.08);
+  background: rgba(0, 240, 255, 0.1);
+}
+
+.theme-paper .colorful-table {
+  border: 1.5px solid #b45309;
+  background: #fffbeb;
 }
 
 .theme-paper .colorful-table th {
   background: #fde68a;
-  color: #78350f;
+  color: #78350f !important;
   font-weight: 800;
   padding: 12px 16px;
-  border-bottom: 2px solid #d97706;
+  border: 1.5px solid #d97706;
+  border-bottom: 2.5px solid #b45309;
 }
 
 .theme-paper .colorful-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid #e2e8f0;
-  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  color: #1e293b !important;
 }
 
 .theme-paper .colorful-table tr:nth-child(even) {
   background: #fefce8;
+}
+
+.theme-clean .colorful-table {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
 }
 
 .theme-clean .colorful-table th {
@@ -2464,17 +2489,70 @@ button,
   color: #1e40af;
   font-weight: 800;
   padding: 12px 16px;
+  border: 1px solid #bfdbfe;
   border-bottom: 2px solid #3b82f6;
 }
 
 .theme-clean .colorful-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid #e2e8f0;
+  border: 1px solid #e2e8f0;
   color: #334155;
 }
 
 .theme-clean .colorful-table tr:nth-child(even) {
   background: #f8fafc;
+}
+
+/* --- VISUAL FLOWCHART PILL CARDS --- */
+.visual-flowchart-card {
+  margin: 16px 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.92));
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  white-space: normal !important;
+}
+
+.visual-flow-header {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #38bdf8 !important;
+  margin-bottom: 12px;
+  line-height: 1.4 !important;
+}
+
+.visual-flow-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.visual-flow-node {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif !important;
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+  line-height: 1.45 !important;
+  color: #f8fafc !important;
+  background: rgba(30, 58, 138, 0.75);
+  border: 1.5px solid #60a5fa;
+  border-radius: 8px;
+  padding: 8px 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.visual-flow-arrow {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif !important;
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  color: #34d399 !important;
+  line-height: 1 !important;
+  padding: 0 2px;
 }
 
 
@@ -2485,7 +2563,7 @@ button,
 
 .theme-paper,
 .theme-paper .notes-html-content,
-.theme-paper .notes-html-content *:not(.katex):not(.katex *):not(.code-editor-box):not(.code-editor-box *):not(.inline-code-badge):not(.ascii-diagram-box):not(.ascii-diagram-box *):not(pre):not(code):not(pre *):not(code *) {
+.theme-paper .notes-html-content *:not(.katex):not(.katex *):not(.code-editor-box):not(.code-editor-box *):not(.inline-code-badge):not(.ascii-diagram-box):not(.ascii-diagram-box *):not(.visual-flowchart-card):not(.visual-flowchart-card *):not(pre):not(code):not(pre *):not(code *) {
   font-family: 'Caveat', 'Homemade Apple', 'Patrick Hand', cursive !important;
   -webkit-font-smoothing: antialiased;
 }
@@ -2516,8 +2594,8 @@ button,
 
 .theme-paper .notes-html-content p,
 .theme-paper .notes-html-content li,
-.theme-paper .notes-html-content span:not(.code-editor-box *):not(.inline-code-badge):not(pre *):not(code *),
-.theme-paper .notes-html-content div:not(.katex *):not(.worked-example-box):not(.worked-example-box *):not(.academic-derivation-box):not(.academic-derivation-box *):not(.circuit-diagram-card):not(.circuit-diagram-card *):not(.exam-trap-box):not(.green-law-box):not(.topper-mnemonic-box):not(.blue-analogy-box):not(.cyan-keytakeaway-box):not(.orange-warning-box):not(.purple-exam-goal-box):not(.rainbow-concept-box):not(.code-editor-box):not(.code-editor-box *):not(.ascii-diagram-box):not(.ascii-diagram-box *) {
+.theme-paper .notes-html-content span:not(.code-editor-box *):not(.inline-code-badge):not(.visual-flowchart-card *):not(pre *):not(code *),
+.theme-paper .notes-html-content div:not(.katex *):not(.worked-example-box):not(.worked-example-box *):not(.academic-derivation-box):not(.academic-derivation-box *):not(.circuit-diagram-card):not(.circuit-diagram-card *):not(.visual-flowchart-card):not(.visual-flowchart-card *):not(.exam-trap-box):not(.green-law-box):not(.topper-mnemonic-box):not(.blue-analogy-box):not(.cyan-keytakeaway-box):not(.orange-warning-box):not(.purple-exam-goal-box):not(.rainbow-concept-box):not(.code-editor-box):not(.code-editor-box *):not(.ascii-diagram-box):not(.ascii-diagram-box *) {
   font-family: 'Caveat', 'Homemade Apple', 'Patrick Hand', cursive !important;
   font-size: 1.55rem !important;
   line-height: 42px !important;

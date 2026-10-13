@@ -2,23 +2,44 @@
 
 Building a production expert system requires a symbiotic triad of three distinct human roles:
 
-```
-    [ DOMAIN EXPERT ]  <====== Knowledge ======>  [ KNOWLEDGE ENGINEER ]
-    - 20+ years field                              - Computer / AI Scientist
-      experience                                   - Interviews expert
-    - Possesses rules of thumb                     - Encodes heuristics into
-      and domain intuition                           rules, frames, and logic
-                                                              |
-                                                              | Synthesizes
-                                                              v
-                                                   [ SYSTEM / INFERENCE ENGINE ]
-                                                              ^
-                                                              | Consults
-                                                              v
-                                                       [ END USER ]
-                                                       - Doctor, technician, clerk
-                                                       - Obtains expert diagnosis
-```
+<div class="circuit-diagram-card">
+  <svg class="circuit-svg" viewBox="0 0 680 220" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="tr-arr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+      </marker>
+    </defs>
+    <rect x="5" y="5" width="670" height="210" rx="12" class="schematic-bg" fill="rgba(15,23,42,0.75)" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5 4" />
+    <text x="340" y="25" text-anchor="middle" fill="#38bdf8" font-size="12.5" font-weight="bold" letter-spacing="1">THE EXPERT SYSTEM KNOWLEDGE ENGINEERING TRIAD</text>
+    <!-- Domain Expert -->
+    <rect x="35" y="42" width="215" height="62" rx="8" fill="rgba(30,58,138,0.85)" stroke="#60a5fa" stroke-width="2" />
+    <text x="142" y="63" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">1. DOMAIN EXPERT</text>
+    <text x="142" y="80" text-anchor="middle" fill="#bae6fd" font-size="10.5">20+ Yrs Field Experience</text>
+    <text x="142" y="95" text-anchor="middle" fill="#bae6fd" font-size="10.5">Heuristics &amp; Tacit Intuition</text>
+    <!-- Bidirectional Arrow -->
+    <line x1="252" y1="73" x2="428" y2="73" stroke="#38bdf8" stroke-width="2" marker-start="url(#tr-arr)" marker-end="url(#tr-arr)" />
+    <text x="340" y="64" text-anchor="middle" fill="#fde047" font-size="10.5" font-weight="bold">Knowledge Acquisition</text>
+    <!-- Knowledge Engineer -->
+    <rect x="430" y="42" width="215" height="62" rx="8" fill="rgba(88,28,135,0.85)" stroke="#c084fc" stroke-width="2" />
+    <text x="537" y="63" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">2. KNOWLEDGE ENGINEER</text>
+    <text x="537" y="80" text-anchor="middle" fill="#e9d5ff" font-size="10.5">AI Scientist / System Architect</text>
+    <text x="537" y="95" text-anchor="middle" fill="#e9d5ff" font-size="10.5">Encodes Rules, Frames &amp; Logic</text>
+    <!-- Arrow down to Expert System -->
+    <line x1="537" y1="104" x2="537" y2="142" stroke="#38bdf8" stroke-width="2" marker-end="url(#tr-arr)" />
+    <text x="585" y="127" text-anchor="middle" fill="#7dd3fc" font-size="10.5" font-weight="bold">Synthesizes</text>
+    <!-- Expert System Shell -->
+    <rect x="415" y="144" width="235" height="54" rx="8" fill="rgba(6,78,59,0.85)" stroke="#34d399" stroke-width="2" />
+    <text x="532" y="166" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">EXPERT SYSTEM ENGINE</text>
+    <text x="532" y="185" text-anchor="middle" fill="#a7f3d0" font-size="10.5">Knowledge Base + Inference Engine</text>
+    <!-- Bidirectional Consultation Arrow -->
+    <line x1="252" y1="171" x2="413" y2="171" stroke="#38bdf8" stroke-width="2" marker-start="url(#tr-arr)" marker-end="url(#tr-arr)" />
+    <text x="332" y="162" text-anchor="middle" fill="#6ee7b7" font-size="10.5" font-weight="bold">Interactive Consultation</text>
+    <!-- End User -->
+    <rect x="35" y="144" width="215" height="54" rx="8" fill="rgba(124,45,18,0.85)" stroke="#fb923c" stroke-width="2" />
+    <text x="142" y="166" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">3. END USER (CLIENT)</text>
+    <text x="142" y="185" text-anchor="middle" fill="#fed7aa" font-size="10.5">Clinician / Technician / Analyst</text>
+  </svg>
+</div>
 
 ---
 

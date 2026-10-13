@@ -19,15 +19,31 @@ This allows the network to simultaneously attend to syntax, co-reference, factua
 
 ### 2. The Three-Phase Foundation Model Training Lifecycle
 
-```
-    [ 1. SELF-SUPERVISED PRETRAINING ]
-    - Trillions of web tokens (Common Crawl, Books, GitHub)
-    - Objective: Next-Token Prediction (Causal Language Modeling)
-    - Loss: L = -sum log P(wₜ | w yₗ)
-    - Optimize policy piₜheta using Proximal Policy Optimization (PPO):
-      max E [ rₚhi(x, y) - beta * DKL( piₜheta(y|x) || piᵣef(y|x) ) ]
-    - Output: Production AI Assistant (Helpful, Honest, Harmless)
-```
+<div class="circuit-diagram-card">
+  <svg class="circuit-svg" viewBox="0 0 680 235" width="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="fm-arr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+      </marker>
+    </defs>
+    <rect x="5" y="5" width="670" height="225" rx="12" class="schematic-bg" fill="rgba(15,23,42,0.75)" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5 4" />
+    <text x="340" y="24" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="bold" letter-spacing="1">3-PHASE FOUNDATION MODEL TRAINING LIFECYCLE (PRETRAINING → SFT → RLHF)</text>
+    <!-- Phase 1: Self-Supervised Pretraining -->
+    <rect x="35" y="36" width="610" height="52" rx="8" fill="rgba(30,58,138,0.85)" stroke="#60a5fa" stroke-width="1.8" />
+    <text x="340" y="55" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">PHASE 1: SELF-SUPERVISED PRETRAINING (BASE MODEL)</text>
+    <text x="340" y="73" text-anchor="middle" fill="#bae6fd" font-size="10">Trillions of web tokens (Common Crawl, GitHub) • Causal Next-Token Prediction: L = −∑ log P(wt | w&lt;t)</text>
+    <line x1="340" y1="88" x2="340" y2="100" stroke="#38bdf8" stroke-width="2" marker-end="url(#fm-arr)" />
+    <!-- Phase 2: Supervised Fine-Tuning (SFT) -->
+    <rect x="35" y="102" width="610" height="52" rx="8" fill="rgba(88,28,135,0.85)" stroke="#c084fc" stroke-width="1.8" />
+    <text x="340" y="121" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">PHASE 2: SUPERVISED FINE-TUNING (SFT — INSTRUCTION FOLLOWING)</text>
+    <text x="340" y="139" text-anchor="middle" fill="#e9d5ff" font-size="10">Curated human prompt-response pairs • Teaches conversational assistant format &amp; task execution</text>
+    <line x1="340" y1="154" x2="340" y2="166" stroke="#38bdf8" stroke-width="2" marker-end="url(#fm-arr)" />
+    <!-- Phase 3: RLHF / PPO / DPO -->
+    <rect x="35" y="168" width="610" height="52" rx="8" fill="rgba(6,78,59,0.9)" stroke="#34d399" stroke-width="2" />
+    <text x="340" y="187" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">PHASE 3: REINFORCEMENT LEARNING FROM HUMAN FEEDBACK (RLHF / PPO)</text>
+    <text x="340" y="205" text-anchor="middle" fill="#a7f3d0" font-size="10">Reward Model rφ(x,y) + KL-Divergence Penalty: max E[rφ(x,y) − β·DKL(πθ || πref)] → Helpful, Honest, Harmless</text>
+  </svg>
+</div>
 
 ---
 
